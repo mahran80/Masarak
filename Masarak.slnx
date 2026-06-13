@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Masarak.API/Masarak.API.csproj" />
+  <Project Path="Masarak.Application/Masarak.Application.csproj" />
+  <Project Path="Masarak.Domain/Masarak.Domain.csproj" />
+  <Project Path="Masarak.Infrastructure/Masarak.Infrastructure.csproj" />
+</Solution>

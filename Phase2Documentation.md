@@ -19,13 +19,10 @@
 
 ```
 Masarak.sln
-├── 1. Core/
-│   ├── Masarak.Domain/               # Entities (e.g., RefreshToken, User), Constants (AppRoles)
-│   └── Masarak.Application/          # Interfaces (IAuthService), DTOs
-├── 2. Infrastructure/
-│   └── Masarak.Infrastructure/       # Context, Migrations, Seeders, Services (AuthService, JwtService)
-└── 3. Presentation/
-    └── Masarak.API/                  # Controllers, Policies, Extensions, Program.cs
+├── Masarak.Domain/               # Entities (e.g., RefreshToken, User), Constants (AppRoles)
+├── Masarak.Application/          # Interfaces (IAuthService), DTOs
+├── Masarak.Infrastructure/       # Context, Migrations, Seeders, Services (AuthService, JwtService)
+└── Masarak.API/                  # Controllers, Policies, Extensions, Program.cs
 ```
 
 **Design approach**: Clean Architecture. The Domain is completely independent. The Application layer holds business contracts and DTOs. Infrastructure implements persistence (EF Core) and external concerns (Auth implementation). The Presentation (API) wires dependencies together and exposes endpoints.

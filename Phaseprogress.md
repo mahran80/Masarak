@@ -2,9 +2,9 @@
 
 ## 1. Current Architecture
 The project follows a **Clean Architecture** approach implemented in .NET 9, divided into three main layers:
-- **1. Core (Domain & Application):** Contains business entities, interfaces, constants (e.g., AppRoles), and DTOs. Completely independent of infrastructure.
-- **2. Infrastructure:** Implements Data Access using Entity Framework Core (EF Core), database context (`Context.cs`), migrations, seeders, and external services (e.g., `AuthService`, `JwtService`, `PasswordService`).
-- **3. Presentation:** The ASP.NET Core API layer containing controllers, routing, authorization policies, middleware, and dependency injection configurations.
+- **Core (Domain & Application):** Contains business entities, interfaces, constants (e.g., AppRoles), and DTOs. Completely independent of infrastructure.
+- **Infrastructure:** Implements Data Access using Entity Framework Core (EF Core), database context (`Context.cs`), migrations, seeders, and external services (e.g., `AuthService`, `JwtService`, `PasswordService`).
+- **Presentation:** The ASP.NET Core API layer containing controllers, routing, authorization policies, middleware, and dependency injection configurations.
 
 ## 2. Bounded Contexts & Business Modules
 The system is logically divided into the following bounded contexts/modules:
