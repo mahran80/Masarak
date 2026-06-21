@@ -50,7 +50,7 @@ namespace Masarak.Infrastructure.Services
                 }
             };
 
-            var service = new SessionService();
+            var service = new Stripe.Checkout.SessionService();
             var session = await service.CreateAsync(options, cancellationToken: ct);
 
             return (session.Url, session.Id);
@@ -76,7 +76,7 @@ namespace Masarak.Infrastructure.Services
 
             if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
             {
-                var session = stripeEvent.Data.Object as Session;
+                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
                 return (stripeEvent.Type, session?.Id, session?.PaymentIntentId);
             }
 

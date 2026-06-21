@@ -1,4 +1,5 @@
 using Masarak.Domain.Entities;
+using Masarak.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Masarak.Infrastructure.Persistence
@@ -199,7 +200,7 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 7. GRADE
+            // 7. GRADE  (Phase 2 Academic Core: Stage, NameAr, Order, IsActive)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Grade>(e =>
             {
@@ -207,12 +208,16 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasKey(x => x.GradeId);
                 e.Property(x => x.GradeId).ValueGeneratedOnAdd();
                 e.Property(x => x.Name).HasMaxLength(100).IsRequired();
+                e.Property(x => x.NameAr).HasMaxLength(100);
+                e.Property(x => x.Stage).HasConversion<string>().HasMaxLength(20);
+                e.Property(x => x.Order).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.HasIndex(x => x.Name).IsUnique().HasDatabaseName("UX_grades_Name");
-                e.Property(x => x.Level).IsRequired();
+                e.HasIndex(x => x.Order).IsUnique().HasDatabaseName("UX_grades_Order");
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 8. CLASS
+            // 8. CLASS  (Phase 2: MaxCapacity, AcademicYear, IsActive, Sessions)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Class>(e =>
             {
@@ -220,9 +225,11 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasKey(x => x.ClassId);
                 e.Property(x => x.ClassId).ValueGeneratedOnAdd();
                 e.Property(x => x.Name).HasMaxLength(100).IsRequired();
-                e.Property(x => x.Capacity).HasDefaultValue(30);
-                e.HasIndex(x => new { x.Name, x.GradeId })
-                 .IsUnique().HasDatabaseName("UX_classes_Name_GradeId");
+                e.Property(x => x.MaxCapacity).HasDefaultValue(30);
+                e.Property(x => x.AcademicYear).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.HasIndex(x => new { x.GradeId, x.Name, x.AcademicYear })
+                 .IsUnique().HasDatabaseName("UX_classes_Grade_Name_Year");
 
                 e.HasOne(x => x.Grade)
                  .WithMany(g => g.Classes)
@@ -231,14 +238,18 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 9. STUDENT_CLASS  (composite PK)
+            // 9. STUDENT_CLASS  (Phase 2: surrogate PK, AcademicYear int)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<StudentClass>(e =>
             {
-                e.ToTable("student_class");
-                e.HasKey(x => new { x.StudentId, x.ClassId, x.AcademicYear });
-                e.Property(x => x.AcademicYear).HasMaxLength(9).IsRequired();
-                e.Property(x => x.IsCurrent).HasDefaultValue(true);
+                e.ToTable("student_classes");
+                e.HasKey(x => x.StudentClassId);
+                e.Property(x => x.StudentClassId).ValueGeneratedOnAdd();
+                e.Property(x => x.AcademicYear).IsRequired();
+                e.Property(x => x.EnrolledAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.HasIndex(x => new { x.StudentId, x.AcademicYear })
+                 .IsUnique().HasDatabaseName("UX_student_classes_Student_Year");
 
                 e.HasOne(x => x.Student)
                  .WithMany(s => s.StudentClasses)
@@ -252,7 +263,7 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 10. SUBJECT
+            // 10. SUBJECT  (Phase 2: NameAr, IsActive)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Subject>(e =>
             {
@@ -260,7 +271,9 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasKey(x => x.SubjectId);
                 e.Property(x => x.SubjectId).ValueGeneratedOnAdd();
                 e.Property(x => x.Name).HasMaxLength(150).IsRequired();
+                e.Property(x => x.NameAr).HasMaxLength(150);
                 e.Property(x => x.Code).HasMaxLength(20).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.HasIndex(x => x.Code).IsUnique().HasDatabaseName("UX_subjects_Code");
                 e.Property(x => x.Description).HasColumnType("nvarchar(max)");
 
@@ -271,14 +284,15 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 11. TEACHING_ASSIGNMENTS
+            // 11. TEACHING_ASSIGNMENTS  (Phase 2: AcademicYear int, IsActive)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<TeachingAssignment>(e =>
             {
                 e.ToTable("teaching_assignments");
                 e.HasKey(x => x.AssignmentId);
                 e.Property(x => x.AssignmentId).ValueGeneratedOnAdd();
-                e.Property(x => x.AcademicYear).HasMaxLength(9).IsRequired();
+                e.Property(x => x.AcademicYear).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
                 e.HasIndex(x => new { x.TeacherId, x.SubjectId, x.ClassId, x.AcademicYear })
                  .IsUnique().HasDatabaseName("UX_teaching_assignments_unique");
@@ -300,7 +314,7 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 12. SESSIONS
+            // 12. SESSIONS  (Phase 2: ScheduledAt, DurationMinutes, ClassId FK, enum Status)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Session>(e =>
             {
@@ -308,15 +322,24 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasKey(x => x.SessionId);
                 e.Property(x => x.SessionId).ValueGeneratedOnAdd();
                 e.Property(x => x.Title).HasMaxLength(255).IsRequired();
-                e.Property(x => x.StartTime).IsRequired();
-                e.Property(x => x.EndTime).IsRequired();
-                e.Property(x => x.MeetingLink).HasMaxLength(500);
-                e.Property(x => x.RecordingUrl).HasMaxLength(500);
-                e.Property(x => x.Status).HasMaxLength(20).HasDefaultValue("Scheduled");
+                e.Property(x => x.Description).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ScheduledAt).IsRequired();
+                e.Property(x => x.DurationMinutes).IsRequired();
+                e.Property(x => x.EmbedUrl).HasMaxLength(500);
+                e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+                e.Ignore(x => x.EndsAt); // computed, not stored
+                e.HasIndex(x => new { x.ClassId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Class_ScheduledAt");
+                e.HasIndex(x => new { x.AssignmentId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Assignment_ScheduledAt");
 
                 e.HasOne(x => x.TeachingAssignment)
                  .WithMany(ta => ta.Sessions)
                  .HasForeignKey(x => x.AssignmentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Class)
+                 .WithMany(c => c.Sessions)
+                 .HasForeignKey(x => x.ClassId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 

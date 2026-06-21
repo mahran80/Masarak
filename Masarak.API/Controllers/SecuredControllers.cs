@@ -45,25 +45,13 @@ namespace Masarak.API.Controllers
         };
     }
 
-    // ─── Teacher Controller ───────────────────────────────────────────────────────
+    // ─── Teacher Controller (Phase 1 placeholders — academic endpoints moved to SessionTeacherController) ──
     [ApiController]
     [Route("api/teacher")]
     [Authorize(Policy = AppPolicies.TeacherOnly)]
     [Produces("application/json")]
     public class TeacherController : ControllerBase
     {
-        [HttpGet("classes")]
-        public IActionResult GetMyClasses() =>
-            Ok(new { message = "My classes — restricted to Teachers.", user = GetUserInfo() });
-
-        [HttpPost("sessions")]
-        public IActionResult CreateSession() =>
-            Ok(new { message = "Session created — Teacher access.", user = GetUserInfo() });
-
-        [HttpGet("assignments")]
-        public IActionResult GetAssignments() =>
-            Ok(new { message = "Assignments — Teacher access.", user = GetUserInfo() });
-
         // Admins and Teachers can both grade
         [HttpPost("grade/{submissionId}")]
         [Authorize(Policy = AppPolicies.AdminOrTeacher)]

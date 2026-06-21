@@ -1,5 +1,6 @@
 using Masarak.Domain.Constants;
 using Masarak.Domain.Entities;
+using Masarak.Domain.Enums;
 using Masarak.Application.Interfaces;
 using Masarak.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -39,14 +40,38 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             Console.WriteLine("[Seeder] Admin created: admin@masarak.com / Admin@12345!  ← CHANGE THIS");
         }
 
+        /// <summary>
+        /// Seeds 12 Egyptian school grades with Arabic/English names and stage classification.
+        /// Phase 2 Academic Core: replaces the simple Grade 1-12 seeder.
+        /// </summary>
         public static async Task SeedGradesAsync(Context db)
         {
             if (await db.Grades.AnyAsync()) return;
-            var grades = Enumerable.Range(1, 12)
-                .Select(i => new Grade { Name = $"Grade {i}", Level = i }).ToList();
+
+            var grades = new List<Grade>
+            {
+                // Primary (ابتدائي) — Grades 1-6
+                Grade.Create("Grade 1", "أولى ابتدائي",  GradeStage.Primary, 1),
+                Grade.Create("Grade 2", "ثانية ابتدائي", GradeStage.Primary, 2),
+                Grade.Create("Grade 3", "ثالثة ابتدائي", GradeStage.Primary, 3),
+                Grade.Create("Grade 4", "رابعة ابتدائي", GradeStage.Primary, 4),
+                Grade.Create("Grade 5", "خامسة ابتدائي", GradeStage.Primary, 5),
+                Grade.Create("Grade 6", "سادسة ابتدائي", GradeStage.Primary, 6),
+
+                // Preparatory (إعدادي) — Grades 7-9
+                Grade.Create("Grade 7", "أولى إعدادي",  GradeStage.Preparatory, 7),
+                Grade.Create("Grade 8", "ثانية إعدادي", GradeStage.Preparatory, 8),
+                Grade.Create("Grade 9", "ثالثة إعدادي", GradeStage.Preparatory, 9),
+
+                // Secondary (ثانوي) — Grades 10-12
+                Grade.Create("Grade 10", "أولى ثانوي",  GradeStage.Secondary, 10),
+                Grade.Create("Grade 11", "ثانية ثانوي", GradeStage.Secondary, 11),
+                Grade.Create("Grade 12", "ثالثة ثانوي", GradeStage.Secondary, 12),
+            };
+
             await db.Grades.AddRangeAsync(grades);
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] Grades 1-12 seeded.");
+            Console.WriteLine("[Seeder] 12 Egyptian school grades seeded (Primary/Preparatory/Secondary).");
         }
 
         public static async Task SeedPlansAsync(Context db)

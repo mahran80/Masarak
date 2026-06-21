@@ -4,20 +4,19 @@ namespace Masarak.Domain.Entities
     /// Assigns a Teacher to teach a Subject to a Class in a given AcademicYear.
     /// Unique constraint: (TeacherId, SubjectId, ClassId, AcademicYear).
     ///
-    /// Auth integration:
-    ///   Teacher JWT → db.TeachingAssignments.Where(ta => ta.Teacher.UserId == currentUserId)
-    ///   This is the primary authorization scope for all teacher-level data:
-    ///   Sessions, Assignments, Exams all hang off this entity.
-    ///
-    /// No structural changes from Phase 1.
+    /// Phase 2 Academic Core:
+    ///   • AcademicYear changed from string to int
+    ///   • Added IsActive flag
+    ///   • Factory method Create() for controlled instantiation
     /// </summary>
     public class TeachingAssignment
     {
         public int      AssignmentId { get; set; }
-        public int      TeacherId    { get; set; }   // FK → teachers.TeacherId
-        public int      SubjectId    { get; set; }   // FK → subjects.SubjectId
-        public int      ClassId      { get; set; }   // FK → classes.ClassId
-        public string   AcademicYear { get; set; } = null!;
+        public int      TeacherId    { get; set; }                 // FK → teachers.TeacherId
+        public int      SubjectId    { get; set; }                 // FK → subjects.SubjectId
+        public int      ClassId      { get; set; }                 // FK → classes.ClassId
+        public int      AcademicYear { get; set; }                 // e.g. 2026
+        public bool     IsActive     { get; set; } = true;
         public DateTime CreatedAt    { get; set; }
 
         // ── Navigation ──────────────────────────────────────────────────────
@@ -27,5 +26,19 @@ namespace Masarak.Domain.Entities
         public virtual ICollection<Session>    Sessions    { get; set; } = new List<Session>();
         public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
         public virtual ICollection<Exam>       Exams       { get; set; } = new List<Exam>();
+
+        // ── Factory ─────────────────────────────────────────────────────────
+        public static TeachingAssignment Create(int teacherId, int classId, int subjectId, int academicYear)
+        {
+            return new TeachingAssignment
+            {
+                TeacherId    = teacherId,
+                SubjectId    = subjectId,
+                ClassId      = classId,
+                AcademicYear = academicYear,
+                IsActive     = true,
+                CreatedAt    = DateTime.UtcNow
+            };
+        }
     }
 }

@@ -262,7 +262,7 @@ namespace Masarak.Infrastructure.Services
             switch (roleName)
             {
                 case AppRoles.Student:
-                    var grade = await _db.Grades.OrderBy(g => g.Level).FirstOrDefaultAsync();
+                    var grade = await _db.Grades.OrderBy(g => g.Order).FirstOrDefaultAsync();
                     if (grade != null)
                     {
                         await _db.Students.AddAsync(new Student

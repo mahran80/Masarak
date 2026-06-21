@@ -174,6 +174,18 @@ namespace Masarak.API.Extensions
             services.AddScoped<IStripeService, StripeService>();
             services.AddScoped<ISubscriptionAccessService, SubscriptionAccessService>();
             services.AddScoped<ISubscriptionService, SubscriptionService>();
+
+            // ── Phase 2 Academic Core ─────────────────────────────────────────
+            services.AddScoped<IGradeRepository, Masarak.Infrastructure.Persistence.Repositories.GradeRepository>();
+            services.AddScoped<IClassRepository, Masarak.Infrastructure.Persistence.Repositories.ClassRepository>();
+            services.AddScoped<ISubjectRepository, Masarak.Infrastructure.Persistence.Repositories.SubjectRepository>();
+            services.AddScoped<ITeachingAssignmentRepository, Masarak.Infrastructure.Persistence.Repositories.TeachingAssignmentRepository>();
+            services.AddScoped<IStudentClassRepository, Masarak.Infrastructure.Persistence.Repositories.StudentClassRepository>();
+            services.AddScoped<ISessionRepository, Masarak.Infrastructure.Persistence.Repositories.SessionRepository>();
+
+            services.AddSingleton<Masarak.Domain.Services.ScheduleConflictChecker>();
+            services.AddScoped<IAcademicService, AcademicService>();
+            services.AddScoped<ISessionService, SessionService>();
             
             return services;
         }
