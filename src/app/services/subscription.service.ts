@@ -7,6 +7,7 @@ import {
   InitiateCheckoutRequest, CheckoutResult,
   AdminActivateRequest, PagedResult, SubscriptionFilter
 } from '../models/subscription.models';
+import { UserInfoDto } from '../models/auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class SubscriptionApiService {
@@ -60,5 +61,12 @@ export class SubscriptionApiService {
   /** POST /api/subscriptions/admin/cancel/{id} */
   adminCancel(subscriptionId: number, reason: string): Observable<void> {
     return this.http.post<void>(`${this.base}/admin/cancel/${subscriptionId}`, { reason });
+  }
+
+  /** GET /api/admin/users?role= */
+  getUsers(role?: string): Observable<UserInfoDto[]> {
+    let params = new HttpParams();
+    if (role) params = params.set('role', role);
+    return this.http.get<UserInfoDto[]>(`${environment.apiBaseUrl}/admin/users`, { params });
   }
 }

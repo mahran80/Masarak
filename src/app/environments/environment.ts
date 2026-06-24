@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://localhost:49179/api',
+  apiBaseUrl: 'http://localhost:49180/api',
   stripeSuccessUrl: 'http://localhost:4200/checkout/success',
   stripeCancelUrl:  'http://localhost:4200/checkout/cancel',
 };

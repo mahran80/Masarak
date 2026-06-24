@@ -155,6 +155,27 @@ export const routes: Routes = [
               import('./features/academic/pages/admin/enrollment-management/enrollment-management.component')
                 .then(m => m.EnrollmentManagementComponent),
           },
+          {
+            path: 'assessment',
+            children: [
+              {
+                path: 'assignments',
+                loadComponent: () => import('./features/assessment/teacher/assignments-list/assignments-list.component').then(m => m.AssignmentsListComponent),
+              },
+              {
+                path: 'assignments/:id/submissions',
+                loadComponent: () => import('./features/assessment/teacher/assignment-submissions/assignment-submissions.component').then(m => m.AssignmentSubmissionsComponent),
+              },
+              {
+                path: 'exams',
+                loadComponent: () => import('./features/assessment/teacher/exams-list/exams-list.component').then(m => m.ExamsListComponent),
+              },
+              {
+                path: 'exams/:id/builder',
+                loadComponent: () => import('./features/assessment/teacher/exam-builder/exam-builder.component').then(m => m.ExamBuilderComponent),
+              }
+            ]
+          },
           { path: '', redirectTo: 'subscriptions', pathMatch: 'full' },
         ],
       },
@@ -182,6 +203,27 @@ export const routes: Routes = [
               import('./features/academic/pages/teacher/my-sessions/my-sessions.component')
                 .then(m => m.MySessionsComponent),
           },
+          {
+            path: 'assessment',
+            children: [
+              {
+                path: 'assignments',
+                loadComponent: () => import('./features/assessment/teacher/assignments-list/assignments-list.component').then(m => m.AssignmentsListComponent),
+              },
+              {
+                path: 'assignments/:id/submissions',
+                loadComponent: () => import('./features/assessment/teacher/assignment-submissions/assignment-submissions.component').then(m => m.AssignmentSubmissionsComponent),
+              },
+              {
+                path: 'exams',
+                loadComponent: () => import('./features/assessment/teacher/exams-list/exams-list.component').then(m => m.ExamsListComponent),
+              },
+              {
+                path: 'exams/:id/builder',
+                loadComponent: () => import('./features/assessment/teacher/exam-builder/exam-builder.component').then(m => m.ExamBuilderComponent),
+              }
+            ]
+          },
           { path: '', redirectTo: 'assignments', pathMatch: 'full' },
         ],
       },
@@ -202,6 +244,27 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/academic/pages/student/my-schedule/my-schedule.component')
                 .then(m => m.MyScheduleComponent),
+          },
+          {
+            path: 'assessment',
+            children: [
+              {
+                path: 'assignments',
+                loadComponent: () => import('./features/assessment/student/my-assignments/my-assignments.component').then(m => m.MyAssignmentsComponent),
+              },
+              {
+                path: 'exams',
+                loadComponent: () => import('./features/assessment/student/my-exams/my-exams.component').then(m => m.MyExamsComponent),
+              },
+              {
+                path: 'exams/take/:id',
+                loadComponent: () => import('./features/assessment/student/exam-taker/exam-taker.component').then(m => m.ExamTakerComponent),
+              },
+              {
+                path: 'exams/result/:id',
+                loadComponent: () => import('./features/assessment/student/exam-result/exam-result.component').then(m => m.ExamResultComponent),
+              }
+            ]
           },
           { path: '', redirectTo: 'my-class', pathMatch: 'full' },
         ],

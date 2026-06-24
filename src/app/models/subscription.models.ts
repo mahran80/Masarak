@@ -49,6 +49,7 @@ export interface CheckoutResult {
 
 export interface AdminActivateRequest {
   studentUserId: number;
+  userId?: number;
   planId: number;
   note?: string;
 }

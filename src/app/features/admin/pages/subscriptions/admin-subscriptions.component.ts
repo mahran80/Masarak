@@ -8,6 +8,7 @@ import {
   SubscriptionDto, PagedResult, SubscriptionStatus,
   PlanDto, AdminActivateRequest
 } from '../../../../models/subscription.models';
+import { UserInfoDto } from '../../../../models/auth.models';
 
 @Component({
   selector: 'app-admin-subscriptions',
@@ -144,23 +145,35 @@ import {
          (click)="closeActivateModal()">
       <div class="card p-8 max-w-md w-full shadow-modal" (click)="$event.stopPropagation()">
         <h2 class="text-xl font-bold text-surface-900 font-display mb-1">Activate Subscription</h2>
-        <p class="text-sm text-surface-500 mb-6">Manually activate a subscription for a student.</p>
+        <p class="text-sm text-surface-500 mb-6">Manually activate a subscription for a teacher or student.</p>
 
         <div *ngIf="activateError()" class="alert-error mb-4 text-sm">{{ activateError() }}</div>
         <div *ngIf="activateSuccess()" class="alert-success mb-4 text-sm">{{ activateSuccess() }}</div>
 
         <form [formGroup]="activateForm" (ngSubmit)="submitActivate()" novalidate class="space-y-4">
           <div>
-            <label class="form-label">Student User ID</label>
-            <input type="number" formControlName="studentUserId" placeholder="e.g. 42" class="form-input"/>
-            <span *ngIf="activateForm.get('studentUserId')?.invalid && activateSubmitted()" class="form-error">
-              Enter a valid student ID
+            <label class="form-label">User Role</label>
+            <select formControlName="userRole" class="form-select" (change)="onRoleChange($event)">
+              <option value="Student">Student</option>
+              <option value="Teacher">Teacher</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Select User</label>
+            <select formControlName="targetUserId" class="form-select">
+              <option [value]="null" disabled>Select user...</option>
+              <option *ngFor="let u of filteredUsers()" [value]="u.userId">
+                {{ u.fullName }} ({{ u.email }})
+              </option>
+            </select>
+            <span *ngIf="activateForm.get('targetUserId')?.invalid && activateSubmitted()" class="form-error">
+              Please select a user
             </span>
           </div>
           <div>
             <label class="form-label">Plan</label>
             <select formControlName="planId" class="form-select">
-              <option value="" disabled>Select a plan…</option>
+              <option [value]="null" disabled>Select a plan…</option>
               <option *ngFor="let p of plans()" [value]="p.planId">{{ p.name }}</option>
             </select>
             <span *ngIf="activateForm.get('planId')?.invalid && activateSubmitted()" class="form-error">
@@ -248,10 +261,18 @@ export class AdminSubscriptionsComponent implements OnInit {
   activateSuccess   = signal<string | null>(null);
   activateSubmitted = signal(false);
 
+  users             = signal<UserInfoDto[]>([]);
+  selectedRole      = signal<'Student' | 'Teacher'>('Student');
+  filteredUsers     = computed(() => {
+    const role = this.selectedRole();
+    return this.users().filter(u => u.role === role);
+  });
+
   activateForm = this.fb.group({
-    studentUserId: [null as number | null, []], // will validate on submit
-    planId:        [null as number | null, []],
-    note:          [''],
+    userRole:     ['Student'],
+    targetUserId: [null as number | null],
+    planId:       [null as number | null],
+    note:         [''],
   });
 
   // Cancel modal
@@ -264,6 +285,7 @@ export class AdminSubscriptionsComponent implements OnInit {
   ngOnInit(): void {
     this.load();
     this.loadPlans();
+    this.loadUsers();
   }
 
   load(): void {
@@ -284,6 +306,19 @@ export class AdminSubscriptionsComponent implements OnInit {
 
   loadPlans(): void {
     this.subApi.getPlans().subscribe({ next: p => this.plans.set(p) });
+  }
+
+  loadUsers(): void {
+    this.subApi.getUsers().subscribe({
+      next: u => this.users.set(u),
+      error: () => {}
+    });
+  }
+
+  onRoleChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value as 'Student' | 'Teacher';
+    this.selectedRole.set(val);
+    this.activateForm.patchValue({ targetUserId: null });
   }
 
   onStatusFilter(event: Event): void {
@@ -313,11 +348,18 @@ export class AdminSubscriptionsComponent implements OnInit {
 
   // ── Activate ──────────────────────────────────────────────────────────────────
   openActivateModal(): void {
-    this.activateForm.reset();
+    this.activateForm.reset({
+      userRole: 'Student',
+      targetUserId: null,
+      planId: null,
+      note: ''
+    });
+    this.selectedRole.set('Student');
     this.activateError.set(null);
     this.activateSuccess.set(null);
     this.activateSubmitted.set(false);
     this.showActivateModal.set(true);
+    this.loadUsers();
   }
 
   closeActivateModal(): void {
@@ -327,11 +369,23 @@ export class AdminSubscriptionsComponent implements OnInit {
   submitActivate(): void {
     this.activateSubmitted.set(true);
     this.activateError.set(null);
-    const { studentUserId, planId, note } = this.activateForm.value;
-    if (!studentUserId || !planId) return;
+    const targetUserId = this.activateForm.get('targetUserId')?.value;
+    const planId = this.activateForm.get('planId')?.value;
+    const note = this.activateForm.get('note')?.value;
+
+    if (!targetUserId || !planId) {
+      if (!targetUserId) this.activateForm.get('targetUserId')?.setErrors({ required: true });
+      if (!planId) this.activateForm.get('planId')?.setErrors({ required: true });
+      return;
+    }
 
     this.activating.set(true);
-    const req: AdminActivateRequest = { studentUserId, planId, note: note || undefined };
+    const req: AdminActivateRequest = { 
+      studentUserId: targetUserId,
+      userId: targetUserId,
+      planId, 
+      note: note || undefined 
+    };
     this.subApi.adminActivate(req).subscribe({
       next: () => {
         this.activating.set(false);

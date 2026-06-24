@@ -154,6 +154,16 @@ import { SubscriptionStatusResponse } from '../../models/subscription.models';
               </svg>
               My Sessions
             </a>
+            <a *ngIf="auth.isTeacher()" routerLink="/teacher/assessment/assignments"
+               class="flex items-center gap-2 text-sm text-surface-700 hover:text-brand-600
+                      hover:bg-brand-50 px-3 py-2 rounded-lg transition-colors">
+              📝 Manage Assignments
+            </a>
+            <a *ngIf="auth.isTeacher()" routerLink="/teacher/assessment/exams"
+               class="flex items-center gap-2 text-sm text-surface-700 hover:text-brand-600
+                      hover:bg-brand-50 px-3 py-2 rounded-lg transition-colors">
+              🏆 Manage Exams
+            </a>
 
             <!-- Phase 2: Student Links -->
             <a *ngIf="auth.isStudent()" routerLink="/student/my-class"
@@ -171,6 +181,16 @@ import { SubscriptionStatusResponse } from '../../models/subscription.models';
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
               My Schedule
+            </a>
+            <a *ngIf="auth.isStudent()" routerLink="/student/assessment/assignments"
+               class="flex items-center gap-2 text-sm text-surface-700 hover:text-brand-600
+                      hover:bg-brand-50 px-3 py-2 rounded-lg transition-colors">
+              📝 My Assignments
+            </a>
+            <a *ngIf="auth.isStudent()" routerLink="/student/assessment/exams"
+               class="flex items-center gap-2 text-sm text-surface-700 hover:text-brand-600
+                      hover:bg-brand-50 px-3 py-2 rounded-lg transition-colors">
+              🏆 My Exams
             </a>
             <a routerLink="/plans"
                class="flex items-center gap-2 text-sm text-surface-700 hover:text-brand-600
