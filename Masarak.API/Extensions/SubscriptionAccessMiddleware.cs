@@ -69,6 +69,14 @@ namespace Masarak.API.Extensions
                 return;
             }
 
+            // Teachers access their endpoints to teach, grade and manage classes.
+            // They do not need a subscription.
+            if (role == AppRoles.Teacher)
+            {
+                await _next(context);
+                return;
+            }
+
             var userIdClaim = context.User.FindFirstValue("userid")
                               ?? context.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
                               ?? context.User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -99,3 +99,5 @@ app.UseAuthorization();
 app.UseMiddleware<Masarak.API.Extensions.SubscriptionAccessMiddleware>();
 app.MapControllers();
 app.Run();
+
+public partial class Program { }

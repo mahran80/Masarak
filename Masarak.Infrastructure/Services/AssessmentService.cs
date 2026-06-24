@@ -54,8 +54,9 @@ namespace Masarak.Infrastructure.Services
         // ── Helper ──────────────────────────────────────────────────────────
         private async Task ValidateTeacherOwnsTeachingAssignmentAsync(int teacherUserId, int teachingAssignmentId)
         {
-            var ta = await _teachingAssignmentRepo.GetByIdAsync(teachingAssignmentId);
-            if (ta == null || ta.Teacher.UserId != teacherUserId)
+            var ta = await _teachingAssignmentRepo.GetByIdWithDetailsAsync(teachingAssignmentId);
+            if (ta == null) throw new KeyNotFoundException("Teaching assignment not found.");
+            if (ta.Teacher.UserId != teacherUserId)
                 throw new UnauthorizedAccessException("You do not have access to this teaching assignment.");
         }
 
@@ -63,7 +64,10 @@ namespace Masarak.Infrastructure.Services
         {
             var assignment = await _assignmentRepo.GetByIdAsync(assignmentId);
             if (assignment == null) throw new KeyNotFoundException("Assignment not found.");
-            if (assignment.TeachingAssignment.Teacher.UserId != teacherUserId)
+            
+            // To safely check teacher, we need the TeachingAssignment loaded. Let's make sure it's loaded.
+            var ta = await _teachingAssignmentRepo.GetByIdWithDetailsAsync(assignment.AssignmentRef);
+            if (ta == null || ta.Teacher.UserId != teacherUserId)
                 throw new UnauthorizedAccessException("You do not have access to this assignment.");
         }
 
@@ -71,7 +75,9 @@ namespace Masarak.Infrastructure.Services
         {
             var exam = await _examRepo.GetByIdWithQuestionsAsync(examId);
             if (exam == null) throw new KeyNotFoundException("Exam not found.");
-            if (exam.TeachingAssignment.Teacher.UserId != teacherUserId)
+            
+            var ta = await _teachingAssignmentRepo.GetByIdWithDetailsAsync(exam.AssignmentId);
+            if (ta == null || ta.Teacher.UserId != teacherUserId)
                 throw new UnauthorizedAccessException("You do not have access to this exam.");
         }
 
