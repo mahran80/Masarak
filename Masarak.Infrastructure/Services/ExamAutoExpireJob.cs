@@ -37,8 +37,8 @@ namespace Masarak.Infrastructure.Services
                     _logger.LogError(ex, "Error occurred executing ExamAutoExpireJob.");
                 }
 
-                // Wait 1 minute before next sweep
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                // Wait 5 minutes before next sweep (spec requirement)
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
 
             _logger.LogInformation("ExamAutoExpireJob is stopping.");

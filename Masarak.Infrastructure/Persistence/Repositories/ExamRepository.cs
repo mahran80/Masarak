@@ -17,6 +17,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
         {
             return await _context.Exams
                 .Include(e => e.TeachingAssignment)
+                    .ThenInclude(ta => ta.Teacher)
                 .Include(e => e.Questions)
                     .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(e => e.ExamId == examId, ct);

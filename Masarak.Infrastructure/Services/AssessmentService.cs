@@ -529,6 +529,7 @@ namespace Masarak.Infrastructure.Services
             else
             {
                 attempt.HasPendingManualGrading = true;
+                attempt.Status = StudentExamStatus.Submitted;
             }
 
             await _studentExamRepo.UpdateAsync(attempt, ct);

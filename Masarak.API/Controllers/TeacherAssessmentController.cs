@@ -114,5 +114,47 @@ namespace Masarak.API.Controllers
             var dto = await _assessmentService.AddQuestionToExamAsync(GetUserId(), examId, request, ct);
             return Created("", dto);
         }
+
+        [HttpPut("exams/{examId}/questions/{questionId}")]
+        [ProducesResponseType(typeof(QuestionDto), 200)]
+        public async Task<IActionResult> UpdateQuestion(int examId, int questionId, [FromBody] UpdateQuestionRequest request, CancellationToken ct)
+        {
+            var dto = await _assessmentService.UpdateQuestionAsync(GetUserId(), questionId, request, ct);
+            return Ok(dto);
+        }
+
+        [HttpDelete("exams/{examId}/questions/{questionId}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> DeleteQuestion(int examId, int questionId, CancellationToken ct)
+        {
+            await _assessmentService.RemoveQuestionAsync(GetUserId(), questionId, ct);
+            return NoContent();
+        }
+
+        // ── Grading Dashboard ──────────────────────────────────────────────────
+
+        [HttpGet("grading/pending")]
+        [ProducesResponseType(typeof(PendingGradingDashboardDto), 200)]
+        public async Task<IActionResult> GetPendingGrading(CancellationToken ct)
+        {
+            var dto = await _assessmentService.GetPendingGradingDashboardAsync(GetUserId(), ct);
+            return Ok(dto);
+        }
+
+        [HttpGet("grading/student-exams/{studentExamId}")]
+        [ProducesResponseType(typeof(ExamGradingReviewDto), 200)]
+        public async Task<IActionResult> GetStudentAnswersForReview(int studentExamId, CancellationToken ct)
+        {
+            var dto = await _assessmentService.GetStudentAnswersForReviewAsync(GetUserId(), studentExamId, ct);
+            return Ok(dto);
+        }
+
+        [HttpPost("grading/answers/{answerId}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> GradeStudentAnswer(int answerId, [FromBody] GradeStudentAnswerRequest request, CancellationToken ct)
+        {
+            await _assessmentService.GradeStudentAnswerAsync(GetUserId(), answerId, request, ct);
+            return NoContent();
+        }
     }
 }

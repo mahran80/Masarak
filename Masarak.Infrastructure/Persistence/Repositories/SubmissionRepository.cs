@@ -31,6 +31,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
         {
             return await _context.Submissions
                 .Include(s => s.Student)
+                    .ThenInclude(st => st.User)
                 .Where(s => s.AssignmentId == assignmentId)
                 .OrderByDescending(s => s.SubmittedAt)
                 .ToListAsync(ct);

@@ -51,7 +51,7 @@ namespace Masarak.Domain.Entities
         public void MarkSubmitted()
         {
             SubmittedAt = DateTime.UtcNow;
-            // Status will be set by grading logic (Submitted or Graded)
+            Status = StudentExamStatus.Submitted;
         }
 
         public void ApplyAutoGrading(decimal autoScore)

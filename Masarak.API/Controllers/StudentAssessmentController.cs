@@ -102,5 +102,15 @@ namespace Masarak.API.Controllers
             var dto = await _assessmentService.GetStudentExamResultAsync(GetUserId(), studentExamId, ct);
             return Ok(dto);
         }
+
+        // ── Performance ────────────────────────────────────────────────────────
+
+        [HttpGet("performance")]
+        [ProducesResponseType(typeof(IEnumerable<SubjectPerformanceDto>), 200)]
+        public async Task<IActionResult> GetMyPerformance([FromQuery] string academicYear, CancellationToken ct)
+        {
+            var dtos = await _assessmentService.GetStudentPerformanceAsync(GetUserId(), academicYear, ct);
+            return Ok(dtos);
+        }
     }
 }
