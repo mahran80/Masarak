@@ -50,6 +50,11 @@ namespace Masarak.Infrastructure.Persistence
         // ── Phase 1 additions ─────────────────────────────────────────────────
         public DbSet<ParentStudentLink> ParentStudentLinks { get; set; }
 
+        // ── Phase 4 DbSets ← NEW ──────────────────────────────────────────────
+        public DbSet<ContentItem> ContentItems { get; set; }
+        public DbSet<ChatRoom>    ChatRooms    { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+
         // ── Constructors ──────────────────────────────────────────────────────
         /// <summary>For ASP.NET Core dependency injection.</summary>
         public Context(DbContextOptions<Context> options) : base(options) { }
@@ -63,7 +68,7 @@ namespace Masarak.Infrastructure.Persistence
             {
                 // Fallback for EF tooling — real connection string comes from DI/appsettings
                 optionsBuilder.UseSqlServer(
-                     @"Data Source=.;Initial Catalog=EduPlatform;Integrated Security=True;TrustServerCertificate=True");
+                     @"Data Source=.\\SQLEXPRESS;Initial Catalog=EduPlatform;Integrated Security=True;TrustServerCertificate=True");
             }
         }
 
@@ -344,15 +349,17 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 13. ATTENDANCE
+            // 13. ATTENDANCE  (Phase 4: enum Status, StudentUserId→User, TeacherNote, RecordedAt)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Attendance>(e =>
             {
                 e.ToTable("attendance");
                 e.HasKey(x => x.AttendanceId);
                 e.Property(x => x.AttendanceId).ValueGeneratedOnAdd();
-                e.Property(x => x.Status).HasMaxLength(20).HasDefaultValue("Present").IsRequired();
-                e.HasIndex(x => new { x.SessionId, x.StudentId })
+                e.Property(x => x.Status).HasConversion<string>().HasMaxLength(10).IsRequired();
+                e.Property(x => x.TeacherNote).HasMaxLength(500);
+                e.Property(x => x.RecordedAt).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(x => new { x.SessionId, x.StudentUserId })
                  .IsUnique().HasDatabaseName("UX_attendance_Session_Student");
 
                 e.HasOne(x => x.Session)
@@ -361,8 +368,8 @@ namespace Masarak.Infrastructure.Persistence
                  .OnDelete(DeleteBehavior.Restrict);
 
                 e.HasOne(x => x.Student)
-                 .WithMany(s => s.Attendances)
-                 .HasForeignKey(x => x.StudentId)
+                 .WithMany()
+                 .HasForeignKey(x => x.StudentUserId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -750,6 +757,84 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasOne(x => x.User)
                  .WithMany(u => u.RefreshTokens)
                  .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 27. CONTENT_ITEMS  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ContentItem>(e =>
+            {
+                e.ToTable("content_items");
+                e.HasKey(x => x.ContentItemId);
+                e.Property(x => x.ContentItemId).ValueGeneratedOnAdd();
+                e.Property(x => x.Type).HasConversion<string>().HasMaxLength(20).IsRequired();
+                e.Property(x => x.SourceType).HasConversion<string>().HasMaxLength(20).IsRequired();
+                e.Property(x => x.Title).HasMaxLength(255).IsRequired();
+                e.Property(x => x.Description).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ResourceUrl).HasMaxLength(2000).IsRequired();
+                e.Property(x => x.BlobName).HasMaxLength(500);
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(x => new { x.TeachingAssignmentId, x.Type, x.IsActive })
+                 .HasDatabaseName("IX_content_items_TA_Type_Active");
+
+                e.HasOne(x => x.TeachingAssignment)
+                 .WithMany()
+                 .HasForeignKey(x => x.TeachingAssignmentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Session)
+                 .WithMany()
+                 .HasForeignKey(x => x.SessionId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 28. CHAT_ROOMS  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ChatRoom>(e =>
+            {
+                e.ToTable("chat_rooms");
+                e.HasKey(x => x.ChatRoomId);
+                e.Property(x => x.ChatRoomId).ValueGeneratedOnAdd();
+                e.Property(x => x.Name).HasMaxLength(150).IsRequired();
+                e.Property(x => x.RoomType).HasConversion<string>().HasMaxLength(30).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.HasIndex(x => x.GradeId)
+                 .IsUnique()
+                 .HasFilter("[GradeId] IS NOT NULL")
+                 .HasDatabaseName("UX_chat_rooms_GradeId");
+
+                e.HasOne(x => x.Grade)
+                 .WithMany()
+                 .HasForeignKey(x => x.GradeId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 29. CHAT_MESSAGES  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ChatMessage>(e =>
+            {
+                e.ToTable("chat_messages");
+                e.HasKey(x => x.ChatMessageId);
+                e.Property(x => x.ChatMessageId).ValueGeneratedOnAdd();
+                e.Property(x => x.Content).HasMaxLength(1000).IsRequired();
+                e.Property(x => x.SentAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.IsDeleted).HasDefaultValue(false);
+                e.HasIndex(x => new { x.ChatRoomId, x.SentAt })
+                 .HasDatabaseName("IX_chat_messages_Room_SentAt");
+                e.HasQueryFilter(m => !m.IsDeleted);
+
+                e.HasOne(x => x.ChatRoom)
+                 .WithMany(r => r.Messages)
+                 .HasForeignKey(x => x.ChatRoomId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Sender)
+                 .WithMany()
+                 .HasForeignKey(x => x.SenderUserId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
         }

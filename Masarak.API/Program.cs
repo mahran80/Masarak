@@ -26,6 +26,18 @@ builder.Services.AddApplicationServices(builder.Configuration);
 
 // ── Background Jobs ──
 builder.Services.AddHostedService<Masarak.Infrastructure.Services.ExamAutoExpireJob>();
+builder.Services.AddHostedService<Masarak.Infrastructure.Services.AbsentMarkingBackgroundJob>();
+
+// ── SignalR (Phase 4: ChatHub) ────────────────────────────────────────────────
+var redisConn = builder.Configuration.GetConnectionString("Redis");
+var signalRBuilder = builder.Services.AddSignalR();
+if (!string.IsNullOrEmpty(redisConn))
+{
+    signalRBuilder.AddStackExchangeRedis(redisConn, options =>
+    {
+        options.Configuration.ChannelPrefix = new StackExchange.Redis.RedisChannel("MasarakSignalR", StackExchange.Redis.RedisChannel.PatternMode.Literal);
+    });
+}
 
 // ── MassTransit ──
 builder.Services.AddMassTransit(x =>
@@ -79,6 +91,7 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedGradesAsync(db);  // needed for student self-registration
     await DatabaseSeeder.SeedAdminUserAsync(db, pwd);
     await DatabaseSeeder.SeedPlansAsync(db);   // Phase 1 plans
+    await DatabaseSeeder.SeedChatRoomsAsync(db); // Phase 4 chat rooms
 }
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
@@ -98,6 +111,7 @@ app.UseAuthentication();   // ← must come before UseAuthorization
 app.UseAuthorization();
 app.UseMiddleware<Masarak.API.Extensions.SubscriptionAccessMiddleware>();
 app.MapControllers();
+app.MapHub<Masarak.API.Hubs.ChatHub>("/hubs/chat"); // Phase 4: SignalR ChatHub
 app.Run();
 
 public partial class Program { }

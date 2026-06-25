@@ -53,6 +53,18 @@ namespace Masarak.API.Extensions
                             if (context.Exception is SecurityTokenExpiredException)
                                 context.Response.Headers.Append("Token-Expired", "true");
                             return Task.CompletedTask;
+                        },
+                        // Phase 4: Forward JWT from query string for SignalR hub auth
+                        // (WebSockets can't send Authorization headers)
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
                         }
                     };
                 });
@@ -196,7 +208,20 @@ namespace Masarak.API.Extensions
             
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
-            
+
+            // ── Phase 4 Attendance, Content & Chat ────────────────────────────
+            services.AddScoped<IAttendanceRepository, Masarak.Infrastructure.Persistence.Repositories.AttendanceRepository>();
+            services.AddScoped<IContentItemRepository, Masarak.Infrastructure.Persistence.Repositories.ContentItemRepository>();
+            services.AddScoped<IChatRoomRepository, Masarak.Infrastructure.Persistence.Repositories.ChatRoomRepository>();
+            services.AddScoped<IChatMessageRepository, Masarak.Infrastructure.Persistence.Repositories.ChatMessageRepository>();
+
+            services.AddSingleton<Masarak.Domain.Services.AttendanceWindowChecker>();
+            services.AddSingleton<Masarak.Domain.Services.ChatRoomAccessPolicy>();
+
+            services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IContentService, ContentService>();
+            services.AddScoped<IChatService, ChatService>();
+
             return services;
         }
     }

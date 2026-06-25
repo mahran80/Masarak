@@ -113,5 +113,28 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] Default subscription plans seeded.");
         }
+
+        /// <summary>
+        /// Phase 4: Seeds one GradeCommunity chat room per grade and one TeachersCommunity room.
+        /// Idempotent — only creates if not exists.
+        /// </summary>
+        public static async Task SeedChatRoomsAsync(Context db)
+        {
+            if (await db.ChatRooms.AnyAsync()) return;
+
+            var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
+            var rooms = new List<Domain.Entities.ChatRoom>();
+
+            foreach (var grade in grades)
+            {
+                rooms.Add(Domain.Entities.ChatRoom.CreateGradeCommunity(grade.GradeId, $"{grade.Name} Community"));
+            }
+
+            rooms.Add(Domain.Entities.ChatRoom.CreateTeachersCommunity());
+
+            await db.ChatRooms.AddRangeAsync(rooms);
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] {rooms.Count} chat rooms seeded ({grades.Count} grade rooms + 1 teachers room).");
+        }
     }
 }

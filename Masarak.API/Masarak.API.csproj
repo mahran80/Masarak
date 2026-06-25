@@ -30,6 +30,9 @@
 
     <!-- Swagger / OpenAPI -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+
+    <!-- Phase 4: SignalR Redis backplane -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
