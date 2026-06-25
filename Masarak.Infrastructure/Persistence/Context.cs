@@ -68,7 +68,7 @@ namespace Masarak.Infrastructure.Persistence
             {
                 // Fallback for EF tooling — real connection string comes from DI/appsettings
                 optionsBuilder.UseSqlServer(
-                     @"Data Source=.\\SQLEXPRESS;Initial Catalog=EduPlatform;Integrated Security=True;TrustServerCertificate=True");
+                     @"Data Source=.;Initial Catalog=EduPlatform;Integrated Security=True;TrustServerCertificate=True");
             }
         }
 
