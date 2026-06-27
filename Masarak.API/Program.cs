@@ -45,6 +45,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<Masarak.Infrastructure.Messaging.ExamGradedConsumer>();
     x.AddConsumer<Masarak.Infrastructure.Messaging.AssignmentGradedConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.PerformanceRecalculatedAiConsumer>(); // Phase 5
 
     x.UsingInMemory((context, cfg) =>
     {
@@ -105,6 +106,7 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedAdminUserAsync(db, pwd);
     await DatabaseSeeder.SeedPlansAsync(db);   // Phase 1 plans
     await DatabaseSeeder.SeedChatRoomsAsync(db); // Phase 4 chat rooms
+    await DatabaseSeeder.SeedAiPromptTemplatesAsync(db); // Phase 5 AI prompt templates
 }
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
