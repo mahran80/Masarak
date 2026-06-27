@@ -336,6 +336,7 @@ namespace Masarak.Infrastructure.Persistence
                 e.Ignore(x => x.EndsAt); // computed, not stored
                 e.HasIndex(x => new { x.ClassId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Class_ScheduledAt");
                 e.HasIndex(x => new { x.AssignmentId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Assignment_ScheduledAt");
+                e.HasIndex(x => new { x.Status, x.ScheduledAt }).HasDatabaseName("IX_sessions_Status_ScheduledAt");
 
                 e.HasOne(x => x.TeachingAssignment)
                  .WithMany(ta => ta.Sessions)

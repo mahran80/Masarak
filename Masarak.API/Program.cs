@@ -6,6 +6,7 @@ using Masarak.Application.Interfaces;
 using Masarak.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +79,18 @@ builder.Services.AddCors(options =>
                        .Get<string[]>() ?? ["http://localhost:3000"])
               .AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
 
+// ── Rate Limiting ─────────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FileUploadPolicy", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 5; // Max 5 uploads per minute
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 2;
+    });
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
@@ -107,6 +120,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseRateLimiter();
 app.UseAuthentication();   // ← must come before UseAuthorization
 app.UseAuthorization();
 app.UseMiddleware<Masarak.API.Extensions.SubscriptionAccessMiddleware>();

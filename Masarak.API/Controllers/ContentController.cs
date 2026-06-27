@@ -5,6 +5,7 @@ using Masarak.Application.Interfaces;
 using Masarak.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Masarak.API.Controllers
 {
@@ -50,6 +51,7 @@ namespace Masarak.API.Controllers
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(ContentItemDto), 201)]
         [RequestSizeLimit(500 * 1024 * 1024)] // 500 MB max
+        [EnableRateLimiting("FileUploadPolicy")]
         public async Task<IActionResult> UploadContentFile(
             IFormFile file,
             [FromForm] int teachingAssignmentId,

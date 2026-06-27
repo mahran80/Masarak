@@ -1,0 +1,737 @@
+{
+  "info": {
+    "name": "Masarak_Phase4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Masarak Phase 4 - Attendance, Content Library & Live Session Infrastructure"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:49179",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "{{studentToken}}",
+      "type": "string"
+    },
+    {
+      "key": "teacherToken",
+      "value": "{{teacherToken}}",
+      "type": "string"
+    },
+    {
+      "key": "parentToken",
+      "value": "{{parentToken}}",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "{{adminToken}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication (Setup)",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.token) { pm.environment.set(\"adminToken\", jsonData.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"admin@masarak.com\",\"password\":\"Password123!\"}"
+            }
+          }
+        },
+        {
+          "name": "Login Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.token) { pm.environment.set(\"teacherToken\", jsonData.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"teacher@masarak.com\",\"password\":\"Password123!\"}"
+            }
+          }
+        },
+        {
+          "name": "Login Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.token) { pm.environment.set(\"studentToken\", jsonData.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"student@masarak.com\",\"password\":\"Password123!\"}"
+            }
+          }
+        },
+        {
+          "name": "Login Parent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.token) { pm.environment.set(\"parentToken\", jsonData.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"parent@masarak.com\",\"password\":\"Password123!\"}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Attendance",
+      "item": [
+        {
+          "name": "Student Joins Live Session (Success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/student/sessions/{{sessionId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "sessions",
+                "{{sessionId}}",
+                "join"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 201', function() {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Joins Live Session (Outside Window - 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/student/sessions/{{expiredSessionId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "sessions",
+                "{{expiredSessionId}}",
+                "join"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409 Conflict', function() {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Teacher Session Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/sessions/{{sessionId}}/attendance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "sessions",
+                "{{sessionId}}",
+                "attendance"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.records && jsonData.records.length > 0) {",
+                  "    pm.environment.set('attendanceId', jsonData.records[0].attendanceId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Override Attendance Status (Teacher)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/attendance/{{attendanceId}}/override",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "attendance",
+                "{{attendanceId}}",
+                "override"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"newStatus\":\"Excused\",\"note\":\"Student was sick\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "pm.test('Status is Excused', function() { pm.expect(pm.response.json().status).to.eql('Excused'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Student Attendance Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/student/attendance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "attendance"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Parent Child Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{parentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/parent/children/{{studentId}}/attendance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parent",
+                "children",
+                "{{studentId}}",
+                "attendance"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Content Library",
+      "item": [
+        {
+          "name": "Upload URL Content (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/content/url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "content",
+                "url"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"teachingAssignmentId\":1,\"sessionId\":null,\"type\":\"Video\",\"sourceType\":\"YouTubeUrl\",\"title\":\"Intro to Math\",\"description\":\"A cool intro video\",\"url\":\"https://youtube.com/watch?v=dQw4w9WgXcQ\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function() { pm.response.to.have.status(201); });",
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.contentItemId) { pm.environment.set('contentItemId', jsonData.contentItemId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Content Download URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/content/{{contentItemId}}/download-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "content",
+                "{{contentItemId}}",
+                "download-url"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Teacher Content List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/content/{{teachingAssignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "content",
+                "{{teachingAssignmentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Student Subject Content List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/student/content/{{subjectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "content",
+                "{{subjectId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Content Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/content/{{contentItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "content",
+                "{{contentItemId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function() { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Chat REST",
+      "item": [
+        {
+          "name": "Get Chat Rooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "rooms"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.length > 0) { pm.environment.set('chatRoomId', jsonData[0].chatRoomId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Chat Room Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/rooms/{{chatRoomId}}/messages?page=1&pageSize=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "rooms",
+                "{{chatRoomId}}",
+                "messages"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() { pm.response.to.have.status(200); });",
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.items && jsonData.items.length > 0) { pm.environment.set('chatMessageId', jsonData.items[0].messageId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Chat Message (Admin or Sender)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/messages/{{chatMessageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "messages",
+                "{{chatMessageId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204 or 404', function() { pm.expect(pm.response.code).to.be.oneOf([204, 404]); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
