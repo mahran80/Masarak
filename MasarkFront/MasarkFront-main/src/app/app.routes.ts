@@ -12,6 +12,9 @@ import { guestGuard } from './core/guards/guest-guard-guard';
 import { AcademicManagementComponent } from './features/admin/components/academic-management/academic-management';
 import { AdminPerformanceComponent } from './features/admin/components/admin-performance/admin-performance';
 import { TeachersDirectoryComponent } from './features/academic/pages/admin/teachers-list/teachers-list.component';
+import { SystemHealthComponent } from './features/admin/components/system-health/system-health.component';
+import { AdminContentComponent } from './features/admin/components/content-moderation/content.component';
+import { AdminSubscriptionsComponent } from './features/admin/components/subscriptions/subscriptions.component';
 // import { AuthGuard, AdminGuard, TeacherGuard, StudentGuard, SubscriptionGuard } from '../core/guards';
 
 export const routes: Routes = [
@@ -88,6 +91,9 @@ export const routes: Routes = [
           { path: 'teachers', component: TeachersDirectoryComponent },
           { path: 'academic', component: AcademicManagementComponent },
           { path: 'performance', component: AdminPerformanceComponent },
+          { path: 'system-health', component: SystemHealthComponent },
+          { path: 'content-moderation', component: AdminContentComponent },
+          { path: 'subscriptions', component: AdminSubscriptionsComponent },
         ],
       }, // محتوى المدير
     ],

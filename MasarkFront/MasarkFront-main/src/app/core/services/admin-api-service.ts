@@ -10,6 +10,23 @@ export interface AdminUserDto {
   role: string;
   isActive: boolean;
   createdAt: string;
+  hasActiveSubscription?: boolean;
+}
+
+export interface AdminUserDetailDto extends AdminUserDto {
+  examsTaken: number;
+  assignmentsSubmitted: number;
+  attendancePercentage: number;
+}
+
+export interface SystemHealthDto {
+  totalUsers: number;
+  activeUsers: number;
+  totalNotifications: number;
+  activeSubscriptions: number;
+  totalContentItems: number;
+  totalSessions: number;
+  recentErrors: string[];
 }
 
 export interface AdminUsersPagedResult {
@@ -65,5 +82,37 @@ export class AdminApiService {
   getClassReport(classId: number, subjectId: number, academicYear: string): Observable<any> {
     let params = new HttpParams().set('academicYear', academicYear);
     return this.http.get<any>(`${this.base}/performance/classes/${classId}/subjects/${subjectId}`, { params });
+  }
+
+  // --- Phase 6 Endpoints ---
+
+  /** GET /api/admin/users/{id} */
+  getUserDetails(userId: number): Observable<AdminUserDetailDto> {
+    return this.http.get<AdminUserDetailDto>(`${this.base}/users/${userId}`);
+  }
+
+  /** PUT /api/admin/users/{id}/deactivate */
+  deactivateUser(userId: number, reason: string): Observable<void> {
+    return this.http.put<void>(`${this.base}/users/${userId}/deactivate`, { reason });
+  }
+
+  /** PUT /api/admin/users/{id}/activate */
+  activateUser(userId: number): Observable<void> {
+    return this.http.put<void>(`${this.base}/users/${userId}/activate`, {});
+  }
+
+  /** POST /api/admin/users/{id}/reset-password */
+  resetUserPassword(userId: number): Observable<{ password?: string, message?: string }> {
+    return this.http.post<{ password?: string, message?: string }>(`${this.base}/users/${userId}/reset-password`, {});
+  }
+
+  /** PUT /api/admin/content/{id}/moderate */
+  moderateContentItem(contentId: number, reason: string): Observable<void> {
+    return this.http.put<void>(`${this.base}/content/${contentId}/moderate`, { reason });
+  }
+
+  /** GET /api/admin/system/health */
+  getSystemHealth(): Observable<SystemHealthDto> {
+    return this.http.get<SystemHealthDto>(`${this.base}/system/health`);
   }
 }

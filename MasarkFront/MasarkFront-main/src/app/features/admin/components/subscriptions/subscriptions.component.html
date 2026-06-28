@@ -1,0 +1,67 @@
+<div class="subs">
+  <div class="subs__breadcrumb">
+    <span>الرئيسية</span>
+    <app-icon name="chevron-left" [size]="13"></app-icon>
+    <span>لوحة التحكم</span>
+    <app-icon name="chevron-left" [size]="13"></app-icon>
+    <span class="subs__breadcrumb-current">الاشتراكات والمدفوعات</span>
+  </div>
+
+  <h1 class="subs__title">إدارة الاشتراكات والمدفوعات</h1>
+
+  <div class="subs__kpis">
+    <div class="card subs__kpi">
+      <div>
+        <span class="subs__kpi-label">عدد الاشتراكات النشطة</span>
+        <span class="subs__kpi-value">{{ activeCount }}</span>
+      </div>
+      <span class="subs__kpi-icon subs__kpi-icon--blue"><app-icon name="users" [size]="22"></app-icon></span>
+    </div>
+    <div class="card subs__kpi">
+      <div>
+        <span class="subs__kpi-label">إجمالي الإيرادات هذا الشهر</span>
+        <span class="subs__kpi-value subs__kpi-value--green">
+          <app-icon name="trend-up" [size]="16"></app-icon> {{ monthlyRevenue | number }} ر.س
+        </span>
+      </div>
+      <span class="subs__kpi-icon subs__kpi-icon--green"><app-icon name="wallet" [size]="22"></app-icon></span>
+    </div>
+  </div>
+
+  <div class="card subs__card">
+    <div class="subs__toolbar">
+      <h3>سجل المدفوعات</h3>
+      <div class="subs__search">
+        <app-icon name="search" [size]="16"></app-icon>
+        <input type="text" placeholder="البحث" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)">
+      </div>
+      <span class="subs__filter"><app-icon name="filter" [size]="14"></app-icon> الفلاتر</span>
+    </div>
+
+    <div class="subs__table-head">
+      <span>إجراءات</span>
+      <span>حالة الدفع</span>
+      <span>المبلغ</span>
+      <span>خطة الاشتراك</span>
+      <span class="subs__col-name">اسم الطالب</span>
+    </div>
+
+    <div class="subs-row" *ngFor="let r of filteredRecords()">
+      <span class="subs-row__actions"><app-icon name="dots" [size]="16"></app-icon></span>
+      <span class="subs-row__status" [class.subs-row__status--pending]="r.status === 'معلق'">{{ r.status }}</span>
+      <span class="subs-row__amount">{{ r.amount }} ر.س</span>
+      <span class="subs-row__plan">{{ r.plan }}</span>
+      <span class="subs-row__name">{{ r.studentName }}</span>
+    </div>
+
+    <div *ngIf="filteredRecords().length === 0" class="subs__empty">
+      لا توجد نتائج مطابقة لعملية البحث.
+    </div>
+
+    <div class="subs__pagination">
+      <button type="button"><app-icon name="chevron-right" [size]="14"></app-icon></button>
+      <span>الصفحة {{ currentPage() }} من {{ totalPages }}</span>
+      <button type="button"><app-icon name="chevron-left" [size]="14"></app-icon></button>
+    </div>
+  </div>
+</div>

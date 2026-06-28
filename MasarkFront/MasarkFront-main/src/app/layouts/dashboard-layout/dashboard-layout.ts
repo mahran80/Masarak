@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthApiService } from '../../core/services/auth-api-service';
 import { AuthStateService } from '../../core/services/auth-state-service';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent],
   templateUrl: './dashboard-layout.html',
 })
 export class DashboardLayoutComponent implements OnInit {

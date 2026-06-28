@@ -120,6 +120,30 @@
           >
             <span>📊</span> تقارير الأداء
           </a>
+
+          <a
+            routerLink="admin/system-health"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>💻</span> حالة النظام
+          </a>
+
+          <a
+            routerLink="admin/content-moderation"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>🛡️</span> إدارة المحتوى
+          </a>
+
+          <a
+            routerLink="admin/subscriptions"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>🎫</span> إدارة الاشتراكات
+          </a>
         }
       </nav>
     </div>
@@ -147,6 +171,7 @@
       </div>
 
       <div class="flex items-center gap-4">
+        <app-notification-bell></app-notification-bell>
         <div class="text-left md:text-right">
           <h4 class="font-bold text-slate-800">{{ userName()?.fullName ?? 'User' }}</h4>
           <p class="text-xs text-slate-500">{{ userRoleDisplay()?.role ?? 'User' }}</p>

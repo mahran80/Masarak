@@ -135,6 +135,12 @@
               <div class="action-btns">
                 <button class="btn-edit" (click)="openEditModal(user)">تعديل</button>
                 <button class="btn-delete" (click)="deleteUser(user)">حذف</button>
+                <button class="btn-edit" *ngIf="user.source === 'api'" (click)="toggleUserStatus(user)">
+                  {{ user.status === 'Active' ? 'تعطيل' : 'تفعيل' }}
+                </button>
+                <button class="btn-edit" *ngIf="user.source === 'api'" (click)="resetPassword(user)">
+                  إعادة تعيين المرور
+                </button>
                 <button
                   *ngIf="user.subscription && user.subscription.status === 'Active'"
                   class="btn-cancel"

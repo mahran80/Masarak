@@ -343,6 +343,52 @@ export class UserManagement implements OnInit {
     }
   }
 
+  toggleUserStatus(user: AdminUser): void {
+    if (user.source !== 'api') {
+      this.setFeedback('يمكن تغيير حالة المستخدمين المسجلين عبر الخادم فقط.', 'error');
+      return;
+    }
+    
+    if (user.status === 'Active') {
+      const reason = prompt('يرجى إدخال سبب التعطيل:');
+      if (!reason) return;
+      this.adminApi.deactivateUser(user.id, reason).subscribe({
+        next: () => {
+          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Inactive' } : u));
+          this.setFeedback(`تم تعطيل المستخدم ${user.name}`);
+        },
+        error: () => this.setFeedback('تعذر تعطيل المستخدم.', 'error')
+      });
+    } else {
+      this.adminApi.activateUser(user.id).subscribe({
+        next: () => {
+          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Active' } : u));
+          this.setFeedback(`تم تفعيل المستخدم ${user.name}`);
+        },
+        error: () => this.setFeedback('تعذر تفعيل المستخدم.', 'error')
+      });
+    }
+  }
+
+  resetPassword(user: AdminUser): void {
+    if (user.source !== 'api') {
+      this.setFeedback('يمكن إعادة تعيين كلمة المرور للمستخدمين المسجلين عبر الخادم فقط.', 'error');
+      return;
+    }
+    if (!confirm(`هل أنت متأكد من إعادة تعيين كلمة المرور للمستخدم "${user.name}"؟`)) return;
+    
+    this.adminApi.resetUserPassword(user.id).subscribe({
+      next: (res) => {
+        if (res.password) {
+          alert(`تمت إعادة تعيين كلمة المرور بنجاح.\nكلمة المرور الجديدة: ${res.password}`);
+        } else {
+          this.setFeedback('تم إرسال رابط إعادة التعيين إلى بريد المستخدم.');
+        }
+      },
+      error: () => this.setFeedback('تعذر إعادة تعيين كلمة المرور.', 'error')
+    });
+  }
+
   cancelSubscription(userId: number, subscriptionId: number): void {
     if (!confirm('هل أنت متأكد من إلغاء هذا الاشتراك؟')) return;
     this.subApi.adminCancel(subscriptionId, 'إلغاء من لوحة الإدارة').subscribe({

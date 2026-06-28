@@ -1,0 +1,13 @@
+<div class="notif-bell-wrapper">
+  <button type="button" class="notif-bell" (click)="togglePanel()">
+    <app-icon name="bell" [size]="20"></app-icon>
+    <span class="notif-bell__badge" *ngIf="notificationService.unreadCount() > 0">
+      {{ notificationService.unreadCount() > 9 ? '9+' : notificationService.unreadCount() }}
+    </span>
+  </button>
+
+  <app-notification-panel
+    *ngIf="isOpen()"
+    (close)="closePanel()">
+  </app-notification-panel>
+</div>

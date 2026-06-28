@@ -1,0 +1,35 @@
+<div class="notif-backdrop" (click)="onBackdropClick()"></div>
+
+<div class="notif-panel">
+  <div class="notif-panel__header">
+    <h4>الإشعارات</h4>
+    <button type="button" class="notif-panel__mark-all" (click)="onMarkAllRead()">
+      تحديد الكل كمقروء
+    </button>
+  </div>
+
+  <div class="notif-panel__list">
+    <div
+      class="notif-item"
+      *ngFor="let n of notificationService.notifications()"
+      [class.notif-item--unread]="!n.isRead"
+      (click)="onMarkRead(n.notificationId)">
+
+      <span class="notif-item__icon">
+        <app-icon [name]="iconFor(n.type)" [size]="16"></app-icon>
+      </span>
+
+      <div class="notif-item__body">
+        <h6>{{ n.title }}</h6>
+        <p>{{ n.body }}</p>
+        <span class="notif-item__time">{{ notificationService.timeAgo(n.createdAt) }}</span>
+      </div>
+
+      <span class="notif-item__dot" *ngIf="!n.isRead"></span>
+    </div>
+
+    <div *ngIf="notificationService.notifications().length === 0" class="notif-panel__empty">
+      لا توجد إشعارات حاليًا.
+    </div>
+  </div>
+</div>

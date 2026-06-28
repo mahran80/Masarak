@@ -1,0 +1,75 @@
+<div class="sys-health">
+  <div class="sys-health__breadcrumb">
+    <span>الرئيسية</span>
+    <app-icon name="chevron-left" [size]="13"></app-icon>
+    <span class="sys-health__breadcrumb-current">حالة النظام</span>
+  </div>
+
+  <h1 class="sys-health__title">مراقبة حالة النظام</h1>
+  <p class="sys-health__subtitle">نظرة عامة على أداء المنصة والخدمات المرتبطة بها</p>
+
+  <!-- KPI Cards -->
+  <div class="sys-health__kpis">
+    <div class="card sys-kpi" *ngFor="let m of metrics()">
+      <span class="sys-kpi__icon" [class]="'sys-kpi__icon--' + m.color">
+        <app-icon [name]="m.icon" [size]="22"></app-icon>
+      </span>
+      <div class="sys-kpi__body">
+        <span class="sys-kpi__label">{{ m.label }}</span>
+        <span class="sys-kpi__value">{{ m.value }}</span>
+        <span class="sys-kpi__status" [class]="'sys-kpi__status--' + m.statusColor">
+          <span class="status-dot"></span>{{ m.statusLabel }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sys-health__grid">
+    <!-- Queue & Jobs -->
+    <div class="card sys-health__card">
+      <h3 class="sys-health__card-title">حالة الطابور والمهام (RabbitMQ / Background Jobs)</h3>
+
+      <div class="sys-row">
+        <span class="sys-row__label">عمق الطابور الحالي</span>
+        <span class="sys-row__value">{{ queueDepth() }} رسالة</span>
+      </div>
+
+      <div class="sys-row">
+        <span class="sys-row__label">اتصالات SignalR النشطة</span>
+        <span class="sys-row__value">{{ signalRConnections() }} اتصال</span>
+      </div>
+
+      <div class="sys-health__jobs-title">المهام النشطة حاليًا</div>
+
+      <div class="sys-job-row" *ngFor="let job of activeJobs()">
+        <span class="sys-job-row__name">{{ job.name }}</span>
+        <span class="sys-job-row__status" [class]="'sys-job-row__status--' + job.statusColor">
+          {{ job.statusLabel }}
+        </span>
+      </div>
+
+      <div *ngIf="activeJobs().length === 0" class="sys-health__empty">
+        لا توجد مهام نشطة حاليًا.
+      </div>
+    </div>
+
+    <!-- Recent Errors -->
+    <div class="card sys-health__card">
+      <h3 class="sys-health__card-title">آخر الأخطاء المسجلة</h3>
+
+      <div class="sys-error-row" *ngFor="let err of recentErrors()">
+        <span class="sys-error-row__icon">
+          <app-icon name="alert-triangle" [size]="16"></app-icon>
+        </span>
+        <div class="sys-error-row__body">
+          <span class="sys-error-row__message">{{ err.message }}</span>
+          <span class="sys-error-row__time">{{ err.time }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="recentErrors().length === 0" class="sys-health__empty">
+        لا توجد أخطاء مسجلة. النظام يعمل بشكل سليم ✅
+      </div>
+    </div>
+  </div>
+</div>

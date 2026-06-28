@@ -1,0 +1,42 @@
+<div class="admin-content">
+  <h1 class="admin-content__title">مدير محتوى المنصة</h1>
+  <div class="admin-content__breadcrumb">
+    <span>الرئيسية</span>
+    <app-icon name="chevron-left" [size]="13"></app-icon>
+    <span class="admin-content__breadcrumb-current">مكتبة المحتوى</span>
+  </div>
+
+  <div class="card admin-content__card">
+    <h3 class="admin-content__card-title">إدارة مكتبة المحتوى</h3>
+
+    <div class="admin-content__table-head">
+      <span>الإجراءات</span>
+      <span>عدد الدروس</span>
+      <span>المعلم</span>
+      <span>المستوى الدراسي</span>
+      <span class="admin-content__col-name">اسم المادة</span>
+    </div>
+
+    <div class="admin-content-row" *ngFor="let s of subjects()">
+      <span class="admin-content-row__actions">
+        <app-button variant="navy" size="sm" icon="archive" (clicked)="archive(s.id)">أرشفة</app-button>
+        <app-button variant="danger" size="sm" icon="trash" (clicked)="remove(s.id)">تعطيل</app-button>
+      </span>
+      <span class="admin-content-row__count">{{ s.lessonsCount }}</span>
+      <span class="admin-content-row__teacher">{{ s.teacherName }}</span>
+      <span class="admin-content-row__grade">{{ s.gradeLabel }}</span>
+      <span class="admin-content-row__name">{{ s.name }}</span>
+    </div>
+
+    <div class="admin-content__pagination">
+      <button type="button"><app-icon name="chevron-right" [size]="14"></app-icon></button>
+      <span>...</span>
+      <button type="button" class="admin-content__page-active">1</button>
+      <button type="button"><app-icon name="chevron-left" [size]="14"></app-icon></button>
+      <span class="admin-content__pagination-label">من 11 صفحة</span>
+    </div>
+  </div>
+</div>
+<div *ngIf="subjects().length === 0" class="admin-content__empty">
+  لا يوجد محتوى حالياً.
+</div>
