@@ -50,6 +50,16 @@ namespace Masarak.Infrastructure.Persistence
         // ── Phase 1 additions ─────────────────────────────────────────────────
         public DbSet<ParentStudentLink> ParentStudentLinks { get; set; }
 
+        // ── Phase 4 DbSets ← NEW ──────────────────────────────────────────────
+        public DbSet<ContentItem> ContentItems { get; set; }
+        public DbSet<ChatRoom>    ChatRooms    { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+
+        // ── Phase 5 DbSets ← NEW ──────────────────────────────────────────────
+        public DbSet<PerformanceAlert>           PerformanceAlerts  { get; set; }
+        public DbSet<AiPromptTemplate>           AiPromptTemplates  { get; set; }
+        public DbSet<AnalyticsDashboardSnapshot> AnalyticsSnapshots { get; set; }
+
         // ── Constructors ──────────────────────────────────────────────────────
         /// <summary>For ASP.NET Core dependency injection.</summary>
         public Context(DbContextOptions<Context> options) : base(options) { }
@@ -331,6 +341,7 @@ namespace Masarak.Infrastructure.Persistence
                 e.Ignore(x => x.EndsAt); // computed, not stored
                 e.HasIndex(x => new { x.ClassId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Class_ScheduledAt");
                 e.HasIndex(x => new { x.AssignmentId, x.ScheduledAt }).HasDatabaseName("IX_sessions_Assignment_ScheduledAt");
+                e.HasIndex(x => new { x.Status, x.ScheduledAt }).HasDatabaseName("IX_sessions_Status_ScheduledAt");
 
                 e.HasOne(x => x.TeachingAssignment)
                  .WithMany(ta => ta.Sessions)
@@ -344,15 +355,17 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 13. ATTENDANCE
+            // 13. ATTENDANCE  (Phase 4: enum Status, StudentUserId→User, TeacherNote, RecordedAt)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Attendance>(e =>
             {
                 e.ToTable("attendance");
                 e.HasKey(x => x.AttendanceId);
                 e.Property(x => x.AttendanceId).ValueGeneratedOnAdd();
-                e.Property(x => x.Status).HasMaxLength(20).HasDefaultValue("Present").IsRequired();
-                e.HasIndex(x => new { x.SessionId, x.StudentId })
+                e.Property(x => x.Status).HasConversion<string>().HasMaxLength(10).IsRequired();
+                e.Property(x => x.TeacherNote).HasMaxLength(500);
+                e.Property(x => x.RecordedAt).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(x => new { x.SessionId, x.StudentUserId })
                  .IsUnique().HasDatabaseName("UX_attendance_Session_Student");
 
                 e.HasOne(x => x.Session)
@@ -361,8 +374,8 @@ namespace Masarak.Infrastructure.Persistence
                  .OnDelete(DeleteBehavior.Restrict);
 
                 e.HasOne(x => x.Student)
-                 .WithMany(s => s.Attendances)
-                 .HasForeignKey(x => x.StudentId)
+                 .WithMany()
+                 .HasForeignKey(x => x.StudentUserId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -574,29 +587,94 @@ namespace Masarak.Infrastructure.Persistence
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 21. AI_RECOMMENDATIONS
+            // 21. AI_RECOMMENDATIONS  (Phase 5 refactored)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<AiRecommendation>(e =>
             {
                 e.ToTable("ai_recommendations");
-                e.HasKey(x => x.RecommendationId);
-                e.Property(x => x.RecommendationId).ValueGeneratedOnAdd();
+                e.HasKey(x => x.AiRecommendationId);
+                e.Property(x => x.AiRecommendationId).ValueGeneratedOnAdd();
+                e.Property(x => x.Type).HasConversion<string>().HasMaxLength(30);
+                e.Property(x => x.Payload).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ProviderUsed).HasMaxLength(50);
                 e.Property(x => x.GeneratedAt).HasDefaultValueSql("GETDATE()");
-                e.Property(x => x.RecType).HasMaxLength(50).IsRequired();
-                e.Property(x => x.ReferenceType).HasMaxLength(50);
-                e.Property(x => x.Reason).HasColumnType("nvarchar(max)").IsRequired();
-                e.Property(x => x.ActionUrl).HasMaxLength(500);
-                e.Property(x => x.IsRead).HasDefaultValue(false);
-                e.Property(x => x.IsDismissed).HasDefaultValue(false);
+                e.Property(x => x.ExpiresAt).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.HasIndex(x => new { x.StudentUserId, x.SubjectId, x.Type, x.IsActive });
 
                 e.HasOne(x => x.Student)
-                 .WithMany(s => s.AiRecommendations)
-                 .HasForeignKey(x => x.StudentId)
+                 .WithMany()
+                 .HasForeignKey(x => x.StudentUserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Subject)
+                 .WithMany()
+                 .HasForeignKey(x => x.SubjectId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
             // ═══════════════════════════════════════════════════════════════════
-            // 22. NOTIFICATIONS
+            // 30. PERFORMANCE_ALERTS  ← Phase 5 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<PerformanceAlert>(e =>
+            {
+                e.ToTable("performance_alerts");
+                e.HasKey(x => x.PerformanceAlertId);
+                e.Property(x => x.PerformanceAlertId).ValueGeneratedOnAdd();
+                e.Property(x => x.AlertType).HasConversion<string>().HasMaxLength(30);
+                e.Property(x => x.Message).HasMaxLength(500).IsRequired();
+                e.Property(x => x.TriggerValue).HasColumnType("decimal(5,2)");
+                e.Property(x => x.Threshold).HasColumnType("decimal(5,2)");
+                e.Property(x => x.IsResolved).HasDefaultValue(false);
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(x => new { x.StudentUserId, x.SubjectId, x.AlertType, x.IsResolved });
+
+                e.HasOne(x => x.Student)
+                 .WithMany()
+                 .HasForeignKey(x => x.StudentUserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Subject)
+                 .WithMany()
+                 .HasForeignKey(x => x.SubjectId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 31. AI_PROMPT_TEMPLATES  ← Phase 5 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<AiPromptTemplate>(e =>
+            {
+                e.ToTable("ai_prompt_templates");
+                e.HasKey(x => x.AiPromptTemplateId);
+                e.Property(x => x.AiPromptTemplateId).ValueGeneratedOnAdd();
+                e.Property(x => x.Key).HasMaxLength(50).IsRequired();
+                e.HasIndex(x => x.Key).IsUnique();
+                e.Property(x => x.SystemPrompt).HasColumnType("nvarchar(max)").IsRequired();
+                e.Property(x => x.UserPromptTemplate).HasColumnType("nvarchar(max)").IsRequired();
+                e.Property(x => x.MaxTokens).IsRequired();
+                e.Property(x => x.Temperature).HasColumnType("decimal(3,2)");
+                e.Property(x => x.UpdatedAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.UpdatedBy).HasMaxLength(100).IsRequired();
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 32. ANALYTICS_SNAPSHOTS  ← Phase 5 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<AnalyticsDashboardSnapshot>(e =>
+            {
+                e.ToTable("analytics_snapshots");
+                e.HasKey(x => x.SnapshotId);
+                e.Property(x => x.SnapshotId).ValueGeneratedOnAdd();
+                e.Property(x => x.Scope).HasConversion<string>().HasMaxLength(20);
+                e.Property(x => x.DataJson).HasColumnType("nvarchar(max)");
+                e.Property(x => x.GeneratedAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.ExpiresAt).IsRequired();
+                e.HasIndex(x => new { x.Scope, x.ScopeEntityId }).IsUnique();
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 22. NOTIFICATIONS  (Phase 6: refactored with Type enum, Channel, ActionUrl, indexes)
             // ═══════════════════════════════════════════════════════════════════
             modelBuilder.Entity<Notification>(e =>
             {
@@ -605,10 +683,18 @@ namespace Masarak.Infrastructure.Persistence
                 e.Property(x => x.NotificationId).ValueGeneratedOnAdd();
                 e.Property(x => x.Title).HasMaxLength(255).IsRequired();
                 e.Property(x => x.Body).HasColumnType("nvarchar(max)").IsRequired();
-                e.Property(x => x.NotifType).HasMaxLength(50).IsRequired();
-                e.Property(x => x.ReferenceType).HasMaxLength(50);
+                e.Property(x => x.Type).HasConversion<string>().HasMaxLength(40).IsRequired();
+                e.Property(x => x.Channel).HasConversion<string>().HasMaxLength(10).IsRequired();
+                e.Property(x => x.ActionUrl).HasMaxLength(500);
                 e.Property(x => x.IsRead).HasDefaultValue(false);
-                e.Property(x => x.SentAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                // Phase 6: Optimized indexes for inbox and unread count queries
+                e.HasIndex(x => new { x.UserId, x.IsRead, x.CreatedAt })
+                 .HasDatabaseName("IX_notifications_UserId_IsRead_CreatedAt");
+                e.HasIndex(x => new { x.UserId, x.IsRead })
+                 .HasFilter("[IsRead] = 0")
+                 .HasDatabaseName("IX_notifications_UserId_Unread");
 
                 e.HasOne(x => x.User)
                  .WithMany(u => u.Notifications)
@@ -750,6 +836,84 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasOne(x => x.User)
                  .WithMany(u => u.RefreshTokens)
                  .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 27. CONTENT_ITEMS  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ContentItem>(e =>
+            {
+                e.ToTable("content_items");
+                e.HasKey(x => x.ContentItemId);
+                e.Property(x => x.ContentItemId).ValueGeneratedOnAdd();
+                e.Property(x => x.Type).HasConversion<string>().HasMaxLength(20).IsRequired();
+                e.Property(x => x.SourceType).HasConversion<string>().HasMaxLength(20).IsRequired();
+                e.Property(x => x.Title).HasMaxLength(255).IsRequired();
+                e.Property(x => x.Description).HasColumnType("nvarchar(max)");
+                e.Property(x => x.ResourceUrl).HasMaxLength(2000).IsRequired();
+                e.Property(x => x.BlobName).HasMaxLength(500);
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(x => new { x.TeachingAssignmentId, x.Type, x.IsActive })
+                 .HasDatabaseName("IX_content_items_TA_Type_Active");
+
+                e.HasOne(x => x.TeachingAssignment)
+                 .WithMany()
+                 .HasForeignKey(x => x.TeachingAssignmentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Session)
+                 .WithMany()
+                 .HasForeignKey(x => x.SessionId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 28. CHAT_ROOMS  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ChatRoom>(e =>
+            {
+                e.ToTable("chat_rooms");
+                e.HasKey(x => x.ChatRoomId);
+                e.Property(x => x.ChatRoomId).ValueGeneratedOnAdd();
+                e.Property(x => x.Name).HasMaxLength(150).IsRequired();
+                e.Property(x => x.RoomType).HasConversion<string>().HasMaxLength(30).IsRequired();
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.HasIndex(x => x.GradeId)
+                 .IsUnique()
+                 .HasFilter("[GradeId] IS NOT NULL")
+                 .HasDatabaseName("UX_chat_rooms_GradeId");
+
+                e.HasOne(x => x.Grade)
+                 .WithMany()
+                 .HasForeignKey(x => x.GradeId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 29. CHAT_MESSAGES  ← Phase 4 NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<ChatMessage>(e =>
+            {
+                e.ToTable("chat_messages");
+                e.HasKey(x => x.ChatMessageId);
+                e.Property(x => x.ChatMessageId).ValueGeneratedOnAdd();
+                e.Property(x => x.Content).HasMaxLength(1000).IsRequired();
+                e.Property(x => x.SentAt).HasDefaultValueSql("GETDATE()");
+                e.Property(x => x.IsDeleted).HasDefaultValue(false);
+                e.HasIndex(x => new { x.ChatRoomId, x.SentAt })
+                 .HasDatabaseName("IX_chat_messages_Room_SentAt");
+                e.HasQueryFilter(m => !m.IsDeleted);
+
+                e.HasOne(x => x.ChatRoom)
+                 .WithMany(r => r.Messages)
+                 .HasForeignKey(x => x.ChatRoomId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Sender)
+                 .WithMany()
+                 .HasForeignKey(x => x.SenderUserId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
         }

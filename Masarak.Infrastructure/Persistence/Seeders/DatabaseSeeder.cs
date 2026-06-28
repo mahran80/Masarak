@@ -113,5 +113,75 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] Default subscription plans seeded.");
         }
+
+        /// <summary>
+        /// Phase 4: Seeds one GradeCommunity chat room per grade and one TeachersCommunity room.
+        /// Idempotent — only creates if not exists.
+        /// </summary>
+        public static async Task SeedChatRoomsAsync(Context db)
+        {
+            if (await db.ChatRooms.AnyAsync()) return;
+
+            var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
+            var rooms = new List<Domain.Entities.ChatRoom>();
+
+            foreach (var grade in grades)
+            {
+                rooms.Add(Domain.Entities.ChatRoom.CreateGradeCommunity(grade.GradeId, $"{grade.Name} Community"));
+            }
+
+            rooms.Add(Domain.Entities.ChatRoom.CreateTeachersCommunity());
+
+            await db.ChatRooms.AddRangeAsync(rooms);
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] {rooms.Count} chat rooms seeded ({grades.Count} grade rooms + 1 teachers room).");
+        }
+
+        /// <summary>
+        /// Phase 5: Seeds default AI prompt templates for weakness analysis, parent reports, and teaching suggestions.
+        /// Idempotent — only creates if not exists.
+        /// </summary>
+        public static async Task SeedAiPromptTemplatesAsync(Context db)
+        {
+            if (await db.AiPromptTemplates.AnyAsync()) return;
+
+            var templates = new List<AiPromptTemplate>
+            {
+                new AiPromptTemplate
+                {
+                    Key = "weakness_analysis",
+                    SystemPrompt = "You are an educational analyst for Egyptian K-12 curriculum. Analyze student performance data and identify specific topic weaknesses. Respond only in JSON.",
+                    UserPromptTemplate = "Student: {student_name}, Subject: {subject_name}, Grade: {grade_name}. Exam results: {exam_results_json}. Assignment results: {assignment_results_json}. Identify top 3 weak topics, provide error rate per topic (0-1), and 2 specific recommended actions per topic in {language}. Return JSON matching schema: {schema}.",
+                    MaxTokens = 1000,
+                    Temperature = 0.3m,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = "system"
+                },
+                new AiPromptTemplate
+                {
+                    Key = "parent_report",
+                    SystemPrompt = "You are a student academic advisor writing a monthly report for an Egyptian parent. Be encouraging, clear, and specific. Write in {language}.",
+                    UserPromptTemplate = "Student: {student_name}, Report month: {month}. Performance data: {performance_json}. Attendance: {attendance_json}. Write a 200-word narrative summary and 3 specific recommended actions for the parent.",
+                    MaxTokens = 800,
+                    Temperature = 0.7m,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = "system"
+                },
+                new AiPromptTemplate
+                {
+                    Key = "teaching_suggestion",
+                    SystemPrompt = "You are a curriculum expert for Egyptian K-12 education. Provide concise, actionable teaching suggestions.",
+                    UserPromptTemplate = "Teacher subject: {subject_name}, Grade: {grade_name}, Student weak topics: {weak_topics_json}. Provide one targeted teaching suggestion and 3 specific action items.",
+                    MaxTokens = 500,
+                    Temperature = 0.5m,
+                    UpdatedAt = DateTime.UtcNow,
+                    UpdatedBy = "system"
+                }
+            };
+
+            await db.AiPromptTemplates.AddRangeAsync(templates);
+            await db.SaveChangesAsync();
+            Console.WriteLine("[Seeder] 3 AI prompt templates seeded (weakness_analysis, parent_report, teaching_suggestion).");
+        }
     }
 }

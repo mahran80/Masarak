@@ -10,6 +10,19 @@ namespace Masarak.Domain.Events
     /// <summary>Raised when a parent is successfully linked to a student.</summary>
     public record ParentStudentLinkedEvent(int ParentUserId, int StudentUserId);
 
+    /// <summary>Raised when a subscription is about to expire (e.g. 7 days before).</summary>
+    public record SubscriptionExpiringEvent(int UserId, int SubscriptionId, int DaysRemaining);
+
+    /// <summary>Raised when a payment fails for a subscription.</summary>
+    public record PaymentFailedEvent(int UserId, int SubscriptionId, string Reason);
+
+    // ── Phase 2 Events ──────────────────────────────────────────────────
+    /// <summary>Raised when a session is scheduled for a class.</summary>
+    public record SessionScheduledEvent(int SessionId, int ClassId, string Title, DateTime ScheduledAt);
+
+    /// <summary>Raised when a student is enrolled in a class.</summary>
+    public record StudentEnrolledEvent(int StudentUserId, int ClassId, int TeacherUserId);
+
     // ── Phase 3 Events ──────────────────────────────────────────────────
     /// <summary>Raised when a student submits an exam (or exam auto-expires).</summary>
     public record ExamSubmittedEvent(int StudentExamId, int StudentUserId, int ExamId);
@@ -22,5 +35,12 @@ namespace Masarak.Domain.Events
 
     /// <summary>Raised after performance metrics are recalculated.</summary>
     public record PerformanceRecalculatedEvent(int StudentUserId, int SubjectId, int ClassId);
+
+    // ── Phase 5 Events ──────────────────────────────────────────────────
+    /// <summary>Raised when a performance alert is created for a student (consumed by Phase 6 Notifications).</summary>
+    public record AlertCreatedEvent(int StudentUserId, int? SubjectId, Enums.AlertType AlertType, string Message);
+
+    /// <summary>Raised when a parent report has been generated and is ready to view.</summary>
+    public record ParentReportReadyEvent(int StudentUserId, string ReportMonth);
 }
 

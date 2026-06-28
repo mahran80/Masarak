@@ -22,57 +22,141 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Masarak.Domain.Entities.AiRecommendation", b =>
+            modelBuilder.Entity("Masarak.Domain.Entities.AiPromptTemplate", b =>
                 {
-                    b.Property<int>("RecommendationId")
+                    b.Property<int>("AiPromptTemplateId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecommendationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AiPromptTemplateId"));
 
-                    b.Property<string>("ActionUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("MaxTokens")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SystemPrompt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Temperature")
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserPromptTemplate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AiPromptTemplateId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("ai_prompt_templates", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.AiRecommendation", b =>
+                {
+                    b.Property<int>("AiRecommendationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AiRecommendationId"));
+
+                    b.Property<int?>("CompletionTokensUsed")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("GeneratedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<bool>("IsDismissed")
+                    b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(true);
 
-                    b.Property<bool>("IsRead")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Reason")
+                    b.Property<string>("Payload")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RecType")
+                    b.Property<int?>("PromptTokensUsed")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderUsed")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("StudentUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
+                    b.HasKey("AiRecommendationId");
 
-                    b.Property<string>("ReferenceType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.HasIndex("SubjectId");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RecommendationId");
-
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentUserId", "SubjectId", "Type", "IsActive");
 
                     b.ToTable("ai_recommendations", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.AnalyticsDashboardSnapshot", b =>
+                {
+                    b.Property<int>("SnapshotId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SnapshotId"));
+
+                    b.Property<string>("DataJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("ScopeEntityId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SnapshotId");
+
+                    b.HasIndex("Scope", "ScopeEntityId")
+                        .IsUnique()
+                        .HasFilter("[ScopeEntityId] IS NOT NULL");
+
+                    b.ToTable("analytics_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Assignment", b =>
@@ -135,31 +219,110 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("JoinedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("LeftAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("RecordedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Present");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("StudentUserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TeacherNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("AttendanceId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentUserId");
 
-                    b.HasIndex("SessionId", "StudentId")
+                    b.HasIndex("SessionId", "StudentUserId")
                         .IsUnique()
                         .HasDatabaseName("UX_attendance_Session_Student");
 
                     b.ToTable("attendance", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("ChatMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChatMessageId"));
+
+                    b.Property<int>("ChatRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("SenderUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SentAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.HasKey("ChatMessageId");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.HasIndex("ChatRoomId", "SentAt")
+                        .HasDatabaseName("IX_chat_messages_Room_SentAt");
+
+                    b.ToTable("chat_messages", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ChatRoom", b =>
+                {
+                    b.Property<int>("ChatRoomId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChatRoomId"));
+
+                    b.Property<int?>("GradeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("RoomType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("ChatRoomId");
+
+                    b.HasIndex("GradeId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_chat_rooms_GradeId")
+                        .HasFilter("[GradeId] IS NOT NULL");
+
+                    b.ToTable("chat_rooms", (string)null);
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Class", b =>
@@ -198,6 +361,70 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UX_classes_Grade_Name_Year");
 
                     b.ToTable("classes", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ContentItem", b =>
+                {
+                    b.Property<int>("ContentItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContentItemId"));
+
+                    b.Property<string>("BlobName")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ResourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int?>("SessionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("TeachingAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("ContentItemId");
+
+                    b.HasIndex("SessionId");
+
+                    b.HasIndex("TeachingAssignmentId", "Type", "IsActive")
+                        .HasDatabaseName("IX_content_items_TA_Type_Active");
+
+                    b.ToTable("content_items", (string)null);
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Exam", b =>
@@ -315,46 +542,53 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"));
 
+                    b.Property<string>("ActionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<bool>("IsRead")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("NotifType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReferenceType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("SentAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "IsRead")
+                        .HasDatabaseName("IX_notifications_UserId_Unread")
+                        .HasFilter("[IsRead] = 0");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt")
+                        .HasDatabaseName("IX_notifications_UserId_IsRead_CreatedAt");
 
                     b.ToTable("notifications", (string)null);
                 });
@@ -489,6 +723,58 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                     b.HasIndex("SubscriptionId");
 
                     b.ToTable("payments", (string)null);
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.PerformanceAlert", b =>
+                {
+                    b.Property<int>("PerformanceAlertId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PerformanceAlertId"));
+
+                    b.Property<string>("AlertType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsResolved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StudentUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Threshold")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("TriggerValue")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("PerformanceAlertId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("StudentUserId", "SubjectId", "AlertType", "IsResolved");
+
+                    b.ToTable("performance_alerts", (string)null);
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Plan", b =>
@@ -780,6 +1066,9 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ClassId", "ScheduledAt")
                         .HasDatabaseName("IX_sessions_Class_ScheduledAt");
+
+                    b.HasIndex("Status", "ScheduledAt")
+                        .HasDatabaseName("IX_sessions_Status_ScheduledAt");
 
                     b.ToTable("sessions", (string)null);
                 });
@@ -1380,13 +1669,20 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Masarak.Domain.Entities.AiRecommendation", b =>
                 {
-                    b.HasOne("Masarak.Domain.Entities.Student", "Student")
-                        .WithMany("AiRecommendations")
-                        .HasForeignKey("StudentId")
+                    b.HasOne("Masarak.Domain.Entities.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Masarak.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Student");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Assignment", b =>
@@ -1408,15 +1704,44 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Masarak.Domain.Entities.Student", "Student")
-                        .WithMany("Attendances")
-                        .HasForeignKey("StudentId")
+                    b.HasOne("Masarak.Domain.Entities.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Session");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("Masarak.Domain.Entities.ChatRoom", "ChatRoom")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatRoomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Masarak.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChatRoom");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ChatRoom", b =>
+                {
+                    b.HasOne("Masarak.Domain.Entities.Grade", "Grade")
+                        .WithMany()
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Grade");
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Class", b =>
@@ -1428,6 +1753,24 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Grade");
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.ContentItem", b =>
+                {
+                    b.HasOne("Masarak.Domain.Entities.Session", "Session")
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Masarak.Domain.Entities.TeachingAssignment", "TeachingAssignment")
+                        .WithMany()
+                        .HasForeignKey("TeachingAssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Session");
+
+                    b.Navigation("TeachingAssignment");
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Exam", b =>
@@ -1510,6 +1853,24 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("Masarak.Domain.Entities.PerformanceAlert", b =>
+                {
+                    b.HasOne("Masarak.Domain.Entities.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Masarak.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Question", b =>
@@ -1761,6 +2122,11 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                     b.Navigation("Submissions");
                 });
 
+            modelBuilder.Entity("Masarak.Domain.Entities.ChatRoom", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("Masarak.Domain.Entities.Class", b =>
                 {
                     b.Navigation("Sessions");
@@ -1815,10 +2181,6 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Masarak.Domain.Entities.Student", b =>
                 {
-                    b.Navigation("AiRecommendations");
-
-                    b.Navigation("Attendances");
-
                     b.Navigation("ParentStudents");
 
                     b.Navigation("StudentClasses");

@@ -6,6 +6,7 @@ using Masarak.Application.Interfaces;
 using Masarak.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +27,36 @@ builder.Services.AddApplicationServices(builder.Configuration);
 
 // ── Background Jobs ──
 builder.Services.AddHostedService<Masarak.Infrastructure.Services.ExamAutoExpireJob>();
+builder.Services.AddHostedService<Masarak.Infrastructure.Services.AbsentMarkingBackgroundJob>();
+
+// ── SignalR (Phase 4: ChatHub) ────────────────────────────────────────────────
+var redisConn = builder.Configuration.GetConnectionString("Redis");
+var signalRBuilder = builder.Services.AddSignalR();
+if (!string.IsNullOrEmpty(redisConn))
+{
+    signalRBuilder.AddStackExchangeRedis(redisConn, options =>
+    {
+        options.Configuration.ChannelPrefix = new StackExchange.Redis.RedisChannel("MasarakSignalR", StackExchange.Redis.RedisChannel.PatternMode.Literal);
+    });
+}
 
 // ── MassTransit ──
 builder.Services.AddMassTransit(x =>
 {
+    // Phase 3 consumers
     x.AddConsumer<Masarak.Infrastructure.Messaging.ExamGradedConsumer>();
     x.AddConsumer<Masarak.Infrastructure.Messaging.AssignmentGradedConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.PerformanceRecalculatedAiConsumer>(); // Phase 5
+
+    // Phase 6 notification consumers
+    x.AddConsumer<Masarak.Infrastructure.Messaging.SubscriptionActivatedNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.SubscriptionExpiringNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.ExamFullyGradedNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.AssignmentGradedNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.SessionScheduledNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.AlertCreatedNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.ParentReportReadyNotificationConsumer>();
+    x.AddConsumer<Masarak.Infrastructure.Messaging.PaymentFailedNotificationConsumer>();
 
     x.UsingInMemory((context, cfg) =>
     {
@@ -66,6 +91,18 @@ builder.Services.AddCors(options =>
                        .Get<string[]>() ?? ["http://localhost:3000"])
               .AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
 
+// ── Rate Limiting ─────────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FileUploadPolicy", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 5; // Max 5 uploads per minute
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 2;
+    });
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
@@ -79,6 +116,8 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedGradesAsync(db);  // needed for student self-registration
     await DatabaseSeeder.SeedAdminUserAsync(db, pwd);
     await DatabaseSeeder.SeedPlansAsync(db);   // Phase 1 plans
+    await DatabaseSeeder.SeedChatRoomsAsync(db); // Phase 4 chat rooms
+    await DatabaseSeeder.SeedAiPromptTemplatesAsync(db); // Phase 5 AI prompt templates
 }
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
@@ -94,10 +133,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseRateLimiter();
 app.UseAuthentication();   // ← must come before UseAuthorization
 app.UseAuthorization();
 app.UseMiddleware<Masarak.API.Extensions.SubscriptionAccessMiddleware>();
 app.MapControllers();
+app.MapHub<Masarak.API.Hubs.ChatHub>("/hubs/chat"); // Phase 4: SignalR ChatHub
+app.MapHub<Masarak.API.Hubs.NotificationHub>("/hubs/notifications"); // Phase 6: SignalR NotificationHub
 app.Run();
 
 public partial class Program { }

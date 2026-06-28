@@ -53,6 +53,18 @@ namespace Masarak.API.Extensions
                             if (context.Exception is SecurityTokenExpiredException)
                                 context.Response.Headers.Append("Token-Expired", "true");
                             return Task.CompletedTask;
+                        },
+                        // Phase 4: Forward JWT from query string for SignalR hub auth
+                        // (WebSockets can't send Authorization headers)
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
                         }
                     };
                 });
@@ -196,7 +208,43 @@ namespace Masarak.API.Extensions
             
             services.AddScoped<IFileStorageService, LocalFileStorageService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
-            
+
+            // ── Phase 4 Attendance, Content & Chat ────────────────────────────
+            services.AddScoped<IAttendanceRepository, Masarak.Infrastructure.Persistence.Repositories.AttendanceRepository>();
+            services.AddScoped<IContentItemRepository, Masarak.Infrastructure.Persistence.Repositories.ContentItemRepository>();
+            services.AddScoped<IChatRoomRepository, Masarak.Infrastructure.Persistence.Repositories.ChatRoomRepository>();
+            services.AddScoped<IChatMessageRepository, Masarak.Infrastructure.Persistence.Repositories.ChatMessageRepository>();
+
+            services.AddSingleton<Masarak.Domain.Services.AttendanceWindowChecker>();
+            services.AddSingleton<Masarak.Domain.Services.ChatRoomAccessPolicy>();
+
+            services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IContentService, ContentService>();
+            services.AddScoped<IChatService, ChatService>();
+
+            // ── Phase 5 AI Recommendations & Analytics ────────────────────────
+            services.AddScoped<IAiRecommendationRepository, Masarak.Infrastructure.Persistence.Repositories.AiRecommendationRepository>();
+            services.AddScoped<IPerformanceAlertRepository, Masarak.Infrastructure.Persistence.Repositories.PerformanceAlertRepository>();
+            services.AddScoped<IAiPromptTemplateRepository, Masarak.Infrastructure.Persistence.Repositories.AiPromptTemplateRepository>();
+            services.AddScoped<IAnalyticsSnapshotRepository, Masarak.Infrastructure.Persistence.Repositories.AnalyticsSnapshotRepository>();
+
+            // AI Providers (HttpClient-based)
+            services.AddHttpClient("OpenAI");
+            services.AddHttpClient("Claude");
+            services.AddHttpClient("Gemini");
+            services.AddSingleton<Masarak.Infrastructure.Services.AI.OpenAiProvider>();
+            services.AddSingleton<Masarak.Infrastructure.Services.AI.ClaudeProvider>();
+            services.AddSingleton<Masarak.Infrastructure.Services.AI.GeminiProvider>();
+            services.AddSingleton<IAiProviderFactory, Masarak.Infrastructure.Services.AI.AiProviderFactory>();
+
+            services.AddScoped<IAiAnalyticsService, Masarak.Infrastructure.Services.AI.AiAnalyticsService>();
+
+            // ── Phase 6 Notifications & Admin ─────────────────────────────────
+            services.AddScoped<INotificationRepository, Masarak.Infrastructure.Persistence.Repositories.NotificationRepository>();
+            services.AddScoped<IAdminUserRepository, Masarak.Infrastructure.Persistence.Repositories.AdminUserRepository>();
+            services.AddScoped<INotificationService, Masarak.Infrastructure.Services.NotificationService>();
+            services.AddScoped<INotificationPushService, Masarak.API.Services.SignalRNotificationPushService>();
+
             return services;
         }
     }

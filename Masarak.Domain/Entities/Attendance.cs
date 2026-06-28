@@ -1,28 +1,65 @@
+using Masarak.Domain.Enums;
+
 namespace Masarak.Domain.Entities
 {
     /// <summary>
     /// Records a Student's presence in a Session.
-    /// Unique per (SessionId, StudentId).
+    /// Unique per (SessionId, StudentUserId).
     ///
-    /// Auth integration:
-    ///   Teachers mark attendance (AdminOrTeacher policy).
-    ///   Students see their own attendance record only
-    ///       (service filters by Student.UserId == currentUserId).
-    ///   Parents see attendance for their linked children.
-    ///
-    /// No structural changes from Phase 1.
+    /// Phase 4 changes:
+    ///   • StudentUserId replaces StudentId (links to User directly, matching Phase 4 spec)
+    ///   • Status uses AttendanceStatus enum instead of string
+    ///   • Added TeacherNote for manual overrides
+    ///   • Added RecordedAt timestamp
+    ///   • Factory methods: RecordPresent(), RecordAbsent()
+    ///   • Domain method: Override()
+    ///   • Private parameterless constructor for EF Core
     /// </summary>
     public class Attendance
     {
-        public int       AttendanceId { get; set; }
-        public int       SessionId    { get; set; }   // FK → sessions.SessionId
-        public int       StudentId    { get; set; }   // FK → students.StudentId
-        public string    Status       { get; set; } = "Present";   // Present|Absent|Late|Excused
-        public DateTime? JoinedAt     { get; set; }
-        public DateTime? LeftAt       { get; set; }
+        public int              AttendanceId  { get; private set; }
+        public int              SessionId     { get; private set; }   // FK → sessions.SessionId
+        public int              StudentUserId { get; private set; }   // FK → users.UserId (student)
+        public AttendanceStatus Status        { get; private set; }   // Present, Absent, Excused
+        public DateTime?        JoinedAt      { get; private set; }   // UTC timestamp of join event
+        public string?          TeacherNote   { get; private set; }   // populated on manual override
+        public DateTime         RecordedAt    { get; private set; }
 
         // ── Navigation ──────────────────────────────────────────────────────
-        public virtual Session Session { get; set; } = null!;
-        public virtual Student Student { get; set; } = null!;
+        public virtual Session Session { get; private set; } = null!;
+        public virtual User    Student { get; private set; } = null!;
+
+        // ── Private parameterless constructor (for EF Core) ─────────────────
+        private Attendance() { }
+
+        // ── Factory Methods ─────────────────────────────────────────────────
+        public static Attendance RecordPresent(int sessionId, int studentUserId, DateTime joinedAt)
+            => new()
+            {
+                SessionId     = sessionId,
+                StudentUserId = studentUserId,
+                Status        = AttendanceStatus.Present,
+                JoinedAt      = joinedAt,
+                RecordedAt    = DateTime.UtcNow
+            };
+
+        public static Attendance RecordAbsent(int sessionId, int studentUserId)
+            => new()
+            {
+                SessionId     = sessionId,
+                StudentUserId = studentUserId,
+                Status        = AttendanceStatus.Absent,
+                RecordedAt    = DateTime.UtcNow
+            };
+
+        // ── Domain Methods ──────────────────────────────────────────────────
+        /// <summary>
+        /// Teacher manually overrides an attendance record.
+        /// </summary>
+        public void Override(AttendanceStatus newStatus, string? note)
+        {
+            Status      = newStatus;
+            TeacherNote = note;
+        }
     }
 }
