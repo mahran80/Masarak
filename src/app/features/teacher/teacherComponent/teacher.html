@@ -1,0 +1,157 @@
+<div class="tc-page font-sans" dir="rtl">
+
+  <!-- ── Top bar ──────────────────────────────────────────────────── -->
+  <div class="tc-topbar">
+    <div>
+      <h1 class="tc-greeting">مرحباً، أستاذ 👋</h1>
+      <p class="tc-date">{{ today }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a routerLink="/dashboard/teacher/assessment/assignments/create"
+         class="tc-btn-primary flex items-center gap-2">
+        ➕ إضافة واجب جديد
+      </a>
+      <a routerLink="/dashboard/teacher/assessment/exams/create"
+         class="tc-btn-secondary flex items-center gap-2">
+        📝 إنشاء اختبار
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Stats cards ───────────────────────────────────────────────── -->
+  <div class="tc-stats-grid">
+    <!-- Pending grading — real data -->
+    <div class="tc-stat-card" [style.--clr]="'#4f8cd4'" [style.--bg]="'#eff6ff'">
+      <div class="stat-icon">📋</div>
+      <div>
+        <p class="stat-label">التصحيح المعلق</p>
+        @if (isLoadingStats()) {
+          <p class="stat-value">...</p>
+        } @else {
+          <p class="stat-value">{{ pendingGradingCount() }}</p>
+        }
+      </div>
+    </div>
+    <!-- Static stats -->
+    <div class="tc-stat-card" [style.--clr]="'#059669'" [style.--bg]="'#ecfdf5'">
+      <div class="stat-icon">🎓</div>
+      <div>
+        <p class="stat-label">إجمالي الطلاب</p>
+        <p class="stat-value">١٢٤</p>
+      </div>
+    </div>
+    <div class="tc-stat-card" [style.--clr]="'#7c3aed'" [style.--bg]="'#f5f3ff'">
+      <div class="stat-icon">📚</div>
+      <div>
+        <p class="stat-label">الدروس هذا الأسبوع</p>
+        <p class="stat-value">١٨</p>
+      </div>
+    </div>
+    <div class="tc-stat-card" [style.--clr]="'#d97706'" [style.--bg]="'#fffbeb'">
+      <div class="stat-icon">✅</div>
+      <div>
+        <p class="stat-label">متوسط الحضور</p>
+        <p class="stat-value">٩٢٪</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main grid ─────────────────────────────────────────────────── -->
+  <div class="tc-grid">
+
+    <!-- Sessions column -->
+    <div class="tc-card sessions-card">
+      <div class="card-header">
+        <h2 class="card-title">جدول اليوم</h2>
+        <span class="sessions-count">{{ sessions().length }} حصص</span>
+      </div>
+
+      <div class="sessions-list">
+        @if (isLoadingSessions()) {
+          <div class="text-center py-6 text-slate-400 font-bold text-sm">جاري تحميل الحصص...</div>
+        } @else if (sessions().length === 0) {
+          <div class="text-center py-6 text-slate-400 font-bold text-sm">لا يوجد حصص متبقية اليوم</div>
+        } @else {
+          @for (s of sessions(); track s.id) {
+            <div class="session-item" [class.live]="s.status === 'live'" [class.done]="s.status === 'done'">
+              <div class="session-time">{{ s.time }}</div>
+              <div class="session-info">
+                <p class="session-title">{{ s.title }} — {{ s.subject }}</p>
+                <p class="session-grade">{{ s.grade }}</p>
+              </div>
+              <div class="session-actions">
+                <span class="status-chip" [class.live]="s.status === 'live'" [class.upcoming]="s.status === 'upcoming'" [class.done]="s.status === 'done'">
+                  @if (s.status === 'live') { <span class="live-dot"></span> }
+                  {{ sessionStatusLabel(s.status) }}
+                </span>
+                @if (s.status === 'live') {
+                  <a [routerLink]="['/dashboard/teacher/session/live', s.id]" class="tc-btn-live">ابدأ الجلسة</a>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="tc-col-right">
+
+      <!-- Attendance ring -->
+      <div class="tc-card attendance-card">
+        <h3 class="card-title sm">ملخص الحضور</h3>
+        <div class="attendance-row">
+          <div class="ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#f1f5f9" stroke-width="10"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#10b981" stroke-width="10"
+                stroke-dasharray="188.5" stroke-dashoffset="15"
+                stroke-linecap="round" transform="rotate(-90 40 40)"/>
+            </svg>
+            <span class="ring-pct">٩٢٪</span>
+          </div>
+          <div class="attendance-legend">
+            <div class="legend-item"><span class="dot green"></span> حضور: ١١٤</div>
+            <div class="legend-item"><span class="dot red"></span> غائب: ٥</div>
+            <div class="legend-item"><span class="dot amber"></span> متأخر: ٣</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending grading card — real data + router link -->
+      <div class="tc-card pending-card">
+        <div class="pending-header">
+          <div>
+            <h3 class="card-title sm">التصحيح المعلق</h3>
+            <p class="pending-sub">واجبات واختبارات بانتظار التصحيح</p>
+          </div>
+          @if (isLoadingStats()) {
+            <div class="pending-count" style="font-size: 1rem">...</div>
+          } @else {
+            <div class="pending-count">{{ pendingGradingCount() }}</div>
+          }
+        </div>
+        <div class="pending-bar">
+          <div class="bar-fill" [style.width]="pendingGradingCount() > 0 ? '70%' : '0%'"></div>
+        </div>
+        <p class="pending-hint">اضغط لمراجعة كل التسليمات</p>
+        <a routerLink="/dashboard/teacher/assessment/grading" class="tc-btn-ghost block text-center">عرض لوحة التصحيح</a>
+      </div>
+
+      <!-- Activities -->
+      <div class="tc-card activities-card">
+        <h3 class="card-title sm">الإشعارات الحديثة</h3>
+        <div class="activities-list">
+          <div *ngFor="let a of activities()" class="activity-item" [class.submission]="a.type === 'submission'" [class.alert]="a.type === 'alert'" [class.message]="a.type === 'message'">
+            <div class="activity-icon">{{ a.icon }}</div>
+            <div class="activity-body">
+              <p class="activity-text">{{ a.text }}</p>
+              <p class="activity-time">{{ a.time }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
