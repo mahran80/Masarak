@@ -29,9 +29,10 @@
 
       <!-- Actions -->
       <div class="flex items-center gap-3">
-        <button class="flex items-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100 active:scale-95">
+        <button (click)="fileInput.click()" class="flex items-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100 active:scale-95">
           <span class="text-base">+</span> تحميل ملف
         </button>
+        <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)" />
         <button class="flex items-center gap-2 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-95">
           <span>📁</span> إنشاء مجلد
         </button>
@@ -72,7 +73,7 @@
             @for (f of filteredFiles(); track f.name) {
               <tr class="hover:bg-slate-50/80 transition-colors">
                 <td class="py-4 pr-4 font-bold text-slate-900">
-                  <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-3 cursor-pointer hover:text-[#4F8CD4] transition-colors" (click)="openFile(f)">
                     <span class="text-xl">{{ f.icon }}</span>
                     {{ f.name }}
                   </div>
@@ -99,7 +100,7 @@
       <!-- Grid view -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         @for (f of filteredFiles(); track f.name) {
-          <div class="flex flex-col items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer group">
+          <div (click)="openFile(f)" class="flex flex-col items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer group">
             <span class="text-4xl group-hover:scale-110 transition-transform">{{ f.icon }}</span>
             <p class="text-xs font-bold text-slate-800 text-center line-clamp-2">{{ f.name }}</p>
             <p class="text-[10px] text-slate-400">{{ f.size === '--' ? f.type : f.size }}</p>
