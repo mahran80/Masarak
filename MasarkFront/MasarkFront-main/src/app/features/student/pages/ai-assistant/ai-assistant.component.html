@@ -10,7 +10,7 @@
     <div class="ai-concepts">
       <h4 class="ai-concepts__title">المفاهيم التي واجهت فيها صعوبة</h4>
       <div class="ai-concept" *ngFor="let c of concepts; let i = index">
-        <p class="ai-concept__title">{{ i + 1 }}. {{ c.title }} ({{ c.subjectTag }})</p>
+        <p class="ai-concept__title">{{ i + 1 }}. {{ c.topicName }} (معدل الخطأ: {{ c.errorRate }}%)</p>
         <div class="ai-concept__actions">
           <app-button variant="secondary" size="sm" icon="edit">إنشاء اختبار تدريبي</app-button>
           <app-button variant="primary" size="sm" icon="book">مراجعة الدرس الموصى به</app-button>

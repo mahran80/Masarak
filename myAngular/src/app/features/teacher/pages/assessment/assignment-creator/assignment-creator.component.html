@@ -1,0 +1,66 @@
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-black text-slate-900">إنشاء واجب جديد</h1>
+      <p class="text-xs font-bold text-slate-400">إضافة واجب دراسي جديد للطلاب مع تحديد موعد التسليم والدرجة.</p>
+    </div>
+  </div>
+
+  <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()" class="bg-white rounded-[24px] p-8 shadow-xs border border-slate-100 space-y-6 max-w-3xl">
+    
+    @if (errorMessage()) {
+      <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="space-y-2">
+      <label class="block text-sm font-bold text-slate-700">عنوان الواجب <span class="text-rose-500">*</span></label>
+      <input type="text" formControlName="title" placeholder="مثال: واجب الرياضيات - المعادلات الخطية"
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+      @if (assignmentForm.get('title')?.touched && assignmentForm.get('title')?.invalid) {
+        <p class="text-xs text-rose-500 font-bold mt-1">عنوان الواجب مطلوب.</p>
+      }
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-bold text-slate-700">التعليمات / الوصف</label>
+      <textarea formControlName="instructions" rows="4" placeholder="اكتب تعليمات الواجب هنا..."
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"></textarea>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-2">
+        <label class="block text-sm font-bold text-slate-700">آخر موعد للتسليم <span class="text-rose-500">*</span></label>
+        <input type="datetime-local" formControlName="dueDate"
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        @if (assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid) {
+          <p class="text-xs text-rose-500 font-bold mt-1">موعد التسليم مطلوب.</p>
+        }
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-bold text-slate-700">الدرجة القصوى <span class="text-rose-500">*</span></label>
+        <input type="number" step="0.01" formControlName="maxScore" placeholder="100" min="0" max="1000"
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        @if (assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid) {
+          <p class="text-xs text-rose-500 font-bold mt-1">درجة الواجب غير صالحة.</p>
+        }
+      </div>
+    </div>
+
+    <div class="pt-4 flex items-center gap-3">
+      <button type="submit" [disabled]="isSubmitting()"
+        class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md shadow-blue-100">
+        @if (isSubmitting()) {
+          جاري الحفظ...
+        } @else {
+          حفظ ونشر الواجب
+        }
+      </button>
+      <button type="button" routerLink="/dashboard/teacher/assignments" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl text-sm transition-all">
+        إلغاء
+      </button>
+    </div>
+  </form>
+</div>

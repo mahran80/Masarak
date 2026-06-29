@@ -5,6 +5,8 @@ import { AiAnalyticsService } from '../../../../core/services/ai-analytics.servi
 import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.model';
 import { inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
 
 interface CommonMistake {
   id: string;
@@ -35,14 +37,17 @@ export class PerformanceAnalysisComponent {
   ];
 
   constructor() {
-    this.route.paramMap.subscribe(params => {
-      const classId = Number(params.get('classId')) || 1;
-      const subjectId = Number(params.get('subjectId')) || 1;
-      this.aiAnalyticsService.getClassAnalytics(classId, subjectId).subscribe(res => {
-        this.analyticsData = res;
-        this.overallLevelPercent = res.classAverage;
-        this.cdr.markForCheck();
-      });
+    this.route.paramMap.pipe(
+      takeUntilDestroyed(),
+      switchMap(params => {
+        const classId = Number(params.get('classId')) || 1;
+        const subjectId = Number(params.get('subjectId')) || 1;
+        return this.aiAnalyticsService.getClassAnalytics(classId, subjectId);
+      })
+    ).subscribe(res => {
+      this.analyticsData = res;
+      this.overallLevelPercent = res.classAverage;
+      this.cdr.markForCheck();
     });
   }
 }

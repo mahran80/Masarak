@@ -1,0 +1,101 @@
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-black text-slate-900">تسليمات الواجب</h1>
+      <p class="text-xs font-bold text-slate-400">مراجعة وتقييم إجابات الطلاب للواجب.</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-[24px] p-6 shadow-xs border border-slate-100 space-y-6 relative">
+    @if (isLoading()) {
+      <div class="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-[24px]">
+        <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-right border-collapse text-sm">
+        <thead>
+          <tr class="text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50">
+            <th class="py-3 pr-4 font-black">اسم الطالب</th>
+            <th class="py-3 font-black">تاريخ التسليم</th>
+            <th class="py-3 font-black">الحالة</th>
+            <th class="py-3 font-black">الدرجة</th>
+            <th class="py-3 pl-4 text-center font-black">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          @for (sub of submissions(); track sub.submissionId) {
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="py-4 pr-4 font-bold text-slate-900">{{ sub.studentName }}</td>
+              <td class="py-4 text-xs text-slate-500 font-bold">{{ sub.submittedAt | date:'medium' }}</td>
+              <td class="py-4 text-xs">
+                <span class="px-2 py-1 rounded-sm text-[10px] font-bold" 
+                      [ngClass]="{
+                        'bg-blue-50 text-blue-600': sub.status === 'Submitted',
+                        'bg-emerald-50 text-emerald-600': sub.status === 'Graded'
+                      }">
+                  {{ sub.status }}
+                </span>
+              </td>
+              <td class="py-4 text-xs font-bold" [ngClass]="{'text-slate-400': !sub.score, 'text-emerald-600': sub.score}">
+                {{ sub.score !== undefined && sub.score !== null ? sub.score : '-' }}
+              </td>
+              <td class="py-4 pl-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  @if (sub.hasFile) {
+                    <button (click)="downloadFile(sub.submissionId)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">تحميل</button>
+                  }
+                  <button (click)="openGradeModal(sub)" class="bg-[#4F8CD4] hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">تقييم</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-8 text-slate-400 font-bold">لا يوجد تسليمات بعد.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (selectedSubmission()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+        <h2 class="text-xl font-black text-slate-900 mb-6">تقييم تسليم {{ selectedSubmission()?.studentName }}</h2>
+        
+        <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()" class="space-y-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-bold text-slate-700">الدرجة الممنوحة</label>
+            <input type="number" step="0.01" formControlName="marksAwarded" 
+                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+          </div>
+          
+          <div class="space-y-2">
+            <label class="block text-sm font-bold text-slate-700">ملاحظات (اختياري)</label>
+            <textarea formControlName="feedback" rows="3"
+                      class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"></textarea>
+          </div>
+
+          <div class="pt-4 flex items-center gap-3">
+            <button type="submit" [disabled]="isGrading()"
+              class="flex-1 bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md">
+              {{ isGrading() ? 'جاري الحفظ...' : 'حفظ التقييم' }}
+            </button>
+            <button type="button" (click)="closeGradeModal()"
+              class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl text-sm transition-all">
+              إلغاء
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

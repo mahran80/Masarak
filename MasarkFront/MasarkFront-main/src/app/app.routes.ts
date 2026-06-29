@@ -18,7 +18,10 @@ import { AdminSubscriptionsComponent } from './features/admin/components/subscri
 import { AdminAnalyticsComponent } from './features/admin/adminComponent/analytics/analytics.component';
 import { PerformanceAnalysisComponent } from './features/teacher/components/performance-analysis/performance-analysis.component';
 import { ParentSummaryComponent } from './features/teacher/components/parent-summary/parent-summary.component';
-// import { AuthGuard, AdminGuard, TeacherGuard, StudentGuard, SubscriptionGuard } from '../core/guards';
+import { authGuard } from './core/guards/auth-guard-guard';
+import { adminGuard } from './core/guards/admin-guard-guard';
+import { teacherGuard } from './core/guards/teacher-guard-guard';
+import { studentGuard } from './core/guards/student-guard-guard';
 
 export const routes: Routes = [
   {
@@ -68,9 +71,11 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayoutComponent, // الشاسيه الثابت
+    canActivate: [authGuard],
     children: [
       {
         path: 'student',
+        canActivate: [studentGuard],
         loadChildren: () =>
           import('./features/student/routes/student.routes').then((m) => m.STUDENT_ROUTES),
           // يفتح لوحة التحكم على رابط: dashboard/student
@@ -78,6 +83,7 @@ export const routes: Routes = [
       }, // محتوى الطالب
       {
         path: 'teacher',
+        canActivate: [teacherGuard],
         children: [
           { path: '', component: TeacherComponent },
           { path: 'courses', component: TeacherCourses },
@@ -85,10 +91,17 @@ export const routes: Routes = [
           { path: 'assignments', component: TeacherAssignments },
           { path: 'analytics/:classId/:subjectId', component: PerformanceAnalysisComponent },
           { path: 'parent-report/:studentId/:month', component: ParentSummaryComponent },
+          { path: 'exams', loadComponent: () => import('./features/teacher/components/teacher-exams/teacher-exams').then(m => m.TeacherExamsComponent) },
+          { path: 'assessment/assignments/create', loadComponent: () => import('./features/teacher/pages/assessment/assignment-creator/assignment-creator.component').then(m => m.AssignmentCreatorComponent) },
+          { path: 'assessment/assignments/:id/submissions', loadComponent: () => import('./features/teacher/pages/assessment/assignment-submissions/assignment-submissions.component').then(m => m.AssignmentSubmissionsComponent) },
+          { path: 'assessment/exams/create', loadComponent: () => import('./features/teacher/pages/assessment/exam-creator/exam-creator.component').then(m => m.ExamCreatorComponent) },
+          { path: 'assessment/grading', loadComponent: () => import('./features/teacher/pages/assessment/grading-dashboard/grading-dashboard.component').then(m => m.GradingDashboardComponent) },
+          { path: 'assessment/grading/exam/:studentExamId', loadComponent: () => import('./features/teacher/pages/assessment/exam-grader/exam-grader.component').then(m => m.ExamGraderComponent) },
         ],
       }, // محتوى المدرس
       {
         path: 'admin',
+        canActivate: [adminGuard],
         children: [
           { path: '', component: AdminComponent },
 

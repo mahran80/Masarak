@@ -1,0 +1,107 @@
+<div class="p-8 font-sans text-slate-800" dir="rtl">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-black text-slate-900">{{ questionToEdit ? 'تعديل سؤال' : 'إضافة سؤال جديد' }}</h2>
+    <button (click)="cancelled.emit()" class="text-slate-400 hover:text-slate-600">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100 mb-6">
+      {{ errorMessage() }}
+    </div>
+  }
+  @if (questionForm.invalid && questionForm.touched) {
+    <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100 mb-6">
+      يرجى تعبئة جميع الحقول المطلوبة باللون الأحمر.
+    </div>
+  }
+
+  <form [formGroup]="questionForm" (ngSubmit)="onSave()" class="space-y-6">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-2">
+        <label class="block text-sm font-bold text-slate-700">نوع السؤال <span class="text-rose-500">*</span></label>
+        <select formControlName="type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none">
+          @for (type of questionTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-slate-700">الدرجة <span class="text-rose-500">*</span></label>
+          <input type="number" step="0.01" formControlName="marks" min="0"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-slate-700">الصعوبة</label>
+          <select formControlName="difficulty" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none">
+            <option value="Easy">سهل</option>
+            <option value="Medium">متوسط</option>
+            <option value="Hard">صعب</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-bold text-slate-700">نص السؤال <span class="text-rose-500">*</span></label>
+      <textarea formControlName="text" rows="3" placeholder="اكتب نص السؤال هنا..."
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"></textarea>
+      @if (questionForm.get('text')?.invalid && questionForm.get('text')?.touched) {
+        <p class="text-xs text-rose-500 font-bold mt-1">نص السؤال مطلوب.</p>
+      }
+    </div>
+
+    @if (questionForm.get('type')?.value === 'MCQ' || questionForm.get('type')?.value === 'TrueFalse') {
+      <div class="space-y-4 pt-4 border-t border-slate-100" formArrayName="options">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-bold text-slate-700">الخيارات</label>
+          @if (questionForm.get('type')?.value !== 'TrueFalse') {
+            <button type="button" (click)="addOption()" class="text-blue-500 hover:text-blue-700 text-xs font-bold">➕ إضافة خيار</button>
+          }
+        </div>
+
+        @for (opt of optionsArray.controls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="flex flex-col gap-1 w-full">
+            <div class="flex items-center gap-3">
+              <input type="text" formControlName="label" placeholder="أ" class="w-16 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-center font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="text" formControlName="text" placeholder="نص الخيار" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              @if (questionForm.get('type')?.value !== 'TrueFalse') {
+                <button type="button" (click)="removeOption(i)" class="text-rose-400 hover:text-rose-600 p-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              }
+            </div>
+            @if (opt.get('text')?.invalid && opt.get('text')?.touched) {
+              <p class="text-xs text-rose-500 font-bold px-1">نص الخيار مطلوب.</p>
+            }
+          </div>
+        }
+
+        <div class="space-y-2 mt-4">
+          <label class="block text-sm font-bold text-slate-700">الإجابة الصحيحة (أدخل الرمز، مثل أ)</label>
+          <input type="text" formControlName="correctAnswer"
+            class="w-full md:w-1/3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+        </div>
+      </div>
+    }
+
+    <div class="pt-6 flex justify-end gap-3 border-t border-slate-100">
+      <button type="button" (click)="cancelled.emit()"
+        class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl text-sm transition-all">
+        إلغاء
+      </button>
+      <button type="submit" [disabled]="isSubmitting()"
+        class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all shadow-md">
+        {{ isSubmitting() ? 'جاري الحفظ...' : 'حفظ السؤال' }}
+      </button>
+    </div>
+  </form>
+</div>
