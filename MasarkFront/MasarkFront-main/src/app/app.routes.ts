@@ -15,6 +15,9 @@ import { TeachersDirectoryComponent } from './features/academic/pages/admin/teac
 import { SystemHealthComponent } from './features/admin/components/system-health/system-health.component';
 import { AdminContentComponent } from './features/admin/components/content-moderation/content.component';
 import { AdminSubscriptionsComponent } from './features/admin/components/subscriptions/subscriptions.component';
+import { AdminAnalyticsComponent } from './features/admin/adminComponent/analytics/analytics.component';
+import { PerformanceAnalysisComponent } from './features/teacher/components/performance-analysis/performance-analysis.component';
+import { ParentSummaryComponent } from './features/teacher/components/parent-summary/parent-summary.component';
 // import { AuthGuard, AdminGuard, TeacherGuard, StudentGuard, SubscriptionGuard } from '../core/guards';
 
 export const routes: Routes = [
@@ -80,6 +83,8 @@ export const routes: Routes = [
           { path: 'courses', component: TeacherCourses },
           { path: 'students', component: TeacherStudents },
           { path: 'assignments', component: TeacherAssignments },
+          { path: 'analytics/:classId/:subjectId', component: PerformanceAnalysisComponent },
+          { path: 'parent-report/:studentId/:month', component: ParentSummaryComponent },
         ],
       }, // محتوى المدرس
       {
@@ -94,6 +99,7 @@ export const routes: Routes = [
           { path: 'system-health', component: SystemHealthComponent },
           { path: 'content-moderation', component: AdminContentComponent },
           { path: 'subscriptions', component: AdminSubscriptionsComponent },
+          { path: 'analytics', component: AdminAnalyticsComponent },
         ],
       }, // محتوى المدير
     ],

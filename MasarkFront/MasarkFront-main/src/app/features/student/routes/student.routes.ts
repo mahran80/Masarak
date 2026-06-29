@@ -63,6 +63,11 @@ export const STUDENT_ROUTES: Routes = [
       import('../pages/profile/profile.component').then((m) => m.StudentProfilePageComponent),
   },
   {
+    path: 'insights',
+    loadComponent: () =>
+      import('../pages/ai-assistant/ai-assistant.component').then((m) => m.AiAssistantComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

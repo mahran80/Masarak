@@ -1,0 +1,34 @@
+<div class="ai-page">
+  <div class="ai-main">
+    <div class="ai-banner">
+      <h3>مساعد مدرستي الذكي (Madrasaty AI) - تحليل أخطائك</h3>
+      <app-icon name="chat" [size]="20"></app-icon>
+    </div>
+
+    <div class="ai-message">{{ intro }}</div>
+
+    <div class="ai-concepts">
+      <h4 class="ai-concepts__title">المفاهيم التي واجهت فيها صعوبة</h4>
+      <div class="ai-concept" *ngFor="let c of concepts; let i = index">
+        <p class="ai-concept__title">{{ i + 1 }}. {{ c.title }} ({{ c.subjectTag }})</p>
+        <div class="ai-concept__actions">
+          <app-button variant="secondary" size="sm" icon="edit">إنشاء اختبار تدريبي</app-button>
+          <app-button variant="primary" size="sm" icon="book">مراجعة الدرس الموصى به</app-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-input">
+      <button type="button" class="ai-input__send" (click)="send()"><app-icon name="play" [size]="16"></app-icon></button>
+      <input type="text" placeholder="اسألني أي شيء حول دروسك..." [ngModel]="messageDraft()" (ngModelChange)="messageDraft.set($event)" [ngModelOptions]="{standalone: true}">
+    </div>
+  </div>
+
+  <aside class="ai-side card">
+    <h3 class="ai-side__title">التنقل السريع</h3>
+    <a class="ai-side__link ai-side__link--active"><app-icon name="calendar" [size]="16"></app-icon> الأنشطة الحديثة</a>
+    <a class="ai-side__link"><app-icon name="trend-up" [size]="16"></app-icon> القدم التحررية</a>
+    <a class="ai-side__link"><app-icon name="clipboard" [size]="16"></app-icon> المحتوطات</a>
+    <a class="ai-side__link"><app-icon name="book" [size]="16"></app-icon> المراجع</a>
+  </aside>
+</div>
