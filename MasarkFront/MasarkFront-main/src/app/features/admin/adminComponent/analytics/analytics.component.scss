@@ -1,0 +1,65 @@
+.analytics__title { font-size: var(--fs-2xl); margin-bottom: var(--space-5); }
+.analytics__main-card { padding: var(--space-6); }
+.analytics__main-title { font-size: var(--fs-xl); margin-bottom: var(--space-6); }
+
+.analytics__grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.analytics__bar-head { margin-bottom: var(--space-2); }
+.analytics__growth-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+.analytics__bar-block h4 { font-size: var(--fs-md); margin-bottom: 2px; }
+.analytics__sub { font-size: var(--fs-xs); color: var(--color-text-muted); display: block; margin-bottom: var(--space-4); }
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  height: 220px;
+}
+.bar-chart__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: var(--space-2);
+}
+.bar-chart__value { font-size: var(--fs-xs); font-weight: 700; color: var(--color-text-muted); }
+.bar-chart__bar {
+  width: 100%;
+  max-width: 34px;
+  border-radius: 6px 6px 0 0;
+  background: var(--color-primary);
+}
+.bar-chart__bar--light { background: var(--color-primary-soft); }
+.bar-chart__label { font-size: 10px; color: var(--color-text-muted); white-space: nowrap; }
+
+.bar-chart--small { height: 140px; gap: var(--space-2); }
+.bar-chart--small .bar-chart__bar { max-width: 18px; }
+
+.analytics__donut-block h4 { font-size: var(--fs-md); margin-bottom: var(--space-5); }
+.donut { width: 150px; height: 150px; display: block; margin: 0 auto var(--space-4); }
+.donut-legend { display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--fs-xs); font-weight: 600; }
+.donut-legend__dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-inline-end: 6px; }
+
+.analytics__login-block { border-top: 1px solid var(--color-border-soft); padding-top: var(--space-6); }
+.analytics__login-block h4 { font-size: var(--fs-md); margin-bottom: var(--space-5); }
+
+@media (max-width: 900px) {
+  .analytics__grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,25 @@
+<div class="parent-summary">
+  <h1 class="parent-summary__title">ملخص الأبوين بالذكاء الاصطناعي</h1>
+
+  <div class="card parent-summary__card">
+    <div class="parent-summary__chart-head">
+      <span class="parent-summary__chip">تطور الأداء</span>
+      <h3>ملخص شهر أبريل</h3>
+      <span class="parent-summary__sub">تطور الأداء</span>
+    </div>
+
+    <div class="trend-chart">
+      <div class="trend-chart__bar-wrap" *ngFor="let m of trend">
+        <span class="trend-chart__bar" [style.height.%]="m.value"></span>
+        <span class="trend-chart__label">{{ m.label }}</span>
+      </div>
+    </div>
+
+    <h3 class="parent-summary__insights-title">أهم الاستنتاجات</h3>
+    <ul class="parent-summary__insights">
+      <li *ngFor="let insight of insights">{{ insight }}</li>
+    </ul>
+
+    <app-button variant="primary" size="md" icon="send">إرسال الملخص لولي الأمر</app-button>
+  </div>
+</div>

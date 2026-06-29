@@ -1,0 +1,135 @@
+.sys-health__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-2);
+}
+.sys-health__breadcrumb-current { color: var(--color-text); font-weight: 700; }
+
+.sys-health__title { font-size: var(--fs-2xl); margin-bottom: var(--space-1); }
+.sys-health__subtitle { color: var(--color-text-muted); font-size: var(--fs-sm); margin-bottom: var(--space-5); }
+
+.sys-health__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.sys-kpi {
+  padding: var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.sys-kpi__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sys-kpi__icon--blue { background: var(--color-primary-light, #eef3ff); color: var(--color-primary); }
+.sys-kpi__icon--green { background: var(--color-success-bg); color: var(--color-success); }
+.sys-kpi__icon--orange { background: var(--color-warning-bg); color: var(--color-warning); }
+
+.sys-kpi__body { display: flex; flex-direction: column; gap: 4px; }
+.sys-kpi__label { font-size: var(--fs-sm); font-weight: 600; color: var(--color-text-muted); }
+.sys-kpi__value { font-size: var(--fs-2xl); font-weight: 800; }
+
+.sys-kpi__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+.sys-kpi__status--green { color: var(--color-success); }
+.sys-kpi__status--orange { color: var(--color-warning); }
+.sys-kpi__status--red { color: var(--color-danger, #e23a3a); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+.sys-health__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.sys-health__card { padding: var(--space-5) var(--space-6); }
+.sys-health__card-title { font-size: var(--fs-md); margin-bottom: var(--space-5); }
+
+.sys-row {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-soft);
+  font-size: var(--fs-sm);
+}
+.sys-row__label { color: var(--color-text-muted); font-weight: 600; }
+.sys-row__value { font-weight: 700; }
+
+.sys-health__jobs-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.sys-job-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+  font-size: var(--fs-sm);
+}
+.sys-job-row__name { font-weight: 600; }
+.sys-job-row__status {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+.sys-job-row__status--green { background: var(--color-success-bg); color: var(--color-success); }
+.sys-job-row__status--orange { background: var(--color-warning-bg); color: var(--color-warning); }
+
+.sys-error-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.sys-error-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.sys-error-row__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-danger-bg, #fdeaea);
+  color: var(--color-danger, #e23a3a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sys-error-row__body { display: flex; flex-direction: column; gap: 4px; }
+.sys-error-row__message { font-size: var(--fs-sm); font-weight: 600; }
+.sys-error-row__time { font-size: var(--fs-xs); color: var(--color-text-muted); }
+
+.sys-health__empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 900px) {
+  .sys-health__kpis { grid-template-columns: 1fr; }
+  .sys-health__grid { grid-template-columns: 1fr; }
+}

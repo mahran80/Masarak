@@ -1,0 +1,54 @@
+<div class="analytics">
+  <h1 class="analytics__title">تحليلات النظام</h1>
+
+  <div class="card analytics__main-card">
+    <h3 class="analytics__main-title">تحليلات المنصة</h3>
+
+    <div class="analytics__grid">
+      <div class="analytics__bar-block">
+        <div class="analytics__bar-head">
+          <span class="analytics__growth-chip"><app-icon name="trend-up" [size]="13"></app-icon> +{{ growthPercent }}%</span>
+        </div>
+        <h4>المستخدمين النشطين يوميًا (DAU)</h4>
+        <span class="analytics__sub">7 الأيام آخر</span>
+
+        <div class="bar-chart">
+          <div class="bar-chart__col" *ngFor="let d of dau">
+            <span class="bar-chart__value">{{ d.value | number }}</span>
+            <span class="bar-chart__bar" [style.height.%]="(d.value / maxDau) * 100"></span>
+            <span class="bar-chart__label">{{ d.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics__donut-block">
+        <h4>المواد الدراسية الأكثر شعبية</h4>
+        <svg viewBox="0 0 140 140" class="donut">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="var(--color-bg-alt)" stroke-width="20"></circle>
+          <circle
+            *ngFor="let seg of donutSegments"
+            cx="70" cy="70" r="60" fill="none"
+            [attr.stroke]="seg.color" stroke-width="20"
+            [attr.stroke-dasharray]="seg.dashArray"
+            [attr.stroke-dashoffset]="seg.offset"
+            transform="rotate(-90 70 70)"></circle>
+        </svg>
+        <ul class="donut-legend">
+          <li *ngFor="let s of subjects">
+            <span class="donut-legend__dot" [style.background]="s.color"></span>{{ s.label }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="analytics__login-block">
+      <h4>أوقات ذروة تسجيل الدخول</h4>
+      <div class="bar-chart bar-chart--small">
+        <div class="bar-chart__col" *ngFor="let h of loginHours">
+          <span class="bar-chart__bar bar-chart__bar--light" [style.height.%]="(h.value / maxLogin) * 100"></span>
+          <span class="bar-chart__label">{{ h.hour }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

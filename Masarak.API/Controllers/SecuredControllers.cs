@@ -17,14 +17,39 @@ namespace Masarak.API.Controllers
         public IActionResult Dashboard() =>
             Ok(new { message = "Admin dashboard — restricted to Admins only.", user = GetUserInfo() });
 
-        [HttpGet("users")]
-        public IActionResult GetAllUsers() =>
-            Ok(new { message = "User list — Admin only.", user = GetUserInfo() });
 
+        [HttpPost("users")]
+        [ProducesResponseType(typeof(Masarak.Application.DTOs.AdminUserDto), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateUser(
+            [FromServices] IAdminUserService adminUserService,
+            [FromBody] Masarak.Application.DTOs.AdminCreateUserRequest request)
+        {
+            try
+            {
+                var result = await adminUserService.CreateUserAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpDelete("users/{id}")]
-        public IActionResult DeleteUser(int id) =>
-            Ok(new { message = $"User {id} deleted by Admin.", user = GetUserInfo() });
-
+       public async Task<IActionResult> DeleteUser(
+            [FromServices] IAdminUserService adminUserService,
+            int id)
+        {
+            try
+            {
+                await adminUserService.DeleteUserAsync(id);
+                return Ok(new { message = $"User {id} deleted by Admin." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(Masarak.Application.DTOs.PagedResult<Masarak.Application.DTOs.SubscriptionDto>), 200)]
         public async Task<IActionResult> GetAllSubscriptions(
