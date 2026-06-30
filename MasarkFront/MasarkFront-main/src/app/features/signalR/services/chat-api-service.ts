@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ChatApiService {
   private http = inject(HttpClient);
 
-  private apiUrl = 'https://localhost:49179/api/chat';
+  private apiUrl = `${environment.apiUrl}/chat`;
 
   getRooms() {
     return this.http.get<any[]>(`${this.apiUrl}/rooms`);

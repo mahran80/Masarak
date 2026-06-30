@@ -6,6 +6,7 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import { WeakTopicDto } from '../../../../models/ai-analytics.model';
 import { inject, ChangeDetectorRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-ai-assistant',
@@ -24,7 +25,9 @@ export class AiAssistantComponent {
   readonly messageDraft = signal('');
 
   constructor() {
-    this.aiAnalyticsService.getStudentInsights().subscribe(res => {
+    this.aiAnalyticsService.getStudentInsights().pipe(
+      takeUntilDestroyed()
+    ).subscribe(res => {
       if (res && res.subjectAnalyses && res.subjectAnalyses.length > 0) {
         this.concepts = res.subjectAnalyses[0].weakTopics || [];
         this.cdr.markForCheck();
