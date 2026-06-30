@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AdminUserDto {
@@ -50,22 +50,25 @@ export class AdminApiService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/admin`;
 
-  /** GET /api/admin/users?pageNumber=&pageSize=&role= */
+  /** GET /api/admin/users?page=&pageSize=&role= */
   getUsers(
-    pageNumber = 1,
+    page = 1,
     pageSize = 100,
     role?: string,
   ): Observable<AdminUsersPagedResult | AdminUserDto[]> {
     let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
+      .set('page', page.toString())
       .set('pageSize', pageSize.toString());
     if (role) params = params.set('role', role);
     return this.http.get<AdminUsersPagedResult | AdminUserDto[]>(`${this.base}/users`, { params });
   }
 
-  /** POST /api/admin/users — create a real user with any role */
+  /** POST /api/auth/register — mapped from admin create user */
   createUser(req: AdminCreateUserRequest): Observable<AdminUserDto> {
-    return this.http.post<AdminUserDto>(`${this.base}/users`, req);
+    const payload = { ...req, confirmPassword: req.password };
+    return this.http.post<any>(`${environment.apiUrl}/auth/register`, payload).pipe(
+      map(res => res.user as AdminUserDto)
+    );
   }
 
   /** DELETE /api/admin/users/{id} */

@@ -52,10 +52,10 @@ export class SubscriptionApiService {
   }
 
   // ── Admin ───────────────────────────────────────────────────────────────────
-  /** GET /api/admin/subscriptions?pageNumber=&pageSize=&status= */
+  /** GET /api/admin/subscriptions?page=&pageSize=&status= */
   getAllSubscriptions(filter: SubscriptionFilter): Observable<PagedResult<SubscriptionDto>> {
     let params = new HttpParams()
-      .set('pageNumber', filter.pageNumber.toString())
+      .set('page', filter.pageNumber.toString())
       .set('pageSize', filter.pageSize.toString());
     if (filter.status) params = params.set('status', filter.status);
     return this.http.get<PagedResult<SubscriptionDto>>(
