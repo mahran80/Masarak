@@ -243,11 +243,74 @@ However, the **only feedback `<div>`** in the HTML template was located at the v
 ### Result
 When the admin clicks "إضافة الاشتراك" and the backend rejects the request (e.g., student already subscribed), the error message now appears directly below the button in a red error box with the exact backend message like `"Student already has an active subscription."`. The admin no longer has to scroll up to see what went wrong.
 
-# Issue 12 Resolution: Student Shown as "Not Subscribed" Despite Having Active Subscription
+# Issue 13 Resolution: Admin-Created Users Cannot Log In (401 Unauthorized)
 
 ## 1. The Problem
-In the admin user management page, a student appeared as having no active subscription (no "✓ مشترك بالفعل" badge, no green subscription badge). However, when the admin tried to assign a new subscription, the backend correctly rejected it with `400 Bad Request: "Student already has an active subscription."`. 
+When an administrator created a new user from the User Management dashboard, the creation was successful. However, when that user attempted to log in, the API (`POST /api/auth/login`) returned a `401 Unauthorized` error, stating "Invalid email or password."
 
+## 2. The Reason
+The backend handles login requests in `AuthService.LoginAsync`. For security and consistency, it normalizes the provided email by trimming whitespace and converting it to lowercase (`request.Email.Trim().ToLowerInvariant()`) before querying the database.
+
+However, the user creation endpoint (`AdminUserService.CreateUserAsync`) was saving the email to the database *exactly* as typed by the administrator in the UI, preserving uppercase letters and potential trailing spaces (e.g., `"John@Example.com "`). Because SQL Server or the EF Core query was strictly comparing the normalized login email (`"john@example.com"`) against the unnormalized stored email, the database query returned `null`, treating the user as non-existent and returning `401`.
+
+## 3. What We Made to Solve It
+
+### Changes Made:
+- We updated `AdminUserService.CreateUserAsync` to apply the exact same normalization rule used during login.
+- Before checking for duplicate emails or saving the new user, the email is now aggressively normalized: `var normalizedEmail = request.Email.Trim().ToLowerInvariant();`
+
+### Result
+Admin-created users are now correctly stored in the database with properly normalized lowercase emails without trailing whitespace. When these users attempt to log in, `AuthService` correctly finds their record, and the `401 Unauthorized` error is resolved.
+
+# Issue 14 Resolution: Admin Reset Password Not Showing New Password
+
+## 1. The Problem
+When an administrator tried to reset a user's password from the User Management dashboard, the backend correctly generated a new password and saved it to the database. However, the admin only saw a green success toast saying "تم إرسال رابط إعادة التعيين إلى بريد المستخدم." (Reset link sent to user's email). The admin was never shown the actual newly generated temporary password, making the feature useless since there is no actual email being sent yet.
+
+## 2. The Reason
+The frontend Angular code (`user-management.ts`) expected the backend to return an object with a `password` field:
+```typescript
+if (res.password) {
+  alert(`تمت إعادة تعيين كلمة المرور بنجاح.\nكلمة المرور الجديدة: ${res.password}`);
+}
+```
+However, the backend `AdminUsersController` was returning an object with the field named `TemporaryPassword`:
+```csharp
+return Ok(new { TemporaryPassword = tempPassword });
+```
+Because the field names didn't match (`password` vs `temporaryPassword` after JSON serialization), the frontend received `undefined` for `res.password`, falling back to the incorrect "email sent" success message instead of showing the alert with the new password.
+
+## 3. What We Made to Solve It
+
+### Changes Made:
+- We updated the `ResetPassword` endpoint in `AdminUsersController.cs` to return an anonymous object with the key `password` instead of `TemporaryPassword`.
+- The new backend return statement is: `return Ok(new { password = tempPassword });`
+
+### Result
+When the admin clicks "إعادة تعيين كلمة المرور" (Reset Password), the frontend now successfully reads the `password` field from the API response and displays an alert popup containing the new temporary password, allowing the admin to copy it and give it to the user.
+
+# Issue 15 Resolution: Admin Cannot Manually Enter Password During Reset
+
+## 1. The Problem
+When an administrator clicked "إعادة تعيين كلمة المرور" (Reset Password), the system automatically generated a random password for the user. The administrator was not given any input field to manually type a specific new password if they wanted to set one themselves.
+
+## 2. The Reason
+The frontend UI used a simple `confirm()` dialog, which only provides "OK" or "Cancel" buttons. The backend `ResetPassword` endpoint did not accept any request body parameters and strictly called `GenerateTemporaryPassword()` every time.
+
+## 3. What We Made to Solve It
+
+### Changes Made:
+1. **Backend (`AdminUsersController.cs`)**: Added an `AdminResetPasswordRequest` DTO containing an optional `NewPassword` string. The `ResetPassword` endpoint now accepts this from the request body. If `NewPassword` is provided, it hashes and saves that password; otherwise, it falls back to generating a random temporary one.
+2. **Frontend (`admin-api-service.ts`)**: Updated the `resetUserPassword` method signature to accept an optional `newPassword` argument and send it in the POST request body.
+3. **Frontend UI (`user-management.ts`)**: Replaced the `confirm()` dialog with a `prompt()` dialog. The admin can now type a custom password into the prompt. If they leave it blank and click OK, it proceeds to auto-generate a random password as before.
+
+### Result
+Administrators now have the flexibility to either type a specific password or leave the input empty to generate a secure random password automatically.
+
+
+# Issue 17 Resolution: Subscription Status Mismatch
+
+## 1. The Problem
 The subscription status displayed in the frontend was wrong — it was out of sync with the actual database state.
 
 ## 2. The Reason
@@ -269,3 +332,41 @@ The `getAllSubscriptions` API returns **all** subscriptions for all users — in
 
 ### Result
 Students with active subscriptions now correctly display the "✓ مشترك بالفعل" badge in the dropdown and the green "Active" badge in the subscription table. The admin can immediately see which students are already subscribed before attempting to assign a new one.
+
+# Issue 16 Resolution: Password Reset Creates Duplicate Users Instead of Updating
+
+## 1. The Problem
+When the administrator successfully reset a user's password, Entity Framework was inserting a brand new user record into the database instead of updating the existing user's password. This caused data duplication and corrupted user accounts.
+
+## 2. The Reason
+In the `UserRepository.UpdateAsync` method, the code was explicitly calling `_context.Users.Update(user)`. 
+When a user is fetched using `_userRepo.GetByIdAsync` (which uses `.FirstOrDefaultAsync()` without `AsNoTracking()`), Entity Framework Core is already "tracking" that entity. 
+
+By forcefully calling `.Update(user)` on an already tracked entity that includes navigation properties (like `Role`), EF Core can become confused about the entity's state, leading it to treat the tracked entity (or its related entities) as `Added` instead of `Modified`, which triggers an `INSERT` statement in the database.
+
+## 3. What We Made to Solve It
+
+### Changes Made:
+- We removed the `_context.Users.Update(user);` line from `Masarak.Infrastructure/Persistence/Repositories/UserRepository.cs`.
+- The `UpdateAsync` method now simply calls `await _context.SaveChangesAsync(ct);`.
+
+### Result
+Because the user entity is already being tracked by EF Core, simply changing `user.PasswordHash` automatically flags the property as modified. Calling `SaveChangesAsync()` now safely generates an `UPDATE` statement targeting only the existing user's password, entirely preventing the creation of duplicate users.
+
+# Issue 18 Resolution: Users Duplicating in Admin Dashboard After Login
+
+## 1. The Problem
+Whenever someone logged in (as an Admin, a Student, or any role), their user account would appear duplicated in the Admin Dashboard's User Management table with a strange negative ID (like `-1`, `-2`, etc.).
+
+## 2. The Reason
+The Angular frontend has a fallback mechanism that saves manually created users into the browser's `localStorage` (`masarak_admin_users_v2`) using negative IDs so they don't clash with real database IDs. 
+However, in `auth-state-service.ts`, there was a method called `_syncToAdminList`. Every single time *any* user successfully logged in, this method took their real user account and forcefully shoved it into that local storage array.
+When the Admin dashboard loaded, it fetched the real users from the backend, AND it read the local storage array. It re-assigned negative IDs to the real users in local storage, making the system think they were completely different new users, causing them to duplicate visually on the screen every time they logged in.
+
+## 3. What We Made to Solve It
+
+### Changes Made:
+- We completely removed the `_syncToAdminList` method and its call from `auth-state-service.ts` because the backend API already returns all users perfectly; there is absolutely no need to manually inject logged-in users into the browser's local fallback storage.
+
+### Result
+Logging in as different roles no longer pollutes the local storage. The Admin dashboard now cleanly relies on the backend database for its user list, preventing any weird duplication or ghost accounts.

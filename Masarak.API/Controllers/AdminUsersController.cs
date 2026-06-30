@@ -118,22 +118,30 @@ namespace Masarak.API.Controllers
             return NoContent();
         }
 
+        public class AdminResetPasswordRequest
+        {
+            public string? NewPassword { get; set; }
+        }
+
         /// <summary>
         /// POST /api/admin/users/{id}/reset-password — Reset a user's password and return a temporary password.
         /// </summary>
         [HttpPost("{id}/reset-password")]
-        public async Task<IActionResult> ResetPassword(int id, CancellationToken ct = default)
+        public async Task<IActionResult> ResetPassword(int id, [FromBody] AdminResetPasswordRequest? request = null, CancellationToken ct = default)
         {
             var user = await _userRepo.GetByIdAsync(id, ct);
             if (user == null)
                 return NotFound(new { Code = "USER_NOT_FOUND", Message = $"User with ID {id} not found." });
 
-            // Generate a temporary password
-            var tempPassword = GenerateTemporaryPassword();
-            user.PasswordHash = _passwordService.HashPassword(tempPassword);
+            // Use provided password or generate a temporary one
+            var newPassword = string.IsNullOrWhiteSpace(request?.NewPassword) 
+                ? GenerateTemporaryPassword() 
+                : request.NewPassword;
+
+            user.PasswordHash = _passwordService.HashPassword(newPassword);
             await _userRepo.UpdateAsync(user, ct);
 
-            return Ok(new { TemporaryPassword = tempPassword });
+            return Ok(new { password = newPassword });
         }
 
         private static string GenerateTemporaryPassword()

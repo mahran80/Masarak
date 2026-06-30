@@ -48,7 +48,10 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                     u.Role.Name,
                     u.IsActive,
                     u.CreatedAt,
-                    u.Subscriptions.Any(s => s.Status == SubscriptionStatus.Active)))
+                    u.Subscriptions.Any(s => s.Status == SubscriptionStatus.Active),
+                    null,
+                    null,
+                    null))
                 .ToListAsync(ct);
 
             return (items, totalCount);

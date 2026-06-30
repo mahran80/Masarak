@@ -38,7 +38,10 @@ namespace Masarak.Infrastructure.Services
                     u.Role.Name,
                     u.IsActive,
                     u.CreatedAt,
-                    _db.Subscriptions.Any(s => s.UserId == u.UserId && s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active)
+                    _db.Subscriptions.Any(s => s.UserId == u.UserId && s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active),
+                    _db.Students.Where(s => s.UserId == u.UserId).Select(s => (int?)s.GradeId).FirstOrDefault(),
+                    _db.Teachers.Where(t => t.UserId == u.UserId).Select(t => t.Specialization).FirstOrDefault(),
+                    _db.Parents.Where(p => p.UserId == u.UserId).SelectMany(p => p.ParentStudents).Select(ps => ps.Student.UserId).ToList()
                 ))
                 .ToListAsync(ct);
 
@@ -67,13 +70,15 @@ namespace Masarak.Infrastructure.Services
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.Name == request.Role, ct);
             if (role == null) throw new InvalidOperationException($"Role {request.Role} not found.");
 
-            if (await _db.Users.AnyAsync(u => u.Email == request.Email, ct))
+            var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+
+            if (await _db.Users.AnyAsync(u => u.Email == normalizedEmail, ct))
                 throw new InvalidOperationException("Email is already in use.");
 
             var user = new User
             {
                 FullName = request.FullName,
-                Email = request.Email,
+                Email = normalizedEmail,
                 PasswordHash = _passwordService.HashPassword(request.Password),
                 RoleId = role.RoleId,
                 Country = request.Country,
@@ -88,16 +93,51 @@ namespace Masarak.Infrastructure.Services
             // If teacher or student, create profile
             if (role.Name == "Teacher")
             {
-                _db.Teachers.Add(new Teacher { UserId = user.UserId, HiringDate = DateTime.UtcNow });
+                _db.Teachers.Add(new Teacher { 
+                    UserId = user.UserId, 
+                    Specialization = request.Specialization,
+                    HiringDate = DateTime.UtcNow 
+                });
                 await _db.SaveChangesAsync(ct);
             }
             else if (role.Name == "Student")
             {
-                // Assign to first grade for now
-                var grade = await _db.Grades.OrderBy(g => g.Order).FirstOrDefaultAsync(ct);
-                if (grade != null)
+                // Assign to provided grade, or fallback to first grade
+                var gradeId = request.GradeId;
+                if (gradeId == null || gradeId == 0)
                 {
-                    _db.Students.Add(new Student { UserId = user.UserId, GradeId = grade.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
+                    var firstGrade = await _db.Grades.OrderBy(g => g.Order).FirstOrDefaultAsync(ct);
+                    gradeId = firstGrade?.GradeId;
+                }
+
+                if (gradeId != null)
+                {
+                    _db.Students.Add(new Student { UserId = user.UserId, GradeId = gradeId.Value, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
+                    await _db.SaveChangesAsync(ct);
+                }
+            }
+            else if (role.Name == "Parent")
+            {
+                var parent = new Parent { UserId = user.UserId };
+                _db.Parents.Add(parent);
+                await _db.SaveChangesAsync(ct);
+
+                if (request.StudentIds != null && request.StudentIds.Any())
+                {
+                    foreach (var studentId in request.StudentIds)
+                    {
+                        // Assume studentId refers to UserId of student, so we must find the actual StudentId
+                        var student = await _db.Students.FirstOrDefaultAsync(s => s.UserId == studentId, ct);
+                        if (student != null)
+                        {
+                            _db.ParentStudents.Add(new ParentStudent
+                            {
+                                ParentId = parent.ParentId,
+                                StudentId = student.StudentId,
+                                Relationship = "Guardian"
+                            });
+                        }
+                    }
                     await _db.SaveChangesAsync(ct);
                 }
             }
@@ -109,7 +149,10 @@ namespace Masarak.Infrastructure.Services
                 role.Name,
                 user.IsActive,
                 user.CreatedAt,
-                false
+                false,
+                request.GradeId,
+                request.Specialization,
+                request.StudentIds ?? new List<int>()
             );
         }
 

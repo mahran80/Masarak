@@ -11,6 +11,9 @@ export interface AdminUserDto {
   isActive: boolean;
   createdAt: string;
   hasActiveSubscription?: boolean;
+  gradeId?: number;
+  specialization?: string;
+  studentIds?: number[];
 }
 
 export interface AdminUserDetailDto extends AdminUserDto {
@@ -43,6 +46,9 @@ export interface AdminCreateUserRequest {
   password: string;
   role: string;
   phone?: string;
+  gradeId?: number;
+  specialization?: string;
+  studentIds?: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -102,8 +108,8 @@ export class AdminApiService {
   }
 
   /** POST /api/admin/users/{id}/reset-password */
-  resetUserPassword(userId: number): Observable<{ password?: string, message?: string }> {
-    return this.http.post<{ password?: string, message?: string }>(`${this.base}/users/${userId}/reset-password`, {});
+  resetUserPassword(userId: number, newPassword?: string): Observable<{ password?: string, message?: string }> {
+    return this.http.post<{ password?: string, message?: string }>(`${this.base}/users/${userId}/reset-password`, { newPassword });
   }
 
   /** PUT /api/admin/content/{id}/moderate */

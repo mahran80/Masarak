@@ -12,6 +12,9 @@ namespace Masarak.Application.DTOs
         public string Role { get; init; } = null!; // "Student", "Teacher", "Parent", "Admin"
         public string? Phone { get; init; }
         public string? Country { get; init; }
+        public int? GradeId { get; init; }
+        public string? Specialization { get; init; }
+        public List<int>? StudentIds { get; init; }
     }
 
     public record TeacherDto(

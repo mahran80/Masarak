@@ -356,6 +356,49 @@
           </select>
         </div>
       </div>
+
+      <!-- Dynamic Role Requirements -->
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Student'">
+        <label class="form-label">المرحلة الدراسية <span style="color:red">*</span></label>
+        <select class="um-select full" [(ngModel)]="form.gradeId">
+          <option [ngValue]="null">-- اختر المرحلة الدراسية --</option>
+          <option *ngFor="let grade of grades()" [value]="grade.gradeId">{{ grade.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Teacher'">
+        <label class="form-label">التخصص (Specialization) <span style="color:red">*</span></label>
+        <input class="um-input" [(ngModel)]="form.specialization" placeholder="مثال: رياضيات، علوم" type="text" />
+      </div>
+
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Parent'">
+        <label class="form-label">أبناء ولي الأمر <span style="color:red">*</span></label>
+        
+        <!-- Selected Students Chips -->
+        <div class="selected-students" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;" *ngIf="form.studentIds.length > 0">
+          <span *ngFor="let id of form.studentIds" style="background: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 16px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            {{ getStudentName(id) }}
+            <button (click)="toggleStudentSelection(id)" style="color: #ef4444; border: none; background: transparent; cursor: pointer; font-weight: bold;">✕</button>
+          </span>
+        </div>
+
+        <input type="text" class="um-input mb-2" [ngModel]="parentStudentSearch()" (ngModelChange)="parentStudentSearch.set($event)" placeholder="البحث عن طالب بالاسم أو البريد..." style="margin-bottom: 8px;" />
+
+        <div class="students-list-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); background: #f8fafc;">
+          <div *ngFor="let s of filteredStudentsForParent()" 
+               style="padding: 8px; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;"
+               [style.background]="form.studentIds.includes(s.id) ? '#dbeafe' : 'transparent'"
+               (click)="toggleStudentSelection(s.id)">
+            <div>
+              <div style="font-weight: 500; font-size: 14px;">{{ s.name }}</div>
+              <div style="font-size: 12px; color: #64748b;" *ngIf="s.email">{{ s.email }}</div>
+            </div>
+            <span *ngIf="form.studentIds.includes(s.id)" style="color: #2563eb; font-weight: bold;">✓ مضاف</span>
+            <span *ngIf="!form.studentIds.includes(s.id)" style="color: #64748b; font-size: 12px;">+ إضافة</span>
+          </div>
+          <div *ngIf="filteredStudentsForParent().length === 0" class="text-muted" style="font-size: 0.9em; text-align: center; padding: 10px;">لا توجد نتائج بحث مطابقة.</div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-footer">
