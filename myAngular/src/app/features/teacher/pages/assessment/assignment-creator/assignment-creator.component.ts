@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { CreateAssignmentRequest } from '../../../models/teacher-assessment.model';
 
@@ -40,9 +40,8 @@ export class AssignmentCreatorComponent implements OnInit {
       maxScore: [100, [Validators.required, Validators.min(0), Validators.max(1000)]],
     });
 
-    // Fetch active assignments for the current year
-    const year = new Date().getFullYear() - 1; // 2025
-    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments?academicYear=${year}`)
+    // Fetch active assignments
+    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (assignments) => {
@@ -66,6 +65,7 @@ export class AssignmentCreatorComponent implements OnInit {
 
     const request: CreateAssignmentRequest = {
       ...this.assignmentForm.value,
+      teachingAssignmentId: Number(this.assignmentForm.value.teachingAssignmentId),
       dueDate: new Date(this.assignmentForm.value.dueDate).toISOString(),
     };
 

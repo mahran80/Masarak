@@ -216,8 +216,8 @@ namespace Masarak.Infrastructure.Services
             if (exam == null) throw new KeyNotFoundException("Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId)
                 throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft)
-                throw new InvalidOperationException("Cannot add questions to a published/closed exam.");
+            if (exam.Status == ExamStatus.Closed)
+                throw new InvalidOperationException("Cannot add questions to a closed exam.");
 
             var question = new Question
             {
@@ -257,7 +257,7 @@ namespace Masarak.Infrastructure.Services
                                            .FirstOrDefaultAsync(e => e.Questions.Any(q => q.QuestionId == questionId), ct);
             if (exam == null) throw new KeyNotFoundException("Question or Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId) throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft) throw new InvalidOperationException("Cannot modify published exam.");
+            if (exam.Status == ExamStatus.Closed) throw new InvalidOperationException("Cannot modify closed exam.");
 
             var question = exam.Questions.First(q => q.QuestionId == questionId);
             question.Type = request.Type;
@@ -288,7 +288,7 @@ namespace Masarak.Infrastructure.Services
                                            .FirstOrDefaultAsync(e => e.Questions.Any(q => q.QuestionId == questionId), ct);
             if (exam == null) throw new KeyNotFoundException("Question or Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId) throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft) throw new InvalidOperationException("Cannot modify published exam.");
+            if (exam.Status == ExamStatus.Closed) throw new InvalidOperationException("Cannot modify closed exam.");
 
             var question = exam.Questions.First(q => q.QuestionId == questionId);
             exam.Questions.Remove(question);

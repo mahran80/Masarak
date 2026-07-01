@@ -39,7 +39,7 @@
         @for (course of courses(); track course.subjectId) {
           <app-student-course-card
             [course]="course"
-            [selected]="selectedCourse()?.subjectId === course.subjectId"
+            [selected]="selectedCourse().subjectId === course.subjectId"
             (viewDetails)="selectCourse($event)"
           />
         }

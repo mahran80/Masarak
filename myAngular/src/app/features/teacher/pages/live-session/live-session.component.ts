@@ -8,7 +8,7 @@ import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-live-session',
   standalone: true,
-  imports: [RouterLink, NgIf],
+  imports: [RouterLink],
   templateUrl: './live-session.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

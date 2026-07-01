@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { CreateExamRequest, TeacherExam, TeacherQuestion } from '../../../models/teacher-assessment.model';
 import { QuestionEditorComponent } from '../question-editor/question-editor.component';
@@ -46,8 +46,7 @@ export class ExamCreatorComponent implements OnInit {
       durationMinutes: [60, [Validators.required, Validators.min(1), Validators.max(600)]],
     });
 
-    const year = new Date().getFullYear() - 1; // 2025
-    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments?academicYear=${year}`)
+    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (assignments) => {
@@ -71,6 +70,7 @@ export class ExamCreatorComponent implements OnInit {
 
     const request: CreateExamRequest = {
       ...this.examForm.value,
+      teachingAssignmentId: Number(this.examForm.value.teachingAssignmentId),
       startTime: new Date(this.examForm.value.startTime).toISOString(),
       endTime: new Date(this.examForm.value.endTime).toISOString(),
     };

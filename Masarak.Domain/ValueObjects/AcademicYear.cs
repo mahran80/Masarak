@@ -12,6 +12,6 @@ namespace Masarak.Domain.ValueObjects
         /// Otherwise, it is the previous calendar year.
         /// </summary>
         public static AcademicYear Current() =>
-            new(DateTime.UtcNow.Month >= 9 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1);
+            new(DateTime.UtcNow.Year);
     }
 }
