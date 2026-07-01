@@ -187,7 +187,6 @@
             <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
               {{ student.name }}
               <ng-container *ngIf="student.email"> ({{ student.email }})</ng-container>
-              — {{ student.source === 'api' ? '🌐 مسجل' : '✍ يدوي' }}
               <ng-container *ngIf="student.subscription?.status === 'Active'"> ✓ مشترك بالفعل</ng-container>
             </option>
           </select>
