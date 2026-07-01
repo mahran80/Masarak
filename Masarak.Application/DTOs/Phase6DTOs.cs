@@ -26,7 +26,10 @@ namespace Masarak.Application.DTOs
         string Role,
         bool IsActive,
         DateTime CreatedAt,
-        bool HasActiveSubscription);
+        bool HasActiveSubscription,
+        int? GradeId = null,
+        string? Specialization = null,
+        List<int>? StudentIds = null);
 
     /// <summary>
     /// Phase 6: Detailed admin user view DTO with activity metrics.

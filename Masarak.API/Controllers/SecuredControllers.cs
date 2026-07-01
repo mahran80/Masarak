@@ -3,6 +3,7 @@ using Masarak.API.Policies;
 using Masarak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masarak.API.Controllers
 {
@@ -14,11 +15,68 @@ namespace Masarak.API.Controllers
     public class AdminController : ControllerBase
     {
         [HttpGet("dashboard")]
-        public IActionResult Dashboard() =>
-            Ok(new { message = "Admin dashboard — restricted to Admins only.", user = GetUserInfo() });
+        public async Task<IActionResult> Dashboard([FromServices] Masarak.Infrastructure.Persistence.Context db, CancellationToken ct)
+        {
+            var totalStudents = await db.Users.CountAsync(u => u.Role.Name == "Student" && u.IsActive, ct);
+            var activeTeachers = await db.Users.CountAsync(u => u.Role.Name == "Teacher" && u.IsActive, ct);
+            var totalRevenue = await db.Subscriptions
+                .Where(s => s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active || s.Status == Masarak.Domain.Enums.SubscriptionStatus.Expired)
+                .SumAsync(s => s.Plan.PriceMonthly, ct);
+
+            var recentActivities = await db.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .Select(u => new 
+                {
+                    fullName = u.FullName,
+                    role = u.Role.Name,
+                    createdAt = u.CreatedAt
+                })
+                .ToListAsync(ct);
+
+            return Ok(new 
+            {
+                totalStudents,
+                activeTeachers,
+                totalRevenue,
+                recentActivities
+            });
+        }
 
 
-
+        [HttpPost("users")]
+        [ProducesResponseType(typeof(Masarak.Application.DTOs.AdminUserDto), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateUser(
+            [FromServices] IAdminUserService adminUserService,
+            [FromBody] Masarak.Application.DTOs.AdminCreateUserRequest request)
+        {
+            try
+            {
+                var result = await adminUserService.CreateUserAsync(request);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpDelete("users/{id}")]
+       public async Task<IActionResult> DeleteUser(
+            [FromServices] IAdminUserService adminUserService,
+            int id)
+        {
+            try
+            {
+                await adminUserService.DeleteUserAsync(id);
+                return Ok(new { message = $"User {id} deleted by Admin." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(Masarak.Application.DTOs.PagedResult<Masarak.Application.DTOs.SubscriptionDto>), 200)]
         public async Task<IActionResult> GetAllSubscriptions(

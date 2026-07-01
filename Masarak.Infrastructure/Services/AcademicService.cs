@@ -19,6 +19,7 @@ namespace Masarak.Infrastructure.Services
         private readonly ISubjectRepository _subjectRepo;
         private readonly ITeachingAssignmentRepository _assignmentRepo;
         private readonly IStudentClassRepository _studentClassRepo;
+        private readonly IUserRepository _userRepo;
         private readonly IDistributedCache _cache;
 
         private const string GradesCacheKey = "grades:all";
@@ -30,6 +31,7 @@ namespace Masarak.Infrastructure.Services
             ISubjectRepository subjectRepo,
             ITeachingAssignmentRepository assignmentRepo,
             IStudentClassRepository studentClassRepo,
+            IUserRepository userRepo,
             IDistributedCache cache)
         {
             _gradeRepo        = gradeRepo;
@@ -37,6 +39,7 @@ namespace Masarak.Infrastructure.Services
             _subjectRepo      = subjectRepo;
             _assignmentRepo   = assignmentRepo;
             _studentClassRepo = studentClassRepo;
+            _userRepo         = userRepo;
             _cache            = cache;
         }
 
@@ -245,6 +248,12 @@ namespace Masarak.Infrastructure.Services
 
         public async Task<StudentClassDto> EnrollStudentAsync(EnrollStudentRequest request, CancellationToken ct = default)
         {
+            var studentUser = await _userRepo.GetByIdAsync(request.StudentId, ct);
+            if (studentUser == null)
+                throw new KeyNotFoundException($"Student {request.StudentId} not found.");
+            if (studentUser.Role.Name != "Student")
+                throw new InvalidOperationException($"User {request.StudentId} is not a Student.");
+
             // 1. Verify class exists and is active
             var cls = await _classRepo.GetByIdWithGradeAsync(request.ClassId, ct)
                 ?? throw new KeyNotFoundException($"Class {request.ClassId} not found.");

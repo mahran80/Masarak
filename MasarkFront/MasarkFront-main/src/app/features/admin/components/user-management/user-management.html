@@ -77,12 +77,11 @@
             <th>الاشتراك</th>
             <th>نوع الاشتراك</th>
             <th>تاريخ الانضمام</th>
-            <th>المصدر</th>
             <th class="center">إجراءات</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of filteredUsers()" class="um-row">
+          <tr *ngFor="let user of paginatedUsers()" class="um-row">
             <!-- ID -->
             <td>
               <span class="text-xs font-mono bg-slate-100 text-slate-500 px-2 py-1 rounded">{{ user.id }}</span>
@@ -124,21 +123,15 @@
             </td>
             <!-- Joined -->
             <td class="text-muted">{{ user.joinedAt }}</td>
-            <!-- Source -->
-            <td>
-              <span class="source-badge" [class.api]="user.source === 'api'" [class.manual]="user.source === 'manual'">
-                {{ user.source === 'api' ? '🌐 مسجل' : '✍ يدوي' }}
-              </span>
-            </td>
             <!-- Actions -->
             <td class="center">
               <div class="action-btns">
                 <button class="btn-edit" (click)="openEditModal(user)">تعديل</button>
-                <button class="btn-delete" (click)="deleteUser(user)">حذف</button>
-                <button class="btn-edit" *ngIf="user.source === 'api'" (click)="toggleUserStatus(user)">
+                <button class="btn-delete" (click)="deleteUser(user)">حذف نهائي</button>
+                <button class="btn-edit" (click)="toggleUserStatus(user)">
                   {{ user.status === 'Active' ? 'تعطيل' : 'تفعيل' }}
                 </button>
-                <button class="btn-edit" *ngIf="user.source === 'api'" (click)="resetPassword(user)">
+                <button class="btn-edit" (click)="resetPassword(user)">
                   إعادة تعيين المرور
                 </button>
                 <button
@@ -157,6 +150,13 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="filteredUsers().length > 0" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding-bottom: 1rem;">
+      <button class="btn-cancel" [disabled]="currentPage() === 1" (click)="prevPage()" style="padding: 0.4rem 1rem;">السابق</button>
+      <span class="text-sm font-medium text-slate-600">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+      <button class="btn-primary" [disabled]="currentPage() === totalPages()" (click)="nextPage()" style="padding: 0.4rem 1rem;">التالي</button>
     </div>
 
     <!-- Stats footer -->
@@ -187,7 +187,6 @@
             <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
               {{ student.name }}
               <ng-container *ngIf="student.email"> ({{ student.email }})</ng-container>
-              — {{ student.source === 'api' ? '🌐 مسجل' : '✍ يدوي' }}
               <ng-container *ngIf="student.subscription?.status === 'Active'"> ✓ مشترك بالفعل</ng-container>
             </option>
           </select>
@@ -241,6 +240,15 @@
         <span *ngIf="!assigning()">🎫 إضافة الاشتراك</span>
         <span *ngIf="assigning()">⏳ جاري الإضافة...</span>
       </button>
+
+      <!-- Subscription feedback (visible inside subscription tab) -->
+      <div *ngIf="feedback()" class="um-feedback sm"
+        [class.is-success]="feedbackType() === 'success'"
+        [class.is-error]="feedbackType() === 'error'"
+        style="margin-top: 12px;">
+        <span class="icon">{{ feedbackType() === 'success' ? '✓' : '✕' }}</span>
+        {{ feedback() }}
+      </div>
     </div>
 
     <!-- Students subscription table -->
@@ -336,6 +344,7 @@
             <option value="Student">طالب</option>
             <option value="Teacher">معلم</option>
             <option value="Parent">ولي أمر</option>
+            <option value="Admin">مدير</option>
           </select>
         </div>
 
@@ -345,6 +354,49 @@
             <option value="Active">نشط</option>
             <option value="Inactive">غير نشط</option>
           </select>
+        </div>
+      </div>
+
+      <!-- Dynamic Role Requirements -->
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Student'">
+        <label class="form-label">المرحلة الدراسية <span style="color:red">*</span></label>
+        <select class="um-select full" [(ngModel)]="form.gradeId">
+          <option [ngValue]="null">-- اختر المرحلة الدراسية --</option>
+          <option *ngFor="let grade of grades()" [value]="grade.gradeId">{{ grade.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Teacher'">
+        <label class="form-label">التخصص (Specialization) <span style="color:red">*</span></label>
+        <input class="um-input" [(ngModel)]="form.specialization" placeholder="مثال: رياضيات، علوم" type="text" />
+      </div>
+
+      <div class="form-group dynamic-field" *ngIf="form.role === 'Parent'">
+        <label class="form-label">أبناء ولي الأمر <span style="color:red">*</span></label>
+        
+        <!-- Selected Students Chips -->
+        <div class="selected-students" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;" *ngIf="form.studentIds.length > 0">
+          <span *ngFor="let id of form.studentIds" style="background: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 16px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+            {{ getStudentName(id) }}
+            <button (click)="toggleStudentSelection(id)" style="color: #ef4444; border: none; background: transparent; cursor: pointer; font-weight: bold;">✕</button>
+          </span>
+        </div>
+
+        <input type="text" class="um-input mb-2" [ngModel]="parentStudentSearch()" (ngModelChange)="parentStudentSearch.set($event)" placeholder="البحث عن طالب بالاسم أو البريد..." style="margin-bottom: 8px;" />
+
+        <div class="students-list-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); background: #f8fafc;">
+          <div *ngFor="let s of filteredStudentsForParent()" 
+               style="padding: 8px; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;"
+               [style.background]="form.studentIds.includes(s.id) ? '#dbeafe' : 'transparent'"
+               (click)="toggleStudentSelection(s.id)">
+            <div>
+              <div style="font-weight: 500; font-size: 14px;">{{ s.name }}</div>
+              <div style="font-size: 12px; color: #64748b;" *ngIf="s.email">{{ s.email }}</div>
+            </div>
+            <span *ngIf="form.studentIds.includes(s.id)" style="color: #2563eb; font-weight: bold;">✓ مضاف</span>
+            <span *ngIf="!form.studentIds.includes(s.id)" style="color: #64748b; font-size: 12px;">+ إضافة</span>
+          </div>
+          <div *ngIf="filteredStudentsForParent().length === 0" class="text-muted" style="font-size: 0.9em; text-align: center; padding: 10px;">لا توجد نتائج بحث مطابقة.</div>
         </div>
       </div>
     </div>

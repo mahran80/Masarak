@@ -11,6 +11,9 @@ export interface AdminUserDto {
   isActive: boolean;
   createdAt: string;
   hasActiveSubscription?: boolean;
+  gradeId?: number | null;
+  specialization?: string | null;
+  studentIds?: number[];
 }
 
 export interface AdminUserDetailDto extends AdminUserDto {
@@ -43,6 +46,18 @@ export interface AdminCreateUserRequest {
   password: string;
   role: string;
   phone?: string;
+  gradeId?: number | null;
+  specialization?: string;
+  studentIds?: number[];
+}
+
+export interface AdminUpdateUserRequest {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  gradeId?: number | null;
+  specialization?: string;
+  studentIds?: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -50,20 +65,20 @@ export class AdminApiService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/admin`;
 
-  /** GET /api/admin/users?pageNumber=&pageSize=&role= */
+  /** GET /api/admin/users?page=&pageSize=&role= */
   getUsers(
-    pageNumber = 1,
+    page = 1,
     pageSize = 100,
     role?: string,
   ): Observable<AdminUsersPagedResult | AdminUserDto[]> {
     let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
+      .set('page', page.toString())
       .set('pageSize', pageSize.toString());
     if (role) params = params.set('role', role);
     return this.http.get<AdminUsersPagedResult | AdminUserDto[]>(`${this.base}/users`, { params });
   }
 
-  /** POST /api/admin/users — create a real user with any role */
+  /** POST /api/admin/users — create user with role-specific profiles */
   createUser(req: AdminCreateUserRequest): Observable<AdminUserDto> {
     return this.http.post<AdminUserDto>(`${this.base}/users`, req);
   }
@@ -71,6 +86,11 @@ export class AdminApiService {
   /** DELETE /api/admin/users/{id} */
   deleteUser(userId: number): Observable<any> {
     return this.http.delete<any>(`${this.base}/users/${userId}`);
+  }
+
+  /** PUT /api/admin/users/{id} — update user details */
+  updateUser(userId: number, req: AdminUpdateUserRequest): Observable<AdminUserDto> {
+    return this.http.put<AdminUserDto>(`${this.base}/users/${userId}`, req);
   }
 
   /** GET /api/admin/dashboard */
@@ -102,8 +122,8 @@ export class AdminApiService {
   }
 
   /** POST /api/admin/users/{id}/reset-password */
-  resetUserPassword(userId: number): Observable<{ password?: string, message?: string }> {
-    return this.http.post<{ password?: string, message?: string }>(`${this.base}/users/${userId}/reset-password`, {});
+  resetUserPassword(userId: number, newPassword?: string): Observable<{ password?: string, message?: string }> {
+    return this.http.post<{ password?: string, message?: string }>(`${this.base}/users/${userId}/reset-password`, { newPassword });
   }
 
   /** PUT /api/admin/content/{id}/moderate */

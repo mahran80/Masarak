@@ -67,7 +67,7 @@ export interface MessageResponse {
 }
 
 export interface LinkageCodeResponse {
-  code: string;
+  linkageCode: string;
 }
 
 // ─── Stored Auth State ───────────────────────────────────────────────────────

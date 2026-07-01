@@ -31,14 +31,15 @@ import { TeacherDto } from '../../../../../models/academic.model';
         <div class="flex-1 relative">
           <input
             type="text"
-            [(ngModel)]="searchQuery"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
             placeholder="البحث باسم المعلم، البريد الإلكتروني، أو التخصص..."
             class="w-full pr-10 pl-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition-all"
           />
           <span class="absolute right-3 top-2.5 text-slate-400">🔍</span>
         </div>
         <div class="w-full md:w-48">
-          <select [(ngModel)]="selectedSpecialization" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none bg-slate-50 focus:bg-white transition-all">
+          <select [ngModel]="selectedSpecialization()" (ngModelChange)="selectedSpecialization.set($event)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none bg-slate-50 focus:bg-white transition-all">
             <option value="">كل التخصصات</option>
             @for (spec of specializations(); track spec) {
               <option [value]="spec">{{ spec }}</option>
@@ -55,7 +56,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
       } @else {
         <!-- Teachers Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (t of filteredTeachers(); track t.teacherId) {
+          @for (t of filteredTeachers(); track t.userId) {
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col overflow-hidden group">
               <!-- Card Top Header -->
               <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-slate-100/50 flex items-start gap-4">
@@ -145,8 +146,8 @@ export class TeachersDirectoryComponent implements OnInit {
   teachers = signal<TeacherDto[]>([]);
   isLoading = signal<boolean>(true);
   
-  searchQuery = '';
-  selectedSpecialization = '';
+  searchQuery = signal('');
+  selectedSpecialization = signal('');
 
   // Get distinct specializations for dropdown filter
   specializations = computed(() => {
@@ -158,8 +159,8 @@ export class TeachersDirectoryComponent implements OnInit {
 
   filteredTeachers = computed(() => {
     let list = this.teachers();
-    const query = this.searchQuery.trim().toLowerCase();
-    const spec = this.selectedSpecialization;
+    const query = this.searchQuery().trim().toLowerCase();
+    const spec = this.selectedSpecialization();
 
     if (query) {
       list = list.filter(t => 

@@ -117,7 +117,7 @@ export class MySubscriptionComponent implements OnInit {
     this.codeLoading.set(true);
     this.authApi.getMyLinkageCode().subscribe({
       next: (r) => {
-        this.linkageCode.set(r.code);
+        this.linkageCode.set(r.linkageCode);
         this.codeLoading.set(false);
       },
       error: (err) => {

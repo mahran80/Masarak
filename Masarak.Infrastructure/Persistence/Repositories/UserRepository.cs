@@ -29,7 +29,6 @@ namespace Masarak.Infrastructure.Persistence.Repositories
 
         public async Task UpdateAsync(User user, CancellationToken ct = default)
         {
-            _context.Users.Update(user);
             await _context.SaveChangesAsync(ct);
         }
     }

@@ -81,7 +81,7 @@
         <h2 class="text-lg font-black text-slate-900 mb-5">أحدث المستخدمين انضماماً</h2>
         
         <div class="space-y-5 flex-1 overflow-y-auto">
-          @for (act of d.recentActivities; track act.fullName) {
+          @for (act of d.recentActivities; track $index) {
             <div class="flex items-start gap-3.5 border-b border-slate-50 pb-3">
               <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm"
                    [ngClass]="{'bg-blue-50': act.role === 'Student', 'bg-emerald-50': act.role === 'Teacher', 'bg-amber-50': act.role !== 'Student' && act.role !== 'Teacher'}">
