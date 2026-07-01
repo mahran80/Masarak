@@ -103,7 +103,7 @@ export class AnswerInputComponent {
 
   isSingleChoiceQuestion(): boolean {
     const qt = (this.question.questionType || '').toLowerCase();
-    return qt.includes('single') || qt.includes('truefalse') || qt.includes('tf') || qt === 'choice';
+    return qt.includes('single') || qt.includes('mcq') || qt.includes('truefalse') || qt.includes('tf') || qt === 'choice';
   }
 
   isMultipleChoiceQuestion(): boolean {

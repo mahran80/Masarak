@@ -6,16 +6,52 @@
       <h1 class="tc-greeting">مرحباً، أستاذ 👋</h1>
       <p class="tc-date">{{ today }}</p>
     </div>
-    <button class="tc-btn-primary">+ إضافة حصة جديدة</button>
+    <div class="flex items-center gap-3">
+      <a routerLink="/dashboard/teacher/assessment/assignments/create"
+         class="tc-btn-primary flex items-center gap-2">
+        ➕ إضافة واجب جديد
+      </a>
+      <a routerLink="/dashboard/teacher/assessment/exams/create"
+         class="tc-btn-secondary flex items-center gap-2">
+        📝 إنشاء اختبار
+      </a>
+    </div>
   </div>
 
   <!-- ── Stats cards ───────────────────────────────────────────────── -->
   <div class="tc-stats-grid">
-    <div *ngFor="let stat of stats()" class="tc-stat-card" [style.--clr]="stat.color" [style.--bg]="stat.bg">
-      <div class="stat-icon">{{ stat.icon }}</div>
+    <!-- Pending grading — real data -->
+    <div class="tc-stat-card" [style.--clr]="'#4f8cd4'" [style.--bg]="'#eff6ff'">
+      <div class="stat-icon">📋</div>
       <div>
-        <p class="stat-label">{{ stat.label }}</p>
-        <p class="stat-value">{{ stat.value }}</p>
+        <p class="stat-label">التصحيح المعلق</p>
+        @if (isLoadingStats()) {
+          <p class="stat-value">...</p>
+        } @else {
+          <p class="stat-value">{{ pendingGradingCount() }}</p>
+        }
+      </div>
+    </div>
+    <!-- Static stats -->
+    <div class="tc-stat-card" [style.--clr]="'#059669'" [style.--bg]="'#ecfdf5'">
+      <div class="stat-icon">🎓</div>
+      <div>
+        <p class="stat-label">إجمالي الطلاب</p>
+        <p class="stat-value">١٢٤</p>
+      </div>
+    </div>
+    <div class="tc-stat-card" [style.--clr]="'#7c3aed'" [style.--bg]="'#f5f3ff'">
+      <div class="stat-icon">📚</div>
+      <div>
+        <p class="stat-label">الدروس هذا الأسبوع</p>
+        <p class="stat-value">١٨</p>
+      </div>
+    </div>
+    <div class="tc-stat-card" [style.--clr]="'#d97706'" [style.--bg]="'#fffbeb'">
+      <div class="stat-icon">✅</div>
+      <div>
+        <p class="stat-label">متوسط الحضور</p>
+        <p class="stat-value">٩٢٪</p>
       </div>
     </div>
   </div>
@@ -31,20 +67,30 @@
       </div>
 
       <div class="sessions-list">
-        <div *ngFor="let s of sessions()" class="session-item" [class.live]="s.status === 'live'" [class.done]="s.status === 'done'">
-          <div class="session-time">{{ s.time }}</div>
-          <div class="session-info">
-            <p class="session-title">{{ s.title }} — {{ s.subject }}</p>
-            <p class="session-grade">{{ s.grade }}</p>
-          </div>
-          <div class="session-actions">
-            <span class="status-chip" [class.live]="s.status === 'live'" [class.upcoming]="s.status === 'upcoming'" [class.done]="s.status === 'done'">
-              <span *ngIf="s.status === 'live'" class="live-dot"></span>
-              {{ sessionStatusLabel(s.status) }}
-            </span>
-            <button *ngIf="s.status === 'live'" class="tc-btn-live">ابدأ الجلسة</button>
-          </div>
-        </div>
+        @if (isLoadingSessions()) {
+          <div class="text-center py-6 text-slate-400 font-bold text-sm">جاري تحميل الحصص...</div>
+        } @else if (sessions().length === 0) {
+          <div class="text-center py-6 text-slate-400 font-bold text-sm">لا يوجد حصص متبقية اليوم</div>
+        } @else {
+          @for (s of sessions(); track s.id) {
+            <div class="session-item" [class.live]="s.status === 'live'" [class.done]="s.status === 'done'">
+              <div class="session-time">{{ s.time }}</div>
+              <div class="session-info">
+                <p class="session-title">{{ s.title }} — {{ s.subject }}</p>
+                <p class="session-grade">{{ s.grade }}</p>
+              </div>
+              <div class="session-actions">
+                <span class="status-chip" [class.live]="s.status === 'live'" [class.upcoming]="s.status === 'upcoming'" [class.done]="s.status === 'done'">
+                  @if (s.status === 'live') { <span class="live-dot"></span> }
+                  {{ sessionStatusLabel(s.status) }}
+                </span>
+                @if (s.status === 'live') {
+                  <a [routerLink]="['/dashboard/teacher/session/live', s.id]" class="tc-btn-live">ابدأ الجلسة</a>
+                }
+              </div>
+            </div>
+          }
+        }
       </div>
     </div>
 
@@ -72,20 +118,24 @@
         </div>
       </div>
 
-      <!-- Pending assignments -->
+      <!-- Pending grading card — real data + router link -->
       <div class="tc-card pending-card">
         <div class="pending-header">
           <div>
-            <h3 class="card-title sm">الواجبات المعلقة</h3>
-            <p class="pending-sub">بانتظار التصحيح</p>
+            <h3 class="card-title sm">التصحيح المعلق</h3>
+            <p class="pending-sub">واجبات واختبارات بانتظار التصحيح</p>
           </div>
-          <div class="pending-count">٣٥</div>
+          @if (isLoadingStats()) {
+            <div class="pending-count" style="font-size: 1rem">...</div>
+          } @else {
+            <div class="pending-count">{{ pendingGradingCount() }}</div>
+          }
         </div>
         <div class="pending-bar">
-          <div class="bar-fill" style="width: 70%"></div>
+          <div class="bar-fill" [style.width]="pendingGradingCount() > 0 ? '70%' : '0%'"></div>
         </div>
-        <p class="pending-hint">٧٠٪ من إجمالي الواجبات المرسلة</p>
-        <button class="tc-btn-ghost">عرض الكل</button>
+        <p class="pending-hint">اضغط لمراجعة كل التسليمات</p>
+        <a routerLink="/dashboard/teacher/assessment/grading" class="tc-btn-ghost block text-center">عرض لوحة التصحيح</a>
       </div>
 
       <!-- Activities -->

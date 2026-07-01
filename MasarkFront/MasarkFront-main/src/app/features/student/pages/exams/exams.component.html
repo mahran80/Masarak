@@ -1,8 +1,8 @@
 <section class="space-y-6 text-slate-900" dir="rtl">
   <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div class="text-right">
-      <p class="text-sm font-semibold text-sky-700">Assessment</p>
-      <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Exams</h1>
+      <p class="text-sm font-semibold text-sky-700">التقييمات</p>
+      <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">الاختبارات</h1>
     </div>
     <button
       type="button"
@@ -10,7 +10,7 @@
       [disabled]="isLoading()"
       (click)="loadExams()"
     >
-      Refresh
+      تحديث
     </button>
   </header>
 
@@ -21,10 +21,10 @@
     </div>
   } @else if (errorMessage()) {
     <article class="rounded-lg border border-rose-200 bg-white p-6 text-right shadow-sm">
-      <p class="text-sm font-semibold text-rose-700">Exams could not be loaded</p>
+      <p class="text-sm font-semibold text-rose-700">لم نتمكن من تحميل الاختبارات</p>
       <p class="mt-2 text-sm text-slate-600">{{ errorMessage() }}</p>
       <button type="button" class="mt-5 rounded-lg bg-rose-600 px-4 py-3 text-sm font-semibold text-white" (click)="loadExams()">
-        Try again
+        حاول مرة أخرى
       </button>
     </article>
   } @else if (totalExams() > 0) {
@@ -38,7 +38,7 @@
                 <p class="mt-1 text-sm font-semibold text-sky-700">{{ group.subject.subjectArabicName }}</p>
               </div>
               <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">
-                {{ group.exams.length }} exams
+                {{ group.exams.length }} اختبارات
               </span>
             </div>
 
@@ -60,7 +60,7 @@
                       }
                     </div>
                     <span class="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
-                      {{ exam.status ?? 'Available' }}
+                      {{ exam.status ?? 'متاح' }}
                     </span>
                   </div>
                 </button>
@@ -72,7 +72,7 @@
 
       <aside class="space-y-5">
         <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-          <h2 class="text-lg font-bold text-slate-950">Exam Details</h2>
+          <h2 class="text-lg font-bold text-slate-950">تفاصيل الاختبار</h2>
           @if (selectedExam(); as selected) {
             <div class="mt-5 space-y-4">
               <div>
@@ -85,33 +85,35 @@
 
               <dl class="grid gap-3 text-sm">
                 @if (selected.exam.startsAt) {
-                  <div class="rounded-lg bg-slate-50 p-3">
-                    <dt class="font-semibold text-slate-500">Starts</dt>
-                    <dd class="mt-1 font-semibold text-slate-950">{{ selected.exam.startsAt | date: 'medium' }}</dd>
+                  <div class="rounded-lg bg-slate-50 p-3 flex justify-between">
+                    <dt class="font-semibold text-slate-500">يبدأ</dt>
+                    <dd class="font-semibold text-slate-950">{{ selected.exam.startsAt | date: 'medium' }}</dd>
                   </div>
                 }
                 @if (selected.exam.endsAt) {
-                  <div class="rounded-lg bg-slate-50 p-3">
-                    <dt class="font-semibold text-slate-500">Ends</dt>
-                    <dd class="mt-1 font-semibold text-slate-950">{{ selected.exam.endsAt | date: 'medium' }}</dd>
+                  <div class="rounded-lg bg-slate-50 p-3 flex justify-between">
+                    <dt class="font-semibold text-slate-500">ينتهي</dt>
+                    <dd class="font-semibold text-slate-950">{{ selected.exam.endsAt | date: 'medium' }}</dd>
                   </div>
                 }
-                <div class="rounded-lg bg-slate-50 p-3">
-                  <dt class="font-semibold text-slate-500">Duration</dt>
-                  <dd class="mt-1 font-semibold text-slate-950">{{ selected.exam.durationMinutes ?? 0 }} min</dd>
+                <div class="rounded-lg bg-slate-50 p-3 flex justify-between">
+                  <dt class="font-semibold text-slate-500">المدة</dt>
+                  <dd class="font-semibold text-slate-950">{{ selected.exam.durationMinutes ?? 0 }} دقيقة</dd>
                 </div>
               </dl>
 
               <button
                 type="button"
                 class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-                [disabled]="isStarting()"
+                [disabled]="isStarting() || store.exam()"
                 (click)="startSelectedExam()"
               >
                 @if (isStarting()) {
-                  Starting...
+                  جاري البدء...
+                } @else if (store.exam()) {
+                  الاختبار قيد التقدم
                 } @else {
-                  Start exam
+                  ابدأ الاختبار
                 }
               </button>
             </div>
@@ -119,131 +121,210 @@
         </article>
 
         @if (examResult(); as result) {
-          <article class="rounded-lg border border-emerald-200 bg-white p-5 text-right shadow-sm">
-            <p class="text-sm font-semibold text-emerald-700">Exam Result</p>
-            <h3 class="mt-2 text-3xl font-bold text-slate-950">{{ result.percentage }}%</h3>
-            <p class="mt-2 text-sm font-semibold text-slate-600">
-              Score {{ result.score }} / {{ result.maxScore }}
-            </p>
+          <article class="rounded-lg border border-emerald-200 bg-white p-5 text-right shadow-sm flex flex-col items-center">
+            <p class="text-sm font-semibold text-emerald-700 mb-4 self-start">نتيجة الاختبار</p>
+            
+            <app-score-badge [score]="result.score" [maxScore]="result.maxScore"></app-score-badge>
+            
+            <h3 class="mt-4 text-3xl font-bold text-slate-950" dir="ltr">{{ result.percentage | number:'1.0-0' }}%</h3>
+            
             @if (result.gradeLetter) {
               <span class="mt-4 inline-flex rounded-full bg-sky-50 px-3 py-1 text-sm font-bold text-sky-700 ring-1 ring-sky-200">
-                {{ result.gradeLetter }}
+                التقدير: {{ result.gradeLetter }}
               </span>
+            }
+            @if (result.hasPendingManualGrading) {
+              <p class="mt-3 text-xs text-amber-600 text-center">بعض الأسئلة المقالية بانتظار تصحيح المعلم.</p>
             }
           </article>
         }
       </aside>
     </div>
 
-    @if (activeExam(); as active) {
-      <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <p class="text-sm font-semibold text-sky-700">Active Exam</p>
-            <h2 class="mt-1 text-xl font-bold text-slate-950">{{ active.title ?? selectedExam()?.exam?.title ?? 'Exam' }}</h2>
-            <p class="mt-1 text-sm text-slate-500">Started {{ active.startedAt | date: 'medium' }}</p>
+    @if (store.exam(); as active) {
+      <article class="relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-6 shadow-2xl backdrop-blur-xl mb-12 ring-1 ring-slate-900/5 transition-all duration-500">
+        <!-- Decorative glowing orbs -->
+        <div class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-sky-400/20 mix-blend-multiply blur-3xl filter transition-all duration-1000"></div>
+        <div class="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-emerald-400/20 mix-blend-multiply blur-3xl filter transition-all duration-1000"></div>
+
+        <div class="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-2xl bg-white/60 p-5 shadow-sm backdrop-blur-md mb-8 border border-white/50">
+          <div class="flex items-center gap-4">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 shadow-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <p class="text-xs font-bold uppercase tracking-wider text-emerald-700">اختبار نشط</p>
+              </div>
+              <h2 class="mt-1 text-2xl font-black text-slate-900 tracking-tight">{{ active.title ?? selectedExam()?.exam?.title ?? 'اختبار' }}</h2>
+            </div>
           </div>
-          @if (active.expiresAt) {
-            <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-200">
-              Expires {{ active.expiresAt | date: 'shortTime' }}
-            </span>
-          }
+          
+          <div class="flex items-center gap-6 rounded-xl bg-slate-900/5 px-6 py-3 border border-slate-900/10 shadow-inner">
+            <div class="text-right flex flex-col gap-1">
+              <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">الوقت المتبقي</span>
+              <div class="text-xl font-bold tracking-tighter text-sky-700">
+                <app-exam-timer 
+                  [durationSeconds]="active.secondsRemaining || (selectedExam()?.exam?.durationMinutes || 0) * 60"
+                  [startTime]="active.startedAt"
+                  (timeUp)="submitActiveExam()">
+                </app-exam-timer>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="mt-6 grid gap-5">
-          @for (question of active.questions; track question.questionId) {
-            <section class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div class="flex items-start justify-between gap-4">
-                <h3 class="font-bold leading-7 text-slate-950">{{ question.text }}</h3>
-                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
-                  {{ question.points ?? 0 }} pts
-                </span>
+        <div class="relative z-10 flex flex-col lg:flex-row gap-8">
+          <!-- Main Question Area -->
+          <div class="flex-1 transition-all duration-300">
+            @if (store.currentQuestion(); as question) {
+              <div class="rounded-2xl bg-white/70 backdrop-blur-md p-6 shadow-sm border border-white/50 mb-6">
+                <app-question-renderer 
+                  [question]="question"
+                  [answer]="store.answers()[question.questionId]"
+                  (answerChange)="onAnswerChange($event)">
+                </app-question-renderer>
+              </div>
+            }
+
+            <div class="flex items-center justify-between rounded-2xl bg-white/60 backdrop-blur-md p-4 shadow-sm border border-white/50">
+              <button
+                type="button"
+                class="group flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="store.isFirstQuestion()"
+                (click)="store.prevQuestion()"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                السابق
+              </button>
+              
+              <div class="flex items-center gap-3">
+                <div class="h-2 w-32 rounded-full bg-slate-200 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-500" [style.width.%]="((store.currentQuestionIndex() + 1) / store.totalQuestions()) * 100"></div>
+                </div>
+                <div class="text-sm font-bold text-slate-500">
+                  <span class="text-slate-900">{{ store.currentQuestionIndex() + 1 }}</span> / {{ store.totalQuestions() }}
+                </div>
               </div>
 
-              @if (isChoiceQuestion(question)) {
-                <div class="mt-4 grid gap-3">
-                  @for (choice of question.choices; track choice.choiceId) {
-                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-sm font-semibold text-slate-700">
-                      @if (isMultipleChoiceQuestion(question)) {
-                        <input
-                          type="checkbox"
-                          class="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                          [checked]="isChoiceSelected(question.questionId, choice.choiceId)"
-                          (change)="toggleMultipleChoiceAnswer(question, choice.choiceId, $event)"
-                        />
-                      } @else {
-                        <input
-                          type="radio"
-                          class="h-4 w-4 border-slate-300 text-sky-600 focus:ring-sky-500"
-                          [attr.name]="'question-' + question.questionId"
-                          [checked]="isChoiceSelected(question.questionId, choice.choiceId)"
-                          (change)="setSingleChoiceAnswer(question, choice.choiceId)"
-                        />
-                      }
-                      <span>{{ choice.text }}</span>
-                    </label>
+              <button
+                type="button"
+                class="group flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-800 to-slate-900 px-6 text-sm font-bold text-white shadow-lg shadow-slate-900/20 transition-all hover:from-slate-700 hover:to-slate-800 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="store.isLastQuestion()"
+                (click)="store.nextQuestion()"
+              >
+                التالي
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Sidebar (Navigator) -->
+          <div class="w-full lg:w-80 flex-shrink-0">
+            <div class="rounded-2xl bg-white/60 backdrop-blur-md p-6 border border-white/50 shadow-sm sticky top-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="font-black text-slate-900 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  خريطة الأسئلة
+                </h3>
+                <span class="text-xs font-black tracking-wide text-sky-700 bg-sky-100 px-3 py-1.5 rounded-full shadow-inner">
+                  {{ store.answeredQuestionsCount() }} / {{ store.totalQuestions() }}
+                </span>
+              </div>
+              
+              <div class="grid grid-cols-5 gap-3">
+                @for (q of active.questions; track q.questionId; let i = $index) {
+                  <button 
+                    type="button"
+                    class="relative h-11 rounded-xl flex items-center justify-center text-sm font-black transition-all duration-300 hover:scale-105 active:scale-95 overflow-hidden"
+                    [class.bg-gradient-to-br]="i === store.currentQuestionIndex()"
+                    [class.from-sky-500]="i === store.currentQuestionIndex()"
+                    [class.to-indigo-600]="i === store.currentQuestionIndex()"
+                    [class.text-white]="i === store.currentQuestionIndex()"
+                    [class.shadow-md]="i === store.currentQuestionIndex()"
+                    [class.shadow-sky-500/30]="i === store.currentQuestionIndex()"
+                    [class.bg-white]="i !== store.currentQuestionIndex()"
+                    [class.ring-1]="i !== store.currentQuestionIndex()"
+                    [class.ring-emerald-400]="i !== store.currentQuestionIndex() && !!store.answers()[q.questionId]"
+                    [class.text-emerald-700]="i !== store.currentQuestionIndex() && !!store.answers()[q.questionId]"
+                    [class.bg-emerald-50]="i !== store.currentQuestionIndex() && !!store.answers()[q.questionId]"
+                    [class.ring-slate-200]="i !== store.currentQuestionIndex() && !store.answers()[q.questionId]"
+                    [class.text-slate-400]="i !== store.currentQuestionIndex() && !store.answers()[q.questionId]"
+                    (click)="store.goToQuestion(i)">
+                    @if (i !== store.currentQuestionIndex() && !!store.answers()[q.questionId]) {
+                      <div class="absolute inset-0 bg-emerald-400/10"></div>
+                    }
+                    <span class="relative z-10">{{ i + 1 }}</span>
+                  </button>
+                }
+              </div>
+
+              <div class="mt-8 pt-6 border-t border-slate-200/50">
+                <div class="flex items-center justify-center gap-2 mb-5 bg-white/50 rounded-lg py-2">
+                  @if (store.isSaving()) {
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-600"></div>
+                    <span class="text-xs font-bold text-sky-700">جاري الحفظ التلقائي...</span>
+                  } @else if (store.lastSavedAt()) {
+                    <div class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-700 tracking-wide">تم الحفظ ({{ store.lastSavedAt() | date:'shortTime' }})</span>
                   }
                 </div>
-              } @else if (isFileQuestion(question)) {
-                <label class="mt-4 grid gap-2 text-sm font-semibold text-slate-700">
-                  Upload answer
-                  <input
-                    type="file"
-                    class="min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-800 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-sky-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-sky-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                    (change)="setFileAnswer(question, $event)"
-                  />
-                </label>
-                @if (fileAnswerName(question.questionId); as fileName) {
-                  <p class="mt-2 text-xs font-semibold text-slate-500">{{ fileName }}</p>
-                }
-              } @else {
-                <textarea
-                  class="mt-4 min-h-28 w-full rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                  [value]="textAnswer(question.questionId)"
-                  (input)="setTextAnswer(question, $event)"
-                ></textarea>
-              }
-            </section>
-          }
+
+                <button
+                  type="button"
+                  class="group relative w-full inline-flex min-h-[3.5rem] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 text-sm font-black text-white overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  [disabled]="isSubmitting()"
+                  (click)="submitActiveExam()"
+                >
+                  <div class="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0 duration-300"></div>
+                  <span class="relative flex items-center gap-2">
+                    @if (isSubmitting()) {
+                      <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-b-transparent"></div>
+                      جاري التسليم...
+                    } @else {
+                      تسليم الاختبار النهائي
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    }
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         @if (actionMessage()) {
-          <p class="mt-5 rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
+          <div class="relative z-10 mt-6 rounded-xl bg-slate-900/5 p-4 text-sm font-bold text-slate-700 border border-slate-900/10 text-center backdrop-blur-sm">
+            {{ actionMessage() }}
+          </div>
         }
-
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            class="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-            [disabled]="isSaving() || isSubmitting()"
-            (click)="saveAnswers()"
-          >
-            @if (isSaving()) {
-              Saving...
-            } @else {
-              Save answers
-            }
-          </button>
-          <button
-            type="button"
-            class="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-            [disabled]="isSubmitting()"
-            (click)="submitActiveExam()"
-          >
-            @if (isSubmitting()) {
-              Submitting...
-            } @else {
-              Submit exam
-            }
-          </button>
-        </div>
       </article>
     } @else if (actionMessage()) {
       <p class="rounded-lg bg-white p-4 text-sm font-semibold text-slate-700 shadow-sm">{{ actionMessage() }}</p>
     }
   } @else {
-    <article class="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-      No exams are available yet.
+    <article class="rounded-lg border border-dashed border-slate-300 bg-white p-12 text-center flex flex-col items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+      <p class="text-slate-500 font-bold text-lg">لا توجد اختبارات متاحة حالياً.</p>
     </article>
   }
 </section>
