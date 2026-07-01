@@ -5,11 +5,13 @@ using Masarak.Application.Interfaces;
 using Masarak.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Masarak.Infrastructure.Persistence;
 
 namespace Masarak.API.Controllers
 {
     /// <summary>
-    /// Student endpoints: view enrolled class and weekly schedule.
+    /// Student endpoints: view enrolled class, courses, and weekly schedule.
     /// </summary>
     [ApiController]
     [Route("api/student")]
@@ -18,10 +20,12 @@ namespace Masarak.API.Controllers
     public class StudentAcademicController : ControllerBase
     {
         private readonly ISessionService _sessionService;
+        private readonly Context _context;
 
-        public StudentAcademicController(ISessionService sessionService)
+        public StudentAcademicController(ISessionService sessionService, Context context)
         {
             _sessionService = sessionService;
+            _context = context;
         }
 
         private int GetUserId() => int.Parse(User.FindFirstValue("userid") ?? "0");
@@ -38,6 +42,40 @@ namespace Masarak.API.Controllers
                 return Ok(enrollment);
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+        [HttpGet("courses")]
+        [ProducesResponseType(typeof(IEnumerable<object>), 200)]
+        public async Task<IActionResult> GetCourses([FromQuery] int? academicYear, CancellationToken ct)
+        {
+            var year = academicYear ?? AcademicYear.Current().Year;
+            var userId = GetUserId();
+            
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId, ct);
+            if (student == null) return NotFound("Student not found.");
+
+            var enrollment = await _context.StudentClasses
+                .Include(sc => sc.Class).ThenInclude(c => c.Grade)
+                .FirstOrDefaultAsync(sc => sc.StudentId == student.StudentId && sc.IsActive && sc.AcademicYear == year, ct);
+
+            if (enrollment == null) return Ok(Array.Empty<object>());
+
+            var courses = await _context.TeachingAssignments
+                .Include(ta => ta.Subject)
+                .Include(ta => ta.Teacher).ThenInclude(t => t.User)
+                .Where(ta => ta.ClassId == enrollment.ClassId && ta.IsActive && ta.AcademicYear == year)
+                .Select(ta => new
+                {
+                    SubjectId = ta.SubjectId,
+                    SubjectName = ta.Subject.Name,
+                    SubjectArabicName = ta.Subject.NameAr ?? ta.Subject.Name,
+                    Description = ta.Subject.Description,
+                    TeacherName = ta.Teacher.User.FullName,
+                    GradeName = enrollment.Class.Grade.Name
+                })
+                .ToListAsync(ct);
+
+            return Ok(courses);
         }
 
         [HttpGet("schedule")]

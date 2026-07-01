@@ -15,6 +15,19 @@
     }
 
     <div class="space-y-2">
+      <label class="block text-sm font-bold text-slate-700">المقرر الدراسي <span class="text-rose-500">*</span></label>
+      <select formControlName="teachingAssignmentId"
+        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        @for (ta of teachingAssignments(); track ta.id) {
+          <option [value]="ta.id">{{ ta.subjectName }} - {{ ta.className }}</option>
+        }
+      </select>
+      @if (assignmentForm.get('teachingAssignmentId')?.touched && assignmentForm.get('teachingAssignmentId')?.invalid) {
+        <p class="text-xs text-rose-500 font-bold mt-1">المقرر الدراسي مطلوب.</p>
+      }
+    </div>
+
+    <div class="space-y-2">
       <label class="block text-sm font-bold text-slate-700">عنوان الواجب <span class="text-rose-500">*</span></label>
       <input type="text" formControlName="title" placeholder="مثال: واجب الرياضيات - المعادلات الخطية"
         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">

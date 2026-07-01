@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { CreateExamRequest, TeacherExam, TeacherQuestion } from '../../../models/teacher-assessment.model';
 import { QuestionEditorComponent } from '../question-editor/question-editor.component';
@@ -18,6 +20,7 @@ export class ExamCreatorComponent implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly http = inject(HttpClient);
 
   readonly currentStep = signal<1 | 2>(1);
   readonly createdExam = signal<TeacherExam | null>(null);
@@ -28,18 +31,33 @@ export class ExamCreatorComponent implements OnInit {
 
   readonly showQuestionEditor = signal(false);
   readonly selectedQuestionForEdit = signal<TeacherQuestion | null>(null);
+  
+  readonly teachingAssignments = signal<any[]>([]);
 
   examForm!: FormGroup;
 
   ngOnInit(): void {
     this.examForm = this.fb.group({
-      teachingAssignmentId: [1, [Validators.required]], 
+      teachingAssignmentId: ['', [Validators.required]], 
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
       durationMinutes: [60, [Validators.required, Validators.min(1), Validators.max(600)]],
     });
+
+    const year = new Date().getFullYear() - 1; // 2025
+    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments?academicYear=${year}`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (assignments) => {
+          this.teachingAssignments.set(assignments);
+          if (assignments.length > 0) {
+            this.examForm.patchValue({ teachingAssignmentId: assignments[0].id });
+          }
+        },
+        error: (err) => console.error('Failed to load courses', err)
+      });
   }
 
   onSaveMeta(): void {

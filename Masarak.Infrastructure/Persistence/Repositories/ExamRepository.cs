@@ -39,8 +39,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                 .Include(e => e.Questions) // Need question count for DTOs
                 .Where(e => e.TeachingAssignment.ClassId == classId &&
                             e.TeachingAssignment.SubjectId == subjectId &&
-                            e.Status == Masarak.Domain.Enums.ExamStatus.Published &&
-                            e.StartTime <= now && e.EndTime >= now)
+                            e.Status == Masarak.Domain.Enums.ExamStatus.Published)
                 .OrderBy(e => e.StartTime)
                 .ToListAsync(ct);
         }

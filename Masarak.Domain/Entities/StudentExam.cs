@@ -36,7 +36,7 @@ namespace Masarak.Domain.Entities
         // ── Factory ─────────────────────────────────────────────────────────
         public static StudentExam Begin(int examId, int studentId, int durationMinutes)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             return new StudentExam
             {
                 ExamId    = examId,
@@ -50,7 +50,7 @@ namespace Masarak.Domain.Entities
 
         public void MarkSubmitted()
         {
-            SubmittedAt = DateTime.UtcNow;
+            SubmittedAt = DateTime.Now;
             Status = StudentExamStatus.Submitted;
         }
 

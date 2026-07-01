@@ -4,6 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { CreateAssignmentRequest } from '../../../models/teacher-assessment.model';
 
@@ -19,20 +21,38 @@ export class AssignmentCreatorComponent implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly http = inject(HttpClient); // Added for fetching assignments
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  
+  // Added to store the teaching assignments
+  readonly teachingAssignments = signal<any[]>([]);
 
   assignmentForm!: FormGroup;
 
   ngOnInit(): void {
     this.assignmentForm = this.fb.group({
-      teachingAssignmentId: [1, [Validators.required]], // Default to 1 for now until we have teaching assignments
+      teachingAssignmentId: ['', [Validators.required]],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
       dueDate: ['', [Validators.required]],
       maxScore: [100, [Validators.required, Validators.min(0), Validators.max(1000)]],
     });
+
+    // Fetch active assignments for the current year
+    const year = new Date().getFullYear() - 1; // 2025
+    this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments?academicYear=${year}`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (assignments) => {
+          this.teachingAssignments.set(assignments);
+          if (assignments.length > 0) {
+            this.assignmentForm.patchValue({ teachingAssignmentId: assignments[0].id });
+          }
+        },
+        error: (err) => console.error('Failed to load courses', err)
+      });
   }
 
   onSubmit(): void {

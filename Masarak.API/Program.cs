@@ -132,6 +132,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 app.UseAuthentication();   // ← must come before UseAuthorization
