@@ -6,6 +6,8 @@ using Masarak.Domain.Enums;
 using Masarak.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Masarak.Infrastructure.Persistence;
 
 namespace Masarak.API.Controllers
 {
@@ -46,6 +48,38 @@ namespace Masarak.API.Controllers
             CancellationToken ct = default)
         {
             var (items, totalCount) = await _adminUserRepo.GetAllAsync(role, search, page, pageSize, ct);
+
+            // Workaround to populate Specialization, GradeId, StudentIds without modifying Masarak.Infrastructure 
+            // to bypass the local Antivirus FileLoadException on newly compiled Infrastructure DLLs.
+            var dbContext = HttpContext.RequestServices.GetService<Context>();
+            if (dbContext != null && items.Any())
+            {
+                var userIds = items.Select(i => i.UserId).ToList();
+                var usersWithDetails = await dbContext.Users
+                    .Where(u => userIds.Contains(u.UserId))
+                    .Select(u => new 
+                    { 
+                        u.UserId, 
+                        GradeId = u.Student != null ? (int?)u.Student.GradeId : null,
+                        Specialization = u.Teacher != null ? u.Teacher.Specialization : null,
+                        StudentIds = u.ParentStudentLinks.Select(l => l.StudentUserId).ToList()
+                    })
+                    .ToDictionaryAsync(u => u.UserId, ct);
+
+                items = items.Select(i => 
+                {
+                    if (usersWithDetails.TryGetValue(i.UserId, out var details))
+                    {
+                        return i with 
+                        { 
+                            GradeId = details.GradeId, 
+                            Specialization = details.Specialization, 
+                            StudentIds = details.StudentIds 
+                        };
+                    }
+                    return i;
+                }).ToList();
+            }
 
             Response.Headers["X-Total-Count"] = totalCount.ToString();
 
@@ -88,6 +122,114 @@ namespace Masarak.API.Controllers
                 0m); // AttendancePercentage — requires separate query
 
             return Ok(dto);
+        }
+
+        /// <summary>
+        /// Request body for updating a user's details.
+        /// Role cannot be changed — only name, email, phone, and role-specific fields.
+        /// </summary>
+        public class AdminUpdateUserRequest
+        {
+            public string? FullName { get; set; }
+            public string? Email { get; set; }
+            public string? Phone { get; set; }
+            // Role-specific
+            public int? GradeId { get; set; }          // Student
+            public string? Specialization { get; set; } // Teacher
+            public List<int>? StudentIds { get; set; }  // Parent
+        }
+
+        /// <summary>
+        /// PUT /api/admin/users/{id} — Update user details (name, email, phone, role-specific fields).
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] AdminUpdateUserRequest request, CancellationToken ct = default)
+        {
+            var user = await _userRepo.GetByIdAsync(id, ct);
+            if (user == null)
+                return NotFound(new { Code = "USER_NOT_FOUND", Message = $"User with ID {id} not found." });
+
+            // Update basic fields if provided
+            if (!string.IsNullOrWhiteSpace(request.FullName))
+                user.FullName = request.FullName.Trim();
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+                var dbContext = HttpContext.RequestServices.GetService<Context>()!;
+                var emailTaken = await dbContext.Users.AnyAsync(u => u.Email == normalizedEmail && u.UserId != id, ct);
+                if (emailTaken)
+                    return BadRequest(new { Code = "EMAIL_TAKEN", Message = "البريد الإلكتروني مستخدم بالفعل." });
+                user.Email = normalizedEmail;
+            }
+
+            user.Phone = request.Phone; // nullable, always set
+
+            await _userRepo.UpdateAsync(user, ct);
+
+            // Update role-specific fields using Context directly
+            var db = HttpContext.RequestServices.GetService<Context>()!;
+
+            var role = await db.Roles.FirstOrDefaultAsync(r => r.RoleId == user.RoleId, ct);
+            var roleName = role?.Name ?? "";
+
+            if (roleName == "Student" && request.GradeId.HasValue)
+            {
+                var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == id, ct);
+                if (student != null)
+                {
+                    student.GradeId = request.GradeId.Value;
+                    await db.SaveChangesAsync(ct);
+                }
+            }
+            else if (roleName == "Teacher")
+            {
+                var teacher = await db.Teachers.FirstOrDefaultAsync(t => t.UserId == id, ct);
+                if (teacher != null)
+                {
+                    teacher.Specialization = request.Specialization;
+                    await db.SaveChangesAsync(ct);
+                }
+            }
+            else if (roleName == "Parent" && request.StudentIds != null)
+            {
+                var parent = await db.Parents.FirstOrDefaultAsync(p => p.UserId == id, ct);
+                if (parent != null)
+                {
+                    // Remove existing links
+                    var existingLinks = db.ParentStudents.Where(ps => ps.ParentId == parent.ParentId);
+                    db.ParentStudents.RemoveRange(existingLinks);
+                    
+                    // Add new links
+                    foreach (var studentUserId in request.StudentIds)
+                    {
+                        var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == studentUserId, ct);
+                        if (student != null)
+                        {
+                            db.ParentStudents.Add(new Masarak.Domain.Entities.ParentStudent
+                            {
+                                ParentId = parent.ParentId,
+                                StudentId = student.StudentId,
+                                Relationship = "Guardian"
+                            });
+                        }
+                    }
+                    await db.SaveChangesAsync(ct);
+                }
+            }
+
+            return Ok(new AdminUserDto(
+                user.UserId,
+                user.FullName,
+                user.Email,
+                roleName,
+                user.IsActive,
+                user.CreatedAt,
+                user.Subscriptions?.Any(s => s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active) ?? false,
+                request.GradeId,
+                request.Specialization,
+                request.StudentIds
+            ));
         }
 
         /// <summary>

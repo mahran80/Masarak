@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   GradeDto,
@@ -93,12 +93,6 @@ export class AcademicApiService {
 
   // ── Teachers ────────────────────────────────────────────────────────
   getTeachers(): Observable<TeacherDto[]> {
-    let params = new HttpParams()
-      .set('page', '1')
-      .set('pageSize', '1000')
-      .set('role', 'Teacher');
-    return this.http.get<any>(`${this.adminBase}/users`, { params }).pipe(
-      map(res => res.items ? res.items as TeacherDto[] : res as TeacherDto[])
-    );
+    return this.http.get<TeacherDto[]>(`${this.adminBase}/teachers`);
   }
 }

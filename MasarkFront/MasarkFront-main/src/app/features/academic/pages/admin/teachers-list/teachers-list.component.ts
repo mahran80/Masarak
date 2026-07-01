@@ -56,7 +56,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
       } @else {
         <!-- Teachers Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (t of filteredTeachers(); track t.teacherId) {
+          @for (t of filteredTeachers(); track t.userId) {
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col overflow-hidden group">
               <!-- Card Top Header -->
               <div class="p-6 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-slate-100/50 flex items-start gap-4">

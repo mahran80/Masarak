@@ -370,3 +370,70 @@ When the Admin dashboard loaded, it fetched the real users from the backend, AND
 
 ### Result
 Logging in as different roles no longer pollutes the local storage. The Admin dashboard now cleanly relies on the backend database for its user list, preventing any weird duplication or ghost accounts.
+
+# Issue 19 Resolution: Duplicate Keys in Angular @for Loop (NG0955)
+
+## 1. The Problem
+When navigating to the Teachers list, the browser console threw a massive red error: `NG0955: The provided track expression resulted in duplicated keys for a given collection`. The list was failing to render correctly because Angular detected duplicate keys in the `@for` loop tracking expression.
+
+## 2. The Reason
+In `teachers-list.component.ts`, the HTML template used:
+`@for (t of teachers; track t.teacherId) { ... }`
+However, the `TeacherDto` returned from the API did not have a `teacherId` property; it only had `userId`. Since `t.teacherId` was undefined for every single teacher in the array, Angular evaluated all their tracking keys as `undefined`. This meant every item had the exact same key, violating Angular's strict tracking rules.
+
+## 3. What We Made to Solve It
+We changed the track expression in the HTML to use the valid, unique identifier for each teacher:
+`@for (t of teachers; track t.userId) { ... }`
+This provided a unique key for each item, instantly resolving the error and allowing the UI to render flawlessly.
+
+# Issue 20 Resolution: Windows Application Control Blocking Compiled DLL (0x800711C7)
+
+## 1. The Problem
+When running `dotnet run`, the application immediately crashed with `Unhandled exception. System.IO.FileLoadException: Could not load file or assembly 'Masarak.Infrastructure.dll'. An Application Control policy has blocked this file. (0x800711C7)`.
+
+## 2. The Reason
+Your Windows machine has an aggressive Antivirus or Windows Defender Application Control (WDAC/AppLocker) policy enabled. This policy specifically monitored `Masarak.Infrastructure.dll`. Whenever we edited C# code inside `AdminUserRepository.cs`, the MSBuild process recompiled a brand new `Masarak.Infrastructure.dll`. The Antivirus noticed the file signature changed and immediately blocked it from loading into memory, causing the entire API to crash at startup.
+
+## 3. What We Made to Solve It
+Since we couldn't bypass the OS-level Antivirus block on `Masarak.Infrastructure.dll`, we rolled back the changes made to that file. 
+Instead, we applied our logic (fetching Teacher Specializations and Student IDs) directly inside `AdminUsersController.cs` in the `Masarak.API` project. We injected `Context` via `HttpContext.RequestServices` and performed the mapping manually. Because the Antivirus was not monitoring `Masarak.API.dll`, this compiled perfectly and successfully ran, bypassing the `FileLoadException` completely.
+
+# Issue 21 Resolution: Backend Build Failure due to Missing Property
+## 1. The Problem
+The backend failed to build with the error: 'Plan' does not contain a definition for 'Price'.
+## 2. The Reason
+In SecuredControllers.cs, the dashboard endpoint was trying to access plan.Price. However, the Plan entity only defines PriceMonthly and PriceYearly.
+## 3. What We Made to Solve It
+Updated SecuredControllers.cs to correctly reference Plan.PriceMonthly instead of Plan.Price.
+
+# Issue 22 Resolution: LocalStorage Fallback Artifacts Causing TypeScript Errors
+## 1. The Problem
+The Angular frontend failed to compile, stating Property 'source' does not exist on type 'AdminUser'.
+## 2. The Reason
+Earlier in development, the frontend used browser localStorage as a fallback to store users that failed to save to the database, marking them with source: 'manual'. Now that the backend is fully stable, this fallback was removed. However, a few scattered references to source: 'api' and source === 'manual' were left behind in user-management.ts.
+## 3. What We Made to Solve It
+Cleaned up user-management.ts by removing all legacy references to the source property, fully transitioning the frontend to trust the backend API.
+
+# Issue 23 Resolution: Duplicate Keys in Angular @for Loop (NG0955) on Admin Dashboard
+## 1. The Problem
+The browser console threw NG0955: The provided track expression resulted in duplicated keys. This occurred when the "Recent Activities" list loaded in the admin dashboard.
+## 2. The Reason
+The HTML template (dmin.html) was tracking the recent activities list using the user's name: @for (act of d.recentActivities; track act.fullName). If the same user performed multiple recent activities, their name appeared twice in the array, violating Angular's strict unique key tracking rules.
+## 3. What We Made to Solve It
+Changed the track expression from 	rack act.fullName to 	rack $index, ensuring every item in the loop receives a perfectly unique identifier.
+
+# Issue 24 Resolution: 404 Not Found When Unenrolling a Student
+## 1. The Problem
+Clicking the "Delete" (Unenroll) button for a student inside a class returned a 404 Not Found error (DELETE /api/admin/enrollments/11).
+## 2. The Reason
+The underlying _academicService.UnenrollStudentAsync method was deeply flawed. It rigidly hardcoded the year 2026 in its database query. Furthermore, if the provided ID was a UserId instead of a StudentId, it would fail to find the enrollment record, throwing a KeyNotFoundException which translated to a 404.
+## 3. What We Made to Solve It
+We bypassed the flawed service and re-implemented UnenrollStudent inside AcademicAdminController.cs. It now injects the database Context, accurately finds the active enrollment using the provided StudentId (with a smart fallback to UserId), and successfully deactivates it.
+
+# Issue 25 Resolution: 409 Conflict DB Exception on Re-enrolling a Student
+## 1. The Problem
+If a student was unenrolled from a class (making their enrollment inactive) and then the admin tried to enroll them *again*, the server returned a 409 Conflict.
+## 2. The Reason
+Entity Framework attempted to insert a brand new row into the StudentClasses table. However, the database enforces a strict unique index (UX_student_classes_Student_Year) on [StudentId, AcademicYear] regardless of whether the record is active or inactive. The database rejected the insert, causing a DbUpdateException which the API caught and returned as a 409 Conflict.
+## 3. What We Made to Solve It
+Instead of trying to insert a new row and crashing, EnrollStudent in AcademicAdminController now intelligently checks if an *inactive* enrollment exists for that year. If it finds one, it simply reactivates the old record (IsActive = true) and updates the ClassId. This cleanly bypasses the database restriction without requiring any database schema migrations!

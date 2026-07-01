@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SubscriptionApiService } from '../../../../core/services/subscription-api-service';
 import { PlanDto, SubscriptionDto } from '../../../../core/models/subscription.model';
 import { AuthStateService } from '../../../../core/services/auth-state-service';
-import { AdminApiService, AdminUserDto } from '../../../../core/services/admin-api-service';
+import { AdminApiService, AdminUserDto, AdminUpdateUserRequest } from '../../../../core/services/admin-api-service';
 import { forkJoin } from 'rxjs';
 import { catchError, of } from 'rxjs';
 import { AcademicApiService } from '../../../../core/services/academic-api-service';
@@ -20,13 +20,11 @@ export interface AdminUser {
   isActive: boolean;
   createdAt: string;
   hasActiveSubscription: boolean;
-  gradeId?: number;
-  specialization?: string;
+  gradeId?: number | null;
+  specialization?: string | null;
   studentIds?: number[];
   status: 'Active' | 'Inactive';
   joinedAt: string;
-  /** 'api' = came from backend, 'manual' = admin-added locally */
-  source: 'api' | 'manual';
   subscription?: {
     subscriptionId: number;
     planName: string;
@@ -48,12 +46,6 @@ export class UserManagement implements OnInit {
   private readonly authState = inject(AuthStateService);
   private readonly adminApi = inject(AdminApiService);
   private readonly academicApi = inject(AcademicApiService);
-
-  private readonly usersStorageKey = 'masarak_admin_users_v2';
-  private readonly subscriptionsStorageKey = 'masarak_student_subscriptions';
-
-  /** Negative IDs for locally-added (manual) users. Never clashes with backend int IDs. */
-  private nextManualId = -1;
 
   // ── State signals ─────────────────────────────────────────────────────────
   users = signal<AdminUser[]>([]);
@@ -78,9 +70,12 @@ export class UserManagement implements OnInit {
   private readonly _roleFilter = signal('');
 
   get searchQuery(): string { return this._searchQuery(); }
-  set searchQuery(v: string) { this._searchQuery.set(v); }
+  set searchQuery(v: string) { this._searchQuery.set(v); this.currentPage.set(1); }
   get roleFilter(): string { return this._roleFilter(); }
-  set roleFilter(v: string) { this._roleFilter.set(v); }
+  set roleFilter(v: string) { this._roleFilter.set(v); this.currentPage.set(1); }
+
+  currentPage = signal(1);
+  pageSize = signal(10);
 
   // ── Form ──────────────────────────────────────────────────────────────────
   form = {
@@ -107,6 +102,25 @@ export class UserManagement implements OnInit {
       return matchQ && matchRole;
     });
   });
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filteredUsers().length / this.pageSize())));
+
+  paginatedUsers = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.filteredUsers().slice(start, start + this.pageSize());
+  });
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
 
   totalStudents = computed(() => this.users().filter((u) => u.role === 'Student').length);
   totalTeachers = computed(() => this.users().filter((u) => u.role === 'Teacher').length);
@@ -194,38 +208,9 @@ export class UserManagement implements OnInit {
         studentIds: u.studentIds,
         status: u.isActive ? 'Active' : 'Inactive',
         joinedAt: this.formatDate(u.createdAt),
-        source: 'api',
         subscription: this.mapSub(subMap.get(u.userId)),
       }));
-
-      // Load locally-added manual users
-      const manualUsers = this.loadManualUsers();
-
-      // Merge: API wins for same id
-      const apiIds = new Set(apiMapped.map((u) => u.id));
-      const mergedManual = manualUsers.filter((u) => !apiIds.has(u.id));
-
-      // Also sync current logged-in user
-      const currentUser = this.authState.user();
-      if (currentUser && !apiIds.has(currentUser.userId)) {
-        const mapped: AdminUser = {
-          id: currentUser.userId,
-          name: currentUser.fullName || currentUser.email,
-          email: currentUser.email,
-          role: currentUser.role,
-          isActive: currentUser.isActive,
-          createdAt: currentUser.createdAt,
-          hasActiveSubscription: false,
-          status: currentUser.isActive ? 'Active' : 'Inactive',
-          joinedAt: this.formatDate(currentUser.createdAt),
-          source: 'api',
-          subscription: this.mapSub(subMap.get(currentUser.userId)),
-        };
-        apiMapped.push(mapped);
-      }
-
-      const merged = [...apiMapped, ...mergedManual];
-      this.users.set(merged);
+      this.users.set(apiMapped);
       this.isLoadingUsers.set(false);
     });
   }
@@ -239,36 +224,6 @@ export class UserManagement implements OnInit {
       status: sub.status,
       endDate: sub.endDate,
     };
-  }
-
-  // ── Manual users storage ──────────────────────────────────────────────────
-  private loadManualUsers(): AdminUser[] {
-    try {
-      const raw = localStorage.getItem(this.usersStorageKey);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as AdminUser[];
-      if (!Array.isArray(parsed)) return [];
-
-      // Re-assign safe negative IDs to any old users that had huge Date.now() IDs
-      // (Int32 max is 2,147,483,647; anything over that is invalid for the backend)
-      const MAX_INT32 = 2_147_483_647;
-      let counter = this.nextManualId;
-      const fixed = parsed.map((u) => {
-        if (u.id > MAX_INT32 || u.id > 0) {
-          return { ...u, id: counter-- };
-        }
-        return u;
-      });
-      this.nextManualId = counter;
-      return fixed;
-    } catch {
-      return [];
-    }
-  }
-
-  private persistManualUsers(): void {
-    const manual = this.users().filter((u) => u.source === 'manual');
-    localStorage.setItem(this.usersStorageKey, JSON.stringify(manual));
   }
 
   // ── Modal helpers ─────────────────────────────────────────────────────────
@@ -333,23 +288,33 @@ export class UserManagement implements OnInit {
     }
 
     if (this.isEditing()) {
-      // Editing existing user – keep local/manual handling for now
-      const updated: AdminUser = {
-        ...this.selectedUser()!,
-        name: trimmedName,
+      const userId = this.selectedUser()!.id;
+      const req: AdminUpdateUserRequest = {
+        fullName: trimmedName,
         email: this.form.email,
-        role: this.form.role,
-        status: this.form.status,
-        isActive: this.form.status === 'Active',
-        hasActiveSubscription: this.selectedUser()!.hasActiveSubscription,
-        gradeId: this.form.gradeId || undefined,
-        specialization: this.form.specialization || undefined,
-        studentIds: [...this.form.studentIds],
+        phone: this.form.phone || undefined,
       };
-      this.users.update((list) => list.map((u) => (u.id === updated.id ? updated : u)));
-      this.persistManualUsers();
-      this.setFeedback('تم تعديل المستخدم بنجاح');
-      setTimeout(() => this.closeModal(), 900);
+
+      // Add role-specific fields
+      if (this.selectedUser()!.role === 'Student') {
+        req.gradeId = this.form.gradeId;
+      } else if (this.selectedUser()!.role === 'Teacher') {
+        req.specialization = this.form.specialization || undefined;
+      } else if (this.selectedUser()!.role === 'Parent') {
+        req.studentIds = [...this.form.studentIds];
+      }
+
+      this.adminApi.updateUser(userId, req).subscribe({
+        next: () => {
+          this.setFeedback('تم تعديل المستخدم بنجاح');
+          this.loadData(); // Reload from backend
+          setTimeout(() => this.closeModal(), 900);
+        },
+        error: (err) => {
+          const msg = err?.error?.message || err?.error?.Message || 'تعذر تعديل المستخدم. يرجى المحاولة مرة أخرى.';
+          this.setFeedback(msg, 'error');
+        },
+      });
       return;
     }
 
@@ -407,7 +372,6 @@ export class UserManagement implements OnInit {
           hasActiveSubscription: !!created.hasActiveSubscription,
           status: created.isActive ? 'Active' : 'Inactive',
           joinedAt: this.formatDate(created.createdAt),
-          source: 'api',
           subscription: null,
         };
         this.users.update((list) => [newUser, ...list]);
@@ -431,37 +395,24 @@ export class UserManagement implements OnInit {
   deleteUser(user: AdminUser): void {
     if (!confirm(`هل أنت متأكد من حذف المستخدم "${user.name}"؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
 
-    if (user.source === 'api') {
-      // Call the real API endpoint for backend users
-      this.adminApi.deleteUser(user.id).subscribe({
-        next: () => {
-          this.users.update((list) => list.filter((u) => u.id !== user.id));
-          this.setFeedback(`تم حذف المستخدم "${user.name}" بنجاح`);
-        },
-        error: () => {
-          this.setFeedback('تعذر حذف المستخدم من الخادم. يرجى المحاولة مرة أخرى.', 'error');
-        },
-      });
-    } else {
-      // For manually-added local users, just remove from state
-      this.users.update((list) => list.filter((u) => u.id !== user.id));
-      this.persistManualUsers();
-      this.setFeedback(`تم حذف المستخدم "${user.name}" بنجاح`);
-    }
+    this.adminApi.deleteUser(user.id).subscribe({
+      next: () => {
+        this.setFeedback(`تم حذف المستخدم "${user.name}" بنجاح`);
+        this.loadData();
+      },
+      error: () => {
+        this.setFeedback('تعذر حذف المستخدم من الخادم. يرجى المحاولة مرة أخرى.', 'error');
+      },
+    });
   }
 
   toggleUserStatus(user: AdminUser): void {
-    if (user.source !== 'api') {
-      this.setFeedback('يمكن تغيير حالة المستخدمين المسجلين عبر الخادم فقط.', 'error');
-      return;
-    }
-    
     if (user.status === 'Active') {
       const reason = prompt('يرجى إدخال سبب التعطيل:');
       if (!reason) return;
       this.adminApi.deactivateUser(user.id, reason).subscribe({
         next: () => {
-          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Inactive' } : u));
+          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Inactive' as const, isActive: false } : u));
           this.setFeedback(`تم تعطيل المستخدم ${user.name}`);
         },
         error: () => this.setFeedback('تعذر تعطيل المستخدم.', 'error')
@@ -469,7 +420,7 @@ export class UserManagement implements OnInit {
     } else {
       this.adminApi.activateUser(user.id).subscribe({
         next: () => {
-          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Active' } : u));
+          this.users.update(list => list.map(u => u.id === user.id ? { ...u, status: 'Active' as const, isActive: true } : u));
           this.setFeedback(`تم تفعيل المستخدم ${user.name}`);
         },
         error: () => this.setFeedback('تعذر تفعيل المستخدم.', 'error')
@@ -478,11 +429,6 @@ export class UserManagement implements OnInit {
   }
 
   resetPassword(user: AdminUser): void {
-    if (user.source !== 'api') {
-      this.setFeedback('يمكن إعادة تعيين كلمة المرور للمستخدمين المسجلين عبر الخادم فقط.', 'error');
-      return;
-    }
-    
     // Ask for new password, or leave empty to auto-generate
     const newPassword = prompt(
       `هل أنت متأكد من إعادة تعيين كلمة المرور للمستخدم "${user.name}"؟\n\nأدخل كلمة المرور الجديدة (أو اترك الحقل فارغاً لتوليد كلمة مرور عشوائية):`
@@ -529,12 +475,6 @@ export class UserManagement implements OnInit {
     if (!this.selectedPlanId()) { this.setFeedback('اختر خطة أولاً', 'error'); return; }
 
     const student = this.studentUsers().find((u) => u.id === studentId);
-    
-    if (student?.source === 'manual') {
-      this.setFeedback('لا يمكن إضافة اشتراك لطالب غير محفوظ في قاعدة البيانات', 'error');
-      this.assigning.set(false);
-      return;
-    }
 
     this.assigning.set(true);
     this.setFeedback(null);

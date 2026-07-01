@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AdminUserDto {
@@ -46,6 +46,18 @@ export interface AdminCreateUserRequest {
   password: string;
   role: string;
   phone?: string;
+  gradeId?: number | null;
+  specialization?: string;
+  studentIds?: number[];
+}
+
+export interface AdminUpdateUserRequest {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  gradeId?: number | null;
+  specialization?: string;
+  studentIds?: number[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -66,17 +78,19 @@ export class AdminApiService {
     return this.http.get<AdminUsersPagedResult | AdminUserDto[]>(`${this.base}/users`, { params });
   }
 
-  /** POST /api/auth/register — mapped from admin create user */
+  /** POST /api/admin/users — create user with role-specific profiles */
   createUser(req: AdminCreateUserRequest): Observable<AdminUserDto> {
-    const payload = { ...req, confirmPassword: req.password };
-    return this.http.post<any>(`${environment.apiUrl}/auth/register`, payload).pipe(
-      map(res => res.user as AdminUserDto)
-    );
+    return this.http.post<AdminUserDto>(`${this.base}/users`, req);
   }
 
   /** DELETE /api/admin/users/{id} */
   deleteUser(userId: number): Observable<any> {
     return this.http.delete<any>(`${this.base}/users/${userId}`);
+  }
+
+  /** PUT /api/admin/users/{id} — update user details */
+  updateUser(userId: number, req: AdminUpdateUserRequest): Observable<AdminUserDto> {
+    return this.http.put<AdminUserDto>(`${this.base}/users/${userId}`, req);
   }
 
   /** GET /api/admin/dashboard */

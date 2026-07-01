@@ -3,6 +3,7 @@ using Masarak.API.Policies;
 using Masarak.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masarak.API.Controllers
 {
@@ -14,8 +15,34 @@ namespace Masarak.API.Controllers
     public class AdminController : ControllerBase
     {
         [HttpGet("dashboard")]
-        public IActionResult Dashboard() =>
-            Ok(new { message = "Admin dashboard — restricted to Admins only.", user = GetUserInfo() });
+        public async Task<IActionResult> Dashboard([FromServices] Masarak.Infrastructure.Persistence.Context db, CancellationToken ct)
+        {
+            var totalStudents = await db.Users.CountAsync(u => u.Role.Name == "Student" && u.IsActive, ct);
+            var activeTeachers = await db.Users.CountAsync(u => u.Role.Name == "Teacher" && u.IsActive, ct);
+            var totalRevenue = await db.Subscriptions
+                .Where(s => s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active || s.Status == Masarak.Domain.Enums.SubscriptionStatus.Expired)
+                .SumAsync(s => s.Plan.PriceMonthly, ct);
+
+            var recentActivities = await db.Users
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .Select(u => new 
+                {
+                    fullName = u.FullName,
+                    role = u.Role.Name,
+                    createdAt = u.CreatedAt
+                })
+                .ToListAsync(ct);
+
+            return Ok(new 
+            {
+                totalStudents,
+                activeTeachers,
+                totalRevenue,
+                recentActivities
+            });
+        }
 
 
         [HttpPost("users")]
