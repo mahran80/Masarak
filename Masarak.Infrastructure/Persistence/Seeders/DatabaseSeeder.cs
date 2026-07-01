@@ -183,5 +183,41 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] 3 AI prompt templates seeded (weakness_analysis, parent_report, teaching_suggestion).");
         }
+        public static async Task SeedNotificationsAsync(Context db)
+        {
+            if (await db.Set<Domain.Entities.Notification>().AnyAsync()) return;
+
+            var admin = await db.Users.FirstOrDefaultAsync(u => u.Email == "admin@masarak.com");
+            if (admin == null) return;
+
+            var notifications = new List<Domain.Entities.Notification>
+            {
+                Domain.Entities.Notification.Create(
+                    admin.UserId,
+                    NotificationType.NewUserRegistered,
+                    "New Teacher Registered",
+                    "A new teacher 'Ahmed Ali' has just registered and awaits approval.",
+                    "/admin/users/123"),
+                Domain.Entities.Notification.Create(
+                    admin.UserId,
+                    NotificationType.PaymentFailed,
+                    "Payment Failed",
+                    "Subscription payment for student 'Sara' failed.",
+                    "/admin/subscriptions/456"),
+                Domain.Entities.Notification.Create(
+                    admin.UserId,
+                    NotificationType.LowPerformanceAlert,
+                    "Low Performance Alert",
+                    "Multiple students have scored below 50% in Grade 10 Math.",
+                    "/admin/analytics")
+            };
+
+            // Keep one unread, mark others as read for testing the count
+            notifications[1].MarkRead();
+
+            await db.Set<Domain.Entities.Notification>().AddRangeAsync(notifications);
+            await db.SaveChangesAsync();
+            Console.WriteLine("[Seeder] 3 test notifications seeded for admin.");
+        }
     }
 }

@@ -118,6 +118,7 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedPlansAsync(db);   // Phase 1 plans
     await DatabaseSeeder.SeedChatRoomsAsync(db); // Phase 4 chat rooms
     await DatabaseSeeder.SeedAiPromptTemplatesAsync(db); // Phase 5 AI prompt templates
+    await DatabaseSeeder.SeedNotificationsAsync(db); // Phase 6 notifications
 }
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────

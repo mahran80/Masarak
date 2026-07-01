@@ -17,13 +17,7 @@ namespace Masarak.API.Controllers
         public IActionResult Dashboard() =>
             Ok(new { message = "Admin dashboard — restricted to Admins only.", user = GetUserInfo() });
 
-        [HttpGet("users")]
-        public IActionResult GetAllUsers() =>
-            Ok(new { message = "User list — Admin only.", user = GetUserInfo() });
 
-        [HttpDelete("users/{id}")]
-        public IActionResult DeleteUser(int id) =>
-            Ok(new { message = $"User {id} deleted by Admin.", user = GetUserInfo() });
 
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(Masarak.Application.DTOs.PagedResult<Masarak.Application.DTOs.SubscriptionDto>), 200)]
