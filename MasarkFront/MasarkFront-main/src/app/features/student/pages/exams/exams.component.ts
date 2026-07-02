@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,16 +12,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 
 import {
-  StartStudentExamResponse,
   StudentCourse,
   StudentEntityId,
   StudentExam,
-  StudentExamAnswer,
   StudentExamGroup,
-  StudentExamQuestion,
   StudentExamResult,
+  StudentExamAnswer
 } from '../../models';
 import { StudentService } from '../../services/student.service';
+import { ExamAttemptStore } from '../../services/exam-attempt.store';
+import { ScoreBadgeComponent } from '../../components/score-badge/score-badge.component';
+import { ExamTimerComponent } from '../../components/exam-timer/exam-timer.component';
+import { QuestionRendererComponent } from '../../components/question-renderer/question-renderer.component';
 
 interface SelectedExam {
   subject: StudentCourse;
@@ -31,22 +33,20 @@ interface SelectedExam {
 @Component({
   selector: 'app-student-exams-page',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, DecimalPipe, ScoreBadgeComponent, ExamTimerComponent, QuestionRendererComponent],
   templateUrl: './exams.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentExamsPageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
+  readonly store = inject(ExamAttemptStore);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly groups = signal<StudentExamGroup[]>([]);
   readonly selectedExamId = signal<StudentEntityId | null>(null);
-  readonly activeExam = signal<StartStudentExamResponse | null>(null);
   readonly examResult = signal<StudentExamResult | null>(null);
-  readonly answers = signal<Record<string, StudentExamAnswer>>({});
   readonly isLoading = signal<boolean>(true);
   readonly isStarting = signal<boolean>(false);
-  readonly isSaving = signal<boolean>(false);
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
@@ -103,9 +103,8 @@ export class StudentExamsPageComponent implements OnInit {
 
   selectExam(exam: StudentExam): void {
     this.selectedExamId.set(exam.examId);
-    this.activeExam.set(null);
+    this.store.clearExam();
     this.examResult.set(null);
-    this.answers.set({});
     this.actionMessage.set(null);
   }
 
@@ -125,8 +124,7 @@ export class StudentExamsPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (exam) => {
-          this.activeExam.set(exam);
-          this.answers.set(this.createAnswerMap(exam.savedAnswers ?? []));
+          this.store.initExam(exam);
           this.isStarting.set(false);
         },
         error: (error: unknown) => {
@@ -136,99 +134,12 @@ export class StudentExamsPageComponent implements OnInit {
       });
   }
 
-  setTextAnswer(question: StudentExamQuestion, event: Event): void {
-    const value = event.target instanceof HTMLTextAreaElement ? event.target.value : '';
-    const key = this.answerKey(question.questionId);
-    const currentAnswers = this.answers();
-
-    this.answers.set({
-      ...currentAnswers,
-      [key]: {
-        ...currentAnswers[key],
-        questionId: question.questionId,
-        answerText: value,
-      },
-    });
-  }
-
-  setSingleChoiceAnswer(question: StudentExamQuestion, choiceId: StudentEntityId): void {
-    const key = this.answerKey(question.questionId);
-
-    this.answers.set({
-      ...this.answers(),
-      [key]: {
-        questionId: question.questionId,
-        selectedOptionId: String(choiceId),
-        selectedChoiceIds: [choiceId],
-      },
-    });
-  }
-
-  toggleMultipleChoiceAnswer(
-    question: StudentExamQuestion,
-    choiceId: StudentEntityId,
-    event: Event,
-  ): void {
-    const checked = event.target instanceof HTMLInputElement ? event.target.checked : false;
-    const key = this.answerKey(question.questionId);
-    const currentAnswers = this.answers();
-    const currentChoiceIds = currentAnswers[key]?.selectedChoiceIds ?? [];
-    const nextChoiceIds = checked
-      ? [...currentChoiceIds, choiceId]
-      : currentChoiceIds.filter((currentChoiceId) => String(currentChoiceId) !== String(choiceId));
-
-    this.answers.set({
-      ...currentAnswers,
-      [key]: {
-        questionId: question.questionId,
-        selectedOptionId: nextChoiceIds.map(String).join(','),
-        selectedChoiceIds: nextChoiceIds,
-      },
-    });
-  }
-
-  setFileAnswer(question: StudentExamQuestion, event: Event): void {
-    const file = event.target instanceof HTMLInputElement ? event.target.files?.[0] ?? null : null;
-    const key = this.answerKey(question.questionId);
-    const currentAnswers = this.answers();
-
-    this.answers.set({
-      ...currentAnswers,
-      [key]: {
-        ...currentAnswers[key],
-        questionId: question.questionId,
-        file,
-      },
-    });
-  }
-
-  saveAnswers(): void {
-    const activeExam = this.activeExam();
-
-    if (!activeExam) {
-      return;
-    }
-
-    this.isSaving.set(true);
-    this.actionMessage.set(null);
-
-    this.studentService
-      .saveExamAnswers(activeExam.studentExamId, { answers: this.answerList() })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.actionMessage.set('Answers saved.');
-        },
-        error: (error: unknown) => {
-          this.isSaving.set(false);
-          this.actionMessage.set(this.studentService.resolveErrorMessage(error));
-        },
-      });
+  onAnswerChange(answer: StudentExamAnswer): void {
+    this.store.setAnswer(answer);
   }
 
   submitActiveExam(): void {
-    const activeExam = this.activeExam();
+    const activeExam = this.store.exam();
 
     if (!activeExam) {
       return;
@@ -236,18 +147,17 @@ export class StudentExamsPageComponent implements OnInit {
 
     this.isSubmitting.set(true);
     this.actionMessage.set(null);
+    
+    // Force one last save before submit
+    this.store.forceSaveNow();
 
     this.studentService
-      .saveExamAnswers(activeExam.studentExamId, { answers: this.answerList() })
-      .pipe(
-        switchMap(() => this.studentService.submitExam(activeExam.studentExamId)),
-        takeUntilDestroyed(this.destroyRef),
-      )
+      .submitExam(activeExam.studentExamId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (result) => {
           this.examResult.set(result);
-          this.activeExam.set(null);
-          this.answers.set({});
+          this.store.clearExam();
           this.isSubmitting.set(false);
           this.actionMessage.set('Exam submitted successfully.');
         },
@@ -256,61 +166,6 @@ export class StudentExamsPageComponent implements OnInit {
           this.actionMessage.set(this.studentService.resolveErrorMessage(error));
         },
       });
-  }
-
-  isChoiceQuestion(question: StudentExamQuestion): boolean {
-    return (question.choices?.length ?? 0) > 0 && !this.isTextQuestion(question);
-  }
-
-  isMultipleChoiceQuestion(question: StudentExamQuestion): boolean {
-    return (question.questionType ?? '').toLowerCase().includes('multiple');
-  }
-
-  isChoiceSelected(questionId: StudentEntityId, choiceId: StudentEntityId): boolean {
-    const selectedChoiceIds = this.answers()[this.answerKey(questionId)]?.selectedChoiceIds ?? [];
-    return selectedChoiceIds.some(
-      (selectedChoiceId) => String(selectedChoiceId) === String(choiceId),
-    );
-  }
-
-  textAnswer(questionId: StudentEntityId): string {
-    return this.answers()[this.answerKey(questionId)]?.answerText ?? '';
-  }
-
-  fileAnswerName(questionId: StudentEntityId): string | null {
-    return this.answers()[this.answerKey(questionId)]?.file?.name ?? null;
-  }
-
-  isFileQuestion(question: StudentExamQuestion): boolean {
-    return (question.questionType ?? '').toLowerCase().includes('file');
-  }
-
-  private answerList(): StudentExamAnswer[] {
-    return Object.values(this.answers());
-  }
-
-  private isTextQuestion(question: StudentExamQuestion): boolean {
-    const questionType = (question.questionType ?? '').toLowerCase();
-    return (
-      questionType.includes('text') ||
-      questionType.includes('short') ||
-      questionType.includes('essay') ||
-      questionType.includes('fill')
-    );
-  }
-
-  private createAnswerMap(answers: StudentExamAnswer[]): Record<string, StudentExamAnswer> {
-    return answers.reduce<Record<string, StudentExamAnswer>>(
-      (answerMap, answer) => ({
-        ...answerMap,
-        [this.answerKey(answer.questionId)]: answer,
-      }),
-      {},
-    );
-  }
-
-  private answerKey(id: StudentEntityId): string {
-    return String(id);
   }
 
   private firstExamId(groups: StudentExamGroup[]): StudentEntityId | null {

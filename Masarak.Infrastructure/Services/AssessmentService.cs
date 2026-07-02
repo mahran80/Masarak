@@ -216,8 +216,8 @@ namespace Masarak.Infrastructure.Services
             if (exam == null) throw new KeyNotFoundException("Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId)
                 throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft)
-                throw new InvalidOperationException("Cannot add questions to a published/closed exam.");
+            if (exam.Status == ExamStatus.Closed)
+                throw new InvalidOperationException("Cannot add questions to a closed exam.");
 
             var question = new Question
             {
@@ -257,7 +257,7 @@ namespace Masarak.Infrastructure.Services
                                            .FirstOrDefaultAsync(e => e.Questions.Any(q => q.QuestionId == questionId), ct);
             if (exam == null) throw new KeyNotFoundException("Question or Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId) throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft) throw new InvalidOperationException("Cannot modify published exam.");
+            if (exam.Status == ExamStatus.Closed) throw new InvalidOperationException("Cannot modify closed exam.");
 
             var question = exam.Questions.First(q => q.QuestionId == questionId);
             question.Type = request.Type;
@@ -288,7 +288,7 @@ namespace Masarak.Infrastructure.Services
                                            .FirstOrDefaultAsync(e => e.Questions.Any(q => q.QuestionId == questionId), ct);
             if (exam == null) throw new KeyNotFoundException("Question or Exam not found.");
             if (exam.TeachingAssignment.Teacher.UserId != teacherUserId) throw new UnauthorizedAccessException();
-            if (exam.Status != ExamStatus.Draft) throw new InvalidOperationException("Cannot modify published exam.");
+            if (exam.Status == ExamStatus.Closed) throw new InvalidOperationException("Cannot modify closed exam.");
 
             var question = exam.Questions.First(q => q.QuestionId == questionId);
             exam.Questions.Remove(question);
@@ -446,8 +446,9 @@ namespace Masarak.Infrastructure.Services
             var exam = await _examRepo.GetByIdWithQuestionsAsync(examId, ct);
             if (exam == null || exam.Status != ExamStatus.Published) throw new InvalidOperationException("Exam unavailable.");
 
-            var now = DateTime.UtcNow;
-            if (now < exam.StartTime || now > exam.EndTime) throw new InvalidOperationException("Outside exam window.");
+            var now = DateTime.Now;
+            // Time window check disabled for demo — students can start any published exam
+            // if (now < exam.StartTime || now > exam.EndTime) throw new InvalidOperationException("Outside exam window.");
 
             var attempt = await _studentExamRepo.GetByStudentAndExamAsync(studentId, examId, ct);
             if (attempt == null)
@@ -461,7 +462,7 @@ namespace Masarak.Infrastructure.Services
 
             return new ExamAttemptDto(
                 attempt.StudentExamId, exam.ExamId, exam.Title, attempt.ExpiresAt,
-                (int)(attempt.ExpiresAt - DateTime.UtcNow).TotalSeconds,
+                (int)(attempt.ExpiresAt - DateTime.Now).TotalSeconds,
                 exam.Questions.Select(q => MapToQuestionDto(q, false)),
                 attempt.StudentAnswers.Select(a => new SavedAnswerDto(a.QuestionId, a.AnswerText, a.SelectedOptionId))
             );

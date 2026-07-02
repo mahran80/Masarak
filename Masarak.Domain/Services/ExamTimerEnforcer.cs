@@ -12,6 +12,6 @@ namespace Masarak.Domain.Services
         /// Returns true if the student exam attempt is still within the allowed time window.
         /// </summary>
         public bool IsWithinTimeWindow(StudentExam attempt)
-            => DateTime.UtcNow < attempt.ExpiresAt;
+            => DateTime.Now < attempt.ExpiresAt;
     }
 }

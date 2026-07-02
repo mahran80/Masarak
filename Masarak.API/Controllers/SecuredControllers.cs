@@ -125,9 +125,6 @@ namespace Masarak.API.Controllers
     [Produces("application/json")]
     public class StudentController : ControllerBase
     {
-        [HttpGet("courses")]
-        public IActionResult GetMyCourses() =>
-            Ok(new { message = "My enrolled courses — Student only.", user = GetUserInfo() });
 
         [HttpGet("grades")]
         public IActionResult GetMyGrades() =>

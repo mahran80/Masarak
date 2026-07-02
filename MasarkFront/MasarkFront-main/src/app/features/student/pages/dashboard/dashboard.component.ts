@@ -52,7 +52,7 @@ export class StudentDashboardPageComponent implements OnInit {
     this.actionMessage.set(null);
 
     this.studentService
-      .getDashboardData(2026)
+      .getDashboardData()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {

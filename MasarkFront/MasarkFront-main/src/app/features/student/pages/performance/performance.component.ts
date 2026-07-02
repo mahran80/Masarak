@@ -11,13 +11,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, switchMap } from 'rxjs';
 
 import { StudentPerformanceTableComponent } from '../../components/performance-table/performance-table.component';
+import { PerformanceChartComponent } from '../../components/performance-chart/performance-chart.component';
 import { StudentGrade, StudentPerformance } from '../../models';
 import { StudentService } from '../../services/student.service';
 
 @Component({
   selector: 'app-student-performance-page',
   standalone: true,
-  imports: [StudentPerformanceTableComponent],
+  imports: [StudentPerformanceTableComponent, PerformanceChartComponent],
   templateUrl: './performance.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +31,13 @@ export class StudentPerformancePageComponent implements OnInit {
   readonly isLoading = signal<boolean>(true);
   readonly errorMessage = signal<string | null>(null);
 
+  readonly chartData = computed(() => {
+    return this.performance().map(p => ({
+      label: p.subjectName,
+      value: p.finalGrade,
+      max: 100
+    }));
+  });
   readonly averageGrade = computed(() => {
     const grades = this.grades();
 

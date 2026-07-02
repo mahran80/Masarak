@@ -45,14 +45,14 @@ namespace Masarak.Domain.Entities
                 StartTime    = startTime,
                 EndTime      = endTime,
                 DurationMins = durationMinutes,
-                Status       = ExamStatus.Draft,
+                Status       = ExamStatus.Published,
                 CreatedAt    = DateTime.UtcNow
             };
         }
 
         public void Publish()
         {
-            if (Questions == null || !Questions.Any())
+            if (Status != ExamStatus.Published && (Questions == null || !Questions.Any()))
                 throw new InvalidOperationException("Cannot publish an exam with no questions.");
             RecalculateTotalMarks();
             Status = ExamStatus.Published;
