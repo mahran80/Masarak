@@ -201,6 +201,7 @@ namespace Masarak.API.Extensions
             services.AddSingleton<Masarak.Domain.Services.ScheduleConflictChecker>();
             services.AddScoped<IAcademicService, AcademicService>();
             services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<IAgoraTokenService, AgoraTokenService>();
 
             // ── Phase 3 Assessment Core ───────────────────────────────────────
             services.AddScoped<IAssignmentRepository, Masarak.Infrastructure.Persistence.Repositories.AssignmentRepository>();

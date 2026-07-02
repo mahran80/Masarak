@@ -98,6 +98,7 @@ export const routes: Routes = [
           { path: 'assessment/grading', loadComponent: () => import('./features/teacher/pages/assessment/grading-dashboard/grading-dashboard.component').then(m => m.GradingDashboardComponent) },
           { path: 'assessment/grading/exam/:studentExamId', loadComponent: () => import('./features/teacher/pages/assessment/exam-grader/exam-grader.component').then(m => m.ExamGraderComponent) },
           { path: 'sessions', loadComponent: () => import('./features/teacher/components/teacher-sessions/teacher-sessions.component').then(m => m.TeacherSessionsComponent) },
+          { path: 'sessions/:id/live', loadComponent: () => import('./features/shared/components/live-room/live-room.component').then(m => m.LiveRoomComponent), data: { role: 'teacher' } },
         ],
       }, // محتوى المدرس
       {

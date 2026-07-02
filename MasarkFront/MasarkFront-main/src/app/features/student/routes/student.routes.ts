@@ -58,6 +58,12 @@ export const STUDENT_ROUTES: Routes = [
       import('../pages/schedule/schedule.component').then((m) => m.StudentSchedulePageComponent),
   },
   {
+    path: 'sessions/:id/live',
+    loadComponent: () =>
+      import('../../shared/components/live-room/live-room.component').then((m) => m.LiveRoomComponent),
+    data: { role: 'student' }
+  },
+  {
     path: 'profile',
     loadComponent: () =>
       import('../pages/profile/profile.component').then((m) => m.StudentProfilePageComponent),

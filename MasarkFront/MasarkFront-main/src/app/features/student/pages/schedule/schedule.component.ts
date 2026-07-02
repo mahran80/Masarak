@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { StudentScheduleCardComponent } from '../../components/schedule-card/schedule-card.component';
 import { StudentEntityId, StudentScheduleSession } from '../../models';
@@ -24,6 +25,7 @@ import { StudentService } from '../../services/student.service';
 export class StudentSchedulePageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly sessions = signal<StudentScheduleSession[]>([]);
   readonly selectedSessionId = signal<StudentEntityId | null>(null);
@@ -92,11 +94,7 @@ export class StudentSchedulePageComponent implements OnInit {
         next: () => {
           this.isJoining.set(false);
           this.actionMessage.set('Session join recorded.');
-          if (session.meetingUrl) {
-            window.open(session.meetingUrl, '_blank');
-          } else {
-            alert('No meeting URL available for this session.');
-          }
+          this.router.navigate(['/dashboard/student/sessions', session.sessionId, 'live']);
         },
         error: (error: unknown) => {
           this.isJoining.set(false);
