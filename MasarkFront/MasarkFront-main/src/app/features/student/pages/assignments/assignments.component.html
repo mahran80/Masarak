@@ -108,40 +108,46 @@
               }
             </dl>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-              Answer
-              <textarea
-                class="min-h-32 rounded-lg border border-slate-200 bg-white p-3 text-sm font-normal text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                [value]="answerText()"
-                (input)="answerText.set(readTextAreaValue($event))"
-              ></textarea>
-            </label>
-
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-              Attachment
-              <input
-                type="file"
-                class="min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-800 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-sky-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-sky-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                (change)="selectedFile.set(readFileValue($event))"
-              />
-            </label>
-
-            @if (actionMessage()) {
-              <p class="rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
-            }
-
-            <button
-              type="button"
-              class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-              [disabled]="isSubmitting()"
-              (click)="submitSelectedAssignment()"
-            >
-              @if (isSubmitting()) {
-                Submitting...
-              } @else {
-                Submit assignment
+            @if (selected.assignment.status === 'Submitted' || selected.assignment.status === 'Graded') {
+              <div class="mt-6 rounded-lg border border-sky-200 bg-sky-50 p-6 text-center text-sm font-semibold text-sky-700">
+                You have already submitted this assignment.
+              </div>
+            } @else {
+              <label class="grid gap-2 text-sm font-semibold text-slate-700">
+                Answer
+                <textarea
+                  class="min-h-32 rounded-lg border border-slate-200 bg-white p-3 text-sm font-normal text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                  [value]="answerText()"
+                  (input)="answerText.set(readTextAreaValue($event))"
+                ></textarea>
+              </label>
+  
+              <label class="grid gap-2 text-sm font-semibold text-slate-700">
+                Attachment
+                <input
+                  type="file"
+                  class="min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-normal text-slate-800 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-sky-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-sky-700 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                  (change)="selectedFile.set(readFileValue($event))"
+                />
+              </label>
+  
+              @if (actionMessage()) {
+                <p class="rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
               }
-            </button>
+  
+              <button
+                type="button"
+                class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                [disabled]="isSubmitting()"
+                (click)="submitSelectedAssignment()"
+              >
+                @if (isSubmitting()) {
+                  Submitting...
+                } @else {
+                  Submit assignment
+                }
+              </button>
+            }
           </div>
         }
       </aside>

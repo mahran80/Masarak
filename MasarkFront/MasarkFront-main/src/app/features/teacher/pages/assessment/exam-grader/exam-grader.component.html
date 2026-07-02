@@ -73,6 +73,16 @@
 
         <form [formGroup]="gradeForm" (ngSubmit)="submitGrade()" class="p-8 bg-blue-50/30">
           <h3 class="text-lg font-black text-slate-900 mb-4">تقييم الإجابة</h3>
+          <div class="mb-6 bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+            <div>
+              <span class="text-xs font-bold text-slate-400 block mb-1">الدرجة العظمى للسؤال</span>
+              <span class="text-xl font-black text-[#4F8CD4]">{{ currentAnswer.maxMarks }}</span> <span class="text-sm font-bold text-slate-500">درجات</span>
+            </div>
+            <div class="text-left">
+              <span class="text-xs font-bold text-slate-400 block mb-1">الحد الأدنى للنجاح</span>
+              <span class="text-xl font-black text-rose-500">{{ currentAnswer.maxMarks / 2 }}</span> <span class="text-sm font-bold text-slate-500">درجات</span>
+            </div>
+          </div>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-2 md:col-span-1">
@@ -95,9 +105,7 @@
             <button type="submit" [disabled]="isGrading()"
               class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all shadow-md flex items-center gap-2">
               {{ isGrading() ? 'جاري الحفظ...' : 'حفظ التقييم والانتقال للتالي' }}
-              @if (!isGrading()) {
-                <span>⬅️</span>
-              }
+              <span [class.hidden]="isGrading()">⬅️</span>
             </button>
           </div>
         </form>

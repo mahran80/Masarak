@@ -97,6 +97,13 @@ namespace Masarak.API.Controllers
             return NoContent();
         }
 
+        [HttpPost("exams/{id}/close")]
+        public async Task<IActionResult> CloseExam(int id, CancellationToken ct)
+        {
+            await _assessmentService.CloseExamAsync(GetUserId(), id, ct);
+            return NoContent();
+        }
+
         [HttpGet("teaching-assignments/{taId}/exams")]
         [ProducesResponseType(typeof(IEnumerable<ExamDto>), 200)]
         public async Task<IActionResult> GetExams(int taId, CancellationToken ct)

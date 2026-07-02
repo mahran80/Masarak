@@ -24,6 +24,7 @@ namespace Masarak.Application.Interfaces
         Task<QuestionDto> UpdateQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default);
         Task RemoveQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default);
         Task PublishExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
+        Task CloseExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
         Task<IEnumerable<ExamDto>> GetTeacherExamsAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);
 
         // ── Teacher: Grading Dashboard ────────────────────────────────────────

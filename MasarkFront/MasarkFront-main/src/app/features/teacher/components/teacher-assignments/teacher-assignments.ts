@@ -1,14 +1,16 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherAssessmentService } from '../../services/teacher-assessment.service';
+import { TeacherContextService } from '../../services/teacher-context.service';
 import { TeacherAssignment } from '../../models/teacher-assessment.model';
 
 @Component({
   selector: 'app-teacher-assignments',
   standalone: true,
-  imports: [DatePipe, NgClass, RouterLink],
+  imports: [DatePipe, NgClass, RouterLink, FormsModule],
   templateUrl: './teacher-assignments.html',
   styleUrl: './teacher-assignments.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,22 +18,40 @@ import { TeacherAssignment } from '../../models/teacher-assessment.model';
 export class TeacherAssignments implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly contextService = inject(TeacherContextService);
 
   readonly assignments = signal<TeacherAssignment[]>([]);
-  readonly isLoading = signal(true);
+  readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  // Default teachingAssignmentId = 1 (placeholder until we have a selector)
-  private readonly defaultTeachingAssignmentId = 1;
+  readonly teachingAssignments = this.contextService.assignments;
+  readonly isLoadingContext = this.contextService.isLoading;
+  readonly selectedTaId = this.contextService.selectedAssignmentId;
+  readonly selectedContext = this.contextService.selectedAssignment;
 
-  ngOnInit(): void {
-    this.loadAssignments();
+  constructor() {
+    effect(() => {
+      const taId = this.selectedTaId();
+      if (taId !== null) {
+        this.loadAssignments(taId);
+      } else {
+        this.assignments.set([]);
+      }
+    }, { allowSignalWrites: true });
   }
 
-  loadAssignments(): void {
+  ngOnInit(): void {
+    this.contextService.loadAssignments();
+  }
+
+  selectAssignment(taId: number): void {
+    this.contextService.selectAssignment(taId);
+  }
+
+  loadAssignments(taId: number): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.assessmentService.getAssignments(this.defaultTeachingAssignmentId)
+    this.assessmentService.getAssignments(taId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -49,7 +69,9 @@ export class TeacherAssignments implements OnInit {
     if (confirm('هل أنت متأكد من نشر هذا الواجب؟ بمجرد نشره سيتمكن الطلاب من رؤيته.')) {
       this.assessmentService.publishAssignment(id)
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => this.loadAssignments());
+        .subscribe(() => {
+          if (this.selectedTaId() !== null) this.loadAssignments(this.selectedTaId()!);
+        });
     }
   }
 
@@ -57,7 +79,9 @@ export class TeacherAssignments implements OnInit {
     if (confirm('هل أنت متأكد من إغلاق هذا الواجب؟ لن يتمكن الطلاب من تسليمه بعد الإغلاق.')) {
       this.assessmentService.closeAssignment(id)
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => this.loadAssignments());
+        .subscribe(() => {
+          if (this.selectedTaId() !== null) this.loadAssignments(this.selectedTaId()!);
+        });
     }
   }
 

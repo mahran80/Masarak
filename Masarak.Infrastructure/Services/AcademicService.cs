@@ -307,6 +307,35 @@ namespace Masarak.Infrastructure.Services
             ));
         }
 
+        public async Task<IEnumerable<StudentInClassDto>> GetStudentsByTeachingAssignmentAsync(int userId, int taId, CancellationToken ct = default)
+        {
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, ct)
+                ?? throw new KeyNotFoundException("Teacher profile not found for this user.");
+
+            var ta = await _assignmentRepo.GetByIdAsync(taId, ct);
+            if (ta == null)
+                throw new KeyNotFoundException($"Teaching Assignment {taId} not found.");
+            if (ta.TeacherId != teacher.TeacherId)
+                throw new UnauthorizedAccessException($"Teacher {teacher.TeacherId} is not assigned to this assignment.");
+
+            var enrollments = await _studentClassRepo.GetByClassIdAsync(ta.ClassId, ct);
+            
+            // Filter out partial students who are NOT taking this specific subject
+            var enrolledStudents = enrollments.Where(sc => 
+                sc.EnrollmentType == Masarak.Domain.Enums.EnrollmentType.FullClass || 
+                sc.StudentClassSubjects.Any(scs => scs.SubjectId == ta.SubjectId));
+
+            return enrolledStudents.Select(sc => new StudentInClassDto(
+                sc.StudentClassId,
+                sc.StudentId,
+                sc.Student?.UserId ?? 0,
+                sc.Student?.User?.FullName ?? "",
+                sc.Student?.User?.Email ?? "",
+                sc.EnrollmentType,
+                sc.StudentClassSubjects.Select(scs => scs.Subject.Name).ToList()
+            ));
+        }
+
         public async Task<StudentClassDto> EnrollStudentAsync(EnrollStudentRequest request, CancellationToken ct = default)
         {
             var studentUser = await _userRepo.GetByIdAsync(request.StudentId, ct);

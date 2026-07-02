@@ -37,21 +37,21 @@
       <div class="stat-icon">🎓</div>
       <div>
         <p class="stat-label">إجمالي الطلاب</p>
-        <p class="stat-value">١٢٤</p>
+        <p class="stat-value">{{ stats()?.totalStudents ?? '...' }}</p>
       </div>
     </div>
     <div class="tc-stat-card" [style.--clr]="'#7c3aed'" [style.--bg]="'#f5f3ff'">
       <div class="stat-icon">📚</div>
       <div>
-        <p class="stat-label">الدروس هذا الأسبوع</p>
-        <p class="stat-value">١٨</p>
+        <p class="stat-label">المقررات النشطة</p>
+        <p class="stat-value">{{ stats()?.activeCourses ?? '...' }}</p>
       </div>
     </div>
     <div class="tc-stat-card" [style.--clr]="'#d97706'" [style.--bg]="'#fffbeb'">
       <div class="stat-icon">✅</div>
       <div>
-        <p class="stat-label">متوسط الحضور</p>
-        <p class="stat-value">٩٢٪</p>
+        <p class="stat-label">متوسط الأداء</p>
+        <p class="stat-value">{{ stats()?.averagePerformance ?? '...' }}٪</p>
       </div>
     </div>
   </div>
@@ -142,13 +142,17 @@
       <div class="tc-card activities-card">
         <h3 class="card-title sm">الإشعارات الحديثة</h3>
         <div class="activities-list">
-          <div *ngFor="let a of activities()" class="activity-item" [class.submission]="a.type === 'submission'" [class.alert]="a.type === 'alert'" [class.message]="a.type === 'message'">
-            <div class="activity-icon">{{ a.icon }}</div>
-            <div class="activity-body">
-              <p class="activity-text">{{ a.text }}</p>
-              <p class="activity-time">{{ a.time }}</p>
+          @if (activities().length === 0) {
+            <div class="text-center py-6 text-slate-400 font-bold text-xs">لا توجد إشعارات حديثة</div>
+          } @else {
+            <div *ngFor="let a of activities()" class="activity-item" [ngClass]="a.color">
+              <div class="activity-icon">{{ a.icon }}</div>
+              <div class="activity-body">
+                <p class="activity-text">{{ a.text }}</p>
+                <p class="activity-time">{{ a.time }}</p>
+              </div>
             </div>
-          </div>
+          }
         </div>
       </div>
 

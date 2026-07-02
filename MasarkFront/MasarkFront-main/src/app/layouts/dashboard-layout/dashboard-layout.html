@@ -13,7 +13,7 @@
       </div>
 
       <nav class="space-y-2">
-        @if (userRole() !== 'Admin') {
+        @if (userRole() !== 'Admin' && userRole() !== 'Teacher') {
           <a
             routerLink="/plans"
             routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
@@ -61,6 +61,14 @@
           >
             <span>📝</span> الاختبارات
           </a>
+
+          <a
+            routerLink="student/schedule"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>📅</span> الجدول الأسبوعي
+          </a>
         } @else if (userRole() === 'Teacher') {
           <a
             routerLink="teacher"
@@ -92,31 +100,39 @@
           </a>
 
           <a
-            routerLink="teacher/exams"
+            routerLink="/dashboard/teacher/exams"
             routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
           >
             <span>📝</span> الاختبارات
           </a>
 
+          <a
+            routerLink="/dashboard/teacher/sessions"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>🎥</span> الحصص المباشرة
+          </a>
+
           <div class="border-t border-slate-100 pt-2 mt-2">
             <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">التقييمات</p>
             <a
-              routerLink="teacher/assessment/grading"
+              routerLink="/dashboard/teacher/assessment/grading"
               routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
             >
               <span>✅</span> لوحة التصحيح
             </a>
             <a
-              routerLink="teacher/assessment/assignments/create"
+              routerLink="/dashboard/teacher/assessment/assignments/create"
               routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
             >
               <span>➕</span> إنشاء واجب
             </a>
             <a
-              routerLink="teacher/assessment/exams/create"
+              routerLink="/dashboard/teacher/assessment/exams/create"
               routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
             >
@@ -125,7 +141,7 @@
           </div>
         } @else if (userRole() === 'Admin') {
           <a
-            routerLink="admin"
+            routerLink="/dashboard/admin"
             [routerLinkActiveOptions]="{ exact: true }"
             routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"

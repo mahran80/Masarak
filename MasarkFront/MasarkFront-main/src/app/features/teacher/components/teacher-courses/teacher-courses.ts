@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   signal,
+  effect
 } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of, catchError, forkJoin } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { TeacherContextService } from '../../services/teacher-context.service';
 
 export type ContentType = 'Video' | 'PDF' | 'Notes' | 'ExerciseSheet';
 export type InnerTab = 'files' | 'upload';
@@ -47,16 +49,14 @@ interface ContentItem {
 export class TeacherCourses implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly contextService = inject(TeacherContextService);
   private readonly teacherBaseUrl = `${environment.apiUrl}/teacher`;
 
   // ─── State ─────────────────────────────────────────────────────────────────
-  readonly teachingAssignments = signal<TeachingAssignment[]>([]);
-  readonly selectedTaId = signal<number | null>(null);
   readonly contentItems = signal<ContentItem[]>([]);
   readonly viewMode = signal<'list' | 'grid'>('list');
   readonly filterType = signal<string>('الكل');
 
-  readonly isLoadingAssignments = signal(true);
   readonly isLoadingContent = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
@@ -79,54 +79,37 @@ export class TeacherCourses implements OnInit {
   readonly filterOptions = ['الكل', 'Video', 'PDF', 'Notes', 'ExerciseSheet'];
 
   // ─── Computed ──────────────────────────────────────────────────────────────
-  readonly selectedAssignment = computed(() =>
-    this.teachingAssignments().find((a) => a.id === this.selectedTaId()) ?? null,
-  );
+  readonly teachingAssignments = this.contextService.assignments;
+  readonly isLoadingAssignments = this.contextService.isLoading;
+  readonly selectedTaId = this.contextService.selectedAssignmentId;
+  readonly selectedAssignment = this.contextService.selectedAssignment;
 
   readonly filteredContent = computed(() => {
     const f = this.filterType();
     return this.contentItems().filter((item) => f === 'الكل' || item.type === f);
   });
 
-  ngOnInit(): void {
-    this.loadAssignments();
+  constructor() {
+    // Watch for assignment changes and load content
+    effect(() => {
+      const taId = this.selectedTaId();
+      if (taId !== null) {
+        this.loadContent(taId);
+      } else {
+        this.contentItems.set([]);
+      }
+    }, { allowSignalWrites: true });
   }
 
-  loadAssignments(): void {
-    this.isLoadingAssignments.set(true);
-    this.errorMessage.set(null);
-
-    const now = new Date();
-    const thisYear = now.getFullYear();
-    const nextYear = thisYear + 1;
-
-    const fetch = (year: number) =>
-      this.http
-        .get<TeachingAssignment[]>(`${this.teacherBaseUrl}/assignments?academicYear=${year}`)
-        .pipe(catchError(() => of([] as TeachingAssignment[])));
-
-    forkJoin([fetch(thisYear), fetch(nextYear)])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(([thisYearData, nextYearData]) => {
-        const seen = new Set<number>();
-        const merged = [...thisYearData, ...nextYearData].filter((a) => {
-          if (seen.has(a.id)) return false;
-          seen.add(a.id);
-          return true;
-        });
-        this.teachingAssignments.set(merged);
-        this.isLoadingAssignments.set(false);
-        const firstId = merged[0]?.id ?? null;
-        if (firstId !== null) this.selectAssignment(firstId);
-      });
+  ngOnInit(): void {
+    this.contextService.loadAssignments();
   }
 
   selectAssignment(taId: number): void {
-    this.selectedTaId.set(taId);
+    this.contextService.selectAssignment(taId);
     this.filterType.set('الكل');
     this.activeTab.set('files');
     this.resetUploadForm();
-    this.loadContent(taId);
   }
 
   switchTab(tab: InnerTab): void {

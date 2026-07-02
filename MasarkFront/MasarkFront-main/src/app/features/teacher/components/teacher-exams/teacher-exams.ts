@@ -1,36 +1,56 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherAssessmentService } from '../../services/teacher-assessment.service';
+import { TeacherContextService } from '../../services/teacher-context.service';
 import { TeacherExam } from '../../models/teacher-assessment.model';
 
 @Component({
   selector: 'app-teacher-exams',
   standalone: true,
-  imports: [DatePipe, NgClass, RouterLink],
+  imports: [DatePipe, NgClass, RouterLink, FormsModule],
   templateUrl: './teacher-exams.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherExamsComponent implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly contextService = inject(TeacherContextService);
 
   readonly exams = signal<TeacherExam[]>([]);
-  readonly isLoading = signal(true);
+  readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  // Default teachingAssignmentId = 1 (placeholder until we have a selector)
-  private readonly defaultTeachingAssignmentId = 1;
+  readonly teachingAssignments = this.contextService.assignments;
+  readonly isLoadingContext = this.contextService.isLoading;
+  readonly selectedTaId = this.contextService.selectedAssignmentId;
+  readonly selectedContext = this.contextService.selectedAssignment;
 
-  ngOnInit(): void {
-    this.loadExams();
+  constructor() {
+    effect(() => {
+      const taId = this.selectedTaId();
+      if (taId !== null) {
+        this.loadExams(taId);
+      } else {
+        this.exams.set([]);
+      }
+    }, { allowSignalWrites: true });
   }
 
-  loadExams(): void {
+  ngOnInit(): void {
+    this.contextService.loadAssignments();
+  }
+
+  selectAssignment(taId: number): void {
+    this.contextService.selectAssignment(taId);
+  }
+
+  loadExams(taId: number): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.assessmentService.getExams(this.defaultTeachingAssignmentId)
+    this.assessmentService.getExams(taId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -49,7 +69,7 @@ export class TeacherExamsComponent implements OnInit {
       this.assessmentService.publishExam(examId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
-          this.loadExams(); // Reload to update status
+          if (this.selectedTaId() !== null) this.loadExams(this.selectedTaId()!); // Reload to update status
         });
     }
   }
@@ -59,7 +79,7 @@ export class TeacherExamsComponent implements OnInit {
       this.assessmentService.closeExam(examId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
-          this.loadExams(); // Reload to update status
+          if (this.selectedTaId() !== null) this.loadExams(this.selectedTaId()!); // Reload to update status
         });
     }
   }

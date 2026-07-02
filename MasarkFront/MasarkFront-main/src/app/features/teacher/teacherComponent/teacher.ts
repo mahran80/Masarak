@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherAssessmentService } from '../services/teacher-assessment.service';
 import { TeacherSessionService, SessionDto } from '../services/teacher-session.service';
+import { TeacherDashboardService } from '../services/teacher-dashboard.service';
 
 interface Session {
   id: number;
@@ -18,7 +19,8 @@ interface RecentActivity {
   icon: string;
   text: string;
   time: string;
-  type: 'submission' | 'alert' | 'message';
+  type: string;
+  color?: string;
 }
 
 @Component({
@@ -31,6 +33,7 @@ interface RecentActivity {
 export class TeacherComponent implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly sessionService = inject(TeacherSessionService);
+  private readonly dashboardService = inject(TeacherDashboardService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly today = new Date().toLocaleDateString('ar-EG', {
@@ -46,33 +49,35 @@ export class TeacherComponent implements OnInit {
 
   readonly sessions = signal<Session[]>([]);
 
-  // Fallback mock sessions shown when API returns no data (useful in development)
-  private readonly mockSessions: Session[] = [
-    { id: 0, title: 'الرياضيات', subject: 'جبر الصف الخامس', grade: 'الصف ٥أ', time: '٠٨:٠٠ – ٠٨:٤٥', status: 'live' },
-    { id: 0, title: 'العلوم', subject: 'التحولات الفيزيائية', grade: 'الصف ٤ب', time: '٠٩:٠٠ – ٠٩:٤٥', status: 'upcoming' },
-    { id: 0, title: 'اللغة العربية', subject: 'النحو والصرف', grade: 'الصف ٥ج', time: '١٠:٠٠ – ١٠:٤٥', status: 'upcoming' },
-    { id: 0, title: 'الرياضيات', subject: 'الهندسة الفراغية', grade: 'الصف ٦أ', time: '١١:٠٠ – ١١:٤٥', status: 'done' },
-  ];
+  readonly activities = signal<RecentActivity[]>([]);
 
-  readonly activities = signal<RecentActivity[]>([
-    { icon: '📝', text: 'تم تقديم واجب الرياضيات من طالب: أحمد علي', time: 'منذ ١٠ دقائق', type: 'submission' },
-    { icon: '📢', text: 'تذكير: اجتماع المعلمين غداً الساعة ١٠:٠٠ ص', time: 'منذ ٣٠ دقيقة', type: 'alert' },
-    { icon: '💬', text: 'رسالة جديدة من ولي أمر الطالب سارة محمد', time: 'منذ ساعة', type: 'message' },
-    { icon: '📝', text: 'تم تقديم واجب العلوم من طالبة: نور أحمد', time: 'منذ ساعتين', type: 'submission' },
-  ]);
+  readonly stats = signal<any>(null);
 
   ngOnInit(): void {
-    this.assessmentService.getPendingGrading()
+    this.dashboardService.getStats()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.pendingGradingCount.set(
-            data.totalPendingExamAnswers + data.totalPendingSubmissions
-          );
+          this.stats.set(data);
+          this.pendingGradingCount.set(data.assignmentsToGrade);
           this.isLoadingStats.set(false);
         },
         error: () => {
           this.isLoadingStats.set(false);
+        }
+      });
+
+    this.dashboardService.getActivities()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.activities.set(data.map(a => ({
+            icon: a.icon,
+            text: a.title,
+            time: a.time,
+            type: 'submission', // Generic fallback
+            color: a.color
+          })));
         }
       });
 
@@ -85,38 +90,32 @@ export class TeacherComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          if (data.length === 0) {
-            // No sessions from API — show mock data so dashboard isn't blank
-            this.sessions.set(this.mockSessions);
-          } else {
-            const mapped = data.map(d => {
-              const start = new Date(d.scheduledAt);
-              const end = new Date(d.endsAt);
-              const formatTime = (date: Date) => date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-              let status: Session['status'] = 'upcoming';
-              if (d.status === 'Completed' || d.status === 'Cancelled') {
-                status = 'done';
-              } else if (d.status === 'Live') {
-                status = 'live';
-              } else if (now >= start && now <= end) {
-                status = 'live'; // Treat in-progress scheduled sessions as live
-              }
-              return {
-                id: d.sessionId,
-                title: d.title,
-                subject: d.subjectName,
-                grade: d.className,
-                time: `${formatTime(start)} – ${formatTime(end)}`,
-                status
-              };
-            });
-            this.sessions.set(mapped);
-          }
+          const mapped = data.map(d => {
+            const start = new Date(d.scheduledAt);
+            const end = new Date(d.endsAt);
+            const formatTime = (date: Date) => date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            let status: Session['status'] = 'upcoming';
+            if (d.status === 'Completed' || d.status === 'Cancelled') {
+              status = 'done';
+            } else if (d.status === 'Live') {
+              status = 'live';
+            } else if (now >= start && now <= end) {
+              status = 'live'; // Treat in-progress scheduled sessions as live
+            }
+            return {
+              id: d.sessionId,
+              title: d.title,
+              subject: d.subjectName,
+              grade: d.className,
+              time: `${formatTime(start)} – ${formatTime(end)}`,
+              status
+            };
+          });
+          this.sessions.set(mapped);
           this.isLoadingSessions.set(false);
         },
         error: () => {
-          // API not available — fall back to mock data
-          this.sessions.set(this.mockSessions);
+          this.sessions.set([]);
           this.isLoadingSessions.set(false);
         }
       });

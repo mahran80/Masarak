@@ -33,6 +33,7 @@ namespace Masarak.Application.Interfaces
 
         // ── Student Enrollment ──────────────────────────────────────────────
         Task<IEnumerable<StudentInClassDto>> GetClassRosterAsync(int classId, CancellationToken ct = default);
+        Task<IEnumerable<StudentInClassDto>> GetStudentsByTeachingAssignmentAsync(int userId, int taId, CancellationToken ct = default);
         Task<StudentClassDto> EnrollStudentAsync(EnrollStudentRequest request, CancellationToken ct = default);
         Task UnenrollStudentAsync(int studentClassId, CancellationToken ct = default);
     }

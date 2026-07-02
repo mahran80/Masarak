@@ -92,6 +92,11 @@ export class StudentSchedulePageComponent implements OnInit {
         next: () => {
           this.isJoining.set(false);
           this.actionMessage.set('Session join recorded.');
+          if (session.meetingUrl) {
+            window.open(session.meetingUrl, '_blank');
+          } else {
+            alert('No meeting URL available for this session.');
+          }
         },
         error: (error: unknown) => {
           this.isJoining.set(false);

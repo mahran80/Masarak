@@ -134,6 +134,30 @@ namespace Masarak.Infrastructure.Services
             return MapSession(loaded!);
         }
 
+        public async Task StartSessionAsync(int userId, int sessionId, CancellationToken ct = default)
+        {
+            var session = await _sessionRepo.GetByIdWithDetailsAsync(sessionId, ct)
+                ?? throw new KeyNotFoundException($"Session {sessionId} not found.");
+
+            if (session.TeachingAssignment.Teacher.UserId != userId)
+                throw new UnauthorizedAccessException("You can only start your own sessions.");
+
+            session.MarkLive();
+            await _sessionRepo.UpdateAsync(session, ct);
+        }
+
+        public async Task CompleteSessionAsync(int userId, int sessionId, CancellationToken ct = default)
+        {
+            var session = await _sessionRepo.GetByIdWithDetailsAsync(sessionId, ct)
+                ?? throw new KeyNotFoundException($"Session {sessionId} not found.");
+
+            if (session.TeachingAssignment.Teacher.UserId != userId)
+                throw new UnauthorizedAccessException("You can only complete your own sessions.");
+
+            session.Complete();
+            await _sessionRepo.UpdateAsync(session, ct);
+        }
+
         public async Task CancelSessionAsync(int userId, int sessionId, CancellationToken ct = default)
         {
             var session = await _sessionRepo.GetByIdWithDetailsAsync(sessionId, ct)

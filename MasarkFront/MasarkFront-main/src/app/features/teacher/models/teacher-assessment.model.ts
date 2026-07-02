@@ -23,6 +23,7 @@ export interface TeacherSubmissionDetail {
   score?: number;
   submittedAt: string;
   hasFile: boolean;
+  maxScore: number;
 }
 
 export interface CreateAssignmentRequest {
