@@ -12,7 +12,7 @@ namespace Masarak.Application.DTOs
 
     public record SubmissionDetailDto(
         int SubmissionId, int StudentId, string StudentName, SubmissionStatus Status, 
-        decimal? Score, DateTime SubmittedAt, bool HasFile);
+        decimal? Score, DateTime SubmittedAt, bool HasFile, decimal MaxScore);
 
     public class CreateAssignmentRequest
     {

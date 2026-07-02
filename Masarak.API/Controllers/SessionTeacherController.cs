@@ -18,10 +18,12 @@ namespace Masarak.API.Controllers
     public class SessionTeacherController : ControllerBase
     {
         private readonly ISessionService _sessionService;
+        private readonly IAcademicService _academicService;
 
-        public SessionTeacherController(ISessionService sessionService)
+        public SessionTeacherController(ISessionService sessionService, IAcademicService academicService)
         {
             _sessionService = sessionService;
+            _academicService = academicService;
         }
 
         private int GetUserId() => int.Parse(User.FindFirstValue("userid") ?? "0");
@@ -38,6 +40,19 @@ namespace Masarak.API.Controllers
                 return Ok(assignments);
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+        [HttpGet("teaching-assignments/{taId}/students")]
+        [ProducesResponseType(typeof(IEnumerable<StudentInClassDto>), 200)]
+        public async Task<IActionResult> GetStudentsForTeachingAssignment(int taId, CancellationToken ct)
+        {
+            try
+            {
+                var students = await _academicService.GetStudentsByTeachingAssignmentAsync(GetUserId(), taId, ct);
+                return Ok(students);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
         }
 
         [HttpPost("sessions")]
@@ -75,6 +90,30 @@ namespace Masarak.API.Controllers
             {
                 await _sessionService.CancelSessionAsync(GetUserId(), id, ct);
                 return NoContent();
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+        }
+
+        [HttpPost("sessions/{id}/start")]
+        public async Task<IActionResult> StartSession(int id, CancellationToken ct)
+        {
+            try
+            {
+                await _sessionService.StartSessionAsync(GetUserId(), id, ct);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+        }
+
+        [HttpPost("sessions/{id}/complete")]
+        public async Task<IActionResult> CompleteSession(int id, CancellationToken ct)
+        {
+            try
+            {
+                await _sessionService.CompleteSessionAsync(GetUserId(), id, ct);
+                return Ok();
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
             catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }

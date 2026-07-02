@@ -141,6 +141,8 @@ namespace Masarak.Infrastructure.Services
         {
             await ValidateTeacherOwnsAssignmentAsync(teacherUserId, assignmentId);
             var submissions = await _submissionRepo.GetByAssignmentIdAsync(assignmentId, ct);
+            var assignment = await _assignmentRepo.GetByIdAsync(assignmentId, ct);
+            var maxScore = assignment?.MaxScore ?? 100;
             
             return submissions.Select(s => new SubmissionDetailDto(
                 s.SubmissionId,
@@ -149,7 +151,8 @@ namespace Masarak.Infrastructure.Services
                 s.Status,
                 s.Score,
                 s.SubmittedAt,
-                s.FileBlobName != null
+                s.FileBlobName != null,
+                maxScore
             ));
         }
 
@@ -310,6 +313,17 @@ namespace Masarak.Infrastructure.Services
                 throw new UnauthorizedAccessException();
 
             exam.Publish();
+            await _examRepo.UpdateAsync(exam, ct);
+        }
+
+        public async Task CloseExamAsync(int teacherUserId, int examId, CancellationToken ct = default)
+        {
+            var exam = await _examRepo.GetByIdWithQuestionsAsync(examId, ct);
+            if (exam == null) throw new KeyNotFoundException("Exam not found.");
+            if (exam.TeachingAssignment.Teacher.UserId != teacherUserId)
+                throw new UnauthorizedAccessException();
+
+            exam.Close();
             await _examRepo.UpdateAsync(exam, ct);
         }
 

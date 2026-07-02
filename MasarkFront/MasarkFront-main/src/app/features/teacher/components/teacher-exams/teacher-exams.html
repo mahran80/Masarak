@@ -3,9 +3,21 @@
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
       <h1 class="text-2xl font-black text-slate-900">الاختبارات</h1>
-      <p class="text-xs font-bold text-slate-400">إدارة الاختبارات ونشرها للطلاب</p>
+      <p class="text-xs font-bold text-slate-400">إعداد الاختبارات ونتائجها للفصل المحدد</p>
     </div>
     <div class="flex items-center gap-3">
+      <!-- Context Selector -->
+      @if (!isLoadingContext()) {
+        <select class="border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 focus:outline-none focus:border-[#4F8CD4]"
+                [ngModel]="selectedTaId()"
+                (ngModelChange)="selectAssignment($event)">
+          <option [ngValue]="null" disabled>اختر الفصل الدراسي</option>
+          @for (ta of teachingAssignments(); track ta.id) {
+            <option [ngValue]="ta.id">{{ ta.className }} - {{ ta.subjectName }}</option>
+          }
+        </select>
+      }
+
       <a routerLink="/dashboard/teacher/assessment/exams/create"
          class="flex items-center justify-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100 active:scale-95">
         📝 إنشاء اختبار جديد
@@ -23,7 +35,9 @@
     } @else if (errorMessage()) {
       <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100 flex items-center justify-between">
         <span>{{ errorMessage() }}</span>
-        <button (click)="loadExams()" class="underline text-rose-700">إعادة المحاولة</button>
+        @if (selectedTaId() !== null) {
+          <button (click)="loadExams(selectedTaId()!)" class="underline text-rose-700">إعادة المحاولة</button>
+        }
       </div>
     } @else {
       <div class="overflow-x-auto">

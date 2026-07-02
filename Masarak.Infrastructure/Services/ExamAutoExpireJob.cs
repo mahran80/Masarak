@@ -48,16 +48,37 @@ namespace Masarak.Infrastructure.Services
         {
             using var scope = _serviceProvider.CreateScope();
             var studentExamRepo = scope.ServiceProvider.GetRequiredService<IStudentExamRepository>();
-            // IAssessmentService assessmentService = scope.ServiceProvider.GetRequiredService<IAssessmentService>();
-            // Instead of circular dependency, we do the logic here or in a dedicated usecase.
-            // For now, let's mark them as AutoExpired/Submitted.
-
+            var dbContext = scope.ServiceProvider.GetRequiredService<Masarak.Infrastructure.Persistence.Context>();
+            
             var now = DateTime.UtcNow;
+
+            // 1. Auto-close published Exams whose EndTime has passed
+            var expiredParentExams = dbContext.Exams.Where(e => e.Status == ExamStatus.Published && e.EndTime < now);
+            foreach (var exam in expiredParentExams)
+            {
+                exam.Close();
+                _logger.LogInformation($"Auto-closed Exam {exam.ExamId} as its deadline has passed.");
+            }
+
+            // 2. Auto-close published Assignments whose DueDate has passed
+            var expiredAssignments = dbContext.Assignments.Where(a => a.Status == AssignmentStatus.Published && a.DueDate < now);
+            foreach (var assignment in expiredAssignments)
+            {
+                assignment.Close();
+                _logger.LogInformation($"Auto-closed Assignment {assignment.AssignmentId} as its deadline has passed.");
+            }
+
+            if (expiredParentExams.Any() || expiredAssignments.Any())
+            {
+                await dbContext.SaveChangesAsync(ct);
+            }
+
+            // 3. Auto-submit Student Exam Attempts
             var expiredExams = await studentExamRepo.GetExpiredInProgressAsync(now, ct);
 
             if (!expiredExams.Any()) return;
 
-            _logger.LogInformation($"Found {expiredExams.Count()} expired exams to auto-submit.");
+            _logger.LogInformation($"Found {expiredExams.Count()} expired student exam attempts to auto-submit.");
 
             foreach (var attempt in expiredExams)
             {

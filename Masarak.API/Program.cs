@@ -127,7 +127,7 @@ using (var scope = app.Services.CreateScope())
         await DatabaseSeeder.SeedTeachingAssignmentsAsync(db);
         await DatabaseSeeder.SeedSubscriptionsAsync(db);
         await DatabaseSeeder.SeedStudentEnrollmentsAsync(db);
-        await DatabaseSeeder.SeedParentDashboardDataAsync(db);
+        await TeacherMockDataSeeder.SeedExtensiveTeacherDataAsync(db);
     }
 }
     
@@ -142,6 +142,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<Masarak.API.Extensions.GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
