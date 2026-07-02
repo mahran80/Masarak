@@ -1,33 +1,32 @@
-<div class="flex flex-col h-[450px] w-[320px] bg-white rounded-xl border overflow-hidden shadow mx-auto">
+<div class="flex flex-col h-[calc(100vh-8rem)] w-full max-w-5xl bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mx-auto mt-4">
 
   <!-- Header -->
-  <div class="bg-blue-500 text-white text-center py-2 text-sm font-semibold">
-    الدردشة
+  <div class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+    <h2 class="text-lg font-bold text-slate-800">مجتمع الاباء</h2>
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+      <span class="text-sm font-medium text-slate-500">متصل</span>
+    </div>
   </div>
 
   <!-- Messages -->
-  <div class="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-50">
+  <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8f9fb]">
 
     @for (msg of store.messages(); track msg.messageId) {
 
-      <div class="flex flex-col">
+      <div class="flex flex-col w-full" [ngClass]="msg.senderUserId === currentUserId ? 'items-end' : 'items-start'">
 
-        <span class="text-[11px] text-slate-500 mb-1">
-          {{ msg.senderName }}
+        <span class="text-[11px] text-slate-400 mb-1 px-1">
+          {{ msg.senderUserId === currentUserId ? 'أنت' : msg.senderName }}
         </span>
 
-        <div class="flex items-end gap-2">
+        <div
+          class="max-w-[85%] px-4 py-3 text-[15px] shadow-sm border"
+          [ngClass]="msg.senderUserId === currentUserId 
+            ? 'bg-blue-600 text-white rounded-2xl rounded-tl-sm border-blue-600' 
+            : 'bg-white text-slate-800 rounded-2xl rounded-tr-sm border-slate-200'">
 
-          <div
-            class="max-w-[75%] bg-blue-100 text-slate-800 px-3 py-2 rounded-2xl rounded-tr-md text-sm">
-
-            {{ msg.content }}
-
-          </div>
-<!-- 
-<span class="text-[10px] text-slate-400">
-            {{ msg.sentAt | date:'HH:mm' }}
-          </span> -->
+          {{ msg.content }}
 
         </div>
 
@@ -38,21 +37,21 @@
   </div>
 
   <!-- Input -->
-  <div class="border-t bg-white p-2">
+  <div class="border-t border-slate-100 bg-white p-4">
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3">
 
       <input
         [(ngModel)]="message"
         (keyup.enter)="send()"
-        placeholder="اكتب رسالتك..."
-        class="flex-1 rounded-full border border-slate-300 px-3 py-2 text-sm outline-none" />
+        placeholder="اكتب رسالتك هنا..."
+        class="flex-1 rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-[15px] outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all" />
 
       <button
         (click)="send()"
-        class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+        class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-200 transition-colors shrink-0">
 
-        ➤
+        <svg class="w-5 h-5 -ml-1 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
 
       </button>
 

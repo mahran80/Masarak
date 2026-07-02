@@ -1,25 +1,32 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatApiService } from '../../services/chat-api-service';
 import { ChatSignalRService } from '../../../../core/services/signalr';
 import { ChatStore } from '../../services/chat.store';
+import { AuthStateService } from '../../../../core/services/auth-state-service';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './chat.html',
 })
 export class Chat implements OnInit, OnDestroy {
   private api = inject(ChatApiService);
   private signalr = inject(ChatSignalRService);
   store = inject(ChatStore);
+  authState = inject(AuthStateService);
 
   roomId: number = 0;
   message = '';
   private messageSub?: Subscription;
+
+  get currentUserId(): number {
+    return this.authState.user()?.userId || 0;
+  }
 
   async ngOnInit() {
     const token = localStorage.getItem('masarak_access_token')!;
