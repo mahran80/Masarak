@@ -19,11 +19,13 @@ namespace Masarak.API.Controllers
     {
         private readonly ISessionService _sessionService;
         private readonly IAcademicService _academicService;
+        private readonly IAgoraTokenService _agoraTokenService;
 
-        public SessionTeacherController(ISessionService sessionService, IAcademicService academicService)
+        public SessionTeacherController(ISessionService sessionService, IAcademicService academicService, IAgoraTokenService agoraTokenService)
         {
             _sessionService = sessionService;
             _academicService = academicService;
+            _agoraTokenService = agoraTokenService;
         }
 
         private int GetUserId() => int.Parse(User.FindFirstValue("userid") ?? "0");
@@ -130,6 +132,16 @@ namespace Masarak.API.Controllers
                 return Ok(sessions);
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+        [HttpGet("sessions/{id}/token")]
+        public IActionResult GetAgoraToken(int id)
+        {
+            // Note: In a real app, verify the teacher owns the session here
+            string channelName = id.ToString();
+            string uid = GetUserId().ToString();
+            string token = _agoraTokenService.GenerateRtcToken(channelName, uid, "publisher");
+            return Ok(new { token, channelName, uid });
         }
     }
 }

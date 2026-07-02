@@ -21,11 +21,13 @@ namespace Masarak.API.Controllers
     {
         private readonly ISessionService _sessionService;
         private readonly Context _context;
+        private readonly IAgoraTokenService _agoraTokenService;
 
-        public StudentAcademicController(ISessionService sessionService, Context context)
+        public StudentAcademicController(ISessionService sessionService, Context context, IAgoraTokenService agoraTokenService)
         {
             _sessionService = sessionService;
             _context = context;
+            _agoraTokenService = agoraTokenService;
         }
 
         private int GetUserId() => int.Parse(User.FindFirstValue("userid") ?? "0");
@@ -92,6 +94,16 @@ namespace Masarak.API.Controllers
                 return Ok(schedule);
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+        [HttpGet("sessions/{id}/token")]
+        public IActionResult GetAgoraToken(int id)
+        {
+            // Note: In a real app, verify the student is allowed to join this session
+            string channelName = id.ToString();
+            string uid = GetUserId().ToString();
+            string token = _agoraTokenService.GenerateRtcToken(channelName, uid, "subscriber");
+            return Ok(new { token, channelName, uid });
         }
     }
 }

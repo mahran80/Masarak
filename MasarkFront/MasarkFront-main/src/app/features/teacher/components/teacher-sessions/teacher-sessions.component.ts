@@ -5,11 +5,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherSessionService, SessionDto } from '../../services/teacher-session.service';
 
 import { TeacherContextService } from '../../services/teacher-context.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-teacher-sessions',
   standalone: true,
-  imports: [DatePipe, NgClass, FormsModule],
+  imports: [DatePipe, NgClass, FormsModule, RouterModule],
   templateUrl: './teacher-sessions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -17,6 +18,7 @@ export class TeacherSessionsComponent implements OnInit {
   private readonly sessionService = inject(TeacherSessionService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly contextService = inject(TeacherContextService);
+  private readonly router = inject(Router);
 
   readonly sessions = signal<SessionDto[]>([]);
   readonly isLoading = signal(false);
@@ -154,7 +156,10 @@ export class TeacherSessionsComponent implements OnInit {
     this.sessionService.startSession(sessionId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.loadSessions(),
+        next: () => {
+          this.loadSessions();
+          this.router.navigate(['/dashboard/teacher/sessions', sessionId, 'live']);
+        },
         error: (err) => alert(err.error?.message || 'Failed to start session')
       });
   }

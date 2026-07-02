@@ -64,20 +64,18 @@
                 <dd class="mt-1 leading-6 text-slate-700">{{ session.description }}</dd>
               </div>
             }
-            @if (session.meetingUrl) {
-              <a
+            @if (session.status === 'Live') {
+              <button
+                type="button"
                 class="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700"
-                [href]="session.meetingUrl"
-                target="_blank"
-                rel="noreferrer"
                 (click)="joinSession(session)"
               >
                 @if (isJoining()) {
-                  Recording...
+                  Connecting...
                 } @else {
-                  Join session
+                  Join Live Session
                 }
-              </a>
+              </button>
             }
           </dl>
         }
