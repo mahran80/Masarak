@@ -158,12 +158,20 @@ namespace Masarak.API.Controllers
             Ok(new { message = "My children — Parent only.", user = GetUserInfo() });
 
         [HttpGet("children/{childId}/grades")]
-        public IActionResult GetChildGrades(int childId) =>
-            Ok(new { message = $"Child {childId} grades — Parent only.", user = GetUserInfo() });
+        [ProducesResponseType(typeof(IEnumerable<Masarak.Application.DTOs.SubjectPerformanceDto>), 200)]
+        public async Task<IActionResult> GetChildGrades(int childId, [FromQuery] string? academicYear, [FromServices] IAssessmentService assessmentService, CancellationToken ct)
+        {
+            var parentId = int.Parse(User.FindFirstValue("userid") ?? "0");
+            try
+            {
+                var year = academicYear ?? Masarak.Domain.ValueObjects.AcademicYear.Current().Year.ToString();
+                var dtos = await assessmentService.GetStudentPerformanceForParentAsync(parentId, childId, year, ct);
+                return Ok(dtos);
+            }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+        }
 
-        [HttpGet("children/{childId}/attendance")]
-        public IActionResult GetChildAttendance(int childId) =>
-            Ok(new { message = $"Child {childId} attendance — Parent only.", user = GetUserInfo() });
+
 
         [HttpPost("link-student")]
         [ProducesResponseType(typeof(Masarak.Application.DTOs.ParentStudentLinkDto), 200)]
@@ -193,6 +201,21 @@ namespace Masarak.API.Controllers
 
             var students = await subscriptionService.GetLinkedStudentsAsync(parentId);
             return Ok(students);
+        }
+
+        [HttpPost("children/{childId}/subscribe")]
+        [ProducesResponseType(typeof(Masarak.Application.DTOs.CheckoutResult), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> SubscribeForChild(int childId, [FromBody] Masarak.Application.DTOs.InitiateCheckoutRequest request, [FromServices] ISubscriptionService subService, [FromServices] Masarak.Application.Interfaces.IParentStudentLinkRepository linkRepo, CancellationToken ct)
+        {
+            var parentId = int.Parse(User.FindFirstValue("userid") ?? "0");
+            if (!await linkRepo.LinkExistsAsync(parentId, childId, ct)) return Forbid();
+            try
+            {
+                var result = await subService.InitiateCheckoutAsync(childId, request, ct);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         private object GetUserInfo() => new

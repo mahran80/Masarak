@@ -20,6 +20,8 @@ namespace Masarak.Infrastructure.Services
         private readonly ITeachingAssignmentRepository _teachingAssignmentRepo;
         private readonly IStudentClassRepository _studentClassRepo;
         private readonly IFileStorageService _fileStorage;
+        private readonly IParentStudentLinkRepository _parentLinkRepo;
+        private readonly ISubscriptionAccessService _accessService;
         private readonly Context _context;
         private readonly AutoGradingService _autoGradingService;
         private readonly ExamTimerEnforcer _timerEnforcer;
@@ -34,6 +36,8 @@ namespace Masarak.Infrastructure.Services
             ITeachingAssignmentRepository teachingAssignmentRepo,
             IStudentClassRepository studentClassRepo,
             IFileStorageService fileStorage,
+            IParentStudentLinkRepository parentLinkRepo,
+            ISubscriptionAccessService accessService,
             Context context,
             IPublishEndpoint publishEndpoint)
         {
@@ -45,6 +49,8 @@ namespace Masarak.Infrastructure.Services
             _teachingAssignmentRepo = teachingAssignmentRepo;
             _studentClassRepo = studentClassRepo;
             _fileStorage = fileStorage;
+            _parentLinkRepo = parentLinkRepo;
+            _accessService = accessService;
             _context = context;
             _publishEndpoint = publishEndpoint;
             _autoGradingService = new AutoGradingService();
@@ -570,6 +576,17 @@ namespace Masarak.Infrastructure.Services
             return perfs.Select(p => new SubjectPerformanceDto(
                 p.SubjectId, p.Subject.Name, p.AvgExam, p.AvgAssignment, p.TotalExamsTaken, p.TotalAssignmentsSubmitted
             ));
+        }
+
+        public async Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceForParentAsync(int parentUserId, int studentUserId, string academicYear, CancellationToken ct = default)
+        {
+            var isLinked = await _parentLinkRepo.LinkExistsAsync(parentUserId, studentUserId, ct);
+            if (!isLinked) throw new UnauthorizedAccessException("You are not linked to this student.");
+
+            var hasSub = await _accessService.HasActiveSubscriptionAsync(studentUserId, ct);
+            if (!hasSub) throw new UnauthorizedAccessException("Student does not have an active subscription.");
+
+            return await GetStudentPerformanceAsync(studentUserId, academicYear, ct);
         }
 
         public async Task<ClassPerformanceReportDto> GetClassPerformanceReportAsync(int classId, int subjectId, string academicYear, CancellationToken ct = default)

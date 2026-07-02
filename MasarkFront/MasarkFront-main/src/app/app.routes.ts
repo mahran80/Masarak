@@ -22,6 +22,7 @@ import { authGuard } from './core/guards/auth-guard-guard';
 import { adminGuard } from './core/guards/admin-guard-guard';
 import { teacherGuard } from './core/guards/teacher-guard-guard';
 import { studentGuard } from './core/guards/student-guard-guard';
+import { parentGuard } from './core/guards/parent-guard-guard';
 
 export const routes: Routes = [
   {
@@ -42,14 +43,6 @@ export const routes: Routes = [
         path: 'register',
         loadComponent: () => import('./features/auth/signup/signup').then((m) => m.Signup),
       },
-      {
-        path: 'ChangePassword',
-        loadComponent: () =>
-          import('./features/auth/change-password-component/change-password-component').then(
-            (m) => m.ChangePasswordComponent,
-          ),
-      },
-
       {
         path: 'ForgotPassword',
         loadComponent: () =>
@@ -73,6 +66,13 @@ export const routes: Routes = [
     component: DashboardLayoutComponent, // الشاسيه الثابت
     canActivate: [authGuard],
     children: [
+      {
+        path: 'change-password',
+        loadComponent: () =>
+          import('./features/auth/change-password-component/change-password-component').then(
+            (m) => m.ChangePasswordComponent,
+          ),
+      },
       {
         path: 'student',
         canActivate: [studentGuard],
@@ -115,6 +115,12 @@ export const routes: Routes = [
           { path: 'analytics', component: AdminAnalyticsComponent },
         ],
       }, // محتوى المدير
+      {
+        path: 'parent',
+        canActivate: [parentGuard],
+        loadChildren: () =>
+          import('./features/parent/routes/parent.routes').then((m) => m.PARENT_ROUTES),
+      },
     ],
   },
   {

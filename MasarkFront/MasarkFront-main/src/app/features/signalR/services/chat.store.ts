@@ -13,10 +13,13 @@ export class ChatStore {
   }
 
   addMessage(message: ChatMessage) {
-
-    this.messages.update(
-      msgs => [...msgs, message]
-    );
+    this.messages.update(msgs => {
+      // Prevent duplicates (especially from BehaviorSubject re-emissions)
+      if (msgs.some(m => m.messageId === message.messageId)) {
+        return msgs;
+      }
+      return [...msgs, message];
+    });
   }
 
   clear() {

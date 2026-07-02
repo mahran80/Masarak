@@ -6,8 +6,12 @@
     class="max-w-2xl w-full space-y-6 bg-white p-8 rounded-2xl shadow-xl border border-slate-100"
   >
     <div class="text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900">إنشاء حساب جديد</h2>
-      <p class="mt-2 text-sm text-slate-500">انضم إلينا وابدأ رحلتك التعليمية الآن</p>
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900">
+        @if (mode === 'Parent') { إنشاء حساب ولي أمر } @else { تسجيل بيانات الطالب }
+      </h2>
+      <p class="mt-2 text-sm text-slate-500">
+        @if (mode === 'Parent') { انضم إلينا وابدأ رحلتك التعليمية الآن } @else { أضف بيانات الطالب الجديد لربطه بحسابك }
+      </p>
     </div>
 
     @if (authState.error()) {
@@ -72,40 +76,37 @@
           }
         </div>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5"
-            >رقم الهاتف <span class="text-slate-400 font-normal">(اختياري)</span></label
-          >
-          <input
-            type="text"
-            formControlName="phone"
-            placeholder="01xxxxxxxxx"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-          />
-        </div>
+        @if (mode === 'Parent') {
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5"
+              >رقم الهاتف</label
+            >
+            <div class="flex gap-2" dir="ltr">
+              <select
+                formControlName="countryCode"
+                class="w-32 px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
+              >
+                @for (country of countryCodes; track country.code) {
+                  <option [value]="country.code">{{ country.name }}</option>
+                }
+              </select>
+              <input
+                type="text"
+                formControlName="phone"
+                placeholder="رقم الهاتف"
+                class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition text-right"
+                [class.border-red-400]="
+                  registerForm.controls.phone.touched && registerForm.controls.phone.invalid
+                "
+              />
+            </div>
+            @if (registerForm.controls.phone.touched && registerForm.controls.phone.invalid) {
+              <small class="text-red-500 text-xs mt-1 block font-medium">رقم الهاتف مطلوب وصيغته يجب أن تكون صحيحة</small>
+            }
+          </div>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5"
-            >الدولة <span class="text-slate-400 font-normal">(اختياري)</span></label
-          >
-          <input
-            type="text"
-            formControlName="country"
-            placeholder="مثال: مصر"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">نوع الحساب</label>
-          <select
-            formControlName="role"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-          >
-            <option value="Student">طالب</option>
-            <option value="Parent">ولي أمر</option>
-          </select>
-        </div>
+          <!-- إخفاء حقل الدولة، سيتم استخدامه كقيمة افتراضية أو يمكن إضافته إذا لزم الأمر -->
+        }
 
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1.5">كلمة المرور</label>
@@ -181,16 +182,18 @@
       </button>
     </form>
 
-    <div class="text-center pt-2">
-      <p class="text-sm text-slate-600">
-        لديك حساب بالفعل؟
-        <a
-          routerLink="/auth/login"
-          class="font-semibold text-blue-600 hover:text-blue-500 transition underline decoration-2 underline-offset-4"
-        >
-          تسجيل الدخول
-        </a>
-      </p>
-    </div>
+    @if (mode === 'Parent') {
+      <div class="text-center pt-2">
+        <p class="text-sm text-slate-600">
+          لديك حساب بالفعل؟
+          <a
+            routerLink="/auth/login"
+            class="font-semibold text-blue-600 hover:text-blue-500 transition underline decoration-2 underline-offset-4"
+          >
+            تسجيل الدخول
+          </a>
+        </p>
+      </div>
+    }
   </div>
 </div>

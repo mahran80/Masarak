@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ChatApiService } from '../../services/chat-api-service';
 import { ChatSignalRService } from '../../../../core/services/signalr';
 import { ChatStore } from '../../services/chat.store';
@@ -11,32 +12,53 @@ import { ChatStore } from '../../services/chat.store';
   imports: [FormsModule],
   templateUrl: './chat.html',
 })
-export class Chat implements OnInit {
+export class Chat implements OnInit, OnDestroy {
   private api = inject(ChatApiService);
   private signalr = inject(ChatSignalRService);
   store = inject(ChatStore);
 
-  roomId = 13;
-
+  roomId: number = 0;
   message = '';
+  private messageSub?: Subscription;
 
   async ngOnInit() {
     const token = localStorage.getItem('masarak_access_token')!;
 
-    await this.signalr.startConnection(token);
+    try {
+      // Fetch available rooms for the user first to avoid unauthorized access
+      this.api.getRooms().subscribe({
+        next: async (rooms) => {
+          if (rooms && rooms.length > 0) {
+            this.roomId = rooms[0].chatRoomId; // Dynamically assign the first available room
 
-    await this.signalr.joinRoom(this.roomId);
+            await this.signalr.startConnection(token);
+            await this.signalr.joinRoom(this.roomId);
 
-    this.loadMessages();
+            this.loadMessages();
 
-    this.signalr.messages$.subscribe((msg) => {
-      if (!msg) return;
+            this.messageSub = this.signalr.messages$.subscribe((msg) => {
+              if (!msg) return;
+              this.store.addMessage(msg);
+            });
+          } else {
+            console.warn('No chat rooms available for this user.');
+          }
+        },
+        error: (err) => console.error('Failed to load chat rooms:', err)
+      });
+    } catch (err: any) {
+      console.error('Failed to initialize chat connection:', err);
+    }
+  }
 
-      this.store.addMessage(msg);
-    });
+  ngOnDestroy() {
+    if (this.messageSub) {
+      this.messageSub.unsubscribe();
+    }
   }
 
   loadMessages() {
+    if (this.roomId === 0) return;
     this.api.getMessages(this.roomId).subscribe({
       next: (res) => {
         console.log('MESSAGES', res);
@@ -49,7 +71,7 @@ export class Chat implements OnInit {
   }
 
   send() {
-    if (!this.message.trim()) return;
+    if (!this.message.trim() || this.roomId === 0) return;
 
     this.signalr.sendMessage(this.roomId, this.message);
 

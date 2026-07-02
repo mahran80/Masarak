@@ -44,6 +44,7 @@ namespace Masarak.Application.Interfaces
 
         // ── Performance & Reports ─────────────────────────────────────────────
         Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceAsync(int studentUserId, string academicYear, CancellationToken ct = default);
+        Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceForParentAsync(int parentUserId, int studentUserId, string academicYear, CancellationToken ct = default);
         Task<ClassPerformanceReportDto> GetClassPerformanceReportAsync(int classId, int subjectId, string academicYear, CancellationToken ct = default);
     }
 }

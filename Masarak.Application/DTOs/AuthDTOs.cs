@@ -110,6 +110,7 @@ namespace Masarak.Application.DTOs
         public string? Country { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? StudentLinkageCode { get; set; }
     }
 
     public class MessageResponse

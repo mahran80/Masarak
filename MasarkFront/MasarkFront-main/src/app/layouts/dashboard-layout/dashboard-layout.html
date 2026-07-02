@@ -188,6 +188,36 @@
           >
             <span>🎫</span> إدارة الاشتراكات
           </a>
+        } @else if (userRole() === 'Parent') {
+          <a
+            routerLink="parent"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>🏠</span> الرئيسية
+          </a>
+          <a
+            routerLink="parent/children"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>👨‍👧‍👦</span> أبنائي
+          </a>
+          <a
+            routerLink="/chat"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>💬</span> المحادثات
+          </a>
+          <a
+            routerLink="parent/profile"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>⚙️</span> الإعدادات
+          </a>
         }
       </nav>
     </div>

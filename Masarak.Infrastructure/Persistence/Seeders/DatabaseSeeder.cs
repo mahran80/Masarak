@@ -270,5 +270,87 @@ public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] 3 AI prompt templates seeded (weakness_analysis, parent_report, teaching_suggestion).");
         }
+
+        public static async Task SeedParentDashboardDataAsync(Context db)
+        {
+            var student = await db.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.FullName.Contains("Youssef"));
+            var subject = await db.Subjects.FirstOrDefaultAsync();
+            var classObj = await db.Classes.FirstOrDefaultAsync();
+            var assignment = await db.TeachingAssignments.FirstOrDefaultAsync(ta => ta.ClassId == classObj!.ClassId && ta.SubjectId == subject!.SubjectId);
+            
+            if (student == null || subject == null || classObj == null || assignment == null) return;
+
+            // Check if we already seeded for this student to ensure idempotency
+            if (await db.Attendances.AnyAsync(a => a.StudentUserId == student.UserId)) return;
+
+            // Seed Session
+            var session = new Session
+            {
+                AssignmentId = assignment.AssignmentId,
+                ClassId = classObj.ClassId,
+                Title = "Intro to Math",
+                Description = "Basic math concepts",
+                ScheduledAt = DateTime.UtcNow.AddDays(-2),
+                DurationMinutes = 60,
+                Status = SessionStatus.Completed,
+                EmbedUrl = "https://zoom.us/test",
+                CreatedAt = DateTime.UtcNow
+            };
+            db.Sessions.Add(session);
+            await db.SaveChangesAsync();
+
+            // Seed Attendance
+            db.Attendances.Add(Attendance.RecordAbsent(session.SessionId, student.UserId));
+            await db.SaveChangesAsync();
+
+            // Seed Student Performance
+            var perf = new StudentPerformance
+            {
+                StudentId = student.StudentId,
+                SubjectId = subject.SubjectId,
+                ClassId = classObj.ClassId,
+                AcademicYear = "2024",
+                TotalExamsTaken = 2,
+                AvgExam = 45m,
+                AttendanceRate = 60m,
+                UpdatedAt = DateTime.UtcNow
+            };
+            db.StudentPerformances.Add(perf);
+            await db.SaveChangesAsync();
+
+            // Seed Performance Alert (Low Attendance)
+            var alert = PerformanceAlert.Create(student.UserId, subject.SubjectId, AlertType.LowAttendance, 
+                "Attendance dropped below 75%", 60m, 75m);
+            db.PerformanceAlerts.Add(alert);
+            
+            // Seed Performance Alert (Low Exam Score)
+            var alert2 = PerformanceAlert.Create(student.UserId, subject.SubjectId, AlertType.LowExamScore, 
+                "Exam score dropped below 50%", 45m, 50m);
+            db.PerformanceAlerts.Add(alert2);
+            await db.SaveChangesAsync();
+
+            // Seed Ai Recommendation (Parent Report)
+            var payload = new 
+            {
+                studentName = student.User.FullName,
+                reportMonth = DateTime.UtcNow.ToString("MMMM yyyy"),
+                overallScore = 45.0m,
+                attendanceRate = 60.0m,
+                subjectSummaries = new[] 
+                {
+                    new { subjectName = subject.Name, avgExam = 45.0m, attendanceRate = 60.0m, note = "Average score: 45.0%" }
+                },
+                narrativeSummary = "Youssef has been struggling with attendance and exam scores recently. We recommend more practice.",
+                recommendedActions = new[] { "Review last 3 assignments", "Attend all future classes", "Practice regularly" },
+                generatedAt = DateTime.UtcNow
+            };
+            
+            var rec = AiRecommendation.Create(student.UserId, null, RecommendationType.ParentReport, 
+                System.Text.Json.JsonSerializer.Serialize(payload), "system", 0, 0, 24 * 30);
+            db.AiRecommendations.Add(rec);
+            
+            await db.SaveChangesAsync();
+            Console.WriteLine("[Seeder] Parent Dashboard data seeded (Attendance, Alerts, Parent Report).");
+        }
     }
 }

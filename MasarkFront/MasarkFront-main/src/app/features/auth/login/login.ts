@@ -64,7 +64,7 @@ export class Login {
     if (role === 'Admin') this.router.navigate(['/dashboard/admin']);
     else if (role === 'Teacher') this.router.navigate(['/dashboard/teacher']);
     else if (role === 'Student') this.router.navigate(['/dashboard/student']);
-    else if (role === 'Parent') this.router.navigate(['/chat']);
+    else if (role === 'Parent') this.router.navigate(['/dashboard/parent']);
     else this.router.navigate(['/chat']);
   }
 }

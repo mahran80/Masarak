@@ -54,6 +54,11 @@ namespace Masarak.Infrastructure.Services
                 EmailConfirmed = false, FailedLoginCount = 0
             };
 
+            if (role.Name == AppRoles.Student)
+            {
+                user.StudentLinkageCode = Masarak.Domain.ValueObjects.StudentLinkageCode.Generate().Value;
+            }
+
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
             await CreateRoleProfileAsync(user, role.Name);
@@ -317,7 +322,8 @@ namespace Masarak.Infrastructure.Services
         {
             UserId = user.UserId, FullName = user.FullName, Email = user.Email,
             Role = roleName, Phone = user.Phone, Country = user.Country,
-            IsActive = user.IsActive, CreatedAt = user.CreatedAt
+            IsActive = user.IsActive, CreatedAt = user.CreatedAt,
+            StudentLinkageCode = user.StudentLinkageCode
         };
 
         private static AuthResponse    Fail(string e)  => new() { Success = false, Error   = e };

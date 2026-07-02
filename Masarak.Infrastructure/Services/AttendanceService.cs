@@ -19,6 +19,7 @@ namespace Masarak.Infrastructure.Services
         private readonly IStudentClassRepository _studentClassRepo;
         private readonly ITeachingAssignmentRepository _taRepo;
         private readonly IParentStudentLinkRepository _parentLinkRepo;
+        private readonly ISubscriptionAccessService _accessService;
         private readonly AttendanceWindowChecker _windowChecker;
         private readonly Context _context;
 
@@ -28,6 +29,7 @@ namespace Masarak.Infrastructure.Services
             IStudentClassRepository studentClassRepo,
             ITeachingAssignmentRepository taRepo,
             IParentStudentLinkRepository parentLinkRepo,
+            ISubscriptionAccessService accessService,
             AttendanceWindowChecker windowChecker,
             Context context)
         {
@@ -36,6 +38,7 @@ namespace Masarak.Infrastructure.Services
             _studentClassRepo = studentClassRepo;
             _taRepo           = taRepo;
             _parentLinkRepo   = parentLinkRepo;
+            _accessService    = accessService;
             _windowChecker    = windowChecker;
             _context          = context;
         }
@@ -145,6 +148,9 @@ namespace Masarak.Infrastructure.Services
             var isLinked = await _parentLinkRepo.LinkExistsAsync(parentUserId, studentUserId, ct);
             if (!isLinked)
                 throw new UnauthorizedAccessException("You are not linked to this student.");
+
+            var hasSub = await _accessService.HasActiveSubscriptionAsync(studentUserId, ct);
+            if (!hasSub) throw new UnauthorizedAccessException("Student does not have an active subscription.");
 
             return await BuildSubjectAttendance(studentUserId, academicYear, ct);
         }

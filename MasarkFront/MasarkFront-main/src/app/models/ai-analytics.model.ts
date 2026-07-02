@@ -22,11 +22,18 @@ export interface ContentRecommendationDto {
 
 export interface PerformanceAlertDto {
   performanceAlertId: number;
+  studentUserId: number;
+  studentName: string;
+  subjectId?: number;
+  subjectName?: string;
   alertType: string;
   message: string;
   triggerValue: number;
   threshold: number;
+  isResolved: boolean;
   createdAt: string;
+  resolvedAt?: string;
+  severity?: string; // Calculated in frontend
 }
 
 export interface PerformanceTrendDto {

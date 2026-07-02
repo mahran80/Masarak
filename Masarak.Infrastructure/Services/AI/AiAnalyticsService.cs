@@ -23,6 +23,7 @@ namespace Masarak.Infrastructure.Services.AI
         private readonly IDistributedCache _cache;
         private readonly IBus _bus;
         private readonly ILogger<AiAnalyticsService> _logger;
+        private readonly ISubscriptionAccessService _accessService;
 
         public AiAnalyticsService(
             Context context,
@@ -33,7 +34,8 @@ namespace Masarak.Infrastructure.Services.AI
             IAiProviderFactory providerFactory,
             IDistributedCache cache,
             IBus bus,
-            ILogger<AiAnalyticsService> logger)
+            ILogger<AiAnalyticsService> logger,
+            ISubscriptionAccessService accessService)
         {
             _context = context;
             _recRepo = recRepo;
@@ -44,6 +46,7 @@ namespace Masarak.Infrastructure.Services.AI
             _cache = cache;
             _bus = bus;
             _logger = logger;
+            _accessService = accessService;
         }
 
         // ── Student: Learning Insights ──────────────────────────────────────
@@ -505,6 +508,9 @@ namespace Masarak.Infrastructure.Services.AI
             var linked = await _context.ParentStudentLinks
                 .AnyAsync(l => l.ParentUserId == parentUserId && l.StudentUserId == studentUserId, ct);
             if (!linked) throw new UnauthorizedAccessException("Parent is not linked to this student");
+
+            var hasSub = await _accessService.HasActiveSubscriptionAsync(studentUserId, ct);
+            if (!hasSub) throw new UnauthorizedAccessException("Student does not have an active subscription.");
         }
 
         private async Task<List<PerformanceAlertDto>> GetAlertDtosForStudentAsync(int studentUserId, CancellationToken ct)
