@@ -67,7 +67,7 @@ export class LiveRoomComponent implements OnInit {
   private async joinChannel(token: string, channel: string, uid: string): Promise<void> {
     this.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
-    this.client.on('user-published', async (user, mediaType) => {
+    this.client.on('user-published', async (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
       await this.client.subscribe(user, mediaType);
       
       if (mediaType === 'video') {
@@ -84,11 +84,11 @@ export class LiveRoomComponent implements OnInit {
       this.updateRemoteUsers();
     });
 
-    this.client.on('user-unpublished', (user) => {
+    this.client.on('user-unpublished', (user: IAgoraRTCRemoteUser) => {
       this.updateRemoteUsers();
     });
 
-    this.client.on('user-left', (user) => {
+    this.client.on('user-left', (user: IAgoraRTCRemoteUser) => {
       this.updateRemoteUsers();
     });
 
