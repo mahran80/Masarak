@@ -4,6 +4,7 @@ using Masarak.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Masarak.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20260702001711_Phase7_Refactoring_AcademicCore")]
+    partial class Phase7_Refactoring_AcademicCore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1386,9 +1389,6 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("SubjectCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("SubjectId");
 
                     b.HasIndex("Code")
@@ -1397,34 +1397,7 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("GradeId");
 
-                    b.HasIndex("SubjectCategoryId");
-
                     b.ToTable("subjects", (string)null);
-                });
-
-            modelBuilder.Entity("Masarak.Domain.Entities.SubjectCategory", b =>
-                {
-                    b.Property<int>("SubjectCategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubjectCategoryId"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("NameAr")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("SubjectCategoryId");
-
-                    b.ToTable("subject_categories", (string)null);
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Submission", b =>
@@ -1609,12 +1582,12 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubjectCategoryId")
+                    b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
-                    b.HasKey("TeacherId", "SubjectCategoryId");
+                    b.HasKey("TeacherId", "SubjectId");
 
-                    b.HasIndex("SubjectCategoryId");
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("teacher_subjects", (string)null);
                 });
@@ -2124,14 +2097,6 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Masarak.Domain.Entities.SubjectCategory", "Category")
-                        .WithMany("Subjects")
-                        .HasForeignKey("SubjectCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
                     b.Navigation("Grade");
                 });
 
@@ -2205,9 +2170,9 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Masarak.Domain.Entities.TeacherSubject", b =>
                 {
-                    b.HasOne("Masarak.Domain.Entities.SubjectCategory", "SubjectCategory")
+                    b.HasOne("Masarak.Domain.Entities.Subject", "Subject")
                         .WithMany("TeacherSubjects")
-                        .HasForeignKey("SubjectCategoryId")
+                        .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2217,7 +2182,7 @@ namespace Masarak.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SubjectCategory");
+                    b.Navigation("Subject");
 
                     b.Navigation("Teacher");
                 });
@@ -2353,14 +2318,9 @@ namespace Masarak.Infrastructure.Persistence.Migrations
 
                     b.Navigation("SubscriptionSubjects");
 
-                    b.Navigation("TeachingAssignments");
-                });
-
-            modelBuilder.Entity("Masarak.Domain.Entities.SubjectCategory", b =>
-                {
-                    b.Navigation("Subjects");
-
                     b.Navigation("TeacherSubjects");
+
+                    b.Navigation("TeachingAssignments");
                 });
 
             modelBuilder.Entity("Masarak.Domain.Entities.Subscription", b =>

@@ -32,5 +32,6 @@ namespace Masarak.Domain.Entities
         public virtual User User { get; set; } = null!;
         public virtual Plan Plan { get; set; } = null!;
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public virtual ICollection<SubscriptionSubject> SubscriptionSubjects { get; set; } = new List<SubscriptionSubject>();
     }
 }

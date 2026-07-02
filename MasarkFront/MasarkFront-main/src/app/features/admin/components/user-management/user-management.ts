@@ -59,6 +59,8 @@ export class UserManagement implements OnInit {
 
   selectedPlanId = signal<number | null>(null);
   selectedStudentId = signal<number | null>(null);
+  availableSubjects = signal<any[]>([]);
+  selectedSubjects = signal<number[]>([]);
   assigning = signal(false);
 
   feedback = signal<string | null>(null);
@@ -392,20 +394,6 @@ export class UserManagement implements OnInit {
     });
   }
 
-  deleteUser(user: AdminUser): void {
-    if (!confirm(`هل أنت متأكد من حذف المستخدم "${user.name}"؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
-
-    this.adminApi.deleteUser(user.id).subscribe({
-      next: () => {
-        this.setFeedback(`تم حذف المستخدم "${user.name}" بنجاح`);
-        this.loadData();
-      },
-      error: () => {
-        this.setFeedback('تعذر حذف المستخدم من الخادم. يرجى المحاولة مرة أخرى.', 'error');
-      },
-    });
-  }
-
   toggleUserStatus(user: AdminUser): void {
     if (user.status === 'Active') {
       const reason = prompt('يرجى إدخال سبب التعطيل:');
@@ -469,21 +457,60 @@ export class UserManagement implements OnInit {
   }
 
   // ── Subscription assignment ────────────────────────────────────────────────
+  
+  onStudentSelected(studentId: number | null) {
+    this.selectedStudentId.set(studentId);
+    this.selectedSubjects.set([]);
+    this.availableSubjects.set([]);
+
+    if (studentId) {
+      const student = this.studentUsers().find(u => u.id === studentId);
+      if (student && student.gradeId) {
+        this.academicApi.getSubjectsByGrade(student.gradeId).subscribe({
+          next: (res) => this.availableSubjects.set(res)
+        });
+      }
+    }
+  }
+
+  toggleSubject(subjectId: number, event: any) {
+    if (event.target.checked) {
+      this.selectedSubjects.update(s => [...s, subjectId]);
+    } else {
+      this.selectedSubjects.update(s => s.filter(id => id !== subjectId));
+    }
+  }
+
   assignSubscription(): void {
     const studentId = this.selectedStudentId();
     if (!studentId) { this.setFeedback('اختر طالبًا أولاً', 'error'); return; }
     if (!this.selectedPlanId()) { this.setFeedback('اختر خطة أولاً', 'error'); return; }
 
     const student = this.studentUsers().find((u) => u.id === studentId);
+    if (!student?.gradeId) {
+      this.setFeedback('لا يمكن الاشتراك لطالب ليس لديه مرحلة دراسية.', 'error');
+      return;
+    }
+
+    const plan = this.plans().find((p) => p.planId === this.selectedPlanId());
+    
+    if (plan?.type === 'PerSubject' && this.selectedSubjects().length === 0) {
+      this.setFeedback('الرجاء اختيار مادة واحدة على الأقل للاشتراك الجزئي.', 'error');
+      return;
+    }
 
     this.assigning.set(true);
     this.setFeedback(null);
 
-    const plan = this.plans().find((p) => p.planId === this.selectedPlanId());
     const note = `Assigned from admin panel for ${student?.name ?? 'student'}`;
 
     this.subApi
-      .adminActivate({ studentUserId: studentId, planId: this.selectedPlanId()!, note })
+      .adminActivate({ 
+        studentUserId: studentId, 
+        planId: this.selectedPlanId()!, 
+        note,
+        subjectIds: plan?.type === 'PerSubject' ? this.selectedSubjects() : undefined
+      })
       .subscribe({
         next: (createdSub) => {
           this.assigning.set(false);

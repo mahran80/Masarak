@@ -37,6 +37,14 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                     && ta.IsActive, ct);
         }
 
+        public async Task<TeachingAssignment?> GetAssignmentBySubjectClassYearAsync(int classId, int subjectId, int academicYear, CancellationToken ct = default)
+        {
+            return await _context.TeachingAssignments
+                .FirstOrDefaultAsync(ta => ta.ClassId == classId
+                    && ta.SubjectId == subjectId
+                    && ta.AcademicYear == academicYear, ct);
+        }
+
         public async Task<IEnumerable<TeachingAssignment>> GetByTeacherIdAsync(int teacherId, int academicYear, CancellationToken ct = default)
         {
             return await _context.TeachingAssignments

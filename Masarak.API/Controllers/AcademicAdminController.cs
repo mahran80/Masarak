@@ -36,6 +36,21 @@ namespace Masarak.API.Controllers
             var teachers = await adminUserService.GetAllTeachersAsync(ct);
             return Ok(teachers);
         }
+
+        [HttpGet("teachers/{id}/specializations")]
+        [ProducesResponseType(typeof(IEnumerable<SubjectDto>), 200)]
+        public async Task<IActionResult> GetTeacherSpecializations(int id, CancellationToken ct)
+        {
+            var specializations = await _academicService.GetTeacherSpecializationsAsync(id, ct);
+            return Ok(specializations);
+        }
+
+        [HttpPut("teachers/{id}/specializations")]
+        public async Task<IActionResult> UpdateTeacherSpecializations(int id, [FromBody] UpdateTeacherSpecializationRequest request, CancellationToken ct)
+        {
+            await _academicService.UpdateTeacherSpecializationAsync(id, request, ct);
+            return NoContent();
+        }
         
         // ── Grades ──────────────────────────────────────────────────────────
 
@@ -47,33 +62,26 @@ namespace Masarak.API.Controllers
             return Ok(grades);
         }
 
-        [HttpPost("grades")]
-        [ProducesResponseType(typeof(GradeDto), 201)]
-        public async Task<IActionResult> CreateGrade([FromBody] CreateGradeRequest request, CancellationToken ct)
-        {
-            var grade = await _academicService.CreateGradeAsync(request, ct);
-            return CreatedAtAction(nameof(GetAllGrades), new { }, grade);
-        }
-
-        [HttpPut("grades/{id}")]
-        [ProducesResponseType(typeof(GradeDto), 200)]
-        public async Task<IActionResult> UpdateGrade(int id, [FromBody] UpdateGradeRequest request, CancellationToken ct)
-        {
-            try
-            {
-                var grade = await _academicService.UpdateGradeAsync(id, request, ct);
-                return Ok(grade);
-            }
-            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
-        }
-
         // ── Subjects ────────────────────────────────────────────────────────
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetAllSubjectCategories(CancellationToken ct)
+        {
+            var categories = await _academicService.GetAllSubjectCategoriesAsync(ct);
+            return Ok(categories);
+        }
 
         [HttpGet("grades/{gradeId}/subjects")]
         [ProducesResponseType(typeof(IEnumerable<SubjectDto>), 200)]
         public async Task<IActionResult> GetSubjectsByGrade(int gradeId, CancellationToken ct)
         {
             var subjects = await _academicService.GetSubjectsByGradeAsync(gradeId, ct);
+            return Ok(subjects);
+        }
+
+        [HttpGet("subjects")]
+        public async Task<IActionResult> GetAllSubjects(CancellationToken ct)
+        {
+            var subjects = await _academicService.GetAllSubjectsAsync(ct);
             return Ok(subjects);
         }
 
@@ -180,71 +188,16 @@ namespace Masarak.API.Controllers
 
         [HttpPost("enrollments")]
         [ProducesResponseType(typeof(StudentClassDto), 201)]
-        public async Task<IActionResult> EnrollStudent(
-            [FromBody] EnrollStudentRequest request,
-            [FromServices] Masarak.Infrastructure.Persistence.Context db,
-            CancellationToken ct)
+        public async Task<IActionResult> EnrollStudent([FromBody] EnrollStudentRequest request, CancellationToken ct)
         {
             try
             {
-                var studentUser = await db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == request.StudentId, ct);
-                if (studentUser == null) return NotFound(new { message = $"Student user {request.StudentId} not found." });
-                if (studentUser.Role.Name != "Student") return Conflict(new { message = $"User {request.StudentId} is not a Student." });
-
-                var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == request.StudentId, ct);
-                if (student == null) return NotFound(new { message = "Student profile not found." });
-
-                var cls = await db.Classes.FirstOrDefaultAsync(c => c.ClassId == request.ClassId, ct);
-                if (cls == null) return NotFound(new { message = $"Class {request.ClassId} not found." });
-                if (!cls.IsActive) return Conflict(new { message = "Cannot enroll in an inactive class." });
-
-                var currentCount = await db.StudentClasses.CountAsync(sc => sc.ClassId == request.ClassId && sc.IsActive, ct);
-                if (currentCount >= cls.MaxCapacity) return Conflict(new { message = $"Class {cls.Name} is at full capacity." });
-
-                var existing = await db.StudentClasses.FirstOrDefaultAsync(sc => sc.StudentId == student.StudentId && sc.AcademicYear == request.AcademicYear, ct);
-                
-                Masarak.Domain.Entities.StudentClass finalEnrollment;
-
-                if (existing != null)
-                {
-                    if (existing.IsActive)
-                    {
-                        return Conflict(new { message = $"Student is already enrolled in a class for academic year {request.AcademicYear}." });
-                    }
-                    else
-                    {
-                        // Reactivate existing enrollment to avoid unique constraint violation
-                        existing.ClassId = request.ClassId;
-                        existing.IsActive = true;
-                        existing.EnrolledAt = DateTime.UtcNow;
-                        db.StudentClasses.Update(existing);
-                        finalEnrollment = existing;
-                    }
-                }
-                else
-                {
-                    var enrollment = new Masarak.Domain.Entities.StudentClass
-                    {
-                        StudentId = student.StudentId,
-                        ClassId = request.ClassId,
-                        AcademicYear = request.AcademicYear,
-                        EnrolledAt = DateTime.UtcNow,
-                        IsActive = true
-                    };
-                    db.StudentClasses.Add(enrollment);
-                    finalEnrollment = enrollment;
-                }
-
-                await db.SaveChangesAsync(ct);
-
-                return Created("", new StudentClassDto(
-                    finalEnrollment.StudentClassId,
-                    student.StudentId,
-                    studentUser.FullName,
-                    cls.ClassId,
-                    cls.Name));
+                var dto = await _academicService.EnrollStudentAsync(request, ct);
+                return Created("", dto);
             }
-            catch (Exception ex) { return Conflict(new { message = ex.Message }); }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
+            catch (Exception ex) { return StatusCode(500, new { message = ex.Message }); }
         }
 
         [HttpDelete("enrollments/{id}")]
@@ -252,25 +205,12 @@ namespace Masarak.API.Controllers
         {
             try
             {
-                // id here is the StudentId (from StudentInClassDto.StudentId).
-                // Find all active enrollments for this student and deactivate them.
-                var enrollments = await db.StudentClasses.Where(sc => sc.StudentId == id && sc.IsActive).ToListAsync(ct);
-                if (!enrollments.Any())
-                {
-                    // Fallback: If no enrollment found by StudentId, maybe the frontend passed UserId?
-                    var student = await db.Students.FirstOrDefaultAsync(s => s.UserId == id, ct);
-                    if (student != null)
-                    {
-                        enrollments = await db.StudentClasses.Where(sc => sc.StudentId == student.StudentId && sc.IsActive).ToListAsync(ct);
-                    }
-                }
+                // id here is the StudentClassId (from StudentInClassDto.StudentClassId).
+                var enrollment = await db.StudentClasses.FirstOrDefaultAsync(sc => sc.StudentClassId == id && sc.IsActive, ct);
 
-                if (!enrollments.Any()) return NotFound(new { message = $"Active enrollment for student {id} not found." });
+                if (enrollment == null) return NotFound(new { message = $"Active enrollment with ID {id} not found." });
 
-                foreach (var enrollment in enrollments)
-                {
-                    enrollment.IsActive = false;
-                }
+                enrollment.IsActive = false;
                 
                 await db.SaveChangesAsync(ct);
                 return NoContent();

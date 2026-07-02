@@ -42,6 +42,14 @@ export class AcademicApiService {
     return this.http.get<SubjectDto[]>(`${this.adminBase}/grades/${gradeId}/subjects`);
   }
 
+  getAllSubjectCategories(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.adminBase}/categories`);
+  }
+
+  getAllSubjects(): Observable<SubjectDto[]> {
+    return this.http.get<SubjectDto[]>(`${this.adminBase}/subjects`);
+  }
+
   createSubject(req: CreateSubjectRequest): Observable<SubjectDto> {
     return this.http.post<SubjectDto>(`${this.adminBase}/subjects`, req);
   }
@@ -94,5 +102,13 @@ export class AcademicApiService {
   // ── Teachers ────────────────────────────────────────────────────────
   getTeachers(): Observable<TeacherDto[]> {
     return this.http.get<TeacherDto[]>(`${this.adminBase}/teachers`);
+  }
+
+  getTeacherSpecializations(teacherId: number): Observable<SubjectDto[]> {
+    return this.http.get<SubjectDto[]>(`${this.adminBase}/teachers/${teacherId}/specializations`);
+  }
+
+  updateTeacherSpecializations(teacherId: number, subjectIds: number[]): Observable<void> {
+    return this.http.put<void>(`${this.adminBase}/teachers/${teacherId}/specializations`, { subjectIds });
   }
 }

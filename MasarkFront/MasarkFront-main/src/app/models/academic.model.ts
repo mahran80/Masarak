@@ -5,6 +5,11 @@ export enum GradeStage {
   Secondary = 2,    // ثانوي
 }
 
+export enum EnrollmentType {
+  FullClass = 1,
+  PerSubject = 2,
+}
+
 export interface GradeDto {
   gradeId: number;
   name: string;
@@ -74,6 +79,7 @@ export interface UpdateClassRequest {
 }
 
 export interface StudentInClassDto {
+  studentClassId: number;
   studentId: number;
   fullName: string;  // backend returns 'FullName' not 'studentName'
   email: string;
@@ -83,6 +89,8 @@ export interface EnrollStudentRequest {
   studentId: number;
   classId: number;
   academicYear: number; // REQUIRED by backend [Range(2020,2100)]
+  enrollmentType?: EnrollmentType;
+  subjectIds?: number[];
 }
 
 export interface TeachingAssignmentDto {
@@ -133,4 +141,8 @@ export interface TeacherDto {
   hiringDate: string;
   bio: string | null;
   courses: TeacherCourseDto[];
+}
+
+export interface UpdateTeacherSpecializationRequest {
+  subjectIds: number[];
 }

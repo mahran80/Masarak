@@ -127,7 +127,6 @@
             <td class="center">
               <div class="action-btns">
                 <button class="btn-edit" (click)="openEditModal(user)">تعديل</button>
-                <button class="btn-delete" (click)="deleteUser(user)">حذف نهائي</button>
                 <button class="btn-edit" (click)="toggleUserStatus(user)">
                   {{ user.status === 'Active' ? 'تعطيل' : 'تفعيل' }}
                 </button>
@@ -182,7 +181,7 @@
       <div class="form-group">
         <label class="form-label">اختر الطالب</label>
         <div class="select-wrap">
-          <select class="um-select full" [ngModel]="selectedStudentId()" (ngModelChange)="selectedStudentId.set($event ? +$event : null)">
+          <select class="um-select full" [ngModel]="selectedStudentId()" (ngModelChange)="onStudentSelected($event ? +$event : null)">
             <option [ngValue]="null">-- اختر طالب --</option>
             <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
               {{ student.name }}
@@ -231,6 +230,32 @@
           <div *ngIf="plans().length === 0" class="plans-empty">لا توجد خطط متاحة حالياً</div>
         </div>
       </div>
+
+      <!-- Subject selector (Only for PerSubject) -->
+      @for (p of plans(); track p.planId) {
+        @if (selectedPlanId() === p.planId && p.type === 'PerSubject') {
+          <div class="form-group">
+            <label class="form-label">اختر المواد (الاشتراك الجزئي)</label>
+            @if (availableSubjects().length > 0) {
+              <div class="flex flex-col gap-2 p-3 bg-white rounded border border-slate-200">
+                <div class="flex gap-4 flex-wrap">
+                  @for (s of availableSubjects(); track s.subjectId) {
+                    <label class="flex items-center gap-1 cursor-pointer">
+                      <input type="checkbox" (change)="toggleSubject(s.subjectId, $event)" [checked]="selectedSubjects().includes(s.subjectId)" class="rounded text-emerald-600 border-slate-300">
+                      <span class="text-sm">{{ s.name }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+              <p class="text-xs text-emerald-600 mt-2 font-medium">
+                التكلفة الإجمالية: {{ p.price * selectedSubjects().length }} {{ p.currency }}
+              </p>
+            } @else {
+              <p class="text-xs text-red-500">لا توجد مواد مسجلة لمرحلة هذا الطالب. يرجى إضافة مواد للمرحلة أولاً.</p>
+            }
+          </div>
+        }
+      }
 
       <button
         class="um-btn-success"

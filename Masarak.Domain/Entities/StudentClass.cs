@@ -16,21 +16,24 @@ namespace Masarak.Domain.Entities
         public int      StudentId      { get; set; }               // FK → students.StudentId
         public int      ClassId        { get; set; }               // FK → classes.ClassId
         public int      AcademicYear   { get; set; }               // e.g. 2026
+        public Masarak.Domain.Enums.EnrollmentType EnrollmentType { get; set; } = Masarak.Domain.Enums.EnrollmentType.FullClass;
         public DateTime EnrolledAt     { get; set; }
         public bool     IsActive       { get; set; } = true;
 
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual Student Student { get; set; } = null!;
         public virtual Class   Class   { get; set; } = null!;
+        public virtual ICollection<StudentClassSubject> StudentClassSubjects { get; set; } = new List<StudentClassSubject>();
 
         // ── Factory ─────────────────────────────────────────────────────────
-        public static StudentClass Enroll(int studentId, int classId, int academicYear)
+        public static StudentClass Enroll(int studentId, int classId, int academicYear, Masarak.Domain.Enums.EnrollmentType enrollmentType = Masarak.Domain.Enums.EnrollmentType.FullClass)
         {
             return new StudentClass
             {
                 StudentId    = studentId,
                 ClassId      = classId,
                 AcademicYear = academicYear,
+                EnrollmentType = enrollmentType,
                 EnrolledAt   = DateTime.UtcNow,
                 IsActive     = true
             };

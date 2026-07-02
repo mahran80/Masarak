@@ -125,6 +125,7 @@ using (var scope = app.Services.CreateScope())
         await DatabaseSeeder.SeedSubjectsAsync(db);
         await DatabaseSeeder.SeedClassesAsync(db);
         await DatabaseSeeder.SeedTeachingAssignmentsAsync(db);
+        await DatabaseSeeder.SeedSubscriptionsAsync(db);
         await DatabaseSeeder.SeedStudentEnrollmentsAsync(db);
     }
 }
