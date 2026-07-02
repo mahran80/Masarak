@@ -21,5 +21,6 @@ namespace Masarak.Domain.Entities
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual User User { get; set; } = null!;
         public virtual ICollection<TeachingAssignment> TeachingAssignments { get; set; } = new List<TeachingAssignment>();
+        public virtual ICollection<TeacherSubject> TeacherSubjects { get; set; } = new List<TeacherSubject>();
     }
 }

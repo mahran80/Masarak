@@ -51,6 +51,7 @@ export interface AdminActivateRequest {
   studentUserId: number;
   planId: number;
   note?: string;
+  subjectIds?: number[];
 }
 
 export interface AdminCancelRequest {

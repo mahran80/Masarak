@@ -3,6 +3,7 @@ using Masarak.Application.Interfaces;
 using Masarak.Domain.Entities;
 using Masarak.Domain.Enums;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace Masarak.Infrastructure.Services
@@ -21,6 +22,7 @@ namespace Masarak.Infrastructure.Services
         private readonly IStudentClassRepository _studentClassRepo;
         private readonly IUserRepository _userRepo;
         private readonly IDistributedCache _cache;
+        private readonly Masarak.Infrastructure.Persistence.Context _context;
 
         private const string GradesCacheKey = "grades:all";
         private const string SubjectsCachePrefix = "subjects:grade:";
@@ -32,7 +34,8 @@ namespace Masarak.Infrastructure.Services
             ITeachingAssignmentRepository assignmentRepo,
             IStudentClassRepository studentClassRepo,
             IUserRepository userRepo,
-            IDistributedCache cache)
+            IDistributedCache cache,
+            Masarak.Infrastructure.Persistence.Context context)
         {
             _gradeRepo        = gradeRepo;
             _classRepo        = classRepo;
@@ -41,6 +44,7 @@ namespace Masarak.Infrastructure.Services
             _studentClassRepo = studentClassRepo;
             _userRepo         = userRepo;
             _cache            = cache;
+            _context          = context;
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -88,28 +92,6 @@ namespace Masarak.Infrastructure.Services
                 classDtos);
         }
 
-        public async Task<GradeDto> CreateGradeAsync(CreateGradeRequest request, CancellationToken ct = default)
-        {
-            var grade = Grade.Create(request.Name, request.NameAr, request.Stage, request.Order);
-            await _gradeRepo.AddAsync(grade, ct);
-            await InvalidateGradesCacheAsync(ct);
-            return MapGrade(grade);
-        }
-
-        public async Task<GradeDto> UpdateGradeAsync(int gradeId, UpdateGradeRequest request, CancellationToken ct = default)
-        {
-            var grade = await _gradeRepo.GetByIdAsync(gradeId, ct)
-                ?? throw new KeyNotFoundException($"Grade {gradeId} not found.");
-
-            grade.Name     = request.Name;
-            grade.NameAr   = request.NameAr;
-            grade.IsActive = request.IsActive;
-
-            await _gradeRepo.UpdateAsync(grade, ct);
-            await InvalidateGradesCacheAsync(ct);
-            return MapGrade(grade);
-        }
-
         // ═══════════════════════════════════════════════════════════════════════
         // SUBJECTS
         // ═══════════════════════════════════════════════════════════════════════
@@ -128,7 +110,23 @@ namespace Masarak.Infrastructure.Services
                 JsonSerializer.Serialize(dtos),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) }, ct);
 
-            return dtos;
+            return subjects.Select(MapSubject);
+        }
+
+        public async Task<IEnumerable<SubjectCategoryDto>> GetAllSubjectCategoriesAsync(CancellationToken ct = default)
+        {
+            var categories = await _context.SubjectCategories
+                .AsNoTracking()
+                .ToListAsync(ct);
+            return categories.Select(c => new SubjectCategoryDto(c.SubjectCategoryId, c.Name, c.NameAr, c.IsActive));
+        }
+
+        public async Task<IEnumerable<SubjectDto>> GetAllSubjectsAsync(CancellationToken ct = default)
+        {
+            var subjects = await _context.Subjects
+                .AsNoTracking()
+                .ToListAsync(ct);
+            return subjects.Select(MapSubject);
         }
 
         public async Task<SubjectDto> CreateSubjectAsync(CreateSubjectRequest request, CancellationToken ct = default)
@@ -137,7 +135,8 @@ namespace Masarak.Infrastructure.Services
             _ = await _gradeRepo.GetByIdAsync(request.GradeId, ct)
                 ?? throw new KeyNotFoundException($"Grade {request.GradeId} not found.");
 
-            var subject = Subject.Create(request.GradeId, request.Name, request.NameAr, request.Code);
+            // Create subject (using a default category of 1 for now if not provided in DTO, we will update DTO later if needed)
+            var subject = Subject.Create(request.GradeId, 1, request.Name, request.NameAr, request.Code);
             await _subjectRepo.AddAsync(subject, ct);
             await InvalidateSubjectsCacheAsync(request.GradeId, ct);
             return MapSubject(subject);
@@ -201,8 +200,39 @@ namespace Masarak.Infrastructure.Services
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // TEACHING ASSIGNMENTS
+        // TEACHING ASSIGNMENTS & SPECIALIZATIONS
         // ═══════════════════════════════════════════════════════════════════════
+
+        public async Task<IEnumerable<SubjectCategoryDto>> GetTeacherSpecializationsAsync(int teacherId, CancellationToken ct = default)
+        {
+            var categories = await _context.TeacherSubjects
+                .Where(ts => ts.TeacherId == teacherId)
+                .Include(ts => ts.SubjectCategory)
+                .Select(ts => ts.SubjectCategory)
+                .ToListAsync(ct);
+
+            return categories.Select(c => new SubjectCategoryDto(c.SubjectCategoryId, c.Name, c.NameAr, c.IsActive));
+        }
+
+        public async Task UpdateTeacherSpecializationAsync(int teacherId, UpdateTeacherSpecializationRequest request, CancellationToken ct = default)
+        {
+            var existing = await _context.TeacherSubjects
+                .Where(ts => ts.TeacherId == teacherId)
+                .ToListAsync(ct);
+            
+            _context.TeacherSubjects.RemoveRange(existing);
+
+            foreach (var categoryId in request.SubjectIds)
+            {
+                _context.TeacherSubjects.Add(new TeacherSubject
+                {
+                    TeacherId = teacherId,
+                    SubjectCategoryId = categoryId
+                });
+            }
+
+            await _context.SaveChangesAsync(ct);
+        }
 
         public async Task<IEnumerable<TeachingAssignmentDto>> GetAssignmentsForClassAsync(int classId, int academicYear, CancellationToken ct = default)
         {
@@ -212,9 +242,35 @@ namespace Masarak.Infrastructure.Services
 
         public async Task<TeachingAssignmentDto> AssignTeacherAsync(AssignTeacherRequest request, CancellationToken ct = default)
         {
-            // Check for duplicate
-            if (await _assignmentRepo.AssignmentExistsAsync(request.TeacherId, request.ClassId, request.SubjectId, request.AcademicYear, ct))
-                throw new InvalidOperationException("This teacher is already assigned to this subject-class combination for this academic year.");
+            var targetSubject = await _context.Subjects.FindAsync(new object[] { request.SubjectId }, ct);
+            if (targetSubject == null) throw new KeyNotFoundException("Subject not found.");
+
+            // Validate that the teacher has the requested subject category in their specializations
+            var hasSpecialization = await _context.TeacherSubjects
+                .AnyAsync(ts => ts.TeacherId == request.TeacherId && ts.SubjectCategoryId == targetSubject.SubjectCategoryId, ct);
+
+            if (!hasSpecialization)
+                throw new InvalidOperationException("Teacher is not specialized in the requested subject. Please add it to their specializations first.");
+
+            var existing = await _assignmentRepo.GetAssignmentBySubjectClassYearAsync(request.ClassId, request.SubjectId, request.AcademicYear, ct);
+            
+            if (existing != null)
+            {
+                if (existing.IsActive)
+                {
+                    if (existing.TeacherId == request.TeacherId)
+                        throw new InvalidOperationException("This teacher is already assigned to this subject-class combination for this academic year.");
+                    else
+                        throw new InvalidOperationException("Another teacher is already assigned to this subject-class combination.");
+                }
+
+                existing.TeacherId = request.TeacherId;
+                existing.IsActive = true;
+                await _assignmentRepo.UpdateAsync(existing, ct);
+
+                var reloaded = await _assignmentRepo.GetByIdWithDetailsAsync(existing.AssignmentId, ct);
+                return MapAssignment(reloaded!);
+            }
 
             var assignment = TeachingAssignment.Create(request.TeacherId, request.ClassId, request.SubjectId, request.AcademicYear);
             await _assignmentRepo.AddAsync(assignment, ct);
@@ -241,9 +297,14 @@ namespace Masarak.Infrastructure.Services
         {
             var enrollments = await _studentClassRepo.GetByClassIdAsync(classId, ct);
             return enrollments.Select(sc => new StudentInClassDto(
+                sc.StudentClassId,
                 sc.StudentId,
+                sc.Student?.UserId ?? 0,
                 sc.Student?.User?.FullName ?? "",
-                sc.Student?.User?.Email ?? ""));
+                sc.Student?.User?.Email ?? "",
+                sc.EnrollmentType,
+                sc.StudentClassSubjects.Select(scs => scs.Subject.Name).ToList()
+            ));
         }
 
         public async Task<StudentClassDto> EnrollStudentAsync(EnrollStudentRequest request, CancellationToken ct = default)
@@ -260,20 +321,83 @@ namespace Masarak.Infrastructure.Services
             if (!cls.IsActive)
                 throw new InvalidOperationException("Cannot enroll in an inactive class.");
 
+            // Validate Student profile exists
+            var studentEntity = await _context.Students.FirstOrDefaultAsync(s => s.UserId == request.StudentId, ct);
+            if (studentEntity == null)
+                throw new KeyNotFoundException($"Student profile for user {request.StudentId} not found.");
+
+            // Validate Student.GradeId == Class.GradeId
+            if (studentEntity.GradeId != cls.GradeId)
+                throw new InvalidOperationException("Student belongs to a different educational level than this class.");
+
+            // 1.5 Fetch Active Subscription to determine EnrollmentType and Subjects
+            var activeSub = await _context.Subscriptions
+                .Include(s => s.Plan)
+                .Include(s => s.SubscriptionSubjects)
+                .FirstOrDefaultAsync(s => s.UserId == request.StudentId && s.Status == SubscriptionStatus.Active, ct);
+
+            if (activeSub == null)
+                throw new InvalidOperationException("Student does not have an active subscription and cannot be enrolled.");
+
+            var enrollmentType = activeSub.Plan.Type == PlanType.PerSubject ? EnrollmentType.PerSubject : EnrollmentType.FullClass;
+            var subjectIds = enrollmentType == EnrollmentType.PerSubject 
+                ? activeSub.SubscriptionSubjects.Select(ss => ss.SubjectId).ToList() 
+                : new List<int>();
+
             // 2. Check MaxCapacity
             var currentCount = await _classRepo.GetEnrollmentCountAsync(request.ClassId, ct);
             if (currentCount >= cls.MaxCapacity)
                 throw new InvalidOperationException($"Class {cls.Name} is at full capacity ({cls.MaxCapacity}).");
 
-            // 3. Check student not already enrolled in another class for same year
-            var existing = await _studentClassRepo.GetByStudentAndYearAsync(request.StudentId, request.AcademicYear, ct);
-            if (existing != null)
-                throw new InvalidOperationException(
-                    $"Student is already enrolled in class '{existing.Class?.Name}' for academic year {request.AcademicYear}.");
+            // 3. Check student not already enrolled in another class for same year (active or inactive)
+            var existing = await _context.StudentClasses
+                .Include(sc => sc.Class)
+                .Include(sc => sc.StudentClassSubjects)
+                .FirstOrDefaultAsync(sc => sc.StudentId == studentEntity.StudentId && sc.AcademicYear == request.AcademicYear, ct);
 
-            // 4. Create enrollment
-            var enrollment = StudentClass.Enroll(request.StudentId, request.ClassId, request.AcademicYear);
-            await _studentClassRepo.AddAsync(enrollment, ct);
+            StudentClass enrollment;
+
+            if (existing != null)
+            {
+                if (existing.IsActive)
+                {
+                    throw new InvalidOperationException(
+                        $"Student is already enrolled in class '{existing.Class?.Name}' for academic year {request.AcademicYear}.");
+                }
+
+                // Reactivate and update
+                existing.IsActive = true;
+                existing.ClassId = request.ClassId;
+                existing.EnrollmentType = enrollmentType;
+                existing.EnrolledAt = DateTime.UtcNow;
+                existing.StudentClassSubjects.Clear();
+
+                if (enrollmentType == EnrollmentType.PerSubject && subjectIds.Any())
+                {
+                    foreach (var subjectId in subjectIds)
+                    {
+                        existing.StudentClassSubjects.Add(new StudentClassSubject { SubjectId = subjectId });
+                    }
+                }
+                
+                await _studentClassRepo.UpdateAsync(existing, ct);
+                enrollment = existing;
+            }
+            else
+            {
+                // 4. Create new enrollment
+                enrollment = StudentClass.Enroll(studentEntity.StudentId, request.ClassId, request.AcademicYear, enrollmentType);
+                
+                if (enrollmentType == EnrollmentType.PerSubject && subjectIds.Any())
+                {
+                    foreach (var subjectId in subjectIds)
+                    {
+                        enrollment.StudentClassSubjects.Add(new StudentClassSubject { SubjectId = subjectId });
+                    }
+                }
+
+                await _studentClassRepo.AddAsync(enrollment, ct);
+            }
 
             // Reload for response
             var loaded = await _studentClassRepo.GetByIdAsync(enrollment.StudentClassId, ct);
@@ -302,7 +426,7 @@ namespace Masarak.Infrastructure.Services
             new(g.GradeId, g.Name, g.NameAr, g.Stage, g.Order, g.IsActive);
 
         private static SubjectDto MapSubject(Subject s) =>
-            new(s.SubjectId, s.GradeId, s.Name, s.NameAr, s.Code, s.IsActive);
+            new(s.SubjectId, s.GradeId, s.Grade?.Name ?? "", s.SubjectCategoryId, s.Name, s.NameAr, s.Code, s.IsActive);
 
         private static TeachingAssignmentDto MapAssignment(TeachingAssignment ta) =>
             new(ta.AssignmentId,

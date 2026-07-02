@@ -11,6 +11,7 @@ namespace Masarak.Domain.Entities
     {
         public int     SubjectId   { get; set; }
         public int     GradeId     { get; set; }                   // FK → grades.GradeId
+        public int     SubjectCategoryId { get; set; }
         public string  Name        { get; set; } = null!;          // "Mathematics"
         public string? NameAr      { get; set; }                   // "الرياضيات"
         public string  Code        { get; set; } = null!;          // unique, e.g. "MATH-G5"
@@ -19,15 +20,19 @@ namespace Masarak.Domain.Entities
 
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual Grade  Grade  { get; set; } = null!;
+        public virtual SubjectCategory Category { get; set; } = null!;
         public virtual ICollection<TeachingAssignment>  TeachingAssignments  { get; set; } = new List<TeachingAssignment>();
         public virtual ICollection<StudentPerformance>  StudentPerformances  { get; set; } = new List<StudentPerformance>();
+        public virtual ICollection<SubscriptionSubject> SubscriptionSubjects { get; set; } = new List<SubscriptionSubject>();
+        public virtual ICollection<StudentClassSubject> StudentClassSubjects { get; set; } = new List<StudentClassSubject>();
 
         // ── Factory ─────────────────────────────────────────────────────────
-        public static Subject Create(int gradeId, string name, string? nameAr, string code)
+        public static Subject Create(int gradeId, int categoryId, string name, string? nameAr, string code)
         {
             return new Subject
             {
                 GradeId  = gradeId,
+                SubjectCategoryId = categoryId,
                 Name     = name,
                 NameAr   = nameAr,
                 Code     = code,

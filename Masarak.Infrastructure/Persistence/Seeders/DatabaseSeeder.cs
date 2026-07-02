@@ -160,69 +160,204 @@ public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
             if (await db.Students.AnyAsync()) return;
 
             var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == AppRoles.Student);
-            var grade1 = await db.Grades.FirstOrDefaultAsync(g => g.Order == 1);
-            if (role == null || grade1 == null) return;
+            if (role == null) return;
+            var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
+            if (!grades.Any()) return;
 
-            var user1 = new User { RoleId = role.RoleId, FullName = "Youssef Student", Email = "youssef@student.com", PasswordHash = pwd.HashPassword("Student@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
-            var user2 = new User { RoleId = role.RoleId, FullName = "Salma Student", Email = "salma@student.com", PasswordHash = pwd.HashPassword("Student@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
-            
-            db.Users.AddRange(user1, user2);
+            var users = new List<User>();
+            var students = new List<Student>();
+            int studentCounter = 1;
+
+            foreach (var grade in grades)
+            {
+                for (int i = 1; i <= 2; i++)
+                {
+                    var user = new User { RoleId = role.RoleId, FullName = $"Student {studentCounter} Grade {grade.Order}", Email = $"student{studentCounter}@grade{grade.Order}.com", PasswordHash = pwd.HashPassword("Student@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
+                    users.Add(user);
+                    studentCounter++;
+                }
+            }
+            db.Users.AddRange(users);
             await db.SaveChangesAsync();
 
-            db.Students.Add(new Student { UserId = user1.UserId, GradeId = grade1.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
-            db.Students.Add(new Student { UserId = user2.UserId, GradeId = grade1.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
+            studentCounter = 1;
+            foreach (var grade in grades)
+            {
+                var gradeUsers = users.Where(u => u.Email.Contains($"@grade{grade.Order}.com")).ToList();
+                foreach (var user in gradeUsers)
+                {
+                    students.Add(new Student { UserId = user.UserId, GradeId = grade.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
+                }
+            }
+            db.Students.AddRange(students);
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 2 test students seeded.");
+            Console.WriteLine($"[Seeder] {students.Count} test students seeded.");
         }
 
         public static async Task SeedSubjectsAsync(Context db)
         {
             if (await db.Subjects.AnyAsync()) return;
-            var grade1 = await db.Grades.FirstOrDefaultAsync(g => g.Order == 1);
-            if (grade1 == null) return;
+            var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
+            if (!grades.Any()) return;
 
-            db.Subjects.Add(Subject.Create(grade1.GradeId, "Mathematics 1", "رياضيات", "MATH-1"));
-            db.Subjects.Add(Subject.Create(grade1.GradeId, "Science 1", "علوم", "SCI-1"));
-            db.Subjects.Add(Subject.Create(grade1.GradeId, "Arabic 1", "عربي", "ARB-1"));
+            // Ensure categories exist
+            if (!await db.SubjectCategories.AnyAsync(c => c.Name == "Mathematics"))
+            {
+                db.SubjectCategories.AddRange(
+                    new SubjectCategory { Name = "Mathematics", NameAr = "رياضيات" },
+                    new SubjectCategory { Name = "Science", NameAr = "علوم" },
+                    new SubjectCategory { Name = "Arabic", NameAr = "عربي" }
+                );
+                await db.SaveChangesAsync();
+            }
+
+            var mathCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Mathematics");
+            var sciCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Science");
+            var araCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Arabic");
+
+            // Update existing subjects to their correct categories if they are currently Uncategorized (Id=1)
+            var existingSubjects = await db.Subjects.ToListAsync();
+            foreach (var subject in existingSubjects)
+            {
+                if (subject.Name.StartsWith("Mathematics")) subject.SubjectCategoryId = mathCat.SubjectCategoryId;
+                else if (subject.Name.StartsWith("Science")) subject.SubjectCategoryId = sciCat.SubjectCategoryId;
+                else if (subject.Name.StartsWith("Arabic")) subject.SubjectCategoryId = araCat.SubjectCategoryId;
+            }
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 3 test subjects seeded.");
+
+            foreach (var grade in grades)
+            {
+                db.Subjects.Add(Subject.Create(grade.GradeId, mathCat.SubjectCategoryId, $"Mathematics {grade.Order}", "رياضيات", $"MATH-{grade.Order}"));
+                db.Subjects.Add(Subject.Create(grade.GradeId, sciCat.SubjectCategoryId, $"Science {grade.Order}", "علوم", $"SCI-{grade.Order}"));
+                db.Subjects.Add(Subject.Create(grade.GradeId, araCat.SubjectCategoryId, $"Arabic {grade.Order}", "عربي", $"ARB-{grade.Order}"));
+            }
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] {grades.Count * 3} test subjects seeded.");
         }
 
         public static async Task SeedClassesAsync(Context db)
         {
             if (await db.Classes.AnyAsync()) return;
-            var grade1 = await db.Grades.FirstOrDefaultAsync(g => g.Order == 1);
-            if (grade1 == null) return;
+            var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
+            if (!grades.Any()) return;
 
-            db.Classes.Add(Class.Create(grade1.GradeId, "Class 1A", 30, 2024));
-            db.Classes.Add(Class.Create(grade1.GradeId, "Class 1B", 30, 2024));
+            foreach (var grade in grades)
+            {
+                db.Classes.Add(Class.Create(grade.GradeId, $"Class {grade.Order}A", 30, DateTime.UtcNow.Year));
+                db.Classes.Add(Class.Create(grade.GradeId, $"Class {grade.Order}B", 30, DateTime.UtcNow.Year));
+            }
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 2 test classes seeded.");
+            Console.WriteLine($"[Seeder] {grades.Count * 2} test classes seeded.");
         }
 
         public static async Task SeedTeachingAssignmentsAsync(Context db)
         {
             if (await db.TeachingAssignments.AnyAsync()) return;
             var teacher1 = await db.Teachers.FirstOrDefaultAsync();
-            var class1 = await db.Classes.FirstOrDefaultAsync();
-            var mathSubj = await db.Subjects.FirstOrDefaultAsync(s => s.Name == "Mathematics 1");
+            var grade1 = await db.Grades.FirstOrDefaultAsync(g => g.Order == 1);
+            if (grade1 == null) return;
+            var class1 = await db.Classes.FirstOrDefaultAsync(c => c.GradeId == grade1.GradeId);
+            var mathSubj = await db.Subjects.FirstOrDefaultAsync(s => s.GradeId == grade1.GradeId && s.Name.StartsWith("Mathematics"));
             if (teacher1 == null || class1 == null || mathSubj == null) return;
 
-            db.TeachingAssignments.Add(TeachingAssignment.Create(teacher1.TeacherId, class1.ClassId, mathSubj.SubjectId, 2024));
+            db.TeachingAssignments.Add(TeachingAssignment.Create(teacher1.TeacherId, class1.ClassId, mathSubj.SubjectId, DateTime.UtcNow.Year));
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] 1 teaching assignment seeded.");
+        }
+
+        public static async Task SeedSubscriptionsAsync(Context db)
+        {
+            if (await db.Subscriptions.AnyAsync()) return;
+            var students = await db.Students.Include(s => s.User).ToListAsync();
+            var plans = await db.Plans.ToListAsync();
+            var monthlyPlan = plans.FirstOrDefault(p => p.Type == Masarak.Domain.Enums.PlanType.Monthly);
+            var perSubjectPlan = plans.FirstOrDefault(p => p.Type == Masarak.Domain.Enums.PlanType.PerSubject);
+
+            if (monthlyPlan == null || perSubjectPlan == null || !students.Any()) return;
+
+            int counter = 0;
+            foreach (var student in students)
+            {
+                // Alternate between monthly and per subject
+                bool isMonthly = counter % 2 == 0;
+                var plan = isMonthly ? monthlyPlan : perSubjectPlan;
+                
+                var sub = new Subscription
+                {
+                    UserId = student.UserId,
+                    PlanId = plan.PlanId,
+                    Status = Masarak.Domain.Enums.SubscriptionStatus.Active,
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow.AddDays(plan.DurationDays),
+                    ActivationMethod = Masarak.Domain.Enums.ActivationMethod.AdminManual,
+                    AdminNote = "Seeded subscription",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var payment = new Payment
+                {
+                    Amount = plan.PriceMonthly,
+                    Currency = plan.Currency,
+                    Status = Masarak.Domain.Enums.PaymentStatus.Completed,
+                    Provider = Masarak.Domain.Enums.PaymentProvider.Manual,
+                    Gateway = "Manual",
+                    GatewayTxnId = $"SEED-{Guid.NewGuid()}",
+                    PaidAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                if (!isMonthly)
+                {
+                    var subjects = await db.Subjects.Where(s => s.GradeId == student.GradeId).Take(2).ToListAsync();
+                    payment.Amount = plan.PriceMonthly * subjects.Count;
+                    foreach (var s in subjects)
+                    {
+                        sub.SubscriptionSubjects.Add(new SubscriptionSubject { SubjectId = s.SubjectId });
+                    }
+                }
+                
+                sub.Payments.Add(payment);
+                db.Subscriptions.Add(sub);
+                counter++;
+            }
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] {students.Count} subscriptions seeded.");
         }
 
         public static async Task SeedStudentEnrollmentsAsync(Context db)
         {
             if (await db.StudentClasses.AnyAsync()) return;
-            var student1 = await db.Students.FirstOrDefaultAsync();
-            var class1 = await db.Classes.FirstOrDefaultAsync();
-            if (student1 == null || class1 == null) return;
+            var students = await db.Students.ToListAsync();
+            var classes = await db.Classes.ToListAsync();
 
-            db.StudentClasses.Add(StudentClass.Enroll(student1.StudentId, class1.ClassId, 2024));
+            int enrollments = 0;
+            foreach (var student in students)
+            {
+                var studentClass = classes.FirstOrDefault(c => c.GradeId == student.GradeId);
+                if (studentClass != null)
+                {
+                    // Check subscription type
+                    var sub = await db.Subscriptions.Include(s => s.SubscriptionSubjects).FirstOrDefaultAsync(s => s.UserId == student.UserId && s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active);
+                    if (sub != null)
+                    {
+                        var isFull = sub.SubscriptionSubjects.Count == 0;
+                        var type = isFull ? Masarak.Domain.Enums.EnrollmentType.FullClass : Masarak.Domain.Enums.EnrollmentType.PerSubject;
+                        var sc = StudentClass.Enroll(student.StudentId, studentClass.ClassId, DateTime.UtcNow.Year, type);
+                        
+                        if (!isFull)
+                        {
+                            foreach (var ss in sub.SubscriptionSubjects)
+                            {
+                                sc.StudentClassSubjects.Add(new StudentClassSubject { SubjectId = ss.SubjectId });
+                            }
+                        }
+                        db.StudentClasses.Add(sc);
+                        enrollments++;
+                    }
+                }
+            }
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 1 student enrollment seeded.");
+            Console.WriteLine($"[Seeder] {enrollments} student enrollments seeded.");
         }
         /// <summary>
         /// Phase 5: Seeds default AI prompt templates for weakness analysis, parent reports, and teaching suggestions.

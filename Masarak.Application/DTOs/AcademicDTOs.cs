@@ -15,9 +15,25 @@ namespace Masarak.Application.DTOs
         int GradeId, string Name, string? NameAr,
         IEnumerable<SubjectDto> Subjects, IEnumerable<ClassDto> Classes);
 
+    // ── Categories ────────────────────────────────────────────────────────
+    public record SubjectCategoryDto(
+        int SubjectCategoryId,
+        string Name,
+        string? NameAr,
+        bool IsActive
+    );
+
+    // ── Subjects ────────────────────────────────────────────────────────
     public record SubjectDto(
-        int SubjectId, int GradeId, string Name, string? NameAr,
-        string Code, bool IsActive);
+        int SubjectId,
+        int GradeId,
+        string GradeName,
+        int SubjectCategoryId,
+        string Name,
+        string? NameAr,
+        string Code,
+        bool IsActive
+    );
 
     public record ClassDto(
         int ClassId, int GradeId, string GradeName, string Name,
@@ -32,7 +48,8 @@ namespace Masarak.Application.DTOs
         int ClassId, string ClassName);
 
     public record StudentInClassDto(
-        int StudentId, string FullName, string Email);
+        int StudentClassId, int StudentId, int UserId, string FullName, string Email,
+        EnrollmentType EnrollmentType, IEnumerable<string> EnrolledSubjects);
 
     public record SessionDto(
         int SessionId, string Title, string? Description,
@@ -81,6 +98,9 @@ namespace Masarak.Application.DTOs
     {
         [Required]
         public int GradeId { get; set; }
+
+        [Required]
+        public int SubjectCategoryId { get; set; }
 
         [Required, MaxLength(150)]
         public string Name { get; set; } = null!;
@@ -154,6 +174,12 @@ namespace Masarak.Application.DTOs
 
         [Required, Range(2020, 2100)]
         public int AcademicYear { get; set; }
+    }
+
+    public class UpdateTeacherSpecializationRequest
+    {
+        [Required]
+        public List<int> SubjectIds { get; set; } = new();
     }
 
     public class ScheduleSessionRequest

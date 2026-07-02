@@ -57,6 +57,14 @@ namespace Masarak.Infrastructure.Services
                 EndDate = DateTime.UtcNow.AddDays(plan.DurationDays) // Will be updated on activation
             };
 
+            if (request.SubjectIds != null && request.SubjectIds.Any())
+            {
+                foreach (var sId in request.SubjectIds)
+                {
+                    subscription.SubscriptionSubjects.Add(new SubscriptionSubject { SubjectId = sId });
+                }
+            }
+
             await _subscriptionRepository.AddAsync(subscription, ct);
             return new CheckoutResult(url, sessionId);
         }
@@ -123,12 +131,24 @@ namespace Masarak.Infrastructure.Services
                 EndDate = DateTime.UtcNow.AddDays(plan.DurationDays)
             };
 
+            if (request.SubjectIds != null && request.SubjectIds.Any())
+            {
+                foreach (var sId in request.SubjectIds)
+                {
+                    subscription.SubscriptionSubjects.Add(new SubscriptionSubject { SubjectId = sId });
+                }
+            }
+
             await _subscriptionRepository.AddAsync(subscription, ct);
+
+            var paymentAmount = plan.Type == PlanType.PerSubject && request.SubjectIds != null && request.SubjectIds.Any()
+                ? plan.PriceMonthly * request.SubjectIds.Count
+                : plan.PriceMonthly;
 
             var payment = new Payment
             {
                 SubscriptionId = subscription.SubscriptionId,
-                Amount = plan.PriceMonthly,
+                Amount = paymentAmount,
                 Currency = plan.Currency,
                 Status = PaymentStatus.Completed,
                 Provider = PaymentProvider.Manual,

@@ -48,6 +48,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
         {
             return await _context.StudentClasses
                 .Include(sc => sc.Student).ThenInclude(s => s.User)
+                .Include(sc => sc.StudentClassSubjects).ThenInclude(scs => scs.Subject)
                 .Where(sc => sc.ClassId == classId && sc.IsActive)
                 .OrderBy(sc => sc.Student.User.FullName)
                 .ToListAsync(ct);

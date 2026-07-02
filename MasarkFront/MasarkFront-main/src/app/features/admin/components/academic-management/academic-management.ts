@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicApiService } from '../../../../core/services/academic-api-service';
@@ -15,7 +15,7 @@ export class AcademicManagementComponent implements OnInit {
   private readonly api = inject(AcademicApiService);
   private readonly adminApi = inject(AdminApiService);
 
-  activeTab = signal<'grades' | 'subjects' | 'classes' | 'roster' | 'teachers'>('grades');
+  activeTab = signal<'grades' | 'subjects' | 'classes' | 'roster' | 'teachers' | 'specializations'>('grades');
   
   // Data State
   grades = signal<any[]>([]);
@@ -23,13 +23,23 @@ export class AcademicManagementComponent implements OnInit {
   classes = signal<any[]>([]);
   roster = signal<any[]>([]);
   teachers = signal<any[]>([]);
+  allCategories = signal<any[]>([]);
   availableTeachers = signal<any[]>([]);
   availableStudents = signal<any[]>([]);
+  filteredStudentsForGrade = computed(() => {
+    const rosterUserIds = new Set(this.roster().map(r => r.userId));
+    return this.availableStudents().filter(s => s.gradeId === this.selectedGrade() && !rosterUserIds.has(s.userId));
+  });
+  teacherSpecializations = signal<any[]>([]);
 
   // Selection State
   selectedGrade = signal<number | null>(null);
   selectedClass = signal<number | null>(null);
-  academicYear = signal<string>('2026');
+  selectedTeacher = signal<number | null>(null);
+  academicYear = signal<string>(new Date().getFullYear().toString());
+
+  // Enrollment State
+  // Enrollment type and subjects are automatically inferred by the backend based on Active Subscription
 
   // Loading & Modals
   isLoading = signal<boolean>(false);
@@ -37,8 +47,11 @@ export class AcademicManagementComponent implements OnInit {
   modalMode = signal<'create' | 'edit'>('create');
   modalType = signal<'grade' | 'subject' | 'class'>('grade');
 
-  // Form State
-  formData = signal<any>({});
+  // Form & Feedback State
+  formData: any = {};
+  feedbackMsg = signal<string>('');
+  feedbackType = signal<'success' | 'error'>('success');
+  confirmAction = signal<{ msg: string, action: () => void } | null>(null);
 
   ngOnInit(): void {
     this.loadGrades();
@@ -47,11 +60,8 @@ export class AcademicManagementComponent implements OnInit {
   }
 
   loadAvailableTeachers() {
-    this.adminApi.getUsers(1, 1000, 'Teacher').subscribe({
-      next: (res: any) => {
-        const list = Array.isArray(res) ? res : (res?.items || []);
-        this.availableTeachers.set(list);
-      }
+    this.api.getTeachers().subscribe({
+      next: (res) => this.availableTeachers.set(res)
     });
   }
 
@@ -64,7 +74,7 @@ export class AcademicManagementComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'grades' | 'subjects' | 'classes' | 'roster' | 'teachers') {
+  setTab(tab: 'grades' | 'subjects' | 'classes' | 'roster' | 'teachers' | 'specializations') {
     this.activeTab.set(tab);
     if (tab === 'grades') this.loadGrades();
     if (tab === 'subjects' && this.selectedGrade()) this.loadSubjects();
@@ -75,55 +85,53 @@ export class AcademicManagementComponent implements OnInit {
       // Subjects must be loaded for the assignment dropdown — use the class's grade
       if (!this.subjects().length && this.selectedGrade()) this.loadSubjects();
     }
+    if (tab === 'specializations') {
+      if (!this.allCategories().length) this.loadAllCategories();
+      if (this.selectedTeacher()) this.loadTeacherSpecializations();
+    }
+  }
+
+  // ── GENERIC LOADER HELPER ──
+  private fetchData<T>(apiCall: import('rxjs').Observable<T>, targetSignal: import('@angular/core').WritableSignal<T>) {
+    this.isLoading.set(true);
+    apiCall.subscribe({
+      next: (res) => { targetSignal.set(res); this.isLoading.set(false); },
+      error: () => this.isLoading.set(false)
+    });
   }
 
   // ── LOADERS ──
   loadGrades() {
-    this.isLoading.set(true);
-    this.api.getGrades().subscribe({
-      next: (res) => { this.grades.set(res); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false)
-    });
+    this.fetchData(this.api.getGrades(), this.grades);
   }
 
   loadSubjects() {
     const gid = this.selectedGrade();
-    if (!gid) return;
-    this.isLoading.set(true);
-    this.api.getSubjectsByGrade(gid).subscribe({
-      next: (res) => { this.subjects.set(res); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false)
-    });
+    if (gid) this.fetchData(this.api.getSubjectsByGrade(gid), this.subjects);
+  }
+
+  loadAllCategories() {
+    this.fetchData(this.api.getAllSubjectCategories(), this.allCategories);
   }
 
   loadClasses() {
     const gid = this.selectedGrade();
-    if (!gid) return;
-    this.isLoading.set(true);
-    this.api.getClassesByGrade(gid, this.academicYear()).subscribe({
-      next: (res) => { this.classes.set(res); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false)
-    });
+    if (gid) this.fetchData(this.api.getClassesByGrade(gid, this.academicYear()), this.classes);
   }
 
   loadRoster() {
     const cid = this.selectedClass();
-    if (!cid) return;
-    this.isLoading.set(true);
-    this.api.getClassRoster(cid).subscribe({
-      next: (res) => { this.roster.set(res); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false)
-    });
+    if (cid) this.fetchData(this.api.getClassRoster(cid), this.roster);
   }
 
   loadTeachers() {
     const cid = this.selectedClass();
-    if (!cid) return;
-    this.isLoading.set(true);
-    this.api.getAssignmentsForClass(cid, this.academicYear()).subscribe({
-      next: (res) => { this.teachers.set(res); this.isLoading.set(false); },
-      error: () => this.isLoading.set(false)
-    });
+    if (cid) this.fetchData(this.api.getAssignmentsForClass(cid, this.academicYear()), this.teachers);
+  }
+
+  loadTeacherSpecializations() {
+    const tid = this.selectedTeacher();
+    if (tid) this.fetchData(this.api.getTeacherSpecializations(tid), this.teacherSpecializations);
   }
 
   // ── UI HELPERS ──
@@ -144,63 +152,76 @@ export class AcademicManagementComponent implements OnInit {
     }
   }
 
+  onTeacherSelect(tid: number) {
+    this.selectedTeacher.set(tid);
+    if (this.activeTab() === 'specializations') this.loadTeacherSpecializations();
+  }
+
+  // ── FEEDBACK HELPERS ──
+  showFeedback(msg: string, type: 'success' | 'error' = 'success') {
+    this.feedbackMsg.set(msg);
+    this.feedbackType.set(type);
+    setTimeout(() => this.feedbackMsg.set(''), 4000);
+  }
+
+  showConfirm(msg: string, action: () => void) {
+    this.confirmAction.set({ msg, action });
+  }
+
   // ── MODALS & CRUD ──
   openModal(type: 'grade' | 'subject' | 'class', mode: 'create' | 'edit', data?: any) {
     this.modalType.set(type);
     this.modalMode.set(mode);
-    this.formData.set(data ? { ...data } : {});
+    this.formData = data ? { ...data } : {};
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
-    this.formData.set({});
+    this.formData = {};
   }
 
   saveModal() {
     const type = this.modalType();
     const mode = this.modalMode();
-    const data = this.formData();
+    const data = this.formData;
 
-    if (type === 'grade') {
-      const req = {
-        name: data.name,
-        nameAr: data.nameAr || undefined,
-        stage: Number(data.stage ?? 0),
-        order: Number(data.order ?? 1),
-      };
-      if (mode === 'create') {
-        this.api.createGrade(req).subscribe({ next: () => { this.closeModal(); this.loadGrades(); }, error: () => alert('فشل إنشاء المرحلة. تأكد من ملء جميع الحقول.') });
-      } else {
-        this.api.updateGrade(data.gradeId, { name: data.name, nameAr: data.nameAr, isActive: data.isActive ?? true }).subscribe({ next: () => { this.closeModal(); this.loadGrades(); }, error: () => alert('فشل تحديث المرحلة.') });
-      }
+    if (!data.name?.trim()) {
+      this.showFeedback('حقل الاسم مطلوب.', 'error');
+      return;
     }
 
+    const handleResult = (obs: import('rxjs').Observable<any>, successMsg: string, errorMsg: string, reloadFn: () => void) => {
+      obs.subscribe({
+        next: () => { this.closeModal(); reloadFn.call(this); this.showFeedback(successMsg); },
+        error: () => this.showFeedback(errorMsg, 'error')
+      });
+    };
+
     if (type === 'subject') {
+      if (!data.code?.trim()) {
+        this.showFeedback('رمز المادة مطلوب.', 'error');
+        return;
+      }
       if (mode === 'create') {
-        const req = {
-          gradeId: this.selectedGrade()!,
-          name: data.name,
-          nameAr: data.nameAr || undefined,
-          code: data.code,    // REQUIRED
-        };
-        this.api.createSubject(req).subscribe({ next: () => { this.closeModal(); this.loadSubjects(); }, error: () => alert('فشل إنشاء المادة. تأكد من ملء جميع الحقول (الاسم والرمز مطلوبان).') });
+        const req = { gradeId: this.selectedGrade()!, name: data.name, nameAr: data.nameAr || undefined, code: data.code };
+        handleResult(this.api.createSubject(req), 'تمت إضافة المادة بنجاح.', 'فشل إنشاء المادة.', this.loadSubjects);
       } else {
-        this.api.updateSubject(data.subjectId, { name: data.name, nameAr: data.nameAr, isActive: data.isActive ?? true }).subscribe({ next: () => { this.closeModal(); this.loadSubjects(); }, error: () => alert('فشل تحديث المادة.') });
+        handleResult(this.api.updateSubject(data.subjectId, { name: data.name, nameAr: data.nameAr, isActive: data.isActive ?? true }), 'تم تحديث المادة بنجاح.', 'فشل تحديث المادة.', this.loadSubjects);
       }
     }
 
     if (type === 'class') {
+      const yr = Number(this.academicYear());
+      if (isNaN(yr) || yr < 2020) {
+        this.showFeedback('سنة أكاديمية غير صالحة.', 'error');
+        return;
+      }
       if (mode === 'create') {
-        const req = {
-          gradeId: this.selectedGrade()!,
-          name: data.name,
-          maxCapacity: Number(data.maxCapacity ?? 30),  // REQUIRED
-          academicYear: Number(this.academicYear()),     // REQUIRED int
-        };
-        this.api.createClass(req).subscribe({ next: () => { this.closeModal(); this.loadClasses(); }, error: () => alert('فشل إنشاء الفصل. تأكد من ملء جميع الحقول.') });
+        const req = { gradeId: this.selectedGrade()!, name: data.name, maxCapacity: Number(data.maxCapacity ?? 30), academicYear: yr };
+        handleResult(this.api.createClass(req), 'تمت إضافة الفصل بنجاح.', 'فشل إنشاء الفصل.', this.loadClasses);
       } else {
-        this.api.updateClass(data.classId, { name: data.name, maxCapacity: Number(data.maxCapacity ?? 30), isActive: data.isActive ?? true }).subscribe({ next: () => { this.closeModal(); this.loadClasses(); }, error: () => alert('فشل تحديث الفصل.') });
+        handleResult(this.api.updateClass(data.classId, { name: data.name, maxCapacity: Number(data.maxCapacity ?? 30), isActive: data.isActive ?? true }), 'تم تحديث الفصل بنجاح.', 'فشل تحديث الفصل.', this.loadClasses);
       }
     }
   }
@@ -208,40 +229,54 @@ export class AcademicManagementComponent implements OnInit {
   // ── ROSTER / TEACHERS ACTIONS ──
   enrollStudent(studentIdStr: string) {
     const cid = this.selectedClass();
-    if (!cid || !studentIdStr) return;
+    if (!cid || !studentIdStr) {
+      this.showFeedback('الرجاء اختيار الطالب.', 'error');
+      return;
+    }
+    const yr = Number(this.academicYear());
+    if (isNaN(yr) || yr < 2020) {
+      this.showFeedback('سنة أكاديمية غير صالحة.', 'error');
+      return;
+    }
+
     this.api.enrollStudent({
       studentId: +studentIdStr,
       classId: cid,
-      academicYear: Number(this.academicYear()),  // REQUIRED int
+      academicYear: yr
     }).subscribe({
-      next: () => this.loadRoster(),
-      error: (err) => {
-        const msg = err.error?.message || 'فشل تسجيل الطالب. تأكد من صحة رقم الطالب ورقم الفصل.';
-        alert('خطأ: ' + msg);
-      }
+      next: () => { 
+        this.loadRoster(); 
+        this.showFeedback('تم تسجيل الطالب بنجاح.'); 
+      },
+      error: (err) => this.showFeedback('خطأ: ' + (err.error?.message || 'فشل التسجيل.'), 'error')
     });
   }
 
   unenrollStudent(studentClassId: number) {
-    if(confirm('هل أنت متأكد من إلغاء قيد الطالب؟')) {
+    this.showConfirm('هل أنت متأكد من إلغاء قيد هذا الطالب من هذا الفصل؟', () => {
       this.api.unenrollStudent(studentClassId).subscribe({
-        next: () => this.loadRoster(),
-        error: () => alert('فشل إلغاء القيد.')
+        next: () => { this.loadRoster(); this.showFeedback('تم إلغاء القيد بنجاح.'); },
+        error: () => this.showFeedback('فشل إلغاء القيد.', 'error')
       });
-    }
+    });
   }
 
   assignTeacher(teacherIdStr: string, subjectIdStr: string) {
     const cid = this.selectedClass();
     const tId = parseInt(teacherIdStr, 10);
     const sId = parseInt(subjectIdStr, 10);
+    const yr = Number(this.academicYear());
 
     if (!cid) {
-      alert('الرجاء اختيار الفصل أولاً');
+      this.showFeedback('الرجاء اختيار الفصل أولاً.', 'error');
       return;
     }
     if (isNaN(tId) || isNaN(sId)) {
-      alert('تأكد من إدخال أرقام صحيحة لرقم المعلم ورقم المادة.');
+      this.showFeedback('تأكد من اختيار المعلم والمادة.', 'error');
+      return;
+    }
+    if (isNaN(yr) || yr < 2020) {
+      this.showFeedback('سنة أكاديمية غير صالحة.', 'error');
       return;
     }
 
@@ -249,22 +284,40 @@ export class AcademicManagementComponent implements OnInit {
       classId: cid,
       subjectId: sId,
       teacherId: tId,
-      academicYear: Number(this.academicYear()),  // REQUIRED int
+      academicYear: yr,
     }).subscribe({
-      next: () => this.loadTeachers(),
-      error: (err) => {
-        const msg = err.error?.message || 'فشل تعيين المعلم. تأكد من صحة رقم المعلم ورقم المادة.';
-        alert('خطأ: ' + msg);
-      }
+      next: () => { this.loadTeachers(); this.showFeedback('تم تعيين المعلم بنجاح.'); },
+      error: (err) => this.showFeedback('خطأ: ' + (err.error?.message || 'فشل التعيين.'), 'error')
     });
   }
 
   unassignTeacher(assignmentId: number) {
-    if(confirm('هل أنت متأكد من إلغاء تعيين المعلم؟')) {
+    this.showConfirm('هل أنت متأكد من إلغاء تعيين هذا المعلم؟', () => {
       this.api.unassignTeacher(assignmentId).subscribe({
-        next: () => this.loadTeachers(),
-        error: () => alert('فشل إلغاء تعيين المعلم.')
+        next: () => { this.loadTeachers(); this.showFeedback('تم إلغاء التعيين بنجاح.'); },
+        error: () => this.showFeedback('فشل إلغاء التعيين.', 'error')
       });
+    });
+  }
+
+  hasSpecialization(category: any): boolean {
+    return this.teacherSpecializations().some(s => s.subjectCategoryId === category.subjectCategoryId);
+  }
+
+  toggleTeacherSubjectByName(category: any) {
+    const current = this.teacherSpecializations();
+    const isSpecialized = current.some(c => c.subjectCategoryId === category.subjectCategoryId);
+    
+    let newCategories: any[];
+    if (isSpecialized) {
+      newCategories = current.filter(c => c.subjectCategoryId !== category.subjectCategoryId);
+    } else {
+      newCategories = [...current, category];
     }
+    this.teacherSpecializations.set(newCategories);
+    this.api.updateTeacherSpecializations(this.selectedTeacher()!, newCategories.map(c => c.subjectCategoryId)).subscribe({
+      next: () => { this.loadTeacherSpecializations(); this.showFeedback('تم تحديث التخصصات بنجاح.'); },
+      error: () => this.showFeedback('فشل تحديث التخصصات.', 'error')
+    });
   }
 }

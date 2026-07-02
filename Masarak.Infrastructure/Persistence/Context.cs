@@ -27,7 +27,11 @@ namespace Masarak.Infrastructure.Persistence
         public DbSet<Grade>              Grades              { get; set; }
         public DbSet<Class>              Classes             { get; set; }
         public DbSet<StudentClass>       StudentClasses      { get; set; }
-        public DbSet<Subject>            Subjects            { get; set; }
+        public DbSet<StudentClassSubject> StudentClassSubjects { get; set; }
+        public DbSet<SubjectCategory>     SubjectCategories   { get; set; }
+        public DbSet<Subject>             Subjects            { get; set; }
+        public DbSet<TeacherSubject>     TeacherSubjects     { get; set; }
+        public DbSet<SubscriptionSubject> SubscriptionSubjects { get; set; }
         public DbSet<TeachingAssignment> TeachingAssignments { get; set; }
         public DbSet<Session>            Sessions            { get; set; }
         public DbSet<Attendance>         Attendances         { get; set; }
@@ -291,6 +295,11 @@ namespace Masarak.Infrastructure.Persistence
                  .WithMany(g => g.Subjects)
                  .HasForeignKey(x => x.GradeId)
                  .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Category)
+                 .WithMany(c => c.Subjects)
+                 .HasForeignKey(x => x.SubjectCategoryId)
+                 .OnDelete(DeleteBehavior.Restrict);
             });
 
             // ═══════════════════════════════════════════════════════════════════
@@ -304,7 +313,7 @@ namespace Masarak.Infrastructure.Persistence
                 e.Property(x => x.AcademicYear).IsRequired();
                 e.Property(x => x.IsActive).HasDefaultValue(true);
                 e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
-                e.HasIndex(x => new { x.TeacherId, x.SubjectId, x.ClassId, x.AcademicYear })
+                e.HasIndex(x => new { x.SubjectId, x.ClassId, x.AcademicYear })
                  .IsUnique().HasDatabaseName("UX_teaching_assignments_unique");
 
                 e.HasOne(x => x.Teacher)
@@ -915,6 +924,65 @@ namespace Masarak.Infrastructure.Persistence
                  .WithMany()
                  .HasForeignKey(x => x.SenderUserId)
                  .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 30. NEW ENTITIES (Phase 7 Refactoring)
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<SubjectCategory>(e =>
+            {
+                e.ToTable("subject_categories");
+                e.HasKey(x => x.SubjectCategoryId);
+                e.Property(x => x.Name).IsRequired().HasMaxLength(100);
+                e.Property(x => x.NameAr).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<TeacherSubject>(e =>
+            {
+                e.ToTable("teacher_subjects");
+                e.HasKey(x => new { x.TeacherId, x.SubjectCategoryId });
+
+                e.HasOne(x => x.Teacher)
+                 .WithMany(t => t.TeacherSubjects)
+                 .HasForeignKey(x => x.TeacherId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.SubjectCategory)
+                 .WithMany(s => s.TeacherSubjects)
+                 .HasForeignKey(x => x.SubjectCategoryId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SubscriptionSubject>(e =>
+            {
+                e.ToTable("subscription_subjects");
+                e.HasKey(x => new { x.SubscriptionId, x.SubjectId });
+
+                e.HasOne(x => x.Subscription)
+                 .WithMany(s => s.SubscriptionSubjects)
+                 .HasForeignKey(x => x.SubscriptionId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.Subject)
+                 .WithMany(s => s.SubscriptionSubjects)
+                 .HasForeignKey(x => x.SubjectId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<StudentClassSubject>(e =>
+            {
+                e.ToTable("student_class_subjects");
+                e.HasKey(x => new { x.StudentClassId, x.SubjectId });
+
+                e.HasOne(x => x.StudentClass)
+                 .WithMany(sc => sc.StudentClassSubjects)
+                 .HasForeignKey(x => x.StudentClassId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.Subject)
+                 .WithMany(s => s.StudentClassSubjects)
+                 .HasForeignKey(x => x.SubjectId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

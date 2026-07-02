@@ -67,6 +67,7 @@ namespace Masarak.Application.DTOs
         public int PlanId { get; init; }
         public string SuccessUrl { get; init; } = null!;
         public string CancelUrl { get; init; } = null!;
+        public List<int>? SubjectIds { get; init; }
     }
 
     public record CheckoutResult(string CheckoutUrl, string SessionId);
@@ -78,6 +79,7 @@ namespace Masarak.Application.DTOs
         public int StudentUserId { get; init; }
         public int PlanId { get; init; }
         public string? Note { get; init; }
+        public List<int>? SubjectIds { get; init; }
     }
 
     public record AdminCancelRequest

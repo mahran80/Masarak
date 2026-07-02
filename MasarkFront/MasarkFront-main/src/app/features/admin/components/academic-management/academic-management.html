@@ -23,6 +23,10 @@
     <button (click)="setTab('teachers')" [class.bg-blue-50]="activeTab() === 'teachers'" [class.text-blue-700]="activeTab() === 'teachers'" class="w-full text-right px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors font-medium">
       تعيين المعلمين
     </button>
+
+    <button (click)="setTab('specializations')" [class.bg-blue-50]="activeTab() === 'specializations'" [class.text-blue-700]="activeTab() === 'specializations'" class="w-full text-right px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors font-medium">
+      تخصصات المعلمين
+    </button>
   </div>
 
   <!-- Main Content Area -->
@@ -35,18 +39,24 @@
       </div>
     }
 
+    <!-- Feedback Banner -->
+    @if (feedbackMsg()) {
+      <div [class]="feedbackType() === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'" class="p-4 mb-6 rounded-xl border flex items-center gap-3">
+        <span>{{ feedbackType() === 'success' ? '✅' : '❌' }}</span>
+        <span class="font-medium">{{ feedbackMsg() }}</span>
+      </div>
+    }
+
     <!-- 1. GRADES TAB -->
     @if (activeTab() === 'grades' && !isLoading()) {
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-slate-800">المراحل الدراسية</h2>
-        <button (click)="openModal('grade', 'create')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">+ إضافة مرحلة</button>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (g of grades(); track g.gradeId) {
           <div class="p-4 border border-slate-200 rounded-xl hover:border-blue-300 transition-all cursor-pointer bg-slate-50 flex justify-between items-center" (click)="onGradeSelect(g.gradeId); setTab('subjects')">
             <span class="font-bold text-slate-700">{{ g.name }}</span>
-            <button (click)="openModal('grade', 'edit', g); $event.stopPropagation()" class="text-slate-400 hover:text-blue-600 p-1">✏️</button>
           </div>
         } @empty {
           <p class="text-slate-500 col-span-full py-8 text-center bg-slate-50 rounded-lg">لا توجد مراحل دراسية بعد.</p>
@@ -146,14 +156,16 @@
         </div>
       } @else {
         <!-- Add Student Form -->
-        <div class="flex gap-2 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-          <select #studentSelect class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 bg-white">
-            <option value="">-- اختر الطالب --</option>
-            @for (s of availableStudents(); track s.userId) {
-              <option [value]="s.userId">{{ s.fullName }} ({{ s.email }})</option>
-            }
-          </select>
-          <button (click)="enrollStudent(studentSelect.value); studentSelect.value = ''" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">تسجيل طالب</button>
+        <div class="flex flex-col gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div class="flex gap-2">
+            <select #studentSelect class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 bg-white">
+              <option value="">-- اختر الطالب --</option>
+              @for (s of filteredStudentsForGrade(); track s.userId) {
+                <option [value]="s.userId">{{ s.fullName }} ({{ s.email }})</option>
+              }
+            </select>
+            <button (click)="enrollStudent(studentSelect.value); studentSelect.value = ''" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">تسجيل طالب</button>
+          </div>
         </div>
 
         <div class="border border-slate-200 rounded-xl overflow-hidden">
@@ -163,6 +175,7 @@
                 <th class="p-4 font-semibold">ID</th>
                 <th class="p-4 font-semibold">اسم الطالب</th>
                 <th class="p-4 font-semibold">البريد الإلكتروني</th>
+                <th class="p-4 font-semibold">نوع التسجيل والمواد</th>
                 <th class="p-4 font-semibold w-24">إجراء</th>
               </tr>
             </thead>
@@ -172,12 +185,24 @@
                   <td class="p-4">{{ r.studentId }}</td>
                   <td class="p-4 font-medium">{{ r.fullName }}</td>
                   <td class="p-4 text-slate-500">{{ r.email }}</td>
+                  <td class="p-4 text-sm">
+                    @if (r.enrollmentType === 'FullClass') {
+                      <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-xs font-medium border border-emerald-200">فصل كامل</span>
+                    } @else {
+                      <div class="flex flex-wrap gap-1">
+                        <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium border border-blue-200 mb-1 block w-fit">جزئي (مواد)</span>
+                        @for (sub of r.enrolledSubjects; track sub) {
+                          <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs">{{ sub }}</span>
+                        }
+                      </div>
+                    }
+                  </td>
                   <td class="p-4">
-                    <button (click)="unenrollStudent(r.studentId)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors text-xs font-medium">حذف</button>
+                    <button (click)="unenrollStudent(r.studentClassId)" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors text-xs font-medium">حذف</button>
                   </td>
                 </tr>
               } @empty {
-                <tr><td colspan="4" class="p-8 text-center text-slate-500">لا يوجد طلاب مسجلين في هذا الفصل.</td></tr>
+                <tr><td colspan="5" class="p-8 text-center text-slate-500">لا يوجد طلاب مسجلين في هذا الفصل.</td></tr>
               }
             </tbody>
           </table>
@@ -201,8 +226,8 @@
         <div class="flex gap-2 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 flex-wrap md:flex-nowrap">
           <select #teacherSelect class="w-full md:flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 bg-white">
             <option value="">-- اختر المعلم --</option>
-            @for (t of availableTeachers(); track t.userId) {
-              <option [value]="t.userId">{{ t.fullName }} ({{ t.email }})</option>
+            @for (t of availableTeachers(); track t.teacherId) {
+              <option [value]="t.teacherId">{{ t.fullName }} ({{ t.email }})</option>
             }
           </select>
           <select #subjectSelect class="w-full md:flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 bg-white">
@@ -236,10 +261,68 @@
         </div>
       }
     }
+
+    <!-- 6. TEACHER SPECIALIZATIONS TAB -->
+    @if (activeTab() === 'specializations' && !isLoading()) {
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-slate-800">تخصصات المعلمين</h2>
+      </div>
+
+      <div class="flex gap-4 flex-col md:flex-row">
+        <!-- Teacher Select -->
+        <div class="w-full md:w-1/3 bg-slate-50 p-4 rounded-xl border border-slate-200 h-fit">
+          <h3 class="font-bold text-slate-700 mb-4">اختر المعلم</h3>
+          <div class="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2">
+            @for (t of availableTeachers(); track t.teacherId) {
+              <button (click)="onTeacherSelect(t.teacherId)" [class.bg-indigo-100]="selectedTeacher() === t.teacherId" [class.border-indigo-300]="selectedTeacher() === t.teacherId" class="text-right p-3 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 transition-colors">
+                <div class="font-bold text-slate-800 text-sm">{{ t.fullName }}</div>
+                <div class="text-xs text-slate-500">{{ t.email }}</div>
+              </button>
+            } @empty {
+              <div class="text-slate-500 text-sm text-center py-4">لا يوجد معلمين.</div>
+            }
+          </div>
+        </div>
+
+        <!-- Subjects Toggles -->
+        <div class="w-full md:w-2/3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          @if (!selectedTeacher()) {
+            <div class="text-slate-500 py-12 text-center">يرجى اختيار معلم أولاً.</div>
+          } @else {
+            <h3 class="font-bold text-slate-700 mb-4">المواد المتاحة للتدريس</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              @for (category of allCategories(); track category.subjectCategoryId) {
+                <label class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-indigo-300 transition-colors">
+                  <input type="checkbox" 
+                         [checked]="hasSpecialization(category)"
+                         (change)="toggleTeacherSubjectByName(category)"
+                         class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                  <span class="font-medium text-slate-700">{{ category.nameAr || category.name }}</span>
+                </label>
+              } @empty {
+                <div class="col-span-full text-slate-500 text-sm text-center py-4">لا توجد مواد دراسية في هذه المرحلة.</div>
+              }
+            </div>
+            
+            <div class="mt-6 p-4 bg-indigo-50 border border-indigo-100 rounded-lg">
+              <h4 class="font-bold text-indigo-800 text-sm mb-2">التخصصات الحالية للمعلم</h4>
+              <div class="flex flex-wrap gap-2">
+                @for (spec of teacherSpecializations(); track spec.subjectId) {
+                  <span class="bg-indigo-600 text-white text-xs px-3 py-1 rounded-full">{{ spec.name }}</span>
+                } @empty {
+                  <span class="text-indigo-600/70 text-xs">لا توجد تخصصات مضافة.</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
   </div>
 </div>
 
-<!-- Modal Dialog -->
+<!-- Modals -->
 @if (isModalOpen()) {
   <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
@@ -255,34 +338,17 @@
         <!-- Shared: Name -->
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">الاسم بالإنجليزية (Name) <span class="text-red-500">*</span></label>
-          <input type="text" [(ngModel)]="formData().name" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+          <input type="text" [(ngModel)]="formData.name" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
         </div>
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-2">الاسم بالعربية (NameAr)</label>
-          <input type="text" [(ngModel)]="formData().nameAr" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
+          <input type="text" [(ngModel)]="formData.nameAr" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
         </div>
-
-        <!-- Grade: Stage + Order -->
-        @if (modalType() === 'grade') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">المرحلة (Stage) <span class="text-red-500">*</span></label>
-            <select [(ngModel)]="formData().stage" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
-              <option [ngValue]="0">ابتدائي (Primary)</option>
-              <option [ngValue]="1">إعدادي (Preparatory)</option>
-              <option [ngValue]="2">ثانوي (Secondary)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">الترتيب (Order) <span class="text-red-500">*</span></label>
-            <input type="number" [(ngModel)]="formData().order" min="1" max="100" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
-          </div>
-        }
-
         <!-- Subject: Code -->
         @if (modalType() === 'subject') {
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">رمز المادة (Code) <span class="text-red-500">*</span> <span class="text-xs text-slate-400">(مثال: MATH-01)</span></label>
-            <input type="text" [(ngModel)]="formData().code" maxlength="20" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
+            <input type="text" [(ngModel)]="formData.code" maxlength="20" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
           </div>
         }
 
@@ -290,14 +356,14 @@
         @if (modalType() === 'class') {
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">أقصى عدد طلاب (MaxCapacity) <span class="text-red-500">*</span></label>
-            <input type="number" [(ngModel)]="formData().maxCapacity" min="1" max="500" placeholder="30" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
+            <input type="number" [(ngModel)]="formData.maxCapacity" min="1" max="500" placeholder="30" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:border-blue-500 transition-all">
           </div>
         }
 
         <!-- Edit mode: IsActive toggle -->
         @if (modalMode() === 'edit') {
           <div class="flex items-center gap-3">
-            <input type="checkbox" [(ngModel)]="formData().isActive" id="isActiveCheck" class="w-4 h-4 accent-blue-600">
+            <input type="checkbox" [(ngModel)]="formData.isActive" id="isActiveCheck" class="w-4 h-4 accent-blue-600">
             <label for="isActiveCheck" class="text-sm font-semibold text-slate-700">نشط (IsActive)</label>
           </div>
         }
@@ -306,6 +372,25 @@
       <div class="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
         <button (click)="closeModal()" class="px-5 py-2 rounded-lg text-slate-600 font-medium hover:bg-slate-200 transition-colors">إلغاء</button>
         <button (click)="saveModal()" class="px-5 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm">حفظ</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Confirm Dialog -->
+@if (confirmAction()) {
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex items-center gap-3 bg-red-50/50">
+        <span class="text-red-500 text-xl">⚠️</span>
+        <h3 class="text-lg font-bold text-slate-800">تأكيد الإجراء</h3>
+      </div>
+      <div class="p-6 text-slate-700 font-medium text-center">
+        {{ confirmAction()?.msg }}
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+        <button (click)="confirmAction.set(null)" class="px-5 py-2 rounded-lg text-slate-600 font-medium hover:bg-slate-200 transition-colors">إلغاء</button>
+        <button (click)="confirmAction()?.action(); confirmAction.set(null)" class="px-5 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-sm">تأكيد</button>
       </div>
     </div>
   </div>
