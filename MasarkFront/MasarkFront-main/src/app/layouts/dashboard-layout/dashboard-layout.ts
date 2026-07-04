@@ -1,8 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthApiService } from '../../core/services/auth-api-service';
 import { AuthStateService } from '../../core/services/auth-state-service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+import { NotificationService } from '../../core/services/notification.service';
+import { NotificationHubService } from '../../core/services/notification-hub.service';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -10,10 +12,12 @@ import { NotificationBellComponent } from '../../shared/components/notification-
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent],
   templateUrl: './dashboard-layout.html',
 })
-export class DashboardLayoutComponent implements OnInit {
+export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private readonly authApi = inject(AuthApiService);
   private readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
+  private readonly notificationHubService = inject(NotificationHubService);
 
   readonly userRole = this.authState.userRole;
   readonly userName = this.authState.user;
@@ -22,8 +26,14 @@ export class DashboardLayoutComponent implements OnInit {
   readonly userRoleDisplay = this.authState.user;
 
   ngOnInit(): void {
-    // هنا مستقبلاً هتعملي تواصل مع الـ API عشان تعرفي الـ Role الحقيقي
-    // وبناءً عليه تحددي الـ userRole والبيانات اللي فوق
+    // Load existing notifications
+    this.notificationService.loadNotifications();
+    // Start listening for real-time notifications
+    this.notificationHubService.startConnection();
+  }
+
+  ngOnDestroy(): void {
+    this.notificationHubService.stopConnection();
   }
 
   onAvatarError(event: any): void {
@@ -32,6 +42,7 @@ export class DashboardLayoutComponent implements OnInit {
   }
 
   logout(): void {
+    this.notificationHubService.stopConnection();
     const refreshToken = this.authState.getRefreshToken();
 
     if (refreshToken) {

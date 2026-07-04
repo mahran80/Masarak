@@ -8,6 +8,7 @@ namespace Masarak.Application.Interfaces
         Task<Subscription?> GetByIdAsync(int subscriptionId, CancellationToken ct = default);
         Task<Subscription?> GetActiveByUserIdAsync(int userId, CancellationToken ct = default);
         Task<Subscription?> GetByStripeSessionIdAsync(string sessionId, CancellationToken ct = default);
+        Task<Subscription?> GetByStripeSubscriptionIdAsync(string stripeSubscriptionId, CancellationToken ct = default);
         Task<IEnumerable<Subscription>> GetByUserIdAsync(int userId, CancellationToken ct = default);
         Task<IEnumerable<Subscription>> GetExpiredActiveSubscriptionsAsync(CancellationToken ct = default);
         Task<(IEnumerable<Subscription> Items, int TotalCount)> GetAllPagedAsync(

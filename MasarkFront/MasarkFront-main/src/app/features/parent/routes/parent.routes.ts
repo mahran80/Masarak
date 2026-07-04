@@ -19,6 +19,10 @@ export const PARENT_ROUTES: Routes = [
     loadComponent: () => import('../pages/smart-report/smart-report.component').then(m => m.SmartReportComponent)
   },
   {
+    path: 'reports/:studentId/:month',
+    loadComponent: () => import('../pages/smart-report/smart-report.component').then(m => m.SmartReportComponent)
+  },
+  {
     path: 'alerts/:studentId',
     loadComponent: () => import('../pages/child-alerts/child-alerts.component').then(m => m.ChildAlertsComponent)
   },
@@ -33,6 +37,10 @@ export const PARENT_ROUTES: Routes = [
   {
     path: 'link',
     loadComponent: () => import('../pages/link-student/link-student.component').then(m => m.LinkStudentComponent)
+  },
+  {
+    path: 'subscriptions',
+    loadComponent: () => import('../pages/subscriptions/parent-subscriptions.component').then(m => m.ParentSubscriptionsComponent)
   },
   {
     path: '**',

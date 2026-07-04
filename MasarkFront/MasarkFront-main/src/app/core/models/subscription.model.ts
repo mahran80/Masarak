@@ -29,6 +29,7 @@ export interface SubscriptionDto {
   endDate: string;
   activationMethod: ActivationMethod;
   adminNote: string | null;
+  isStripeManaged: boolean;
 }
 
 export interface SubscriptionStatusResponse {

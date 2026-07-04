@@ -68,6 +68,16 @@ export class ParentService {
     return this.http.post<any>(`${this.baseUrl}/children/${childId}/subscribe`, { planId, successUrl, cancelUrl });
   }
 
+  /** GET /api/parent/children/{childId}/subscription */
+  getChildSubscription(childId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/children/${childId}/subscription`);
+  }
+
+  /** POST /api/parent/children/{childId}/subscribe/change */
+  changeChildSubscription(childId: number, newPlanId: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/children/${childId}/subscribe/change`, { newPlanId });
+  }
+
   // --- Actions ---
 
   setSelectedStudent(studentId: number) {

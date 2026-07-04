@@ -11,9 +11,9 @@ export class NotificationService {
   private readonly _notifications = signal<NotificationDto[]>([]);
 
   readonly notifications = computed(() =>
-    [...this._notifications()].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    [...this._notifications()]
+      .filter(n => !n.isRead) // Only show unread notifications per user request
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   );
 
   readonly unreadCount = computed(() =>

@@ -1,42 +1,87 @@
-<div class="admin-content">
-  <h1 class="admin-content__title">مدير محتوى المنصة</h1>
-  <div class="admin-content__breadcrumb">
-    <span>الرئيسية</span>
-    <app-icon name="chevron-left" [size]="13"></app-icon>
-    <span class="admin-content__breadcrumb-current">مكتبة المحتوى</span>
+<div class="space-y-6 animate-fade-in pb-12">
+  <!-- Header -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+        <span>الرئيسية</span>
+        <app-icon name="chevron-left" [size]="14"></app-icon>
+        <span class="font-bold text-slate-800">مكتبة المحتوى</span>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+        <span class="text-blue-600">🛡️</span> إدارة محتوى المنصة
+      </h1>
+      <p class="text-sm text-slate-500 mt-1">مراجعة وتعطيل المحتوى غير المناسب أو المخالف</p>
+    </div>
   </div>
 
-  <div class="card admin-content__card">
-    <h3 class="admin-content__card-title">إدارة مكتبة المحتوى</h3>
-
-    <div class="admin-content__table-head">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <!-- Table Header -->
+    <div class="grid grid-cols-[140px_1fr_120px_150px_100px_180px] bg-slate-50 border-b border-slate-200 p-4 text-sm font-bold text-slate-600">
       <span>الإجراءات</span>
-      <span>عدد الدروس</span>
-      <span>المعلم</span>
+      <span>العنوان / المادة</span>
       <span>المستوى الدراسي</span>
-      <span class="admin-content__col-name">اسم المادة</span>
+      <span>المعلم</span>
+      <span>النوع</span>
+      <span>تاريخ الإضافة</span>
     </div>
 
-    <div class="admin-content-row" *ngFor="let s of subjects()">
-      <span class="admin-content-row__actions">
-        <app-button variant="navy" size="sm" icon="archive" (clicked)="archive(s.id)">أرشفة</app-button>
-        <app-button variant="danger" size="sm" icon="trash" (clicked)="remove(s.id)">تعطيل</app-button>
-      </span>
-      <span class="admin-content-row__count">{{ s.lessonsCount }}</span>
-      <span class="admin-content-row__teacher">{{ s.teacherName }}</span>
-      <span class="admin-content-row__grade">{{ s.gradeLabel }}</span>
-      <span class="admin-content-row__name">{{ s.name }}</span>
+    <!-- Table Rows -->
+    <div class="flex flex-col">
+      <div *ngFor="let item of contentItems()" class="grid grid-cols-[140px_1fr_120px_150px_100px_180px] items-center p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors text-sm">
+        <div class="flex items-center gap-2">
+          <app-button variant="navy" size="sm" icon="archive" (clicked)="archive(item.id)">أرشفة</app-button>
+          <app-button variant="danger" size="sm" icon="trash" (clicked)="remove(item.id)">تعطيل</app-button>
+        </div>
+        
+        <div class="flex flex-col pr-4">
+          <span class="font-bold text-slate-800 truncate" [title]="item.title">{{ item.title }}</span>
+          <span class="text-xs text-slate-500">{{ item.subjectName }}</span>
+        </div>
+
+        <div class="font-medium text-slate-600">
+          {{ item.gradeLabel }}
+        </div>
+
+        <div class="flex items-center gap-2 text-slate-600">
+          <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold shrink-0">
+            {{ item.teacherName.charAt(0) }}
+          </div>
+          <span class="truncate" [title]="item.teacherName">{{ item.teacherName }}</span>
+        </div>
+
+        <div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-bold"
+                [class.bg-blue-50]="item.type === 'Video'" [class.text-blue-600]="item.type === 'Video'"
+                [class.bg-orange-50]="item.type === 'PDF'" [class.text-orange-600]="item.type === 'PDF'"
+                [class.bg-purple-50]="item.type === 'ExerciseSheet'" [class.text-purple-600]="item.type === 'ExerciseSheet'"
+                [class.bg-emerald-50]="item.type === 'Notes'" [class.text-emerald-600]="item.type === 'Notes'">
+            {{ item.type }}
+          </span>
+        </div>
+
+        <div class="text-slate-500">
+          {{ item.createdAt | date:'short' }}
+        </div>
+      </div>
     </div>
 
-    <div class="admin-content__pagination">
-      <button type="button"><app-icon name="chevron-right" [size]="14"></app-icon></button>
-      <span>...</span>
-      <button type="button" class="admin-content__page-active">1</button>
-      <button type="button"><app-icon name="chevron-left" [size]="14"></app-icon></button>
-      <span class="admin-content__pagination-label">من 11 صفحة</span>
+    <!-- Empty State -->
+    <div *ngIf="contentItems().length === 0" class="p-12 text-center text-slate-500">
+      <div class="text-4xl mb-4">📭</div>
+      <div class="font-bold text-slate-700 text-lg mb-1">لا يوجد محتوى حالياً</div>
+      <p class="text-sm">لم يقم المعلمون برفع أي محتوى حتى الآن.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="contentItems().length > 0" class="flex items-center justify-center gap-2 p-4 border-t border-slate-100 bg-slate-50 text-sm text-slate-500">
+      <button class="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 flex items-center justify-center">
+        <app-icon name="chevron-right" [size]="14"></app-icon>
+      </button>
+      <button class="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center">1</button>
+      <button class="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 flex items-center justify-center">
+        <app-icon name="chevron-left" [size]="14"></app-icon>
+      </button>
+      <span class="mr-4">صفحة 1 من 1</span>
     </div>
   </div>
-</div>
-<div *ngIf="subjects().length === 0" class="admin-content__empty">
-  لا يوجد محتوى حالياً.
 </div>

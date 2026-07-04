@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SubscriptionApiService } from '../../../../core/services/subscription-api-service';
@@ -15,6 +15,12 @@ export class PlansComponent implements OnInit {
   private subApi = inject(SubscriptionApiService);
   readonly auth = inject(AuthStateService);
   private router = inject(Router);
+
+  @Input() handleCheckout = true;
+  @Input() disabledPlanId: number | null = null; // To disable the currently active plan
+  @Input() isProcessingPlanId: number | null = null; // For external loading state
+  
+  @Output() planSelected = new EventEmitter<PlanDto>();
 
   plans = signal<PlanDto[]>([]);
   loading = signal(true);
@@ -42,6 +48,13 @@ export class PlansComponent implements OnInit {
   }
 
   onSelectPlan(plan: PlanDto): void {
+    if (this.disabledPlanId === plan.planId) return;
+
+    if (!this.handleCheckout) {
+      this.planSelected.emit(plan);
+      return;
+    }
+
     if (!this.auth.isAuthenticated()) {
       this.router.navigate(['/my-subscription']);
       return;

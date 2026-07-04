@@ -220,8 +220,13 @@ export class SmartReportComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = params.get('studentId');
+      const month = params.get('month');
+      
       if (id) {
         this.studentId.set(Number(id));
+        if (month) {
+          this.selectedMonth.set(month);
+        }
         this.loadReport();
       }
     });

@@ -131,8 +131,18 @@ export class AdminApiService {
     return this.http.put<void>(`${this.base}/content/${contentId}/moderate`, { reason });
   }
 
+  /** GET /api/admin/content */
+  getContentItems(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/content`);
+  }
+
   /** GET /api/admin/system/health */
   getSystemHealth(): Observable<SystemHealthDto> {
     return this.http.get<SystemHealthDto>(`${this.base}/system/health`);
+  }
+
+  /** GET /api/admin/system/subscriptions-dashboard */
+  getSubscriptionsDashboard(): Observable<any> {
+    return this.http.get<any>(`${this.base}/system/subscriptions-dashboard`);
   }
 }

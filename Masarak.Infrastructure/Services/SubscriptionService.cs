@@ -74,16 +74,20 @@ namespace Masarak.Infrastructure.Services
             if (!_stripeService.ValidateWebhookSignature(payload, signature))
                 throw new UnauthorizedAccessException("Invalid webhook signature.");
 
-            var (eventType, sessionId, paymentIntentId) = _stripeService.ParseWebhookEvent(payload, signature);
+            var stripeEvent = _stripeService.ParseWebhookEvent(payload, signature);
 
-            if (eventType == "checkout.session.completed" && sessionId != null)
+            if (stripeEvent.Type == "checkout.session.completed")
             {
-                var subscription = await _subscriptionRepository.GetByStripeSessionIdAsync(sessionId, ct);
+                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
+                if (session == null) return;
+
+                var subscription = await _subscriptionRepository.GetByStripeSessionIdAsync(session.Id, ct);
                 if (subscription != null && subscription.Status == SubscriptionStatus.Pending)
                 {
                     subscription.Status = SubscriptionStatus.Active;
                     subscription.StartDate = DateTime.UtcNow;
                     subscription.EndDate = DateTime.UtcNow.AddDays(subscription.Plan.DurationDays);
+                    subscription.StripeSubscriptionId = session.SubscriptionId;
                     
                     await _subscriptionRepository.UpdateAsync(subscription, ct);
 
@@ -95,7 +99,7 @@ namespace Masarak.Infrastructure.Services
                         Status = PaymentStatus.Completed,
                         Provider = PaymentProvider.Stripe,
                         Gateway = "Stripe",
-                        StripePaymentIntentId = paymentIntentId,
+                        StripePaymentIntentId = session.PaymentIntentId,
                         CreatedAt = DateTime.UtcNow,
                         PaidAt = DateTime.UtcNow
                     };
@@ -104,6 +108,112 @@ namespace Masarak.Infrastructure.Services
                     await _accessService.InvalidateCacheAsync(subscription.UserId);
                 }
             }
+            else if (stripeEvent.Type == "customer.subscription.updated")
+            {
+                var stripeSub = stripeEvent.Data.Object as Stripe.Subscription;
+                if (stripeSub != null && stripeSub.Metadata.TryGetValue("PlanId", out var planIdStr) && int.TryParse(planIdStr, out var newPlanId))
+                {
+                    var subscription = await _subscriptionRepository.GetByStripeSubscriptionIdAsync(stripeSub.Id, ct);
+                    if (subscription != null && subscription.PlanId != newPlanId)
+                    {
+                        var newPlan = await _planRepository.GetByIdAsync(newPlanId, ct);
+                        if (newPlan != null)
+                        {
+                            subscription.PlanId = newPlanId;
+                            // Optionally update EndDate based on new plan duration or keep it synced with Stripe's current_period_end
+                            // In a full Stripe Billing setup, we'd sync StartDate and EndDate directly from stripeSub.CurrentPeriodStart/End
+                            
+                            await _subscriptionRepository.UpdateAsync(subscription, ct);
+                            await _accessService.InvalidateCacheAsync(subscription.UserId);
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task<bool> VerifyCheckoutSessionAsync(string sessionId, CancellationToken ct = default)
+        {
+            var subscription = await _subscriptionRepository.GetByStripeSessionIdAsync(sessionId, ct);
+            if (subscription == null) return false;
+            
+            if (subscription.Status == SubscriptionStatus.Active) 
+                return true;
+
+            var service = new Stripe.Checkout.SessionService();
+            var session = await service.GetAsync(sessionId, cancellationToken: ct);
+
+            if (session.PaymentStatus == "paid")
+            {
+                subscription.Status = SubscriptionStatus.Active;
+                subscription.StartDate = DateTime.UtcNow;
+                subscription.EndDate = DateTime.UtcNow.AddDays(subscription.Plan.DurationDays);
+                subscription.StripeSubscriptionId = session.SubscriptionId;
+                
+                await _subscriptionRepository.UpdateAsync(subscription, ct);
+                
+                // Add payment if not exists
+                var payment = new Payment
+                {
+                    SubscriptionId = subscription.SubscriptionId,
+                    Amount = subscription.Plan.PriceMonthly,
+                    Currency = subscription.Plan.Currency,
+                    Status = PaymentStatus.Completed,
+                    Provider = PaymentProvider.Stripe,
+                    Gateway = "Stripe",
+                    StripePaymentIntentId = session.PaymentIntentId,
+                    CreatedAt = DateTime.UtcNow,
+                    PaidAt = DateTime.UtcNow
+                };
+                await _paymentRepository.AddAsync(payment, ct);
+
+                await _accessService.InvalidateCacheAsync(subscription.UserId);
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<string?> ChangeSubscriptionAsync(int parentId, int childId, int newPlanId, CancellationToken ct = default)
+        {
+            if (!await _linkRepository.LinkExistsAsync(parentId, childId, ct))
+                throw new UnauthorizedAccessException("You do not have permission to manage this student's subscription.");
+
+            var activeSub = await _subscriptionRepository.GetActiveByUserIdAsync(childId, ct);
+            if (activeSub == null)
+                throw new InvalidOperationException("Student does not have an active subscription to change.");
+
+            if (string.IsNullOrEmpty(activeSub.StripeSubscriptionId))
+                throw new InvalidOperationException("Only subscriptions managed by Stripe can be upgraded or downgraded online.");
+
+            var newPlan = await _planRepository.GetByIdAsync(newPlanId, ct);
+            if (newPlan == null) throw new InvalidOperationException("Selected plan not found.");
+
+            if (activeSub.PlanId == newPlanId)
+                throw new InvalidOperationException("Student is already on this plan.");
+
+            bool isUpgrade = newPlan.PriceMonthly > activeSub.Plan.PriceMonthly;
+
+            var checkoutUrl = await _stripeService.ChangeSubscriptionAsync(
+                activeSub.StripeSubscriptionId, 
+                newPlanId, 
+                newPlan.Name, 
+                newPlan.PriceMonthly, 
+                newPlan.Currency, 
+                isUpgrade,
+                successUrl: "", // Handled by API call directly
+                cancelUrl: "", 
+                ct);
+
+            if (isUpgrade)
+            {
+                // Immediate update in domain for upgrades
+                activeSub.PlanId = newPlanId;
+                await _subscriptionRepository.UpdateAsync(activeSub, ct);
+                await _accessService.InvalidateCacheAsync(childId);
+            }
+            // For downgrades, we do not update local PlanId yet. We wait for customer.subscription.updated webhook
+            // at the end of the billing cycle.
+
+            return checkoutUrl;
         }
 
         public async Task<SubscriptionDto> AdminActivateAsync(int adminId, AdminActivateRequest request, CancellationToken ct = default)
@@ -259,7 +369,8 @@ namespace Masarak.Infrastructure.Services
             s.StartDate,
             s.EndDate,
             s.ActivationMethod,
-            s.AdminNote
+            s.AdminNote,
+            !string.IsNullOrEmpty(s.StripeSubscriptionId)
         );
     }
 }

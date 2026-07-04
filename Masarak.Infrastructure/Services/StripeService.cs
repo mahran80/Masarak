@@ -31,6 +31,7 @@ namespace Masarak.Infrastructure.Services
                         {
                             UnitAmountDecimal = price * 100, // Stripe uses smallest currency unit
                             Currency = currency.ToLowerInvariant(),
+                            Recurring = new SessionLineItemPriceDataRecurringOptions { Interval = "month" },
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
                                 Name = planName,
@@ -39,7 +40,15 @@ namespace Masarak.Infrastructure.Services
                         Quantity = 1,
                     },
                 },
-                Mode = "payment", // Using 'payment' for Phase 1. Subscriptions can use 'subscription' mode later if we use Stripe Billing.
+                Mode = "subscription", // Using subscription mode for automatic billing & prorations
+                SubscriptionData = new SessionSubscriptionDataOptions
+                {
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "UserId", userId.ToString() },
+                        { "PlanId", planId.ToString() }
+                    }
+                },
                 SuccessUrl = successUrl + "?session_id={CHECKOUT_SESSION_ID}",
                 CancelUrl = cancelUrl,
                 ClientReferenceId = $"{userId}_{planId}",
@@ -56,6 +65,38 @@ namespace Masarak.Infrastructure.Services
             return (session.Url, session.Id);
         }
 
+        public async Task<string?> ChangeSubscriptionAsync(
+            string stripeSubscriptionId, int newPlanId, string newPlanName, decimal newPrice, string currency, 
+            bool isUpgrade, string successUrl, string cancelUrl, CancellationToken ct = default)
+        {
+            var service = new Stripe.SubscriptionService();
+            var subscription = await service.GetAsync(stripeSubscriptionId, cancellationToken: ct);
+            
+            var options = new SubscriptionUpdateOptions
+            {
+                ProrationBehavior = isUpgrade ? "create_prorations" : "none",
+                Items = new List<SubscriptionItemOptions>
+                {
+                    new SubscriptionItemOptions
+                    {
+                        Id = subscription.Items.Data[0].Id,
+                        PriceData = new SubscriptionItemPriceDataOptions
+                        {
+                            UnitAmountDecimal = newPrice * 100,
+                            Currency = currency.ToLowerInvariant(),
+                            Recurring = new SubscriptionItemPriceDataRecurringOptions { Interval = "month" },
+                            Product = subscription.Items.Data[0].Price.ProductId
+                        }
+                    }
+                },
+                Metadata = new Dictionary<string, string> { { "PlanId", newPlanId.ToString() } }
+            };
+
+            await service.UpdateAsync(stripeSubscriptionId, options, cancellationToken: ct);
+            
+            return null; // Updated successfully via API, no checkout redirect needed.
+        }
+
         public bool ValidateWebhookSignature(string payload, string signature)
         {
             try
@@ -70,17 +111,9 @@ namespace Masarak.Infrastructure.Services
             }
         }
 
-        public (string EventType, string? SessionId, string? PaymentIntentId) ParseWebhookEvent(string payload, string signature)
+        public Stripe.Event ParseWebhookEvent(string payload, string signature)
         {
-            var stripeEvent = EventUtility.ConstructEvent(payload, signature, _settings.WebhookSecret);
-
-            if (stripeEvent.Type == EventTypes.CheckoutSessionCompleted)
-            {
-                var session = stripeEvent.Data.Object as Stripe.Checkout.Session;
-                return (stripeEvent.Type, session?.Id, session?.PaymentIntentId);
-            }
-
-            return (stripeEvent.Type, null, null);
+            return EventUtility.ConstructEvent(payload, signature, _settings.WebhookSecret);
         }
     }
 }
