@@ -437,3 +437,79 @@ If a student was unenrolled from a class (making their enrollment inactive) and 
 Entity Framework attempted to insert a brand new row into the StudentClasses table. However, the database enforces a strict unique index (UX_student_classes_Student_Year) on [StudentId, AcademicYear] regardless of whether the record is active or inactive. The database rejected the insert, causing a DbUpdateException which the API caught and returned as a 409 Conflict.
 ## 3. What We Made to Solve It
 Instead of trying to insert a new row and crashing, EnrollStudent in AcademicAdminController now intelligently checks if an *inactive* enrollment exists for that year. If it finds one, it simply reactivates the old record (IsActive = true) and updates the ClassId. This cleanly bypasses the database restriction without requiring any database schema migrations!
+
+# Issue 26 Resolution: Assessment Double Submission Bug
+## 1. The Problem
+Students were able to submit assignments multiple times, bypassing existing validation.
+## 2. The Reason
+The database/service lacked an explicit validation check to verify whether a student had already submitted a solution for a specific assignment before attempting to insert a new submission record.
+## 3. What We Made to Solve It
+Updated the `SubmitAssignmentAsync` method in `AssessmentService.cs`. Added an `AnyAsync` verification step to check if a submission already exists for the given student and assignment, throwing a validation exception if true.
+
+# Issue 27 Resolution: Missing Agora NuGet Package
+## 1. The Problem
+The backend required `AgoraIO.Server.Core` to generate RTC tokens, but the package could not be found or installed on NuGet.
+## 2. The Reason
+Agora officially distributes their C# token generators via GitHub rather than an official, modern NuGet package, leaving standard `dotnet add package` commands failing to find it.
+## 3. What We Made to Solve It
+Identified an alternative, well-maintained package called `Agora-Token-Generator`. Installed it in both `Masarak.API` and `Masarak.Infrastructure`. Re-wrote `AgoraTokenService.cs` to leverage `AgoraIO.Rtc.RtcTokenBuilder` to generate real, cryptographically secure access tokens.
+
+# Issue 28 Resolution: Student "Join Session" Router Bug
+## 1. The Problem
+The student's "Join session" button was navigating to an external Zoom link instead of the native Angular Agora component. Additionally, the button was visible for sessions that were merely "Scheduled" but not yet "Live".
+## 2. The Reason
+The HTML template used `<a>` tags with `[href]` properties pointing to the database's `meetingUrl` (which originally held Zoom links). The presence of the `href` attribute caused the browser to open a new tab immediately, overriding our new Angular Router configuration logic (`this.router.navigate`).
+## 3. What We Made to Solve It
+Modified `student-schedule-card.component.html` and `schedule.component.html` (sidebar). Removed the `<a>` tags with `href` attributes. Replaced them with `<button>` elements connected strictly to the Angular Router. Finally, wrapped the buttons in an `@if (session.status === 'Live')` condition so students can only join active sessions.
+
+# Issue 29 Resolution: Teacher "Rejoin Session" Missing Button
+## 1. The Problem
+Once a teacher started a session and its status became "Live", the teacher could not rejoin the video room if they accidentally closed the tab, as there was no "Join" button available for Live sessions in the dashboard.
+## 2. The Reason
+The UI logic in `teacher-sessions.component.html` only rendered a button for sessions that were in the "Scheduled" state (to start them). It had no logic to render an entry button for sessions already marked "Live".
+## 3. What We Made to Solve It
+Added an explicit "الانضمام للغرفة" (Join Room) button via `[routerLink]` in `TeacherSessionsComponent` configured to appear specifically when `session.status === 'Live'` so teachers can click and return to their active sessions.
+
+# Issue 30 Resolution: Centralized Admin Session Scheduling
+## 1. The Problem
+Teachers were originally responsible for scheduling their own sessions. However, business rules dictated that the Admin must have exclusive control over the schedule to manage recurring weekly timelines and prevent overlapping conflicts.
+## 2. The Reason
+The system lacked an Admin-level scheduling module. The `Sessions` table was flat and did not support tracking grouped recurring sessions. Furthermore, the `TeacherSessionsComponent` contained scheduling controls that violated the new role boundaries.
+## 3. What We Made to Solve It
+1. **Database Schema Update:** Introduced `SeriesId` to the `Sessions` table to track recurring session blocks.
+2. **Backend API Overhaul:** Created `AdminSessionsController` and `SessionAdminService`. The service loops through weekly intervals and validates against overlapping conflicts using a newly optimized `HasConflictAsync` repository query.
+3. **Frontend Revamp:** Removed CRUD capabilities from the Teacher dashboard. Created a robust `AdminScheduleComponent` with an intuitive Grade -> Class -> Calendar workflow, giving Admins full authority over creating and cancelling single or grouped recurring sessions.
+
+# Issue 31 Resolution: Angular NG0955 Track Expression & HTTP 400 on Admin Schedule
+## 1. The Problem
+When loading the new Admin Schedule page, the frontend console threw `NG0955: The provided track expression resulted in duplicated keys for a given collection`, and clicking on grades resulted in a `400 Bad Request` hitting `/api/admin/grades/undefined/classes`.
+## 2. The Reason
+The HTML template used `track g.id` and `track c.id` in its `@for` loops, and passed `g.id` into the `onGradeSelect` event handler. However, the backend DTOs map these fields as `gradeId` and `classId`, not `id`. Thus, `id` was `undefined` for every item in the list, causing duplicated track keys in Angular, and producing the literal string `"undefined"` in the HTTP request URL which ASP.NET rightfully rejected with a 400 error.
+## 3. What We Made to Solve It
+Updated `admin-schedule.component.html` to correctly reference `g.gradeId` and `c.classId` in both the `@for` loop track expressions and the click event bindings. This resolved both the Angular key collisions and the HTTP 400 error instantly.
+
+# Issue 32 Resolution: Missing SubjectId in TeachingAssignmentDto causing Form Validation Failure
+## 1. The Problem
+When the Admin tried to create a new session in the Admin Schedule dashboard, they received a frontend alert stating "Please fill all required fields", even though they had visibly filled out every input in the modal.
+## 2. The Reason
+The `<select>` dropdown for choosing the Subject and Teacher was trying to bind to `ta.subjectId` from the `assignments()` array. However, the backend's `TeachingAssignmentDto` did not include a `SubjectId` or `ClassId` property. Since `subjectId` was missing from the API JSON response, the frontend dropdown assigned `undefined` to the form model, constantly triggering the required field validation check.
+## 3. What We Made to Solve It
+Modified `TeachingAssignmentDto` in `Masarak.Application/DTOs/AcademicDTOs.cs` to include `SubjectId` and `ClassId`. Updated `AcademicService.cs` and `SessionService.cs` mapping functions to properly populate these IDs from the database records. Lastly, updated the frontend interface `academic.model.ts` to match. Now the select dropdown successfully binds the required IDs.
+
+# Issue 33 Resolution: Real-time UI Teacher Conflict Detection
+## 1. The Problem
+When scheduling a session, the intelligent time picker dropdown would only gray out times that the *Class* was busy. If the *Teacher* was busy with another class, the UI wouldn't gray it out, causing a `409 Conflict` popup when the Admin tried to save, which caused confusion.
+## 2. The Reason
+The frontend only had access to `sessions()`, which was populated by fetching the schedule for the currently selected Class. It didn't know the Teacher's global schedule.
+## 3. What We Made to Solve It
+1. **Backend:** Added `GetTeacherScheduleAsync` to `ISessionAdminService` and an accompanying `GET /api/admin/sessions/teacher/{teacherId}` endpoint in `AdminSessionsController`.
+2. **Frontend:** Added `teacherSessions` signal in `admin-schedule.component.ts`. Bound the Subject dropdown to `onSubjectChange()` to automatically fetch the Teacher's schedule when a subject is chosen.
+3. Updated the `availableTimeSlots` logic to concatenate `sessions()` and `teacherSessions()` into a single `existingSessions` array, ensuring the dropdown now grays out times if *either* the Class or the Teacher is busy!
+
+# Issue 34 Resolution: Invisible Timezone Shift Causing 409 Conflicts
+## 1. The Problem
+When the Admin selected an "available" time slot in the UI (e.g. 08:00) and clicked save, the server immediately rejected it with a `409 Conflict`, even though the dropdown showed it as free.
+## 2. The Reason
+The frontend was converting the selected date and time into a UTC ISO string (e.g. `2026-07-04T05:00:00.000Z`) before sending it to the API. However, the database saves `datetime2` without a timezone offset, storing it literally as `05:00:00`. When the frontend loaded the sessions back, it read `05:00:00` and parsed it as Local time! This meant a session originally booked for 8:00 AM appeared to the UI as being booked for 5:00 AM. Consequently, 8:00 AM appeared "available", but selecting it submitted another 5:00 AM UTC request, which the database rightfully rejected as a conflict.
+## 3. What We Made to Solve It
+Removed the `.toISOString()` conversion in `admin-schedule.component.ts`. The frontend now constructs and sends strict Local Time strings (e.g. `2026-07-04T08:00:00`), ensuring the backend database stores the exact literal clock time the Admin intended, perfectly synchronizing the dropdown validation with the database validation.

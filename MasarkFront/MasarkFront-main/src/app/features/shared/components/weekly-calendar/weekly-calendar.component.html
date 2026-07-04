@@ -1,0 +1,98 @@
+<div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden" dir="rtl">
+  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 bg-slate-50 border-b border-slate-100">
+    @for (day of days; track day.date) {
+      <div class="px-4 py-4 text-center" [ngClass]="{'bg-sky-50/50': day.isToday}">
+        <p class="text-sm font-bold" [ngClass]="day.isToday ? 'text-sky-700' : 'text-slate-900'">{{ day.dayName }}</p>
+        <p class="text-xs font-semibold mt-1" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMMM d' }}</p>
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 min-h-[500px]">
+    @for (day of days; track day.date) {
+      <div class="p-3 bg-white" [ngClass]="{'bg-sky-50/30': day.isToday}">
+        @if (day.sessions.length > 0) {
+          <div class="flex flex-col gap-3">
+            @for (s of day.sessions; track s.id) {
+              <div class="rounded-xl border border-slate-100 bg-white p-3 shadow-xs hover:border-[#4F8CD4]/30 transition-all group relative overflow-hidden">
+                <!-- Status bar -->
+                <div class="absolute right-0 top-0 bottom-0 w-1"
+                     [ngClass]="{
+                       'bg-sky-400': s.status === 'Scheduled',
+                       'bg-emerald-500 animate-pulse': s.status === 'Live',
+                       'bg-slate-300': s.status === 'Completed',
+                       'bg-rose-400': s.status === 'Cancelled'
+                     }"></div>
+                
+                <div class="pr-2">
+                  <div class="flex justify-between items-start mb-1">
+                    <p class="font-bold text-slate-900 text-sm leading-tight line-clamp-2">{{ s.title }}</p>
+                  </div>
+                  
+                  <div class="text-[10px] font-bold text-slate-500 mt-1">{{ s.subjectName }}</div>
+                  
+                  @if (role === 'admin' || role === 'teacher') {
+                    <div class="text-[10px] font-bold text-sky-600 mt-0.5">{{ s.className }}</div>
+                  }
+                  @if (role === 'admin' || role === 'student') {
+                    <div class="text-[10px] font-bold text-slate-400 mt-0.5">{{ s.teacherName }}</div>
+                  }
+
+                  <div class="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span dir="ltr">{{ s.scheduledAt | date:'h:mm a' }}</span>
+                  </div>
+                  <div class="text-[10px] font-bold text-slate-400 mt-0.5">{{ s.durationMinutes }} دقيقة</div>
+
+                  <!-- Actions -->
+                  <div class="mt-3 pt-2 border-t border-slate-50 flex flex-wrap gap-1.5 justify-end">
+                    
+                    @if (role === 'teacher') {
+                      @if (s.status === 'Scheduled') {
+                        <button (click)="start.emit(s)" [disabled]="!canStartSession(s)" [ngClass]="{'opacity-50 cursor-not-allowed': !canStartSession(s)}" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">بدء الحصة</button>
+                        <div class="flex gap-1.5 w-full">
+                          <button (click)="edit.emit(s)" class="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">تعديل</button>
+                          <button (click)="cancel.emit(s)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إلغاء</button>
+                        </div>
+                      }
+                      @if (s.status === 'Live') {
+                        <button (click)="join.emit(s)" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">انضمام</button>
+                        <button (click)="complete.emit(s)" class="w-full bg-blue-50 hover:bg-blue-100 text-[#4F8CD4] text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إنهاء الحصة</button>
+                      }
+                    }
+
+                    @if (role === 'student') {
+                      @if (s.status === 'Live') {
+                        <button (click)="join.emit(s)" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors shadow-sm">انضمام للجلسة</button>
+                      }
+                    }
+
+                    @if (role === 'admin') {
+                       @if (s.status === 'Scheduled') {
+                          <button (click)="edit.emit(s)" class="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">تعديل</button>
+                          <button (click)="cancel.emit(s)" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إلغاء</button>
+                       }
+                       @if (s.status === 'Cancelled' || s.status === 'Completed') {
+                         <button (click)="edit.emit(s)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إعادة تنشيط</button>
+                       }
+                    }
+
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Empty Holiday state -->
+          <div class="h-full min-h-[200px] flex flex-col items-center justify-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500 p-2 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+            <span class="text-2xl mb-2 block">☕</span>
+            <p class="text-xs font-black text-slate-400">لا توجد حصص</p>
+            <p class="text-[10px] font-bold text-slate-300 mt-1">يوم حر</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

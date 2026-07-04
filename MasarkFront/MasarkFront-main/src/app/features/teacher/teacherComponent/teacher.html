@@ -85,7 +85,7 @@
                   {{ sessionStatusLabel(s.status) }}
                 </span>
                 @if (s.status === 'live') {
-                  <a [routerLink]="['/dashboard/teacher/session/live', s.id]" class="tc-btn-live">ابدأ الجلسة</a>
+                  <button (click)="onSessionClick(s)" class="tc-btn-live">ابدأ الجلسة</button>
                 }
               </div>
             </div>

@@ -5,9 +5,13 @@ import { catchError, forkJoin, of, tap } from 'rxjs';
 
 export interface TeachingAssignment {
   id: number;
+  classId: number;
   className: string;
+  subjectId: number;
   subjectName: string;
   academicYear: number;
+  gradeId: number;
+  gradeName: string;
 }
 
 @Injectable({

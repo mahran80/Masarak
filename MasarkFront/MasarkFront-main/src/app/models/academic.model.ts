@@ -97,7 +97,9 @@ export interface TeachingAssignmentDto {
   id: number;        // backend returns 'Id' not 'assignmentId'
   teacherId: number;
   teacherName: string;
+  classId: number;
   className: string;
+  subjectId: number;
   subjectName: string;
   academicYear: number;
   isActive: boolean;

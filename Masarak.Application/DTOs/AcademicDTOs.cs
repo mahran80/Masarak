@@ -41,7 +41,8 @@ namespace Masarak.Application.DTOs
 
     public record TeachingAssignmentDto(
         int Id, int TeacherId, string TeacherName,
-        string ClassName, string SubjectName, int AcademicYear, bool IsActive);
+        int ClassId, string ClassName, int SubjectId, string SubjectName, int AcademicYear, bool IsActive,
+        int GradeId = 0, string GradeName = "");
 
     public record StudentClassDto(
         int StudentClassId, int StudentId, string StudentName,
@@ -55,7 +56,7 @@ namespace Masarak.Application.DTOs
         int SessionId, string Title, string? Description,
         DateTime ScheduledAt, int DurationMinutes, DateTime EndsAt,
         string? EmbedUrl, SessionStatus Status,
-        string SubjectName, string ClassName, string TeacherName);
+        string SubjectName, int ClassId, string ClassName, string TeacherName);
 
     public record WeeklyScheduleDto(
         DateTime WeekStart, DateTime WeekEnd,
@@ -217,5 +218,29 @@ namespace Masarak.Application.DTOs
 
         [MaxLength(500)]
         public string? EmbedUrl { get; set; }
+    }
+
+    public class AdminScheduleSessionRequest
+    {
+        [Required]
+        public int ClassId { get; set; }
+
+        [Required]
+        public int SubjectId { get; set; }
+
+        [Required, MaxLength(100)]
+        public string Title { get; set; } = null!;
+
+        [MaxLength(500)]
+        public string? Description { get; set; }
+
+        [Required]
+        public DateTime ScheduledAt { get; set; }
+
+        [Required, Range(15, 300)]
+        public int DurationMinutes { get; set; }
+
+        public bool IsRecurring { get; set; }
+        public DateTime? RecurUntil { get; set; }
     }
 }

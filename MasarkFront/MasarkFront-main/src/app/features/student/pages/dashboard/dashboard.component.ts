@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 import { StudentAttendanceSummaryComponent } from '../../components/attendance-summary/attendance-summary.component';
 import { StudentCourseCardComponent } from '../../components/course-card/course-card.component';
@@ -33,6 +33,7 @@ import { StudentService } from '../../services/student.service';
 export class StudentDashboardPageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly data = signal<StudentDashboardData | null>(null);
   readonly isLoading = signal<boolean>(true);
@@ -71,14 +72,6 @@ export class StudentDashboardPageComponent implements OnInit {
     if (session.sessionId === undefined) {
       return;
     }
-
-    this.studentService
-      .joinSession(session.sessionId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.actionMessage.set('Session join recorded.'),
-        error: (error: unknown) =>
-          this.actionMessage.set(this.studentService.resolveErrorMessage(error)),
-      });
+    this.router.navigate(['/dashboard/student/sessions', session.sessionId, 'live']);
   }
 }

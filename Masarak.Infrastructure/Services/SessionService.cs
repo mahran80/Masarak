@@ -51,10 +51,14 @@ namespace Masarak.Infrastructure.Services
                 ta.AssignmentId,
                 ta.TeacherId,
                 ta.Teacher?.User?.FullName ?? "",
+                ta.ClassId,
                 ta.Class?.Name ?? "",
+                ta.SubjectId,
                 ta.Subject?.Name ?? "",
                 ta.AcademicYear,
-                ta.IsActive));
+                ta.IsActive,
+                ta.Class?.GradeId ?? 0,
+                ta.Class?.Grade?.Name ?? ""));
         }
 
         public async Task<SessionDto> ScheduleSessionAsync(
@@ -141,6 +145,13 @@ namespace Masarak.Infrastructure.Services
 
             if (session.TeachingAssignment.Teacher.UserId != userId)
                 throw new UnauthorizedAccessException("You can only start your own sessions.");
+
+            var now = DateTime.UtcNow;
+            if (now < session.ScheduledAt.AddMinutes(-15))
+                throw new InvalidOperationException("You can only start the session up to 15 minutes before its scheduled time.");
+                
+            if (now > session.EndsAt)
+                throw new InvalidOperationException("You cannot start a session after its scheduled end time.");
 
             session.MarkLive();
             await _sessionRepo.UpdateAsync(session, ct);
@@ -232,6 +243,7 @@ namespace Masarak.Infrastructure.Services
                 s.EmbedUrl,
                 s.Status,
                 s.TeachingAssignment?.Subject?.Name ?? "",
+                s.ClassId,
                 s.Class?.Name ?? "",
                 s.TeachingAssignment?.Teacher?.User?.FullName ?? "");
     }

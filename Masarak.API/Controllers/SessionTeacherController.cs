@@ -57,45 +57,7 @@ namespace Masarak.API.Controllers
             catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
         }
 
-        [HttpPost("sessions")]
-        [ProducesResponseType(typeof(SessionDto), 201)]
-        public async Task<IActionResult> ScheduleSession([FromBody] ScheduleSessionRequest request, CancellationToken ct)
-        {
-            try
-            {
-                var session = await _sessionService.ScheduleSessionAsync(GetUserId(), request, ct);
-                return Created("", session);
-            }
-            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
-            catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
-        }
 
-        [HttpPut("sessions/{id}")]
-        [ProducesResponseType(typeof(SessionDto), 200)]
-        public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSessionRequest request, CancellationToken ct)
-        {
-            try
-            {
-                var session = await _sessionService.UpdateSessionAsync(GetUserId(), id, request, ct);
-                return Ok(session);
-            }
-            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
-            catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
-        }
-
-        [HttpDelete("sessions/{id}")]
-        public async Task<IActionResult> CancelSession(int id, CancellationToken ct)
-        {
-            try
-            {
-                await _sessionService.CancelSessionAsync(GetUserId(), id, ct);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
-            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
-        }
 
         [HttpPost("sessions/{id}/start")]
         public async Task<IActionResult> StartSession(int id, CancellationToken ct)

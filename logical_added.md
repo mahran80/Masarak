@@ -67,3 +67,65 @@ The application now supports dropping and dynamically re-adding a student to a c
 ### Implementation Details
 - Bypassed the rigid UX_student_classes_Student_Year database index constraint gracefully.
 - The EnrollStudent API intelligently detects if an inactive record already exists for that user and year. If found, it seamlessly reactivates the record and updates the class assignment rather than attempting a conflicting INSERT. This achieves dynamic re-enrollment without requiring complex database schema migrations.
+
+## 6. Agora vs. Zoom Architecture Pivot
+**Date:** July 2, 2026
+
+### Feature Description
+Conducted a deep analysis of Zoom vs. Agora for Live Sessions. Successfully pivoted the architectural implementation from external Zoom links to a fully native, in-app Agora WebRTC solution to keep users inside the Masarak LMS platform.
+
+## 7. Backend Video Token Infrastructure (Agora)
+**Date:** July 2, 2026
+
+### Feature Description
+Implemented the foundation for securely authenticating users into Agora rooms without exposing the developer keys.
+
+### Implementation Details
+- Created `IAgoraTokenService` and the concrete `AgoraTokenService`.
+- Registered the services in Dependency Injection inside `ServiceCollectionExtensions.cs`.
+- Implemented secure token generation logic ensuring tokens are scoped to the specific channel, assigned proper Publisher/Subscriber roles, and expire after 1 hour.
+
+## 8. Video Room API Endpoints
+**Date:** July 2, 2026
+
+### Feature Description
+Exposed new REST API endpoints that the Angular frontend uses to securely fetch Agora access tokens on demand.
+
+### Implementation Details
+- Created `GET /api/teacher/sessions/{id}/token` in `SessionTeacherController.cs`.
+- Created `GET /api/student/sessions/{id}/token` in `StudentAcademicController.cs`.
+- Integrated `appsettings.json` blocks for `AppId` and `AppCertificate` injection.
+
+## 9. Native Frontend Video UI (`LiveRoomComponent`)
+**Date:** July 2, 2026
+
+### Feature Description
+Built a custom, immersive video conferencing interface directly into the Angular application using the Agora Web SDK, completely replacing external Zoom redirects.
+
+### Implementation Details
+- Installed the `agora-rtc-sdk-ng` package via NPM.
+- Built out the `LiveRoomComponent` inside `src/app/features/shared/components/live-room`. 
+- Implemented logic for connecting to an Agora channel, requesting camera/microphone permissions, and publishing local tracks.
+- Implemented dynamic subscription logic to render multiple remote participants in a CSS Grid layout.
+- Added user control toggles (Mute/Unmute Mic, Turn On/Off Camera) and session abandonment (Leave Room).
+
+## 10. Seamless Live Routing
+**Date:** July 2, 2026
+
+### Feature Description
+Integrated the new video room gracefully into the existing Angular routing architecture and user flows.
+
+### Implementation Details
+- Added the `:id/live` nested routes in both Teacher routing (`app.routes.ts`) and Student routing (`student.routes.ts`) to serve the `LiveRoomComponent`.
+- Passed route `data` identifying the user as either a `role: 'teacher'` or `role: 'student'` for permissions scaling within the component.
+
+## 11. Admin Centralized Session Scheduling
+**Date:** July 4, 2026
+
+### Feature Description
+Moved the responsibility of scheduling live academic sessions from individual Teachers to the Administrator. The Admin now has a dedicated, full-calendar module to generate recurring weekly schedules for any class and subject.
+
+### Implementation Details
+- Added `SeriesId` to the `Session` entity to group recurring blocks.
+- Implemented `AdminScheduleComponent` to browse the hierarchy of Grades -> Classes -> Schedules.
+- The `SessionAdminService` efficiently validates overlapping schedule conflicts via `HasConflictAsync` across all recurring instances before inserting the block into the database.

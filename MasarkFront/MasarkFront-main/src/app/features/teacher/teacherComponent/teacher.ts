@@ -1,6 +1,6 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherAssessmentService } from '../services/teacher-assessment.service';
 import { TeacherSessionService, SessionDto } from '../services/teacher-session.service';
@@ -13,6 +13,9 @@ interface Session {
   grade: string;
   time: string;
   status: 'live' | 'upcoming' | 'done';
+  originalStatus: string;
+  scheduledAt: Date;
+  endsAt: Date;
 }
 
 interface RecentActivity {
@@ -35,6 +38,7 @@ export class TeacherComponent implements OnInit {
   private readonly sessionService = inject(TeacherSessionService);
   private readonly dashboardService = inject(TeacherDashboardService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly today = new Date().toLocaleDateString('ar-EG', {
     weekday: 'long',
@@ -108,7 +112,10 @@ export class TeacherComponent implements OnInit {
               subject: d.subjectName,
               grade: d.className,
               time: `${formatTime(start)} – ${formatTime(end)}`,
-              status
+              status,
+              originalStatus: d.status,
+              scheduledAt: start,
+              endsAt: end
             };
           });
           this.sessions.set(mapped);
@@ -123,5 +130,29 @@ export class TeacherComponent implements OnInit {
 
   sessionStatusLabel(status: Session['status']): string {
     return { live: 'جارية الآن', upcoming: 'قادمة', done: 'منتهية' }[status];
+  }
+
+  canStartSession(s: Session): boolean {
+    const now = new Date();
+    const startWindow = new Date(s.scheduledAt.getTime() - 15 * 60000);
+    return now >= startWindow && now <= s.endsAt;
+  }
+
+  onSessionClick(s: Session): void {
+    if (s.originalStatus === 'Scheduled') {
+      if (!this.canStartSession(s)) {
+        alert('You can only start a session up to 15 minutes before its scheduled time, and you cannot start it after it ends.');
+        return;
+      }
+      if (confirm('Are you sure you want to start this session?')) {
+        this.sessionService.startSession(s.id).subscribe({
+          next: () => this.router.navigate(['/dashboard/teacher/sessions', s.id, 'live']),
+          error: (err) => alert(err.error?.message || err.error?.detail || 'Failed to start session')
+        });
+      }
+    } else {
+      // Already live, just navigate
+      this.router.navigate(['/dashboard/teacher/sessions', s.id, 'live']);
+    }
   }
 }

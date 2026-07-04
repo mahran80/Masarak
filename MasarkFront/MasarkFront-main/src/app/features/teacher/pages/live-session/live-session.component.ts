@@ -34,6 +34,7 @@ export class LiveSessionComponent implements OnInit {
         sessionId: 0,
         title: 'جلسة تجريبية',
         subjectName: '',
+        classId: 0,
         className: '',
         teacherName: '',
         scheduledAt: new Date().toISOString(),

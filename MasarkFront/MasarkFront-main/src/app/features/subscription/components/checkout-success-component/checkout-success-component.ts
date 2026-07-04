@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-checkout-success',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [CommonModule],
   template: `
     <div class="min-h-screen bg-surface-50 flex items-center justify-center px-4">
       <div class="card p-10 max-w-md w-full text-center">

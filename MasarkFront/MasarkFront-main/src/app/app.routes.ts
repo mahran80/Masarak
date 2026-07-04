@@ -115,6 +115,7 @@ export const routes: Routes = [
           { path: 'content-moderation', component: AdminContentComponent },
           { path: 'subscriptions', component: AdminSubscriptionsComponent },
           { path: 'analytics', component: AdminAnalyticsComponent },
+          { path: 'schedule', loadComponent: () => import('./features/admin/components/admin-schedule/admin-schedule.component').then(m => m.AdminScheduleComponent) },
         ],
       }, // محتوى المدير
       {

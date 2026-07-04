@@ -1,89 +1,60 @@
-<section class="space-y-6 text-slate-900" dir="rtl">
-  <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div class="text-right">
-      <p class="text-sm font-semibold text-sky-700">Schedule</p>
-      <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Upcoming Sessions</h1>
+<section class="p-6 bg-slate-50 min-h-screen text-slate-900" dir="rtl">
+  <header class="mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold text-[#4F8CD4]">الجدول الدراسي</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">حصص صفي</h1>
+      </div>
+      
+      <div class="flex items-center gap-4 bg-white rounded-xl shadow-sm border border-slate-100 p-1.5">
+        <select
+          [ngModel]="selectedWeek()"
+          (change)="onWeekChange($event)"
+          class="bg-transparent text-sm font-bold text-slate-700 min-w-[140px] text-center focus:outline-none cursor-pointer px-2 py-1"
+          dir="rtl"
+        >
+          @for (week of academicWeeks(); track week.value) {
+            <option [value]="week.value">{{ week.label }}</option>
+          }
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4F8CD4] px-6 text-sm font-bold text-white transition hover:bg-[#3d6ca3] shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="isLoading()"
+        (click)="loadSchedule()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        تحديث
+      </button>
     </div>
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-      [disabled]="isLoading()"
-      (click)="loadSchedule()"
-    >
-      Refresh
-    </button>
   </header>
 
   @if (isLoading()) {
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
-        <div class="h-64 animate-pulse rounded-lg border border-slate-200 bg-white p-5 shadow-sm"></div>
+    <div class="grid grid-cols-7 gap-4">
+      @for (item of [1, 2, 3, 4, 5, 6, 7]; track item) {
+        <div class="h-[500px] animate-pulse rounded-xl bg-white shadow-sm"></div>
       }
     </div>
   } @else if (errorMessage()) {
-    <article class="rounded-lg border border-rose-200 bg-white p-6 text-right shadow-sm">
-      <p class="text-sm font-semibold text-rose-700">Schedule could not be loaded</p>
-      <p class="mt-2 text-sm text-slate-600">{{ errorMessage() }}</p>
-      <button type="button" class="mt-5 rounded-lg bg-rose-600 px-4 py-3 text-sm font-semibold text-white" (click)="loadSchedule()">
-        Try again
-      </button>
-    </article>
-  } @else if (sessions().length > 0) {
-    @if (actionMessage()) {
-      <p class="rounded-lg bg-white p-4 text-sm font-semibold text-slate-700 shadow-sm">{{ actionMessage() }}</p>
-    }
-
-    <div class="grid gap-6 xl:grid-cols-3">
-      <div class="grid gap-4 md:grid-cols-2 xl:col-span-2">
-        @for (session of sessions(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
-          <app-student-schedule-card
-            [session]="session"
-            (viewDetails)="selectSession($event)"
-            (joinSession)="joinSession($event)"
-          />
-        }
+    <div class="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+      <div class="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
+        <p class="text-sm font-bold text-rose-700">عذرًا، لم نتمكن من تحميل الجدول</p>
+        <p class="mt-2 text-sm text-slate-600">{{ errorMessage() }}</p>
+        <button type="button" class="mt-4 rounded-lg bg-rose-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm" (click)="loadSchedule()">
+          إعادة المحاولة
+        </button>
       </div>
-
-      <aside class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-        <h2 class="text-lg font-bold text-slate-950">Session Details</h2>
-        @if (selectedSession(); as session) {
-          <dl class="mt-5 grid gap-3 text-sm">
-            <div class="rounded-lg bg-slate-50 p-4">
-              <dt class="font-semibold text-slate-500">Title</dt>
-              <dd class="mt-1 font-bold text-slate-950">{{ session.sessionTitle }}</dd>
-            </div>
-            @if (session.subjectName) {
-              <div class="rounded-lg bg-slate-50 p-4">
-                <dt class="font-semibold text-slate-500">Subject</dt>
-                <dd class="mt-1 font-bold text-sky-700">{{ session.subjectName }}</dd>
-              </div>
-            }
-            @if (session.description) {
-              <div class="rounded-lg bg-slate-50 p-4">
-                <dt class="font-semibold text-slate-500">Description</dt>
-                <dd class="mt-1 leading-6 text-slate-700">{{ session.description }}</dd>
-              </div>
-            }
-            @if (session.status === 'Live') {
-              <button
-                type="button"
-                class="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700"
-                (click)="joinSession(session)"
-              >
-                @if (isJoining()) {
-                  Connecting...
-                } @else {
-                  Join Live Session
-                }
-              </button>
-            }
-          </dl>
-        }
-      </aside>
     </div>
   } @else {
-    <article class="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-      No upcoming sessions are scheduled.
-    </article>
+    <app-weekly-calendar 
+      [weekStart]="weekStart()" 
+      [sessions]="calendarSessions()" 
+      role="student"
+      (join)="joinSessionFromCalendar($event)"
+    ></app-weekly-calendar>
   }
 </section>

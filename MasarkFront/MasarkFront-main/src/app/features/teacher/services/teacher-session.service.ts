@@ -13,6 +13,7 @@ export interface SessionDto {
   embedUrl?: string;
   status: 'Scheduled' | 'Live' | 'Completed' | 'Cancelled';
   subjectName: string;
+  classId: number;
   className: string;
   teacherName: string;
 }

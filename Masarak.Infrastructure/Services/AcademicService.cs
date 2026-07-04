@@ -461,10 +461,14 @@ namespace Masarak.Infrastructure.Services
             new(ta.AssignmentId,
                 ta.TeacherId,
                 ta.Teacher?.User?.FullName ?? "",
+                ta.ClassId,
                 ta.Class?.Name ?? "",
+                ta.SubjectId,
                 ta.Subject?.Name ?? "",
                 ta.AcademicYear,
-                ta.IsActive);
+                ta.IsActive,
+                ta.Class?.GradeId ?? 0,
+                ta.Class?.Grade?.Name ?? "");
 
         private async Task InvalidateGradesCacheAsync(CancellationToken ct)
         {

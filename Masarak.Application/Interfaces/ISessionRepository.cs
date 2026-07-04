@@ -11,6 +11,10 @@ namespace Masarak.Application.Interfaces
         Task<IEnumerable<Session>> GetUpcomingByClassIdAsync(int classId, DateTime after, CancellationToken ct = default);
         Task<IEnumerable<Session>> GetByTeacherIdAsync(int teacherId, DateTime from, DateTime to, CancellationToken ct = default);
         Task AddAsync(Session session, CancellationToken ct = default);
+        Task AddRangeAsync(IEnumerable<Session> sessions, CancellationToken ct = default);
         Task UpdateAsync(Session session, CancellationToken ct = default);
+        Task UpdateRangeAsync(IEnumerable<Session> sessions, CancellationToken ct = default);
+        Task<bool> HasConflictAsync(int classId, int teacherId, DateTime start, DateTime end, Guid? excludeSeriesId = null, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetBySeriesIdAsync(Guid seriesId, CancellationToken ct = default);
     }
 }

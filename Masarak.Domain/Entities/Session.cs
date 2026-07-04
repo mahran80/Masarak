@@ -25,6 +25,7 @@ namespace Masarak.Domain.Entities
         public int            DurationMinutes      { get; set; }
         public string?        EmbedUrl             { get; set; }   // Zoom/Teams URL provided by teacher
         public SessionStatus  Status               { get; set; } = SessionStatus.Scheduled;
+        public Guid?          SeriesId             { get; set; }   // Groups recurring sessions
         public DateTime       CreatedAt            { get; set; }
 
         // ── Computed ─────────────────────────────────────────────────────────
@@ -42,7 +43,7 @@ namespace Masarak.Domain.Entities
 
         // ── Factory ─────────────────────────────────────────────────────────
         public static Session Schedule(int assignmentId, int classId, string title,
-            string? description, DateTime scheduledAt, int durationMinutes, string? embedUrl)
+            string? description, DateTime scheduledAt, int durationMinutes, string? embedUrl, Guid? seriesId = null)
         {
             return new Session
             {
@@ -53,6 +54,7 @@ namespace Masarak.Domain.Entities
                 ScheduledAt     = scheduledAt,
                 DurationMinutes = durationMinutes,
                 EmbedUrl        = embedUrl,
+                SeriesId        = seriesId,
                 Status          = SessionStatus.Scheduled,
                 CreatedAt       = DateTime.UtcNow
             };

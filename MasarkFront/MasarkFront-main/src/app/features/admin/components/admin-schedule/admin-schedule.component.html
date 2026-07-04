@@ -1,0 +1,251 @@
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-black text-slate-900">جدول الحصص</h1>
+      <p class="text-xs font-bold text-slate-400">إدارة الجداول الأسبوعية للصفوف الدراسية</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-6">
+    <!-- Left Sidebar: Grade & Class Selection -->
+    <div class="w-full md:w-1/4 bg-white rounded-[24px] p-6 shadow-xs border border-slate-100 flex flex-col gap-4">
+      <h2 class="text-lg font-black text-slate-800">الصفوف الدراسية</h2>
+      <div class="flex flex-col gap-2">
+        @for (g of grades(); track g.gradeId) {
+          <div class="border border-slate-100 rounded-xl overflow-hidden">
+            <button (click)="onGradeSelect(g.gradeId)" 
+                    class="w-full text-right px-4 py-3 font-bold transition-colors flex justify-between items-center"
+                    [ngClass]="selectedGradeId() === g.gradeId ? 'bg-[#4F8CD4] text-white' : 'hover:bg-slate-50 text-slate-700'">
+              <span>{{ g.name }}</span>
+            </button>
+            @if (selectedGradeId() === g.gradeId) {
+              <div class="bg-slate-50 p-2 flex flex-col gap-1">
+                @for (c of classes(); track c.classId) {
+                  <button (click)="onClassSelect(c.classId)"
+                          class="w-full text-right px-3 py-2 text-sm font-bold rounded-lg transition-colors"
+                          [ngClass]="selectedClassId() === c.classId ? 'bg-[#4F8CD4]/10 text-[#4F8CD4]' : 'hover:bg-slate-200 text-slate-600'">
+                    {{ c.name }}
+                  </button>
+                } @empty {
+                  <div class="text-xs text-slate-400 text-center py-2">لا توجد فصول</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Main Content: Schedule View -->
+    <div class="flex-1 space-y-6">
+      @if (selectedClassId()) {
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-white rounded-[24px] p-4 shadow-xs border border-slate-100">
+          
+          <div class="flex items-center gap-4 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+            <button (click)="viewMode.set('week'); loadSessions()"
+                    class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+                    [ngClass]="viewMode() === 'week' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700'">
+              عرض أسبوعي
+            </button>
+            <button (click)="viewMode.set('list'); loadSessions()"
+                    class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+                    [ngClass]="viewMode() === 'list' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700'">
+              عرض القائمة
+            </button>
+          </div>
+
+          @if (viewMode() === 'list') {
+            <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+              <label class="text-xs font-bold text-slate-500">من:</label>
+              <input type="date" class="bg-transparent text-sm font-bold text-slate-700 focus:outline-none" 
+                     [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event); loadSessions()">
+              <label class="text-xs font-bold text-slate-500 mr-2">إلى:</label>
+              <input type="date" class="bg-transparent text-sm font-bold text-slate-700 focus:outline-none" 
+                     [ngModel]="toDate()" (ngModelChange)="toDate.set($event); loadSessions()">
+            </div>
+          } @else {
+            <div class="flex items-center gap-4 bg-slate-50 rounded-xl border border-slate-200 p-1.5">
+              <select
+                [ngModel]="selectedWeek()"
+                (change)="onWeekChange($event)"
+                class="bg-transparent text-sm font-bold text-slate-700 min-w-[140px] text-center focus:outline-none cursor-pointer px-2 py-1"
+                dir="rtl"
+              >
+                @for (week of academicWeeks(); track week.value) {
+                  <option [value]="week.value">{{ week.label }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <button (click)="openModal()" class="flex items-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md active:scale-95">
+            + جدولة حصة جديدة
+          </button>
+        </div>
+
+        <!-- Schedule List -->
+        <div class="bg-white rounded-[24px] p-6 shadow-xs border border-slate-100">
+          @if (errorMessage()) {
+            <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold mb-4">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          @if (viewMode() === 'week') {
+            <app-weekly-calendar 
+              [weekStart]="weekStart()" 
+              [sessions]="calendarSessions()" 
+              role="admin"
+              (cancel)="onCalendarCancel($event)"
+              (edit)="onCalendarEdit($event)"
+            ></app-weekly-calendar>
+          } @else {
+            <div class="overflow-x-auto">
+              <table class="w-full text-right border-collapse text-sm">
+                <thead>
+                  <tr class="text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50">
+                    <th class="py-3 pr-4 font-black">عنوان الحصة</th>
+                    <th class="py-3 font-black">المادة / المعلم</th>
+                    <th class="py-3 font-black">الموعد والمدة</th>
+                    <th class="py-3 font-black">الحالة</th>
+                    <th class="py-3 pl-4 text-center font-black">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                  @for (s of sessions(); track s.sessionId) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="py-4 pr-4 font-bold text-slate-900">{{ s.title }}</td>
+                      <td class="py-4 text-xs font-bold text-slate-600">
+                        <div>{{ s.subjectName }}</div>
+                        <div class="text-slate-400">{{ s.teacherName }}</div>
+                      </td>
+                      <td class="py-4 text-xs font-bold text-slate-600">
+                        <div>{{ s.scheduledAt | date:'MMM d, yyyy h:mm a' }}</div>
+                        <div class="text-slate-400">{{ s.durationMinutes }} دقيقة</div>
+                      </td>
+                      <td class="py-4 text-xs">
+                        <span class="px-2 py-1 rounded-sm text-[10px] font-bold"
+                          [ngClass]="{
+                            'bg-slate-100 text-slate-600': s.status === 'Scheduled',
+                            'bg-emerald-50 text-emerald-600': s.status === 'Live',
+                            'bg-blue-50 text-[#4F8CD4]': s.status === 'Completed',
+                            'bg-rose-50 text-rose-600': s.status === 'Cancelled'
+                          }">
+                          {{ s.status === 'Scheduled' ? 'مجدولة' : s.status === 'Live' ? 'مباشر الآن' : s.status === 'Completed' ? 'مكتملة' : 'ملغاة' }}
+                        </span>
+                      </td>
+                      <td class="py-4 pl-4 text-center">
+                        @if (s.status === 'Scheduled') {
+                          <div class="flex items-center justify-center gap-2">
+                            <button (click)="cancelSession(s, false)" class="text-rose-500 hover:text-rose-700 text-xs font-bold transition-colors">إلغاء حصة</button>
+                            @if (s.seriesId) {
+                              <button (click)="cancelSession(s, true)" class="text-rose-700 hover:text-rose-900 text-xs font-bold transition-colors">إلغاء السلسلة</button>
+                            }
+                          </div>
+                        } @else if (s.status === 'Completed' || s.status === 'Cancelled') {
+                          <button (click)="reactivateSession(s)" class="text-emerald-500 hover:text-emerald-700 text-xs font-bold transition-colors">إعادة تنشيط</button>
+                        }
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="text-center py-12 text-slate-400 font-bold">لا يوجد حصص مجدولة لهذا الفصل</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="bg-white rounded-[24px] p-12 shadow-xs border border-slate-100 flex flex-col items-center justify-center text-slate-400">
+          <span class="text-4xl mb-4">🏫</span>
+          <p class="font-bold text-lg">اختر فصلاً دراسياً لعرض الجدول</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" dir="rtl">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <h2 class="text-xl font-black text-slate-900 mb-4">جدولة حصة جديدة</h2>
+      
+      <div class="space-y-4">
+        <label class="block">
+          <span class="text-xs font-bold text-slate-600 block mb-1">المادة والمعلم <span class="text-rose-500">*</span></span>
+          <select class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                  [ngModel]="formSubjectId()" (ngModelChange)="onSubjectChange($event)">
+            <option [ngValue]="null" disabled>اختر المادة</option>
+            @for (ta of assignments(); track ta.id) {
+              <option [ngValue]="ta.subjectId">{{ ta.subjectName }} (أ. {{ ta.teacherName }})</option>
+            }
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="text-xs font-bold text-slate-600 block mb-1">عنوان الحصة <span class="text-rose-500">*</span></span>
+          <input type="text" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                 [ngModel]="formTitle()" (ngModelChange)="formTitle.set($event)" placeholder="مثال: الحصة الأولى">
+        </label>
+
+        <label class="block">
+          <span class="text-xs font-bold text-slate-600 block mb-1">الوصف (اختياري)</span>
+          <textarea class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                    [ngModel]="formDescription()" (ngModelChange)="formDescription.set($event)" rows="2"></textarea>
+        </label>
+
+        <div class="flex gap-4">
+          <label class="block flex-1">
+            <span class="text-xs font-bold text-slate-600 block mb-1">التاريخ <span class="text-rose-500">*</span></span>
+            <input type="date" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                   [ngModel]="formDate()" (ngModelChange)="formDate.set($event)">
+          </label>
+          <label class="block flex-1">
+            <span class="text-xs font-bold text-slate-600 block mb-1">الوقت <span class="text-rose-500">*</span></span>
+            <select class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                    [ngModel]="formTime()" (ngModelChange)="formTime.set($event)">
+              <option value="" disabled>اختر الوقت</option>
+              @for (slot of availableTimeSlots(); track slot.value) {
+                <option [value]="slot.value" [disabled]="slot.disabled">{{ slot.label }} {{ slot.disabled ? '(محجوز)' : '' }}</option>
+              }
+            </select>
+          </label>
+          <label class="block w-1/4">
+            <span class="text-xs font-bold text-slate-600 block mb-1">المدة (د)</span>
+            <input type="number" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                   [ngModel]="formDuration()" (ngModelChange)="formDuration.set($event)" min="15" step="5">
+          </label>
+        </div>
+
+        <div class="border-t border-slate-100 pt-4 mt-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 text-[#4F8CD4] rounded focus:ring-[#4F8CD4]"
+                   [ngModel]="formIsRecurring()" (ngModelChange)="formIsRecurring.set($event)">
+            <span class="text-sm font-bold text-slate-700">تكرار أسبوعي</span>
+          </label>
+          
+          @if (formIsRecurring()) {
+            <label class="block mt-3">
+              <span class="text-xs font-bold text-slate-600 block mb-1">تكرار حتى تاريخ <span class="text-rose-500">*</span></span>
+              <input type="date" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#4F8CD4]"
+                     [ngModel]="formRecurUntil()" (ngModelChange)="formRecurUntil.set($event)">
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-4">
+        <button (click)="closeModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700">إلغاء</button>
+        <button (click)="saveSession()" [disabled]="isSaving()" class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-md">
+          {{ isSaving() ? 'جاري الحفظ...' : 'حفظ الجدول' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
