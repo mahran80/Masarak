@@ -211,7 +211,15 @@ namespace Masarak.API.Extensions
             services.AddScoped<ISubmissionRepository, Masarak.Infrastructure.Persistence.Repositories.SubmissionRepository>();
             services.AddScoped<IStudentPerformanceRepository, Masarak.Infrastructure.Persistence.Repositories.StudentPerformanceRepository>();
             
-            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            var azureStorageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
+            if (!string.IsNullOrEmpty(azureStorageConnectionString))
+            {
+                services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+            }
+            else
+            {
+                services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            }
             services.AddScoped<IAssessmentService, AssessmentService>();
 
             // ── Phase 4 Attendance, Content & Chat ────────────────────────────

@@ -57,6 +57,7 @@ export interface TeacherQuestion {
   marks: number;
   difficulty: DifficultyLevel;
   order: number;
+  correctAnswer?: string;
   options?: TeacherQuestionOption[];
 }
 
@@ -86,6 +87,10 @@ export interface AddQuestionRequest {
 }
 
 export type UpdateQuestionRequest = AddQuestionRequest;
+
+export interface AddQuestionsFromBankRequest {
+  questionBankIds: number[];
+}
 
 export interface PendingGradingDashboard {
   totalPendingExamAnswers: number;

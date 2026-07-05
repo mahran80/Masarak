@@ -136,23 +136,46 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             await db.SaveChangesAsync();
             Console.WriteLine($"[Seeder] {rooms.Count} chat rooms seeded ({grades.Count} grade rooms + 1 teachers room).");
         }
-public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
+        public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
         {
-            if (await db.Teachers.AnyAsync()) return;
+            if (await db.Teachers.CountAsync() >= 10) return;
 
             var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == AppRoles.Teacher);
             if (role == null) return;
 
-            var user1 = new User { RoleId = role.RoleId, FullName = "Ahmed Teacher", Email = "ahmed.teacher@masarak.com", PasswordHash = pwd.HashPassword("Teacher@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
-            var user2 = new User { RoleId = role.RoleId, FullName = "Mona Teacher", Email = "mona.teacher@masarak.com", PasswordHash = pwd.HashPassword("Teacher@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
-            
-            db.Users.AddRange(user1, user2);
-            await db.SaveChangesAsync();
+            var specializations = new[] { 
+                "Mathematics", "Science", "Arabic", "English", "History", 
+                "Geography", "Physics", "Chemistry", "Biology", "Computer Science" 
+            };
 
-            db.Teachers.Add(new Teacher { UserId = user1.UserId, Specialization = "Mathematics", Bio = "Math teacher", HiringDate = DateTime.UtcNow });
-            db.Teachers.Add(new Teacher { UserId = user2.UserId, Specialization = "Science", Bio = "Science teacher", HiringDate = DateTime.UtcNow });
+            var users = new List<User>();
+            var teachers = new List<Teacher>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                var spec = specializations[i];
+                var name = $"{spec} Teacher";
+                var email = $"{spec.Replace(" ", "").ToLower()}.teacher@masarak.com";
+
+                if (!await db.Users.AnyAsync(u => u.Email == email))
+                {
+                    var user = new User { 
+                        RoleId = role.RoleId, FullName = name, Email = email, 
+                        PasswordHash = pwd.HashPassword("Teacher@123!"), Country = "EG", 
+                        CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 
+                    };
+                    db.Users.Add(user);
+                    await db.SaveChangesAsync(); // Save to get UserId
+
+                    db.Teachers.Add(new Teacher { 
+                        UserId = user.UserId, Specialization = spec, 
+                        Bio = $"Experienced {spec} teacher", HiringDate = DateTime.UtcNow 
+                    });
+                }
+            }
+            
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 2 test teachers seeded.");
+            Console.WriteLine("[Seeder] 10 test teachers seeded with 10 specializations.");
         }
 
         public static async Task SeedTestStudentsAsync(Context db, IPasswordService pwd)
@@ -196,43 +219,54 @@ public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
 
         public static async Task SeedSubjectsAsync(Context db)
         {
-            if (await db.Subjects.AnyAsync()) return;
+            if (await db.Subjects.CountAsync() > 100) return; // If plenty of subjects exist, skip
             var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
             if (!grades.Any()) return;
 
-            // Ensure categories exist
-            if (!await db.SubjectCategories.AnyAsync(c => c.Name == "Mathematics"))
-            {
-                db.SubjectCategories.AddRange(
-                    new SubjectCategory { Name = "Mathematics", NameAr = "رياضيات" },
-                    new SubjectCategory { Name = "Science", NameAr = "علوم" },
-                    new SubjectCategory { Name = "Arabic", NameAr = "عربي" }
-                );
-                await db.SaveChangesAsync();
-            }
+            var specializations = new[] { 
+                ("Mathematics", "رياضيات", "MATH"), ("Science", "علوم", "SCI"), 
+                ("Arabic", "لغة عربية", "ARB"), ("English", "لغة إنجليزية", "ENG"), 
+                ("History", "تاريخ", "HIS"), ("Geography", "جغرافيا", "GEO"), 
+                ("Physics", "فيزياء", "PHY"), ("Chemistry", "كيمياء", "CHE"), 
+                ("Biology", "أحياء", "BIO"), ("Computer Science", "حاسب آلي", "CS") 
+            };
 
-            var mathCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Mathematics");
-            var sciCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Science");
-            var araCat = await db.SubjectCategories.FirstAsync(c => c.Name == "Arabic");
+            // Ensure categories exist
+            foreach (var spec in specializations)
+            {
+                if (!await db.SubjectCategories.AnyAsync(c => c.Name == spec.Item1))
+                {
+                    db.SubjectCategories.Add(new SubjectCategory { Name = spec.Item1, NameAr = spec.Item2 });
+                }
+            }
+            await db.SaveChangesAsync();
+
+            var categories = await db.SubjectCategories.ToListAsync();
 
             // Update existing subjects to their correct categories if they are currently Uncategorized (Id=1)
             var existingSubjects = await db.Subjects.ToListAsync();
             foreach (var subject in existingSubjects)
             {
-                if (subject.Name.StartsWith("Mathematics")) subject.SubjectCategoryId = mathCat.SubjectCategoryId;
-                else if (subject.Name.StartsWith("Science")) subject.SubjectCategoryId = sciCat.SubjectCategoryId;
-                else if (subject.Name.StartsWith("Arabic")) subject.SubjectCategoryId = araCat.SubjectCategoryId;
+                var cat = categories.FirstOrDefault(c => subject.Name.StartsWith(c.Name));
+                if (cat != null) subject.SubjectCategoryId = cat.SubjectCategoryId;
             }
             await db.SaveChangesAsync();
 
             foreach (var grade in grades)
             {
-                db.Subjects.Add(Subject.Create(grade.GradeId, mathCat.SubjectCategoryId, $"Mathematics {grade.Order}", "رياضيات", $"MATH-{grade.Order}"));
-                db.Subjects.Add(Subject.Create(grade.GradeId, sciCat.SubjectCategoryId, $"Science {grade.Order}", "علوم", $"SCI-{grade.Order}"));
-                db.Subjects.Add(Subject.Create(grade.GradeId, araCat.SubjectCategoryId, $"Arabic {grade.Order}", "عربي", $"ARB-{grade.Order}"));
+                foreach (var spec in specializations)
+                {
+                    var catId = categories.First(c => c.Name == spec.Item1).SubjectCategoryId;
+                    var subjName = $"{spec.Item1} {grade.Order}";
+                    
+                    if (!await db.Subjects.AnyAsync(s => s.Name == subjName && s.GradeId == grade.GradeId))
+                    {
+                        db.Subjects.Add(Subject.Create(grade.GradeId, catId, subjName, spec.Item2, $"{spec.Item3}-{grade.Order}"));
+                    }
+                }
             }
             await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] {grades.Count * 3} test subjects seeded.");
+            Console.WriteLine($"[Seeder] Test subjects seeded for 10 categories across {grades.Count} grades.");
         }
 
         public static async Task SeedClassesAsync(Context db)

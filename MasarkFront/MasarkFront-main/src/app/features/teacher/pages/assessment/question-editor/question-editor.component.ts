@@ -12,7 +12,9 @@ import { AddQuestionRequest, QuestionType, TeacherQuestion, TeacherQuestionOptio
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionEditorComponent implements OnInit {
-  @Input({ required: true }) examId!: number;
+  @Input() mode: 'exam' | 'bank' = 'exam';
+  @Input() examId?: number;
+  @Input() subjectId?: number;
   @Input() questionToEdit: TeacherQuestion | null = null;
   
   @Output() saved = new EventEmitter<TeacherQuestion>();
@@ -121,7 +123,11 @@ export class QuestionEditorComponent implements OnInit {
     };
 
     if (this.questionToEdit) {
-      this.assessmentService.updateQuestion(this.examId, this.questionToEdit.questionId, request as UpdateQuestionRequest)
+      const updateObs = this.mode === 'exam' 
+        ? this.assessmentService.updateQuestion(this.examId!, this.questionToEdit.questionId, request as UpdateQuestionRequest)
+        : this.assessmentService.updateBankQuestion(this.subjectId!, this.questionToEdit.questionId, request as UpdateQuestionRequest);
+
+      updateObs
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (q) => {
@@ -134,7 +140,11 @@ export class QuestionEditorComponent implements OnInit {
           }
         });
     } else {
-      this.assessmentService.addQuestion(this.examId, request)
+      const addObs = this.mode === 'exam'
+        ? this.assessmentService.addQuestion(this.examId!, request)
+        : this.assessmentService.addQuestionToBank(this.subjectId!, request);
+
+      addObs
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (q) => {

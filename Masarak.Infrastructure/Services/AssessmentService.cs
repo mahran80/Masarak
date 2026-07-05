@@ -334,6 +334,180 @@ namespace Masarak.Infrastructure.Services
             return exams.Select(MapToExamDto);
         }
 
+        // ── Question Bank ─────────────────────────────────────────────────────
+        
+        public async Task<IEnumerable<QuestionDto>> GetQuestionBankAsync(int teacherUserId, int subjectId, CancellationToken ct = default)
+        {
+            // Verify teacher has at least one active assignment for this subject
+            var isTeachingSubject = await _context.TeachingAssignments
+                .AnyAsync(ta => ta.Teacher.UserId == teacherUserId && ta.SubjectId == subjectId && ta.IsActive, ct);
+            
+            if (!isTeachingSubject)
+                throw new UnauthorizedAccessException("You do not teach this subject.");
+
+            // Ignore query filters to get questions with ExamId == null
+            var bankQuestions = await _context.Questions
+                .IgnoreQueryFilters()
+                .Include(q => q.Options)
+                .Where(q => q.SubjectId == subjectId && q.ExamId == null)
+                .ToListAsync(ct);
+
+            return bankQuestions.Select(q => MapToQuestionDto(q, includeCorrectAnswer: true));
+        }
+
+        public async Task<QuestionDto> AddQuestionToBankAsync(int teacherUserId, int subjectId, AddQuestionRequest request, CancellationToken ct = default)
+        {
+            var isTeachingSubject = await _context.TeachingAssignments
+                .AnyAsync(ta => ta.Teacher.UserId == teacherUserId && ta.SubjectId == subjectId && ta.IsActive, ct);
+            
+            if (!isTeachingSubject)
+                throw new UnauthorizedAccessException("You do not teach this subject.");
+
+            var question = new Question
+            {
+                ExamId = null, // Indicates it's in the bank
+                SubjectId = subjectId,
+                Type = request.Type,
+                QuestionText = request.Text,
+                Marks = request.Marks,
+                Difficulty = request.Difficulty,
+                OrderNum = request.Order,
+                CorrectAns = request.CorrectAnswer,
+                ImageUrl = request.ImageUrl
+            };
+
+            if (request.Options != null)
+            {
+                foreach (var opt in request.Options)
+                {
+                    question.Options.Add(new QuestionOption
+                    {
+                        Label = opt.Label.Length > 0 ? opt.Label[0] : 'A',
+                        Text = opt.Text
+                    });
+                }
+            }
+
+            _context.Questions.Add(question);
+            await _context.SaveChangesAsync(ct);
+            // After saving, QuestionBankId might just be QuestionId itself for root bank questions, or we leave it null.
+            // For now, leaving it null is fine, or setting it: question.QuestionBankId = question.QuestionId. Let's do that.
+            question.QuestionBankId = question.QuestionId;
+            await _context.SaveChangesAsync(ct);
+
+            return MapToQuestionDto(question, includeCorrectAnswer: true);
+        }
+
+        public async Task<QuestionDto> UpdateBankQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default)
+        {
+            var question = await _context.Questions
+                .IgnoreQueryFilters()
+                .Include(q => q.Options)
+                .FirstOrDefaultAsync(q => q.QuestionId == questionId && q.ExamId == null, ct);
+
+            if (question == null) throw new KeyNotFoundException("Question not found in the bank.");
+
+            var isTeachingSubject = await _context.TeachingAssignments
+                .AnyAsync(ta => ta.Teacher.UserId == teacherUserId && ta.SubjectId == question.SubjectId && ta.IsActive, ct);
+            
+            if (!isTeachingSubject)
+                throw new UnauthorizedAccessException("You do not teach this subject.");
+
+            question.Type = request.Type;
+            question.QuestionText = request.Text;
+            question.Marks = request.Marks;
+            question.Difficulty = request.Difficulty;
+            question.OrderNum = request.Order;
+            question.CorrectAns = request.CorrectAnswer;
+            question.ImageUrl = request.ImageUrl;
+
+            question.Options.Clear();
+            if (request.Options != null)
+            {
+                foreach (var opt in request.Options)
+                {
+                    question.Options.Add(new QuestionOption { Label = opt.Label.Length > 0 ? opt.Label[0] : 'A', Text = opt.Text });
+                }
+            }
+
+            await _context.SaveChangesAsync(ct);
+            return MapToQuestionDto(question, includeCorrectAnswer: true);
+        }
+
+        public async Task RemoveBankQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default)
+        {
+            var question = await _context.Questions
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(q => q.QuestionId == questionId && q.ExamId == null, ct);
+
+            if (question == null) throw new KeyNotFoundException("Question not found in the bank.");
+
+            var isTeachingSubject = await _context.TeachingAssignments
+                .AnyAsync(ta => ta.Teacher.UserId == teacherUserId && ta.SubjectId == question.SubjectId && ta.IsActive, ct);
+            
+            if (!isTeachingSubject)
+                throw new UnauthorizedAccessException("You do not teach this subject.");
+
+            // Hard delete the bank question. It won't cascade to exams because cloned questions in exams have ExamId != null and are separate records.
+            // (Cloned questions only keep QuestionBankId as a reference, which will be nullified or left pointing to a deleted ID depending on FK config.
+            // In our config, it's restrict, but QuestionBankId is not currently a strict FK, just a column).
+            _context.Questions.Remove(question);
+            await _context.SaveChangesAsync(ct);
+        }
+
+        public async Task<IEnumerable<QuestionDto>> AddQuestionsFromBankToExamAsync(int teacherUserId, int examId, AddQuestionsFromBankRequest request, CancellationToken ct = default)
+        {
+            await ValidateTeacherOwnsExamAsync(teacherUserId, examId);
+            var exam = await _examRepo.GetByIdWithQuestionsAsync(examId, ct);
+            if (exam == null || exam.Status == ExamStatus.Closed)
+                throw new InvalidOperationException("Cannot add questions to a closed exam.");
+
+            // Fetch the requested questions from the bank
+            var bankQuestions = await _context.Questions
+                .IgnoreQueryFilters()
+                .Include(q => q.Options)
+                .Where(q => request.QuestionBankIds.Contains(q.QuestionId) && q.ExamId == null)
+                .ToListAsync(ct);
+
+            if (!bankQuestions.Any()) return Enumerable.Empty<QuestionDto>();
+
+            var addedQuestions = new List<Question>();
+
+            foreach (var bq in bankQuestions)
+            {
+                var clonedQuestion = new Question
+                {
+                    ExamId = examId,
+                    QuestionBankId = bq.QuestionId, // Reference the original bank question
+                    SubjectId = bq.SubjectId,
+                    Type = bq.Type,
+                    QuestionText = bq.QuestionText,
+                    Marks = bq.Marks,
+                    Difficulty = bq.Difficulty,
+                    OrderNum = bq.OrderNum,
+                    CorrectAns = bq.CorrectAns,
+                    ImageUrl = bq.ImageUrl
+                };
+
+                foreach (var opt in bq.Options)
+                {
+                    clonedQuestion.Options.Add(new QuestionOption
+                    {
+                        Label = opt.Label,
+                        Text = opt.Text
+                    });
+                }
+
+                exam.Questions.Add(clonedQuestion);
+                addedQuestions.Add(clonedQuestion);
+            }
+
+            exam.RecalculateTotalMarks();
+            await _examRepo.UpdateAsync(exam, ct);
+
+            return addedQuestions.Select(q => MapToQuestionDto(q, includeCorrectAnswer: true));
+        }
+
         // ── Teacher: Grading Dashboard ────────────────────────────────────────
 
         public async Task<PendingGradingDashboardDto> GetPendingGradingDashboardAsync(int teacherUserId, CancellationToken ct = default)

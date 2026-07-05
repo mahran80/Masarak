@@ -15,6 +15,7 @@ import {
   TeacherQuestion,
   TeacherSubmissionDetail,
   UpdateQuestionRequest,
+  AddQuestionsFromBankRequest
 } from '../models/teacher-assessment.model';
 
 @Injectable({
@@ -82,6 +83,28 @@ export class TeacherAssessmentService {
 
   deleteQuestion(examId: number, questionId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/exams/${examId}/questions/${questionId}`);
+  }
+
+  // --- Question Bank ---
+
+  getQuestionBank(subjectId: number): Observable<TeacherQuestion[]> {
+    return this.http.get<TeacherQuestion[]>(`${this.baseUrl}/subjects/${subjectId}/question-bank`);
+  }
+
+  addQuestionToBank(subjectId: number, request: AddQuestionRequest): Observable<TeacherQuestion> {
+    return this.http.post<TeacherQuestion>(`${this.baseUrl}/subjects/${subjectId}/question-bank`, request);
+  }
+
+  updateBankQuestion(subjectId: number, questionId: number, request: UpdateQuestionRequest): Observable<TeacherQuestion> {
+    return this.http.put<TeacherQuestion>(`${this.baseUrl}/subjects/${subjectId}/question-bank/${questionId}`, request);
+  }
+
+  deleteBankQuestion(subjectId: number, questionId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/subjects/${subjectId}/question-bank/${questionId}`);
+  }
+
+  addQuestionsFromBank(examId: number, request: AddQuestionsFromBankRequest): Observable<TeacherQuestion[]> {
+    return this.http.post<TeacherQuestion[]>(`${this.baseUrl}/exams/${examId}/questions/from-bank`, request);
   }
 
   // --- Grading Dashboard ---

@@ -23,6 +23,13 @@ namespace Masarak.Application.Interfaces
         Task<QuestionDto> AddQuestionToExamAsync(int teacherUserId, int examId, AddQuestionRequest request, CancellationToken ct = default);
         Task<QuestionDto> UpdateQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default);
         Task RemoveQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default);
+        
+        // Question Bank Support
+        Task<IEnumerable<QuestionDto>> GetQuestionBankAsync(int teacherUserId, int subjectId, CancellationToken ct = default);
+        Task<QuestionDto> AddQuestionToBankAsync(int teacherUserId, int subjectId, AddQuestionRequest request, CancellationToken ct = default);
+        Task<QuestionDto> UpdateBankQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default);
+        Task RemoveBankQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default);
+        Task<IEnumerable<QuestionDto>> AddQuestionsFromBankToExamAsync(int teacherUserId, int examId, AddQuestionsFromBankRequest request, CancellationToken ct = default);
         Task PublishExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
         Task CloseExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
         Task<IEnumerable<ExamDto>> GetTeacherExamsAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);

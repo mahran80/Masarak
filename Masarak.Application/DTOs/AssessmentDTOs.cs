@@ -66,6 +66,12 @@ namespace Masarak.Application.DTOs
 
     public class UpdateQuestionRequest : AddQuestionRequest { }
 
+    public class AddQuestionsFromBankRequest
+    {
+        [Required]
+        public IEnumerable<int> QuestionBankIds { get; set; } = new List<int>();
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // Teacher - Grading Dashboard DTOs
     // ═══════════════════════════════════════════════════════════════════════════

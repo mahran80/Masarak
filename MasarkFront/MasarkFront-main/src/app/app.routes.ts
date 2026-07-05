@@ -95,6 +95,7 @@ export const routes: Routes = [
           { path: 'assessment/assignments/create', loadComponent: () => import('./features/teacher/pages/assessment/assignment-creator/assignment-creator.component').then(m => m.AssignmentCreatorComponent) },
           { path: 'assessment/assignments/:id/submissions', loadComponent: () => import('./features/teacher/pages/assessment/assignment-submissions/assignment-submissions.component').then(m => m.AssignmentSubmissionsComponent) },
           { path: 'assessment/exams/create', loadComponent: () => import('./features/teacher/pages/assessment/exam-creator/exam-creator.component').then(m => m.ExamCreatorComponent) },
+          { path: 'assessment/question-bank', loadComponent: () => import('./features/teacher/pages/assessment/question-bank/question-bank.component').then(m => m.QuestionBankComponent) },
           { path: 'assessment/grading', loadComponent: () => import('./features/teacher/pages/assessment/grading-dashboard/grading-dashboard.component').then(m => m.GradingDashboardComponent) },
           { path: 'assessment/grading/exam/:studentExamId', loadComponent: () => import('./features/teacher/pages/assessment/exam-grader/exam-grader.component').then(m => m.ExamGraderComponent) },
           { path: 'sessions', loadComponent: () => import('./features/teacher/components/teacher-sessions/teacher-sessions.component').then(m => m.TeacherSessionsComponent) },

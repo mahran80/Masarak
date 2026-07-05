@@ -32,6 +32,11 @@ export class ExamCreatorComponent implements OnInit {
   readonly showQuestionEditor = signal(false);
   readonly selectedQuestionForEdit = signal<TeacherQuestion | null>(null);
   
+  readonly showQuestionBank = signal(false);
+  readonly bankQuestions = signal<TeacherQuestion[]>([]);
+  readonly selectedBankQuestionIds = signal<number[]>([]);
+  readonly isFetchingBank = signal(false);
+
   readonly teachingAssignments = signal<any[]>([]);
 
   examForm!: FormGroup;
@@ -151,5 +156,65 @@ export class ExamCreatorComponent implements OnInit {
           this.questions.set(this.questions().filter(q => q.questionId !== qId));
         });
     }
+  }
+
+  openQuestionBank(): void {
+    const exam = this.createdExam();
+    if (!exam) return;
+    
+    const taId = Number(this.examForm.value.teachingAssignmentId);
+    const ta = this.teachingAssignments().find(t => t.id === taId);
+    if (!ta) return;
+    
+    this.isFetchingBank.set(true);
+    this.showQuestionBank.set(true);
+    this.selectedBankQuestionIds.set([]);
+
+    this.assessmentService.getQuestionBank(ta.subjectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (questions) => {
+          this.bankQuestions.set(questions);
+          this.isFetchingBank.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          this.isFetchingBank.set(false);
+        }
+      });
+  }
+
+  closeQuestionBank(): void {
+    this.showQuestionBank.set(false);
+  }
+
+  toggleBankQuestionSelection(qId: number): void {
+    const current = this.selectedBankQuestionIds();
+    if (current.includes(qId)) {
+      this.selectedBankQuestionIds.set(current.filter(id => id !== qId));
+    } else {
+      this.selectedBankQuestionIds.set([...current, qId]);
+    }
+  }
+
+  importSelectedQuestions(): void {
+    const exam = this.createdExam();
+    const ids = this.selectedBankQuestionIds();
+    if (!exam || ids.length === 0) return;
+
+    this.isSubmitting.set(true);
+    this.assessmentService.addQuestionsFromBank(exam.examId, { questionBankIds: ids })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (importedQuestions) => {
+          this.questions.set([...this.questions(), ...importedQuestions]);
+          this.isSubmitting.set(false);
+          this.closeQuestionBank();
+        },
+        error: (err) => {
+          console.error(err);
+          this.isSubmitting.set(false);
+        }
+      });
   }
 }
