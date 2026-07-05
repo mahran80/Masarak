@@ -59,6 +59,9 @@ namespace Masarak.Infrastructure.Persistence
         public DbSet<ChatRoom>    ChatRooms    { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
 
+        // ── Lessons Phase DbSets ← NEW ──────────────────────────────────────────────
+        public DbSet<Lesson> Lessons { get; set; }
+
         // ── Phase 5 DbSets ← NEW ──────────────────────────────────────────────
         public DbSet<PerformanceAlert>           PerformanceAlerts  { get; set; }
         public DbSet<AiPromptTemplate>           AiPromptTemplates  { get; set; }
@@ -409,6 +412,11 @@ namespace Masarak.Infrastructure.Persistence
                  .WithMany(ta => ta.Assignments)
                  .HasForeignKey(x => x.AssignmentRef)
                  .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Lesson)
+                 .WithMany(l => l.Assignments)
+                 .HasForeignKey(x => x.LessonId)
+                 .OnDelete(DeleteBehavior.SetNull);
             });
 
             // ═══════════════════════════════════════════════════════════════════
@@ -465,6 +473,11 @@ namespace Masarak.Infrastructure.Persistence
                  .WithMany(ta => ta.Exams)
                  .HasForeignKey(x => x.AssignmentId)
                  .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Lesson)
+                 .WithMany(l => l.Exams)
+                 .HasForeignKey(x => x.LessonId)
+                 .OnDelete(DeleteBehavior.SetNull);
             });
 
             // ═══════════════════════════════════════════════════════════════════
@@ -876,6 +889,34 @@ namespace Masarak.Infrastructure.Persistence
                 e.HasOne(x => x.Session)
                  .WithMany()
                  .HasForeignKey(x => x.SessionId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.Lesson)
+                 .WithMany(l => l.ContentItems)
+                 .HasForeignKey(x => x.LessonId)
+                 .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // ═══════════════════════════════════════════════════════════════════
+            // 27b. LESSONS  ← NEW
+            // ═══════════════════════════════════════════════════════════════════
+            modelBuilder.Entity<Lesson>(e =>
+            {
+                e.ToTable("lessons");
+                e.HasKey(x => x.LessonId);
+                e.Property(x => x.LessonId).ValueGeneratedOnAdd();
+                e.Property(x => x.Title).HasMaxLength(255).IsRequired();
+                e.Property(x => x.Description).HasColumnType("nvarchar(max)");
+                e.Property(x => x.OrderNum).IsRequired();
+                e.Property(x => x.IsPublished).HasDefaultValue(false);
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+                
+                e.HasIndex(x => new { x.TeachingAssignmentId, x.OrderNum })
+                 .HasDatabaseName("IX_lessons_TA_Order");
+
+                e.HasOne(x => x.TeachingAssignment)
+                 .WithMany(ta => ta.Lessons)
+                 .HasForeignKey(x => x.TeachingAssignmentId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
 

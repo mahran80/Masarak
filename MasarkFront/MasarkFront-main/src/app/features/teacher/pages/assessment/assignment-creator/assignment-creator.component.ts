@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
+import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateAssignmentRequest } from '../../../models/teacher-assessment.model';
 
 @Component({
@@ -21,24 +22,40 @@ export class AssignmentCreatorComponent implements OnInit {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly http = inject(HttpClient); // Added for fetching assignments
+  private readonly http = inject(HttpClient);
+  private readonly lessonsService = inject(TeacherLessonsService);
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   
   // Added to store the teaching assignments
   readonly teachingAssignments = signal<any[]>([]);
+  readonly lessons = signal<any[]>([]);
 
   assignmentForm!: FormGroup;
 
   ngOnInit(): void {
     this.assignmentForm = this.fb.group({
       teachingAssignmentId: ['', [Validators.required]],
+      lessonId: [''],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
       dueDate: ['', [Validators.required]],
       maxScore: [100, [Validators.required, Validators.min(0), Validators.max(1000)]],
     });
+
+    this.assignmentForm.get('teachingAssignmentId')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(taId => {
+        if (taId) {
+          this.lessonsService.getLessons(Number(taId)).subscribe(res => {
+            this.lessons.set(res);
+            this.assignmentForm.patchValue({ lessonId: '' });
+          });
+        } else {
+          this.lessons.set([]);
+        }
+      });
 
     // Fetch active assignments
     this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
@@ -66,6 +83,7 @@ export class AssignmentCreatorComponent implements OnInit {
     const request: CreateAssignmentRequest = {
       ...this.assignmentForm.value,
       teachingAssignmentId: Number(this.assignmentForm.value.teachingAssignmentId),
+      lessonId: this.assignmentForm.value.lessonId ? Number(this.assignmentForm.value.lessonId) : undefined,
       dueDate: new Date(this.assignmentForm.value.dueDate).toISOString(),
     };
 

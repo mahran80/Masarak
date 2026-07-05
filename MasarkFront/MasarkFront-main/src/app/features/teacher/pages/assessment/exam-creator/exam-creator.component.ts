@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
+import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateExamRequest, TeacherExam, TeacherQuestion } from '../../../models/teacher-assessment.model';
 import { QuestionEditorComponent } from '../question-editor/question-editor.component';
 
@@ -21,6 +22,7 @@ export class ExamCreatorComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
+  private readonly lessonsService = inject(TeacherLessonsService);
 
   readonly currentStep = signal<1 | 2>(1);
   readonly createdExam = signal<TeacherExam | null>(null);
@@ -38,18 +40,33 @@ export class ExamCreatorComponent implements OnInit {
   readonly isFetchingBank = signal(false);
 
   readonly teachingAssignments = signal<any[]>([]);
+  readonly lessons = signal<any[]>([]);
 
   examForm!: FormGroup;
 
   ngOnInit(): void {
     this.examForm = this.fb.group({
       teachingAssignmentId: ['', [Validators.required]], 
+      lessonId: [''],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
       durationMinutes: [60, [Validators.required, Validators.min(1), Validators.max(600)]],
     });
+
+    this.examForm.get('teachingAssignmentId')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(taId => {
+        if (taId) {
+          this.lessonsService.getLessons(Number(taId)).subscribe(res => {
+            this.lessons.set(res);
+            this.examForm.patchValue({ lessonId: '' });
+          });
+        } else {
+          this.lessons.set([]);
+        }
+      });
 
     this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -76,6 +93,7 @@ export class ExamCreatorComponent implements OnInit {
     const request: CreateExamRequest = {
       ...this.examForm.value,
       teachingAssignmentId: Number(this.examForm.value.teachingAssignmentId),
+      lessonId: this.examForm.value.lessonId ? Number(this.examForm.value.lessonId) : undefined,
       startTime: new Date(this.examForm.value.startTime).toISOString(),
       endTime: new Date(this.examForm.value.endTime).toISOString(),
     };

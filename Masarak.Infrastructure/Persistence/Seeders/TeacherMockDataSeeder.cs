@@ -32,13 +32,13 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
             var items = new List<ContentItem>
             {
-                ContentItem.CreateUrlBased(teachingAssignmentId, null, ContentType.Video, ContentSourceType.YouTubeUrl, 
+                ContentItem.CreateUrlBased(teachingAssignmentId, null, null, ContentType.Video, ContentSourceType.YouTubeUrl, 
                     "Introduction to the Subject", "First lecture video covering the basics.", "https://youtube.com/watch?v=mock1"),
-                ContentItem.CreateUrlBased(teachingAssignmentId, null, ContentType.Video, ContentSourceType.YouTubeUrl, 
+                ContentItem.CreateUrlBased(teachingAssignmentId, null, null, ContentType.Video, ContentSourceType.YouTubeUrl, 
                     "Advanced Concepts", "Deep dive into advanced topics.", "https://youtube.com/watch?v=mock2"),
-                ContentItem.CreateBlobBased(teachingAssignmentId, null, ContentType.PDF, 
+                ContentItem.CreateBlobBased(teachingAssignmentId, null, null, ContentType.PDF, 
                     "Syllabus and Guidelines", "PDF document for the curriculum", "syllabus.pdf", "https://masarak.blob.core.windows.net/files/syllabus.pdf", 1024 * 500),
-                ContentItem.CreateBlobBased(teachingAssignmentId, null, ContentType.ExerciseSheet, 
+                ContentItem.CreateBlobBased(teachingAssignmentId, null, null, ContentType.ExerciseSheet, 
                     "Worksheet 1", "Practice exercises for chapter 1", "worksheet1.pdf", "https://masarak.blob.core.windows.net/files/worksheet1.pdf", 1024 * 300)
             };
 
@@ -52,8 +52,8 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
             var assignments = new List<Assignment>
             {
-                Assignment.Create(teachingAssignmentId, "Homework 1: Fundamentals", "Complete all questions from page 12.", DateTime.UtcNow.AddDays(-2), 10),
-                Assignment.Create(teachingAssignmentId, "Homework 2: Application", "Write a short essay on the application of the subject.", DateTime.UtcNow.AddDays(5), 20)
+                Assignment.Create(teachingAssignmentId, null, "Homework 1: Fundamentals", "Complete all questions from page 12.", DateTime.UtcNow.AddDays(-2), 10),
+                Assignment.Create(teachingAssignmentId, null, "Homework 2: Application", "Write a short essay on the application of the subject.", DateTime.UtcNow.AddDays(5), 20)
             };
             assignments[0].Publish();
             assignments[1].Publish();
@@ -90,8 +90,8 @@ namespace Masarak.Infrastructure.Persistence.Seeders
         {
             if (await db.Exams.AnyAsync(e => e.AssignmentId == teachingAssignmentId)) return;
 
-            var exam1 = Exam.Create(teachingAssignmentId, "Midterm Quiz 1", "Answer all questions carefully.", DateTime.UtcNow.AddDays(-5), DateTime.UtcNow.AddDays(-4), 30);
-            var exam2 = Exam.Create(teachingAssignmentId, "Final Exam Preparation", "Practice test for the finals.", DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(11), 60);
+            var exam1 = Exam.Create(teachingAssignmentId, null, "Midterm Quiz 1", "Answer all questions carefully.", DateTime.UtcNow.AddDays(-5), DateTime.UtcNow.AddDays(-4), 30);
+            var exam2 = Exam.Create(teachingAssignmentId, null, "Final Exam Preparation", "Practice test for the finals.", DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(11), 60);
 
             await db.Exams.AddRangeAsync(exam1, exam2);
             await db.SaveChangesAsync();

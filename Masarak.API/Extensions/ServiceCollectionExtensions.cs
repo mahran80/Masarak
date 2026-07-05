@@ -234,6 +234,10 @@ namespace Masarak.API.Extensions
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IContentService, ContentService>();
             services.AddScoped<IChatService, ChatService>();
+            
+            // ── Phase 4.5 Lessons ──────────────────────────────────────────────
+            services.AddScoped<ITeacherLessonService, LessonService>();
+            services.AddScoped<IStudentLessonService, LessonService>();
 
             // ── Phase 5 AI Recommendations & Analytics ────────────────────────
             services.AddScoped<IAiRecommendationRepository, Masarak.Infrastructure.Persistence.Repositories.AiRecommendationRepository>();

@@ -102,6 +102,7 @@ namespace Masarak.Infrastructure.Services
 
             var assignment = Assignment.Create(
                 request.TeachingAssignmentId,
+                request.LessonId,
                 request.Title,
                 request.Instructions,
                 request.DueDate,
@@ -208,6 +209,7 @@ namespace Masarak.Infrastructure.Services
 
             var exam = Exam.Create(
                 request.TeachingAssignmentId,
+                request.LessonId,
                 request.Title,
                 request.Instructions,
                 request.StartTime,

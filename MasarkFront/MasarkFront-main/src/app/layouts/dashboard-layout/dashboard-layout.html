@@ -47,6 +47,14 @@
           </a>
 
           <a
+            routerLink="student/lessons"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>📖</span> الدروس والوحدات
+          </a>
+
+          <a
             routerLink="student/library"
             routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
@@ -87,9 +95,18 @@
           </a>
           <a
             routerLink="teacher/courses"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
           >
             <span>👥</span> المقررات الدراسيه
+          </a>
+
+          <a
+            routerLink="teacher/lessons"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>📚</span> الدروس
           </a>
 
           <a
@@ -145,6 +162,13 @@
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
             >
               <span>📝</span> إنشاء اختبار
+            </a>
+            <a
+              routerLink="/dashboard/teacher/assessment/question-bank"
+              routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+            >
+              <span>📚</span> بنك الأسئلة
             </a>
           </div>
         } @else if (userRole() === 'Admin') {

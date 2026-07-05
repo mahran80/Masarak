@@ -53,6 +53,7 @@ namespace Masarak.Application.DTOs
     public record UploadContentUrlRequest(
         int TeachingAssignmentId,
         int? SessionId,
+        int? LessonId,
         ContentType Type,
         ContentSourceType SourceType,
         string Title,

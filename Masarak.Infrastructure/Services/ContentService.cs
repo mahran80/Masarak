@@ -51,6 +51,7 @@ namespace Masarak.Infrastructure.Services
             var item = ContentItem.CreateUrlBased(
                 request.TeachingAssignmentId,
                 request.SessionId,
+                request.LessonId,
                 request.Type,
                 request.SourceType,
                 request.Title,
@@ -62,7 +63,7 @@ namespace Masarak.Infrastructure.Services
         }
 
         public async Task<ContentItemDto> UploadContentFileAsync(
-            int teacherUserId, int teachingAssignmentId, int? sessionId,
+            int teacherUserId, int teachingAssignmentId, int? sessionId, int? lessonId,
             ContentType type, string title, string? description,
             Stream fileStream, string fileName, CancellationToken ct = default)
         {
@@ -79,7 +80,7 @@ namespace Masarak.Infrastructure.Services
             var (blobName, publicUrl) = await _fileStorage.UploadAsync(fileStream, fileName, container, ct);
 
             var item = ContentItem.CreateBlobBased(
-                teachingAssignmentId, sessionId,
+                teachingAssignmentId, sessionId, lessonId,
                 type, title, description,
                 blobName, publicUrl, fileStream.Length);
 

@@ -28,6 +28,7 @@ export interface TeacherSubmissionDetail {
 
 export interface CreateAssignmentRequest {
   teachingAssignmentId: number;
+  lessonId?: number;
   title: string;
   instructions?: string;
   dueDate: string;
@@ -68,6 +69,7 @@ export interface TeacherQuestionOption {
 
 export interface CreateExamRequest {
   teachingAssignmentId: number;
+  lessonId?: number;
   title: string;
   instructions?: string;
   startTime: string;

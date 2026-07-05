@@ -26,6 +26,7 @@ namespace Masarak.Domain.Entities
         public virtual ICollection<Session>    Sessions    { get; set; } = new List<Session>();
         public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
         public virtual ICollection<Exam>       Exams       { get; set; } = new List<Exam>();
+        public virtual ICollection<Lesson>     Lessons     { get; set; } = new List<Lesson>();
 
         // ── Factory ─────────────────────────────────────────────────────────
         public static TeachingAssignment Create(int teacherId, int classId, int subjectId, int academicYear)

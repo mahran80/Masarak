@@ -27,6 +27,11 @@ export const STUDENT_ROUTES: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'lessons',
+    loadComponent: () =>
+      import('../pages/student-lessons/student-lessons.component').then((m) => m.StudentLessonsComponent),
+  },
+  {
     path: 'assignments',
     loadComponent: () =>
       import('../pages/assignments/assignments.component').then(
