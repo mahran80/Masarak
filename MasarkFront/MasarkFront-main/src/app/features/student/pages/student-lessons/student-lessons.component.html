@@ -1,0 +1,122 @@
+<div class="p-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">دروسي</h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">تصفح المحتوى والاختبارات حسب الدروس</p>
+  </div>
+
+  <!-- Select Subject -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-8">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اختر المادة</label>
+    <select class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+            (change)="onSelectSubject($event)">
+      <option value="">-- اختر --</option>
+      <option *ngFor="let subject of subjects" [value]="subject.subjectId">
+        {{ subject.subjectName }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="selectedSubjectId">
+    <!-- Empty State -->
+    <div *ngIf="lessons.length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-book-open text-2xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">لا توجد دروس بعد</h3>
+      <p class="text-gray-500 dark:text-gray-400">لم يقم المعلم بنشر أي دروس لهذه المادة حتى الآن.</p>
+    </div>
+
+    <!-- List -->
+    <div *ngIf="lessons.length > 0" class="space-y-4">
+      <div *ngFor="let lesson of lessons"
+           class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        
+        <!-- Summary -->
+        <div class="p-5 flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" (click)="toggleDetails(lesson.lessonId)">
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ lesson.title }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1 mt-1">{{ lesson.description || 'لا يوجد وصف' }}</p>
+            <div class="flex gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+              <span title="المحتوى"><i class="fas fa-file-alt text-indigo-400 me-1"></i> {{ lesson.contentCount }}</span>
+              <span title="الاختبارات"><i class="fas fa-tasks text-emerald-400 me-1"></i> {{ lesson.examCount }}</span>
+              <span title="الواجبات"><i class="fas fa-edit text-orange-400 me-1"></i> {{ lesson.assignmentCount }}</span>
+            </div>
+          </div>
+          <div class="text-gray-400">
+            <i class="fas" [ngClass]="expandedLessonId === lesson.lessonId ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </div>
+        </div>
+
+        <!-- Expanded Details -->
+        <div *ngIf="expandedLessonId === lesson.lessonId" class="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 p-5">
+          <div *ngIf="!lessonDetails[lesson.lessonId]" class="text-center py-4 text-gray-500">
+            جاري التحميل...
+          </div>
+          <div *ngIf="lessonDetails[lesson.lessonId] as detail">
+            
+            <!-- Content Items -->
+            <div class="mb-5">
+              <h4 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
+                <i class="fas fa-file-alt"></i> المحتوى التعليمي
+              </h4>
+              <div *ngIf="detail.contentItems?.length; else noContent" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div *ngFor="let item of detail.contentItems" 
+                     (click)="openContent(item.resourceUrl)"
+                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-indigo-300 transition-colors flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500">
+                    <i class="fas fa-play" *ngIf="item.type === 'Video'"></i>
+                    <i class="fas fa-file-pdf" *ngIf="item.type === 'PDF'"></i>
+                    <i class="fas fa-link" *ngIf="item.type === 'Link'"></i>
+                    <i class="fas fa-file" *ngIf="!['Video','PDF','Link'].includes(item.type)"></i>
+                  </div>
+                  <div>
+                    <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ item.title }}</h5>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ item.type }}</p>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noContent><p class="text-sm text-gray-500">لا يوجد محتوى</p></ng-template>
+            </div>
+
+            <!-- Exams -->
+            <div class="mb-5">
+              <h4 class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-3 flex items-center gap-2">
+                <i class="fas fa-tasks"></i> الاختبارات
+              </h4>
+              <div *ngIf="detail.exams?.length; else noExams" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div *ngFor="let item of detail.exams" 
+                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
+                  <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-gray-500"><i class="far fa-clock"></i> {{ item.durationMinutes }} دقيقة</span>
+                    <a [href]="'/dashboard/student/exams'" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">الانتقال للاختبارات</a>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noExams><p class="text-sm text-gray-500">لا توجد اختبارات</p></ng-template>
+            </div>
+
+            <!-- Assignments -->
+            <div>
+              <h4 class="text-sm font-bold text-orange-600 dark:text-orange-400 mb-3 flex items-center gap-2">
+                <i class="fas fa-edit"></i> الواجبات
+              </h4>
+              <div *ngIf="detail.assignments?.length; else noAssig" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div *ngFor="let item of detail.assignments" 
+                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
+                  <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-gray-500"><i class="far fa-calendar-alt"></i> {{ item.dueDate | date:'mediumDate' }}</span>
+                    <a [href]="'/dashboard/student/assignments'" class="text-xs font-bold text-orange-600 hover:text-orange-700">الانتقال للواجبات</a>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noAssig><p class="text-sm text-gray-500">لا توجد واجبات</p></ng-template>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

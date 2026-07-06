@@ -56,6 +56,7 @@ namespace Masarak.API.Controllers
             IFormFile file,
             [FromForm] int teachingAssignmentId,
             [FromForm] int? sessionId,
+            [FromForm] int? lessonId,
             [FromForm] ContentType type,
             [FromForm] string title,
             [FromForm] string? description,
@@ -68,7 +69,7 @@ namespace Masarak.API.Controllers
             {
                 using var stream = file.OpenReadStream();
                 var result = await _contentService.UploadContentFileAsync(
-                    GetUserId(), teachingAssignmentId, sessionId,
+                    GetUserId(), teachingAssignmentId, sessionId, lessonId,
                     type, title, description, stream, file.FileName, ct);
                 return Created("", result);
             }

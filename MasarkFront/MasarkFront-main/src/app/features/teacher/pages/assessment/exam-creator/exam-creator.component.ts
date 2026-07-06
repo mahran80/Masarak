@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
+import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateExamRequest, TeacherExam, TeacherQuestion } from '../../../models/teacher-assessment.model';
 import { QuestionEditorComponent } from '../question-editor/question-editor.component';
 
@@ -21,6 +22,7 @@ export class ExamCreatorComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
+  private readonly lessonsService = inject(TeacherLessonsService);
 
   readonly currentStep = signal<1 | 2>(1);
   readonly createdExam = signal<TeacherExam | null>(null);
@@ -32,19 +34,39 @@ export class ExamCreatorComponent implements OnInit {
   readonly showQuestionEditor = signal(false);
   readonly selectedQuestionForEdit = signal<TeacherQuestion | null>(null);
   
+  readonly showQuestionBank = signal(false);
+  readonly bankQuestions = signal<TeacherQuestion[]>([]);
+  readonly selectedBankQuestionIds = signal<number[]>([]);
+  readonly isFetchingBank = signal(false);
+
   readonly teachingAssignments = signal<any[]>([]);
+  readonly lessons = signal<any[]>([]);
 
   examForm!: FormGroup;
 
   ngOnInit(): void {
     this.examForm = this.fb.group({
       teachingAssignmentId: ['', [Validators.required]], 
+      lessonId: [''],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
       startTime: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
       durationMinutes: [60, [Validators.required, Validators.min(1), Validators.max(600)]],
     });
+
+    this.examForm.get('teachingAssignmentId')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(taId => {
+        if (taId) {
+          this.lessonsService.getLessons(Number(taId)).subscribe(res => {
+            this.lessons.set(res);
+            this.examForm.patchValue({ lessonId: '' });
+          });
+        } else {
+          this.lessons.set([]);
+        }
+      });
 
     this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -71,6 +93,7 @@ export class ExamCreatorComponent implements OnInit {
     const request: CreateExamRequest = {
       ...this.examForm.value,
       teachingAssignmentId: Number(this.examForm.value.teachingAssignmentId),
+      lessonId: this.examForm.value.lessonId ? Number(this.examForm.value.lessonId) : undefined,
       startTime: new Date(this.examForm.value.startTime).toISOString(),
       endTime: new Date(this.examForm.value.endTime).toISOString(),
     };
@@ -151,5 +174,65 @@ export class ExamCreatorComponent implements OnInit {
           this.questions.set(this.questions().filter(q => q.questionId !== qId));
         });
     }
+  }
+
+  openQuestionBank(): void {
+    const exam = this.createdExam();
+    if (!exam) return;
+    
+    const taId = Number(this.examForm.value.teachingAssignmentId);
+    const ta = this.teachingAssignments().find(t => t.id === taId);
+    if (!ta) return;
+    
+    this.isFetchingBank.set(true);
+    this.showQuestionBank.set(true);
+    this.selectedBankQuestionIds.set([]);
+
+    this.assessmentService.getQuestionBank(ta.subjectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (questions) => {
+          this.bankQuestions.set(questions);
+          this.isFetchingBank.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          this.isFetchingBank.set(false);
+        }
+      });
+  }
+
+  closeQuestionBank(): void {
+    this.showQuestionBank.set(false);
+  }
+
+  toggleBankQuestionSelection(qId: number): void {
+    const current = this.selectedBankQuestionIds();
+    if (current.includes(qId)) {
+      this.selectedBankQuestionIds.set(current.filter(id => id !== qId));
+    } else {
+      this.selectedBankQuestionIds.set([...current, qId]);
+    }
+  }
+
+  importSelectedQuestions(): void {
+    const exam = this.createdExam();
+    const ids = this.selectedBankQuestionIds();
+    if (!exam || ids.length === 0) return;
+
+    this.isSubmitting.set(true);
+    this.assessmentService.addQuestionsFromBank(exam.examId, { questionBankIds: ids })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (importedQuestions) => {
+          this.questions.set([...this.questions(), ...importedQuestions]);
+          this.isSubmitting.set(false);
+          this.closeQuestionBank();
+        },
+        error: (err) => {
+          console.error(err);
+          this.isSubmitting.set(false);
+        }
+      });
   }
 }

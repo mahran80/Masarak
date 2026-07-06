@@ -17,6 +17,7 @@ namespace Masarak.Domain.Entities
     {
         public int               AssignmentId  { get; set; }
         public int               AssignmentRef { get; set; }   // FK → teaching_assignments.AssignmentId
+        public int?              LessonId      { get; set; }   // FK → lessons.LessonId
         public string            Title         { get; set; } = null!;
         public string?           Description   { get; set; }
         public string?           Instructions  { get; set; }
@@ -27,15 +28,17 @@ namespace Masarak.Domain.Entities
 
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual TeachingAssignment      TeachingAssignment { get; set; } = null!;
+        public virtual Lesson?                 Lesson             { get; set; }
         public virtual ICollection<Submission> Submissions        { get; set; } = new List<Submission>();
 
         // ── Factory ─────────────────────────────────────────────────────────
-        public static Assignment Create(int assignmentRef, string title, string? instructions,
+        public static Assignment Create(int assignmentRef, int? lessonId, string title, string? instructions,
             DateTime dueDate, decimal maxScore)
         {
             return new Assignment
             {
                 AssignmentRef = assignmentRef,
+                LessonId      = lessonId,
                 Title         = title,
                 Instructions  = instructions,
                 DueDate       = dueDate,
@@ -47,5 +50,8 @@ namespace Masarak.Domain.Entities
 
         public void Publish() { Status = AssignmentStatus.Published; }
         public void Close()   { Status = AssignmentStatus.Closed; }
+
+        public void AttachToLesson(int lessonId) => LessonId = lessonId;
+        public void DetachFromLesson() => LessonId = null;
     }
 }

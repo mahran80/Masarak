@@ -138,6 +138,48 @@ namespace Masarak.API.Controllers
             return NoContent();
         }
 
+        // ── Question Bank ──────────────────────────────────────────────────────
+
+        [HttpGet("subjects/{subjectId}/question-bank")]
+        [ProducesResponseType(typeof(IEnumerable<QuestionDto>), 200)]
+        public async Task<IActionResult> GetQuestionBank(int subjectId, CancellationToken ct)
+        {
+            var dtos = await _assessmentService.GetQuestionBankAsync(GetUserId(), subjectId, ct);
+            return Ok(dtos);
+        }
+
+        [HttpPost("subjects/{subjectId}/question-bank")]
+        [ProducesResponseType(typeof(QuestionDto), 201)]
+        public async Task<IActionResult> AddQuestionToBank(int subjectId, [FromBody] AddQuestionRequest request, CancellationToken ct)
+        {
+            var dto = await _assessmentService.AddQuestionToBankAsync(GetUserId(), subjectId, request, ct);
+            return Created("", dto);
+        }
+
+        [HttpPut("subjects/{subjectId}/question-bank/{questionId}")]
+        [ProducesResponseType(typeof(QuestionDto), 200)]
+        public async Task<IActionResult> UpdateBankQuestion(int subjectId, int questionId, [FromBody] UpdateQuestionRequest request, CancellationToken ct)
+        {
+            var dto = await _assessmentService.UpdateBankQuestionAsync(GetUserId(), questionId, request, ct);
+            return Ok(dto);
+        }
+
+        [HttpDelete("subjects/{subjectId}/question-bank/{questionId}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> DeleteBankQuestion(int subjectId, int questionId, CancellationToken ct)
+        {
+            await _assessmentService.RemoveBankQuestionAsync(GetUserId(), questionId, ct);
+            return NoContent();
+        }
+
+        [HttpPost("exams/{examId}/questions/from-bank")]
+        [ProducesResponseType(typeof(IEnumerable<QuestionDto>), 200)]
+        public async Task<IActionResult> AddQuestionsFromBank(int examId, [FromBody] AddQuestionsFromBankRequest request, CancellationToken ct)
+        {
+            var dtos = await _assessmentService.AddQuestionsFromBankToExamAsync(GetUserId(), examId, request, ct);
+            return Ok(dtos);
+        }
+
         // ── Grading Dashboard ──────────────────────────────────────────────────
 
         [HttpGet("grading/pending")]

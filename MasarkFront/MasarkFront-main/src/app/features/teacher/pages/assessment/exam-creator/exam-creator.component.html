@@ -44,6 +44,17 @@
       </div>
 
       <div class="space-y-2">
+        <label class="block text-sm font-bold text-slate-700">الدرس (اختياري)</label>
+        <select formControlName="lessonId"
+          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+          <option value="">-- بدون درس / مادة عامة --</option>
+          @for (lesson of lessons(); track lesson.lessonId) {
+            <option [value]="lesson.lessonId">{{ lesson.title }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="space-y-2">
         <label class="block text-sm font-bold text-slate-700">عنوان الاختبار <span class="text-rose-500">*</span></label>
         <input type="text" formControlName="title" placeholder="مثال: اختبار منتصف الفصل - العلوم"
           class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
@@ -88,10 +99,16 @@
       
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-black text-slate-900">أسئلة الاختبار ({{ questions().length }})</h3>
-        <button type="button" (click)="openAddQuestion()"
-          class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-4 py-2 rounded-xl text-sm transition-all">
-          ➕ إضافة سؤال
-        </button>
+        <div class="flex gap-2">
+          <button type="button" (click)="openQuestionBank()"
+            class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold px-4 py-2 rounded-xl text-sm transition-all border border-indigo-100">
+            📚 استيراد من بنك الأسئلة
+          </button>
+          <button type="button" (click)="openAddQuestion()"
+            class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-4 py-2 rounded-xl text-sm transition-all border border-emerald-100">
+            ➕ إضافة سؤال
+          </button>
+        </div>
       </div>
 
       <div class="space-y-4">
@@ -138,6 +155,66 @@
           (saved)="onQuestionSaved($event)"
           (cancelled)="closeQuestionEditor()">
         </app-question-editor>
+      </div>
+    </div>
+  }
+  @if (showQuestionBank()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-xl font-black text-slate-900">بنك الأسئلة</h2>
+          <button (click)="closeQuestionBank()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1 space-y-4">
+          @if (isFetchingBank()) {
+            <div class="text-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F8CD4] mx-auto"></div>
+              <p class="text-slate-500 font-bold mt-4">جاري تحميل الأسئلة...</p>
+            </div>
+          } @else {
+            @for (q of bankQuestions(); track q.questionId) {
+              <div class="border rounded-xl p-4 flex items-start gap-4 transition-all"
+                   [class.border-blue-500]="selectedBankQuestionIds().includes(q.questionId)"
+                   [class.bg-blue-50]="selectedBankQuestionIds().includes(q.questionId)"
+                   [class.border-slate-200]="!selectedBankQuestionIds().includes(q.questionId)"
+                   (click)="toggleBankQuestionSelection(q.questionId)"
+                   class="cursor-pointer hover:border-blue-300">
+                <div class="mt-1">
+                  <input type="checkbox" 
+                         [checked]="selectedBankQuestionIds().includes(q.questionId)"
+                         (change)="toggleBankQuestionSelection(q.questionId); $event.stopPropagation()"
+                         class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-md">{{ q.type }}</span>
+                    <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-md">{{ q.difficulty }}</span>
+                    <span class="text-slate-500 text-xs font-bold">{{ q.marks }} درجات</span>
+                  </div>
+                  <p class="font-bold text-slate-800 text-sm">{{ q.text }}</p>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl">
+                <p class="text-slate-400 font-bold">لا توجد أسئلة في بنك أسئلة هذا المقرر.</p>
+              </div>
+            }
+          }
+        </div>
+        
+        <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50 rounded-b-3xl">
+          <button (click)="closeQuestionBank()" class="px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition-colors">
+            إلغاء
+          </button>
+          <button (click)="importSelectedQuestions()" 
+                  [disabled]="selectedBankQuestionIds().length === 0 || isSubmitting()"
+                  class="bg-[#4F8CD4] text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-600 disabled:opacity-50 transition-colors shadow-sm">
+            استيراد ({{ selectedBankQuestionIds().length }})
+          </button>
+        </div>
       </div>
     </div>
   }

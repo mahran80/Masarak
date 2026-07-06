@@ -28,6 +28,7 @@ export interface TeacherSubmissionDetail {
 
 export interface CreateAssignmentRequest {
   teachingAssignmentId: number;
+  lessonId?: number;
   title: string;
   instructions?: string;
   dueDate: string;
@@ -57,6 +58,7 @@ export interface TeacherQuestion {
   marks: number;
   difficulty: DifficultyLevel;
   order: number;
+  correctAnswer?: string;
   options?: TeacherQuestionOption[];
 }
 
@@ -67,6 +69,7 @@ export interface TeacherQuestionOption {
 
 export interface CreateExamRequest {
   teachingAssignmentId: number;
+  lessonId?: number;
   title: string;
   instructions?: string;
   startTime: string;
@@ -86,6 +89,10 @@ export interface AddQuestionRequest {
 }
 
 export type UpdateQuestionRequest = AddQuestionRequest;
+
+export interface AddQuestionsFromBankRequest {
+  questionBankIds: number[];
+}
 
 export interface PendingGradingDashboard {
   totalPendingExamAnswers: number;

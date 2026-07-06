@@ -12,7 +12,7 @@ namespace Masarak.Application.Interfaces
         Task<ContentItemDto> UploadContentUrlAsync(int teacherUserId, UploadContentUrlRequest request, CancellationToken ct = default);
 
         /// <summary>Teacher uploads a file-based content item to blob storage.</summary>
-        Task<ContentItemDto> UploadContentFileAsync(int teacherUserId, int teachingAssignmentId, int? sessionId,
+        Task<ContentItemDto> UploadContentFileAsync(int teacherUserId, int teachingAssignmentId, int? sessionId, int? lessonId,
             ContentType type, string title, string? description,
             Stream fileStream, string fileName, CancellationToken ct = default);
 

@@ -17,6 +17,7 @@ namespace Masarak.Application.DTOs
     public class CreateAssignmentRequest
     {
         [Required] public int TeachingAssignmentId { get; set; }
+        public int? LessonId { get; set; }
         [Required, MaxLength(255)] public string Title { get; set; } = null!;
         public string? Instructions { get; set; }
         [Required] public DateTime DueDate { get; set; }
@@ -45,6 +46,7 @@ namespace Masarak.Application.DTOs
     public class CreateExamRequest
     {
         [Required] public int TeachingAssignmentId { get; set; }
+        public int? LessonId { get; set; }
         [Required, MaxLength(255)] public string Title { get; set; } = null!;
         public string? Instructions { get; set; }
         [Required] public DateTime StartTime { get; set; }
@@ -65,6 +67,12 @@ namespace Masarak.Application.DTOs
     }
 
     public class UpdateQuestionRequest : AddQuestionRequest { }
+
+    public class AddQuestionsFromBankRequest
+    {
+        [Required]
+        public IEnumerable<int> QuestionBankIds { get; set; } = new List<int>();
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // Teacher - Grading Dashboard DTOs

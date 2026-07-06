@@ -13,6 +13,7 @@ namespace Masarak.Domain.Entities
         public int               ContentItemId        { get; private set; }
         public int               TeachingAssignmentId { get; private set; }  // FK → teaching_assignments.AssignmentId
         public int?              SessionId            { get; private set; }  // optional link to a specific session
+        public int?              LessonId             { get; private set; }  // optional link to a lesson
         public ContentType       Type                 { get; private set; }  // Video, PDF, Notes, ExerciseSheet
         public ContentSourceType SourceType           { get; private set; }  // YouTubeUrl, VimeoUrl, AzureBlob
         public string            Title                { get; private set; } = null!;
@@ -26,6 +27,7 @@ namespace Masarak.Domain.Entities
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual TeachingAssignment TeachingAssignment { get; private set; } = null!;
         public virtual Session?          Session            { get; private set; }
+        public virtual Lesson?           Lesson             { get; private set; }
 
         // ── Private parameterless constructor (for EF Core) ─────────────────
         private ContentItem() { }
@@ -35,7 +37,7 @@ namespace Masarak.Domain.Entities
         /// Creates a URL-based content item (YouTube or Vimeo).
         /// </summary>
         public static ContentItem CreateUrlBased(
-            int teachingAssignmentId, int? sessionId,
+            int teachingAssignmentId, int? sessionId, int? lessonId,
             ContentType type, ContentSourceType sourceType,
             string title, string? description, string url)
         {
@@ -43,6 +45,7 @@ namespace Masarak.Domain.Entities
             {
                 TeachingAssignmentId = teachingAssignmentId,
                 SessionId            = sessionId,
+                LessonId             = lessonId,
                 Type                 = type,
                 SourceType           = sourceType,
                 Title                = title,
@@ -57,7 +60,7 @@ namespace Masarak.Domain.Entities
         /// Creates a blob-based content item (uploaded file stored in Azure Blob).
         /// </summary>
         public static ContentItem CreateBlobBased(
-            int teachingAssignmentId, int? sessionId,
+            int teachingAssignmentId, int? sessionId, int? lessonId,
             ContentType type, string title, string? description,
             string blobName, string blobUrl, long fileSizeBytes)
         {
@@ -65,6 +68,7 @@ namespace Masarak.Domain.Entities
             {
                 TeachingAssignmentId = teachingAssignmentId,
                 SessionId            = sessionId,
+                LessonId             = lessonId,
                 Type                 = type,
                 SourceType           = ContentSourceType.AzureBlob,
                 Title                = title,
@@ -109,5 +113,8 @@ namespace Masarak.Domain.Entities
             Title       = title;
             Description = description;
         }
+
+        public void AttachToLesson(int lessonId) => LessonId = lessonId;
+        public void DetachFromLesson() => LessonId = null;
     }
 }

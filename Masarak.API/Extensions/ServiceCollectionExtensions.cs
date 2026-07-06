@@ -211,7 +211,15 @@ namespace Masarak.API.Extensions
             services.AddScoped<ISubmissionRepository, Masarak.Infrastructure.Persistence.Repositories.SubmissionRepository>();
             services.AddScoped<IStudentPerformanceRepository, Masarak.Infrastructure.Persistence.Repositories.StudentPerformanceRepository>();
             
-            services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            var azureStorageConnectionString = configuration.GetConnectionString("AzureBlobStorage");
+            if (!string.IsNullOrEmpty(azureStorageConnectionString))
+            {
+                services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+            }
+            else
+            {
+                services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            }
             services.AddScoped<IAssessmentService, AssessmentService>();
 
             // ── Phase 4 Attendance, Content & Chat ────────────────────────────
@@ -226,6 +234,10 @@ namespace Masarak.API.Extensions
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IContentService, ContentService>();
             services.AddScoped<IChatService, ChatService>();
+            
+            // ── Phase 4.5 Lessons ──────────────────────────────────────────────
+            services.AddScoped<ITeacherLessonService, LessonService>();
+            services.AddScoped<IStudentLessonService, LessonService>();
 
             // ── Phase 5 AI Recommendations & Analytics ────────────────────────
             services.AddScoped<IAiRecommendationRepository, Masarak.Infrastructure.Persistence.Repositories.AiRecommendationRepository>();

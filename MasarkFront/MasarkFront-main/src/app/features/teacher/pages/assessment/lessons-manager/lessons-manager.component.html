@@ -1,0 +1,204 @@
+<div class="p-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">إدارة الدروس</h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">قم بتنظيم المحتوى والاختبارات في دروس ووحدات</p>
+  </div>
+
+  <!-- Select Class/Subject -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-8">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اختر الفصل والمادة</label>
+    <select class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+            (change)="onSelectTa($event)">
+      <option value="">-- اختر --</option>
+      <option *ngFor="let ta of teachingAssignments" [value]="ta.id">
+        {{ ta.className }} - {{ ta.subjectName }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="selectedTaId">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">الدروس</h2>
+      <button (click)="openCreateForm()"
+              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        إضافة درس جديد
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="showForm" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-8">
+      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+        {{ isEditMode ? 'تعديل الدرس' : 'درس جديد' }}
+      </h3>
+      <form [formGroup]="lessonForm" (ngSubmit)="submitForm()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عنوان الدرس</label>
+          <input type="text" formControlName="title"
+                 class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">وصف (اختياري)</label>
+          <textarea formControlName="description" rows="3"
+                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" (click)="cancelForm()"
+                  class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            إلغاء
+          </button>
+          <button type="submit" [disabled]="lessonForm.invalid"
+                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50">
+            حفظ
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="lessons.length === 0 && !showForm" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-book-open text-2xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">لا توجد دروس بعد</h3>
+      <p class="text-gray-500 dark:text-gray-400">قم بإنشاء الدرس الأول للبدء في تنظيم المحتوى الخاص بك.</p>
+    </div>
+
+    <!-- List -->
+    <div *ngIf="lessons.length > 0" class="space-y-4">
+      <div *ngFor="let lesson of lessons; let i = index"
+           class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        
+        <!-- Handle & Summary -->
+        <div class="p-5 flex items-center gap-4">
+          <div class="flex flex-col gap-1">
+            <button *ngIf="i > 0" (click)="moveUp(i)" class="text-gray-400 hover:text-indigo-600 transition-colors p-1" title="تحريك لأعلى">
+              <i class="fas fa-chevron-up"></i>
+            </button>
+            <button *ngIf="i < lessons.length - 1" (click)="moveDown(i)" class="text-gray-400 hover:text-indigo-600 transition-colors p-1" title="تحريك لأسفل">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+          
+          <div class="flex-1 cursor-pointer" (click)="toggleDetails(lesson.lessonId)">
+            <div class="flex items-center gap-3 mb-1">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ lesson.title }}</h3>
+              <span *ngIf="lesson.isPublished" class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">منشور</span>
+              <span *ngIf="!lesson.isPublished" class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">مسودة</span>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{{ lesson.description || 'لا يوجد وصف' }}</p>
+            <div class="flex gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+              <span title="المحتوى"><i class="fas fa-file-alt text-indigo-400 me-1"></i> {{ lesson.contentCount }}</span>
+              <span title="الاختبارات"><i class="fas fa-tasks text-emerald-400 me-1"></i> {{ lesson.examCount }}</span>
+              <span title="الواجبات"><i class="fas fa-edit text-orange-400 me-1"></i> {{ lesson.assignmentCount }}</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button *ngIf="!lesson.isPublished" (click)="publishLesson(lesson.lessonId)" title="نشر"
+                    class="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <i class="fas fa-check"></i>
+            </button>
+            <button (click)="openCloneModal(lesson.lessonId)" title="نسخ لفصل آخر"
+                    class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button (click)="openEditForm(lesson)" title="تعديل"
+                    class="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteLesson(lesson.lessonId)" title="حذف"
+                    class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Expanded Details (Children) -->
+        <div *ngIf="expandedLessonId === lesson.lessonId" class="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 p-5">
+          <div *ngIf="!lessonDetails[lesson.lessonId]" class="text-center py-4 text-gray-500">
+            جاري التحميل...
+          </div>
+          <div *ngIf="lessonDetails[lesson.lessonId] as detail">
+            
+            <!-- Content Items -->
+            <div class="mb-4">
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">المحتوى التعليمي</h4>
+              <ul *ngIf="detail.contentItems?.length; else noContent" class="space-y-2">
+                <li *ngFor="let item of detail.contentItems" class="flex justify-between items-center bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                  <button (click)="detachContent(lesson.lessonId, item.contentItemId)" class="text-xs text-red-500 hover:text-red-700">إزالة من الدرس</button>
+                </li>
+              </ul>
+              <ng-template #noContent><p class="text-xs text-gray-500">لا يوجد محتوى</p></ng-template>
+            </div>
+
+            <!-- Exams -->
+            <div class="mb-4">
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">الاختبارات</h4>
+              <ul *ngIf="detail.exams?.length; else noExams" class="space-y-2">
+                <li *ngFor="let item of detail.exams" class="flex justify-between items-center bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                  <button (click)="detachExam(lesson.lessonId, item.examId)" class="text-xs text-red-500 hover:text-red-700">إزالة من الدرس</button>
+                </li>
+              </ul>
+              <ng-template #noExams><p class="text-xs text-gray-500">لا توجد اختبارات</p></ng-template>
+            </div>
+
+            <!-- Assignments -->
+            <div>
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b border-gray-200 dark:border-gray-700 pb-1">الواجبات</h4>
+              <ul *ngIf="detail.assignments?.length; else noAssig" class="space-y-2">
+                <li *ngFor="let item of detail.assignments" class="flex justify-between items-center bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                  <span class="text-sm text-gray-800 dark:text-gray-200">{{ item.title }}</span>
+                  <button (click)="detachAssignment(lesson.lessonId, item.assignmentId)" class="text-xs text-red-500 hover:text-red-700">إزالة من الدرس</button>
+                </li>
+              </ul>
+              <ng-template #noAssig><p class="text-xs text-gray-500">لا توجد واجبات</p></ng-template>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500">
+              لإضافة عناصر جديدة، قم بإنشائها من الشاشات الخاصة بها واختر هذا الدرس.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Clone Modal -->
+<div *ngIf="showCloneModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6">
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">نسخ الدرس لفصول أخرى</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      اختر الفصول التي تريد نسخ هيكل هذا الدرس إليها. (يتم نسخ هيكل الدرس فقط بدون المحتويات والاختبارات لتجنب التكرار الخاطئ).
+    </p>
+    
+    <form [formGroup]="cloneForm" (ngSubmit)="submitClone()" class="space-y-4">
+      <div class="space-y-2 max-h-48 overflow-y-auto pr-2">
+        <label *ngFor="let ta of teachingAssignments" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">
+          <input type="checkbox" [disabled]="ta.id === selectedTaId" 
+                 [checked]="ta.id === selectedTaId"
+                 (change)="toggleCloneTa(ta.id, $event)"
+                 class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+          <span class="text-sm text-gray-700 dark:text-gray-300">
+            {{ ta.className }} - {{ ta.subjectName }}
+            <span *ngIf="ta.id === selectedTaId" class="text-xs text-indigo-500 ml-1">(الفصل الحالي)</span>
+          </span>
+        </label>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <button type="button" (click)="closeCloneModal()"
+                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+          إلغاء
+        </button>
+        <button type="submit" [disabled]="cloneForm.invalid || !cloneForm.value.targetTaIds?.length"
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg disabled:opacity-50">
+          نسخ
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
