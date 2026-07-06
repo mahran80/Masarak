@@ -15,6 +15,8 @@ import { of, catchError, forkJoin } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { TeacherContextService } from '../../services/teacher-context.service';
+import { TeacherLessonsService } from '../../services/teacher-lessons.service';
+import { Lesson } from '../../models/teacher-lessons.model';
 
 export type ContentType = 'Video' | 'PDF' | 'Notes' | 'ExerciseSheet';
 export type InnerTab = 'files' | 'upload';
@@ -36,6 +38,8 @@ interface ContentItem {
   fileSizeBytes?: number;
   createdAt: string;
   isActive: boolean;
+  lessonId?: number;
+  lessonTitle?: string;
 }
 
 @Component({
@@ -50,6 +54,7 @@ export class TeacherCourses implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly contextService = inject(TeacherContextService);
+  private readonly lessonsService = inject(TeacherLessonsService);
   private readonly teacherBaseUrl = `${environment.apiUrl}/teacher`;
 
   // ─── State ─────────────────────────────────────────────────────────────────
@@ -59,6 +64,8 @@ export class TeacherCourses implements OnInit {
 
   readonly isLoadingContent = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  
+  readonly lessons = signal<Lesson[]>([]);
 
   // ─── Inner Tabs ────────────────────────────────────────────────────────────
   readonly activeTab = signal<InnerTab>('files');
@@ -74,6 +81,7 @@ export class TeacherCourses implements OnInit {
   uploadContentType: ContentType = 'PDF';
   uploadFile: File | null = null;
   uploadUrl = '';
+  uploadLessonId: number | null = null;
 
   readonly contentTypes: ContentType[] = ['Video', 'PDF', 'Notes', 'ExerciseSheet'];
   readonly filterOptions = ['الكل', 'Video', 'PDF', 'Notes', 'ExerciseSheet'];
@@ -95,8 +103,10 @@ export class TeacherCourses implements OnInit {
       const taId = this.selectedTaId();
       if (taId !== null) {
         this.loadContent(taId);
+        this.loadLessons(taId);
       } else {
         this.contentItems.set([]);
+        this.lessons.set([]);
       }
     }, { allowSignalWrites: true });
   }
@@ -137,6 +147,17 @@ export class TeacherCourses implements OnInit {
       });
   }
 
+  loadLessons(taId: number): void {
+    this.lessonsService.getLessons(taId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lessonsData) => {
+          this.lessons.set(lessonsData.sort((a, b) => a.orderNum - b.orderNum));
+        },
+        error: (err) => console.error('Failed to load lessons', err)
+      });
+  }
+
   openFile(url: string): void {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
@@ -167,6 +188,7 @@ export class TeacherCourses implements OnInit {
     formData.append('type', this.uploadContentType);
     formData.append('title', this.uploadTitle.trim());
     if (this.uploadDescription.trim()) formData.append('description', this.uploadDescription.trim());
+    if (this.uploadLessonId) formData.append('lessonId', String(this.uploadLessonId));
 
     this.isUploading.set(true);
     this.uploadError.set(null);
@@ -199,6 +221,7 @@ export class TeacherCourses implements OnInit {
       title: this.uploadTitle.trim(),
       description: this.uploadDescription.trim() || null,
       url: this.uploadUrl.trim(),
+      lessonId: this.uploadLessonId || null,
     };
 
     this.isUploading.set(true);
@@ -228,6 +251,7 @@ export class TeacherCourses implements OnInit {
     this.uploadContentType = 'PDF';
     this.uploadFile = null;
     this.uploadUrl = '';
+    this.uploadLessonId = null;
     this.uploadError.set(null);
   }
 

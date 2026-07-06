@@ -10,7 +10,7 @@
     <select class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
             (change)="onSelectTa($event)">
       <option value="">-- اختر --</option>
-      <option *ngFor="let ta of teachingAssignments" [value]="ta.assignmentId">
+      <option *ngFor="let ta of teachingAssignments" [value]="ta.id">
         {{ ta.className }} - {{ ta.subjectName }}
       </option>
     </select>
@@ -178,13 +178,13 @@
     <form [formGroup]="cloneForm" (ngSubmit)="submitClone()" class="space-y-4">
       <div class="space-y-2 max-h-48 overflow-y-auto pr-2">
         <label *ngFor="let ta of teachingAssignments" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">
-          <input type="checkbox" [disabled]="ta.assignmentId === selectedTaId" 
-                 [checked]="ta.assignmentId === selectedTaId"
-                 (change)="toggleCloneTa(ta.assignmentId, $event)"
+          <input type="checkbox" [disabled]="ta.id === selectedTaId" 
+                 [checked]="ta.id === selectedTaId"
+                 (change)="toggleCloneTa(ta.id, $event)"
                  class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
           <span class="text-sm text-gray-700 dark:text-gray-300">
             {{ ta.className }} - {{ ta.subjectName }}
-            <span *ngIf="ta.assignmentId === selectedTaId" class="text-xs text-indigo-500 ml-1">(الفصل الحالي)</span>
+            <span *ngIf="ta.id === selectedTaId" class="text-xs text-indigo-500 ml-1">(الفصل الحالي)</span>
           </span>
         </label>
       </div>

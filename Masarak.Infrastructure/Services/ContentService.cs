@@ -187,6 +187,8 @@ namespace Masarak.Infrastructure.Services
                 ResourceUrl:   item.ResourceUrl,
                 FileSizeBytes: item.FileSizeBytes,
                 CreatedAt:     item.CreatedAt,
-                IsActive:      item.IsActive);
+                IsActive:      item.IsActive,
+                LessonId:      item.LessonId,
+                LessonTitle:   item.Lesson?.Title);
     }
 }

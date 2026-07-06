@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +17,7 @@ export class LessonsManagerComponent implements OnInit {
   private lessonsService = inject(TeacherLessonsService);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   teachingAssignments: any[] = [];
   selectedTaId: number | null = null;
@@ -52,7 +53,10 @@ export class LessonsManagerComponent implements OnInit {
   loadTeachingAssignments() {
     this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`).subscribe({
       next: (data) => {
-        this.teachingAssignments = data;
+        setTimeout(() => {
+          this.teachingAssignments = data;
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -70,7 +74,10 @@ export class LessonsManagerComponent implements OnInit {
     if (!this.selectedTaId) return;
     this.lessonsService.getLessons(this.selectedTaId).subscribe({
       next: (data) => {
-        this.lessons = data.sort((a, b) => a.orderNum - b.orderNum);
+        setTimeout(() => {
+          this.lessons = data.sort((a, b) => a.orderNum - b.orderNum);
+          this.cdr.detectChanges();
+        });
       },
     });
   }

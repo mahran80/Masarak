@@ -21,12 +21,14 @@ namespace Masarak.Infrastructure.Persistence.Repositories
             return await _context.ContentItems
                 .Include(c => c.TeachingAssignment)
                     .ThenInclude(ta => ta.Teacher)
+                .Include(c => c.Lesson)
                 .FirstOrDefaultAsync(c => c.ContentItemId == id, ct);
         }
 
         public async Task<IEnumerable<ContentItem>> GetByTeachingAssignmentIdAsync(int taId, CancellationToken ct = default)
         {
             return await _context.ContentItems
+                .Include(c => c.Lesson)
                 .Where(c => c.TeachingAssignmentId == taId && c.IsActive)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync(ct);
@@ -36,6 +38,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
         {
             return await _context.ContentItems
                 .Include(c => c.TeachingAssignment)
+                .Include(c => c.Lesson)
                 .Where(c => c.TeachingAssignment.SubjectId == subjectId
                     && c.TeachingAssignment.ClassId == classId
                     && c.IsActive)

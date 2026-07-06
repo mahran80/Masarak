@@ -48,7 +48,9 @@ namespace Masarak.Application.DTOs
         string ResourceUrl,
         long? FileSizeBytes,
         DateTime CreatedAt,
-        bool IsActive);
+        bool IsActive,
+        int? LessonId = null,
+        string? LessonTitle = null);
 
     public record UploadContentUrlRequest(
         int TeachingAssignmentId,

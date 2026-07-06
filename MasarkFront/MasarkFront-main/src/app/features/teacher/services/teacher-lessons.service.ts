@@ -16,7 +16,7 @@ import {
 })
 export class TeacherLessonsService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/teacher/lessons`;
+  private apiUrl = `${environment.apiUrl}/teacher/lessons`;
 
   getLessons(taId: number): Observable<Lesson[]> {
     return this.http.get<Lesson[]>(`${this.apiUrl}/teaching-assignments/${taId}`);
