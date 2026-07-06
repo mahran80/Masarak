@@ -17,6 +17,7 @@ import { environment } from '../../../../../environments/environment';
 import { TeacherContextService } from '../../services/teacher-context.service';
 import { TeacherLessonsService } from '../../services/teacher-lessons.service';
 import { Lesson } from '../../models/teacher-lessons.model';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 export type ContentType = 'Video' | 'PDF' | 'Notes' | 'ExerciseSheet';
 export type InnerTab = 'files' | 'upload';
@@ -45,7 +46,7 @@ interface ContentItem {
 @Component({
   selector: 'app-teacher-courses',
   standalone: true,
-  imports: [NgClass, DatePipe, FormsModule],
+  imports: [NgClass, DatePipe, FormsModule, IconComponent],
   templateUrl: './teacher-courses.html',
   styleUrl: './teacher-courses.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -200,7 +201,7 @@ export class TeacherCourses implements OnInit {
         next: (item) => {
           this.contentItems.update((items) => [item, ...items]);
           this.isUploading.set(false);
-          this.uploadSuccess.set(`✅ تم رفع "${item.title}" بنجاح!`);
+          this.uploadSuccess.set(`تم رفع "${item.title}" بنجاح!`);
           this.resetUploadForm();
           setTimeout(() => { this.activeTab.set('files'); this.uploadSuccess.set(null); }, 1800);
         },
@@ -234,7 +235,7 @@ export class TeacherCourses implements OnInit {
         next: (item) => {
           this.contentItems.update((items) => [item, ...items]);
           this.isUploading.set(false);
-          this.uploadSuccess.set(`✅ تمت إضافة "${item.title}" بنجاح!`);
+          this.uploadSuccess.set(`تمت إضافة "${item.title}" بنجاح!`);
           this.resetUploadForm();
           setTimeout(() => { this.activeTab.set('files'); this.uploadSuccess.set(null); }, 1800);
         },
@@ -266,7 +267,7 @@ export class TeacherCourses implements OnInit {
   }
 
   typeIcon(type: ContentType): string {
-    return ({ Video: '▶️', PDF: '📄', Notes: '📝', ExerciseSheet: '📋' } as Record<ContentType, string>)[type] ?? '📁';
+    return ({ Video: 'play-circle', PDF: 'pdf', Notes: 'pencil-square', ExerciseSheet: 'clipboard-document-list' } as Record<ContentType, string>)[type] ?? 'doc';
   }
 
   typeLabel(type: ContentType): string {

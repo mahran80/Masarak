@@ -1,14 +1,15 @@
-<div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden" dir="rtl">
-  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 bg-slate-50 border-b border-slate-100">
-    @for (day of days; track day.date) {
-      <div class="px-4 py-4 text-center" [ngClass]="{'bg-sky-50/50': day.isToday}">
-        <p class="text-sm font-bold" [ngClass]="day.isToday ? 'text-sky-700' : 'text-slate-900'">{{ day.dayName }}</p>
-        <p class="text-xs font-semibold mt-1" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMMM d' }}</p>
-      </div>
-    }
-  </div>
+<div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-x-auto" dir="rtl">
+  <div class="min-w-[900px]">
+    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 bg-slate-50 border-b border-slate-100">
+      @for (day of days; track day.date) {
+        <div class="px-4 py-4 text-center" [ngClass]="{'bg-sky-50/50': day.isToday}">
+          <p class="text-sm font-bold" [ngClass]="day.isToday ? 'text-sky-700' : 'text-slate-900'">{{ day.dayName }}</p>
+          <p class="text-xs font-semibold mt-1" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMMM d' }}</p>
+        </div>
+      }
+    </div>
 
-  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 min-h-[500px]">
+    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 min-h-[500px]">
     @for (day of days; track day.date) {
       <div class="p-3 bg-white" [ngClass]="{'bg-sky-50/30': day.isToday}">
         @if (day.sessions.length > 0) {
@@ -87,12 +88,13 @@
         } @else {
           <!-- Empty Holiday state -->
           <div class="h-full min-h-[200px] flex flex-col items-center justify-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500 p-2 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
-            <span class="text-2xl mb-2 block">☕</span>
+            <app-icon name="sparkles" [size]="28" class="mx-auto mb-2 text-slate-300"></app-icon>
             <p class="text-xs font-black text-slate-400">لا توجد حصص</p>
             <p class="text-[10px] font-bold text-slate-300 mt-1">يوم حر</p>
           </div>
         }
       </div>
     }
+  </div>
   </div>
 </div>

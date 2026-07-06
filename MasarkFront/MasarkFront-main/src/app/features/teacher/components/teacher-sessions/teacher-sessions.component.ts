@@ -7,11 +7,12 @@ import { TeacherSessionService, SessionDto } from '../../services/teacher-sessio
 import { TeacherContextService } from '../../services/teacher-context.service';
 import { Router, RouterModule } from '@angular/router';
 import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/components/weekly-calendar/weekly-calendar.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-teacher-sessions',
   standalone: true,
-  imports: [NgClass, FormsModule, RouterModule, WeeklyCalendarComponent],
+  imports: [NgClass, FormsModule, RouterModule, WeeklyCalendarComponent, IconComponent],
   templateUrl: './teacher-sessions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
