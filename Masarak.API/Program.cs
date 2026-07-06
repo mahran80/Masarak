@@ -112,23 +112,16 @@ using (var scope = app.Services.CreateScope())
     var db  = scope.ServiceProvider.GetRequiredService<Context>();
     var pwd = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     await db.Database.MigrateAsync();          // apply pending migrations
+    
+    // Core Seeders
     await DatabaseSeeder.SeedRolesAsync(db);
-    await DatabaseSeeder.SeedGradesAsync(db);  // needed for student self-registration
     await DatabaseSeeder.SeedAdminUserAsync(db, pwd);
-    await DatabaseSeeder.SeedPlansAsync(db);   // Phase 1 plans
-    await DatabaseSeeder.SeedChatRoomsAsync(db); // Phase 4 chat rooms
-    await DatabaseSeeder.SeedAiPromptTemplatesAsync(db); // Phase 5 AI prompt templates
-    if (app.Environment.IsDevelopment())
-    {
-        await DatabaseSeeder.SeedTestTeachersAsync(db, pwd);
-        await DatabaseSeeder.SeedTestStudentsAsync(db, pwd);
-        await DatabaseSeeder.SeedSubjectsAsync(db);
-        await DatabaseSeeder.SeedClassesAsync(db);
-        await DatabaseSeeder.SeedTeachingAssignmentsAsync(db);
-        await DatabaseSeeder.SeedSubscriptionsAsync(db);
-        await DatabaseSeeder.SeedStudentEnrollmentsAsync(db);
-        await TeacherMockDataSeeder.SeedExtensiveTeacherDataAsync(db);
-    }
+    await DatabaseSeeder.SeedPlansAsync(db);
+    await DatabaseSeeder.SeedChatRoomsAsync(db);
+    await DatabaseSeeder.SeedAiPromptTemplatesAsync(db);
+    
+    // Enterprise Seeder (will skip automatically if already seeded)
+    // await Masarak.Infrastructure.Persistence.Seeders.EnterpriseSeeder.SeedAllAsync(db, pwd);
 }
     
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
@@ -153,6 +146,7 @@ app.UseMiddleware<Masarak.API.Extensions.SubscriptionAccessMiddleware>();
 app.MapControllers();
 app.MapHub<Masarak.API.Hubs.ChatHub>("/hubs/chat"); // Phase 4: SignalR ChatHub
 app.MapHub<Masarak.API.Hubs.NotificationHub>("/hubs/notifications"); // Phase 6: SignalR NotificationHub
+app.MapHub<Masarak.API.Hubs.LiveSessionHub>("/hubs/live-session"); // Phase 2: SignalR LiveSessionHub
 app.Run();
 
 public partial class Program { }

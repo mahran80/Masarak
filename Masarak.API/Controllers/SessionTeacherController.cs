@@ -96,6 +96,43 @@ namespace Masarak.API.Controllers
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
         }
 
+        [HttpGet("sessions/{id}")]
+        [ProducesResponseType(typeof(SessionDto), 200)]
+        public async Task<IActionResult> GetSession(int id, CancellationToken ct)
+        {
+            try
+            {
+                var session = await _sessionService.GetTeacherSessionByIdAsync(GetUserId(), id, ct);
+                return Ok(session);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+        [HttpPut("sessions/{id}")]
+        [ProducesResponseType(typeof(SessionDto), 200)]
+        public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSessionRequest request, CancellationToken ct)
+        {
+            try
+            {
+                var session = await _sessionService.UpdateSessionAsync(GetUserId(), id, request, ct);
+                return Ok(session);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+        }
+
+        [HttpDelete("sessions/{id}")]
+        public async Task<IActionResult> CancelSession(int id, CancellationToken ct)
+        {
+            try
+            {
+                await _sessionService.CancelSessionAsync(GetUserId(), id, ct);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+        }
+
         [HttpGet("sessions/{id}/token")]
         public IActionResult GetAgoraToken(int id)
         {

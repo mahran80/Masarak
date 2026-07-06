@@ -16,6 +16,7 @@ export interface SessionDto {
   classId: number;
   className: string;
   teacherName: string;
+  assignmentId: number;
 }
 
 export interface ScheduleSessionRequest {

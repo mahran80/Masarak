@@ -24,7 +24,6 @@ namespace Masarak.Domain.Entities
         public int      MaxSubjects     { get; set; } = -1;   // -1 = unlimited
         public bool     HasAi           { get; set; } = false;
         public bool     HasLiveClass    { get; set; } = true;
-        public bool     HasRecordings   { get; set; } = true;
         public bool     IsActive        { get; set; } = true;
 
         // ── Navigation ──────────────────────────────────────────────────────

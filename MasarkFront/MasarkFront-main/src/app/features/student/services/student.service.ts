@@ -69,6 +69,7 @@ interface SessionDto {
   subjectName?: string | null;
   className?: string | null;
   teacherName?: string | null;
+  assignmentId?: number;
 }
 
 interface SubjectAttendanceDto {

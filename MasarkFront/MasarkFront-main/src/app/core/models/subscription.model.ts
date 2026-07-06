@@ -15,7 +15,6 @@ export interface PlanDto {
   maxSubjects: number;
   hasAi: boolean;
   hasLiveClass: boolean;
-  hasRecordings: boolean;
 }
 
 export interface SubscriptionDto {

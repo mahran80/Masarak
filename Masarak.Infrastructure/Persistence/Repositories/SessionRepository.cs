@@ -39,6 +39,17 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                 .ToListAsync(ct);
         }
 
+        public async Task<IEnumerable<Session>> GetAllAsync(DateTime from, DateTime to, CancellationToken ct = default)
+        {
+            return await _context.Sessions
+                .Include(s => s.TeachingAssignment).ThenInclude(ta => ta.Teacher).ThenInclude(t => t.User)
+                .Include(s => s.TeachingAssignment).ThenInclude(ta => ta.Subject)
+                .Include(s => s.Class)
+                .Where(s => s.ScheduledAt >= from && s.ScheduledAt <= to)
+                .OrderBy(s => s.ScheduledAt)
+                .ToListAsync(ct);
+        }
+
         public async Task<IEnumerable<Session>> GetByTeachingAssignmentIdAsync(int assignmentId, CancellationToken ct = default)
         {
             return await _context.Sessions

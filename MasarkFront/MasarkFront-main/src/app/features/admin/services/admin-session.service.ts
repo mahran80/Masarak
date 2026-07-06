@@ -60,6 +60,13 @@ export class AdminSessionService {
     return this.http.get<AdminSessionDto[]>(`${this.apiUrl}/class/${classId}`, { params });
   }
 
+  getAllSessions(from: string, to: string): Observable<AdminSessionDto[]> {
+    let params = new HttpParams()
+      .set('from', from)
+      .set('to', to);
+    return this.http.get<AdminSessionDto[]>(`${this.apiUrl}`, { params });
+  }
+
   getTeacherSchedule(teacherId: number, from: string, to: string): Observable<AdminSessionDto[]> {
     let params = new HttpParams()
       .set('from', from)

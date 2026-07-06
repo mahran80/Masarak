@@ -131,6 +131,12 @@ namespace Masarak.Infrastructure.Services
             return sessions.Select(MapSession);
         }
 
+        public async Task<IEnumerable<SessionDto>> GetAllScheduleAsync(DateTime from, DateTime to, CancellationToken ct = default)
+        {
+            var sessions = await _sessionRepo.GetAllAsync(from, to, ct);
+            return sessions.Select(MapSession);
+        }
+
         public async Task ReactivateSessionAsync(int sessionId, CancellationToken ct = default)
         {
             var session = await _sessionRepo.GetByIdAsync(sessionId, ct)
@@ -157,6 +163,7 @@ namespace Masarak.Infrastructure.Services
                 s.TeachingAssignment?.Subject?.Name ?? "",
                 s.ClassId,
                 s.Class?.Name ?? "",
-                s.TeachingAssignment?.Teacher?.User?.FullName ?? "");
+                s.TeachingAssignment?.Teacher?.User?.FullName ?? "",
+                s.AssignmentId);
     }
 }

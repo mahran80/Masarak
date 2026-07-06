@@ -99,6 +99,9 @@
             <!-- Role -->
             <td>
               <span class="role-badge" [ngClass]="roleClass(user.role)">{{ roleLabel(user.role) }}</span>
+              <div *ngIf="user.role === 'Teacher' && user.specialization" class="text-xs text-slate-500 font-bold mt-1 max-w-[120px] truncate" title="{{ user.specialization }}">
+                {{ user.specialization }}
+              </div>
             </td>
             <!-- Status -->
             <td>
@@ -224,7 +227,6 @@
             <div class="plan-features">
               <span *ngIf="plan.hasAi" class="feat">🤖 AI</span>
               <span *ngIf="plan.hasLiveClass" class="feat">📹 حصص مباشرة</span>
-              <span *ngIf="plan.hasRecordings" class="feat">🎬 تسجيلات</span>
             </div>
           </div>
           <div *ngIf="plans().length === 0" class="plans-empty">لا توجد خطط متاحة حالياً</div>

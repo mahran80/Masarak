@@ -731,7 +731,6 @@ namespace Masarak.Infrastructure.Persistence
                 e.Property(x => x.MaxSubjects).HasDefaultValue(-1);
                 e.Property(x => x.HasAi).HasDefaultValue(false);
                 e.Property(x => x.HasLiveClass).HasDefaultValue(true);
-                e.Property(x => x.HasRecordings).HasDefaultValue(true);
                 e.Property(x => x.IsActive).HasDefaultValue(true);
             });
 
