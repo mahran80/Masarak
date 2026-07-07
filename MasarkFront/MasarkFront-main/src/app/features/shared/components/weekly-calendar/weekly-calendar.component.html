@@ -62,6 +62,9 @@
                         <button (click)="join.emit(s)" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">انضمام</button>
                         <button (click)="complete.emit(s)" class="w-full bg-blue-50 hover:bg-blue-100 text-[#4F8CD4] text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إنهاء الحصة</button>
                       }
+                      @if (s.status === 'Completed') {
+                        <button (click)="attendance.emit(s)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">سجل الحضور</button>
+                      }
                     }
 
                     @if (role === 'student') {

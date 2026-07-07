@@ -40,6 +40,7 @@ export class WeeklyCalendarComponent implements OnChanges {
   @Output() edit = new EventEmitter<CalendarSession>();
   @Output() cancel = new EventEmitter<CalendarSession>();
   @Output() complete = new EventEmitter<CalendarSession>();
+  @Output() attendance = new EventEmitter<CalendarSession>();
 
   days: DayColumn[] = [];
 

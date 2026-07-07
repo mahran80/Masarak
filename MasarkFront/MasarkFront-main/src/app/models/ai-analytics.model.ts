@@ -80,10 +80,11 @@ export interface TeachingSuggestionDto {
 }
 
 export interface StudentInsightDto {
-  studentId: number;
   studentName: string;
-  weaknessAnalyses: WeaknessAnalysisDto[];
-  teachingSuggestion: TeachingSuggestionDto;
+  subjectName: string;
+  weakTopics: WeakTopicDto[];
+  activeAlerts: PerformanceAlertDto[];
+  latestSuggestion: TeachingSuggestionDto | null;
 }
 
 export interface ClassAnalyticsDashboardDto {
@@ -98,14 +99,14 @@ export interface ClassAnalyticsDashboardDto {
 }
 
 export interface ScoreDistributionBucketDto {
-  bucketRange: string;
-  studentCount: number;
+  label: string;
+  count: number;
 }
 
 export interface StudentScoreDto {
-  studentId: number;
+  studentUserId: number;
   studentName: string;
-  score: number;
+  averageScore: number;
 }
 
 export interface PlatformAnalyticsDto {
@@ -139,11 +140,14 @@ export interface SubjectScoreCellDto {
 }
 
 export interface AiPromptTemplateDto {
+  aiPromptTemplateId: number;
   key: string;
   systemPrompt: string;
   userPromptTemplate: string;
   maxTokens: number;
   temperature: number;
+  updatedAt: string;
+  updatedBy: string;
 }
 
 export interface UpdatePromptTemplateRequest {

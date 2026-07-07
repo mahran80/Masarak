@@ -87,6 +87,14 @@
         >
           <app-icon name="calendar" [size]="20"></app-icon> الجدول الأسبوعي
         </a>
+
+        <a
+          routerLink="student/insights"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="trend-up" [size]="20"></app-icon> رؤى التعلم
+        </a>
       } @else if (userRole() === 'Teacher') {
         <a
           routerLink="teacher"
@@ -247,6 +255,24 @@
         >
           <app-icon name="credit-card" [size]="20"></app-icon> إدارة الاشتراكات
         </a>
+
+        <div class="border-t border-slate-100 pt-2 mt-2">
+          <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">الذكاء الاصطناعي</p>
+          <a
+            routerLink="admin/platform-analytics"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="chart" [size]="20"></app-icon> تحليلات المنصة
+          </a>
+          <a
+            routerLink="admin/prompt-editor"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="robot" [size]="20"></app-icon> قوالب الذكاء الاصطناعي
+          </a>
+        </div>
       } @else if (userRole() === 'Parent') {
         <a
           routerLink="parent"

@@ -84,7 +84,7 @@
                  إعادة المحاولة
                </button>
              </div>
-          </div>
+           </div>
         } @else {
           <app-weekly-calendar 
             [weekStart]="weekStart()" 
@@ -95,6 +95,7 @@
             (edit)="onCalendarEdit($event)"
             (cancel)="onCalendarCancel($event)"
             (complete)="onCalendarComplete($event)"
+            (attendance)="onCalendarAttendance($event)"
           ></app-weekly-calendar>
         }
       } @else {

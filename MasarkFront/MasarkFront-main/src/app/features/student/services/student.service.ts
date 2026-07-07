@@ -223,6 +223,12 @@ export class StudentService {
       .pipe(map((items) => items.map((item) => this.mapContentItem(item, subjectId))));
   }
 
+  getDownloadUrl(contentId: StudentEntityId): Observable<string> {
+    return this.http
+      .get<{ downloadUrl: string }>(`${environment.apiUrl}/content/${encodeURIComponent(String(contentId))}/download-url`)
+      .pipe(map(res => res.downloadUrl));
+  }
+
   getAttendance(academicYear?: StudentAcademicYear): Observable<StudentAttendanceSummary> {
     return this.http
       .get<SubjectAttendanceDto[]>(`${this.baseUrl}/attendance`, {

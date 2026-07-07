@@ -351,6 +351,10 @@ export class TeacherSessionsComponent implements OnInit {
     this.completeSession(Number(s.id));
   }
 
+  onCalendarAttendance(s: CalendarSession): void {
+    this.router.navigate(['/dashboard/teacher/sessions', s.id, 'attendance']);
+  }
+
   private formatDateForApi(date: Date): string {
     const d = new Date(date);
     let month = '' + (d.getMonth() + 1);
