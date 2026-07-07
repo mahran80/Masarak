@@ -178,6 +178,7 @@ export class LessonsManagerComponent implements OnInit {
         this.lessonsService.getLessonDetail(lessonId).subscribe({
           next: (detail) => {
             this.lessonDetails[lessonId] = detail;
+            this.cdr.detectChanges();
           }
         });
       }

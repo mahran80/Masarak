@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StudentLessonsService } from '../../services/student-lessons.service';
 import { Lesson, LessonDetail } from '../../../teacher/models/teacher-lessons.model';
@@ -25,10 +25,13 @@ export class StudentLessonsComponent implements OnInit {
     this.loadSubjects();
   }
 
+  private cdr = inject(ChangeDetectorRef);
+
   loadSubjects() {
     this.http.get<any[]>(`${environment.apiUrl}/student/courses`).subscribe({
       next: (data) => {
         this.subjects = data;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -47,6 +50,7 @@ export class StudentLessonsComponent implements OnInit {
     this.lessonsService.getLessons(this.selectedSubjectId).subscribe({
       next: (data) => {
         this.lessons = data;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -60,6 +64,7 @@ export class StudentLessonsComponent implements OnInit {
         this.lessonsService.getLessonDetail(lessonId).subscribe({
           next: (detail) => {
             this.lessonDetails[lessonId] = detail;
+            this.cdr.detectChanges();
           }
         });
       }

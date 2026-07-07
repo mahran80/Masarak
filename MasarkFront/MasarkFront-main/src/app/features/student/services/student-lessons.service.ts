@@ -9,7 +9,7 @@ import { Lesson, LessonDetail } from '../../teacher/models/teacher-lessons.model
 })
 export class StudentLessonsService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/student/lessons`;
+  private apiUrl = `${environment.apiUrl}/student/lessons`;
 
   getLessons(subjectId: number): Observable<Lesson[]> {
     return this.http.get<Lesson[]>(`${this.apiUrl}/subjects/${subjectId}`);
