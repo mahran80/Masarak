@@ -5,11 +5,12 @@ import { HttpClient } from '@angular/common/http';
 import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { Lesson, LessonDetail } from '../../../models/teacher-lessons.model';
 import { environment } from '../../../../../../environments/environment';
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-lessons-manager',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IconComponent],
   templateUrl: './lessons-manager.component.html',
   styleUrls: ['./lessons-manager.component.scss'],
 })

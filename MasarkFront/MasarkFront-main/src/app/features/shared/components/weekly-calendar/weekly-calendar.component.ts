@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import { CommonModule, DatePipe } from '@angular/common';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 export interface CalendarSession {
   id: number | string;
@@ -25,7 +26,7 @@ interface DayColumn {
 @Component({
   selector: 'app-weekly-calendar',
   standalone: true,
-  imports: [CommonModule, DatePipe, NgClass],
+  imports: [CommonModule, DatePipe, NgClass, IconComponent],
   templateUrl: './weekly-calendar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,6 +40,7 @@ export class WeeklyCalendarComponent implements OnChanges {
   @Output() edit = new EventEmitter<CalendarSession>();
   @Output() cancel = new EventEmitter<CalendarSession>();
   @Output() complete = new EventEmitter<CalendarSession>();
+  @Output() attendance = new EventEmitter<CalendarSession>();
 
   days: DayColumn[] = [];
 

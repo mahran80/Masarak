@@ -5,11 +5,12 @@ import { AuthStateService } from '../../core/services/auth-state-service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationHubService } from '../../core/services/notification-hub.service';
+import { IconComponent } from '../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, IconComponent],
   templateUrl: './dashboard-layout.html',
 })
 export class DashboardLayoutComponent implements OnInit, OnDestroy {

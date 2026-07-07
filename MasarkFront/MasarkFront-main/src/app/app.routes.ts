@@ -101,6 +101,9 @@ export const routes: Routes = [
           { path: 'lessons', loadComponent: () => import('./features/teacher/pages/assessment/lessons-manager/lessons-manager.component').then(m => m.LessonsManagerComponent) },
           { path: 'sessions', loadComponent: () => import('./features/teacher/components/teacher-sessions/teacher-sessions.component').then(m => m.TeacherSessionsComponent) },
           { path: 'sessions/:id/live', loadComponent: () => import('./features/shared/components/live-room/live-room.component').then(m => m.LiveRoomComponent), data: { role: 'teacher' } },
+          { path: 'sessions/:id/attendance', loadComponent: () => import('./features/teacher/pages/live-session/attendance/session-attendance.component').then(m => m.TeacherSessionAttendanceComponent) },
+          { path: 'class-analytics/:classId/:subjectId', loadComponent: () => import('./features/teacher/pages/class-analytics/class-analytics.component').then(m => m.ClassAnalyticsComponent) },
+          { path: 'student-insight/:studentId/:subjectId', loadComponent: () => import('./features/teacher/pages/student-insight/student-insight.component').then(m => m.StudentInsightComponent) },
         ],
       }, // محتوى المدرس
       {
@@ -118,6 +121,9 @@ export const routes: Routes = [
           { path: 'subscriptions', component: AdminSubscriptionsComponent },
           { path: 'analytics', component: AdminAnalyticsComponent },
           { path: 'schedule', loadComponent: () => import('./features/admin/components/admin-schedule/admin-schedule.component').then(m => m.AdminScheduleComponent) },
+          { path: 'platform-analytics', loadComponent: () => import('./features/admin/pages/platform-analytics/platform-analytics.component').then(m => m.PlatformAnalyticsComponent) },
+          { path: 'heatmap/:gradeId', loadComponent: () => import('./features/admin/pages/grade-heatmap/grade-heatmap.component').then(m => m.GradeHeatmapComponent) },
+          { path: 'prompt-editor', loadComponent: () => import('./features/admin/pages/prompt-editor/prompt-editor.component').then(m => m.PromptEditorComponent) },
         ],
       }, // محتوى المدير
       {

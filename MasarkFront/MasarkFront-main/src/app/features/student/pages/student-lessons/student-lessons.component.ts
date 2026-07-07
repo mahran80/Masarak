@@ -4,11 +4,12 @@ import { StudentLessonsService } from '../../services/student-lessons.service';
 import { Lesson, LessonDetail } from '../../../teacher/models/teacher-lessons.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-student-lessons',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './student-lessons.component.html',
 })
 export class StudentLessonsComponent implements OnInit {

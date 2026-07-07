@@ -1,292 +1,324 @@
 <div class="min-h-screen bg-slate-100 flex font-sans" dir="rtl">
   <aside
-    class="w-64 bg-white border-l border-slate-200 fixed inset-y-0 right-0 z-20 flex flex-col justify-between p-6"
+    class="w-64 bg-white border-l border-slate-200 fixed inset-y-0 right-0 z-20 flex flex-col p-6"
   >
-    <div class="space-y-8">
-      <div class="flex items-center gap-2 px-2">
-        <span class="text-2xl font-black text-blue-600">مدرستي</span>
-        <div
-          class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold"
-        >
-          م
-        </div>
+    <!-- Logo (Fixed at top) -->
+    <div class="flex items-center gap-2 px-2 mb-8 shrink-0">
+      <span class="text-2xl font-black text-blue-600">مدرستي</span>
+      <div
+        class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold"
+      >
+        م
       </div>
-
-      <nav class="space-y-2">
-        @if (userRole() === 'Student') {
-          <a
-            routerLink="/plans"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>💳</span> الخطط والاشتراكات
-          </a>
-        } @else if (userRole() === 'Parent') {
-          <a
-            routerLink="/dashboard/parent/subscriptions"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>💳</span> الخطط والاشتراكات
-          </a>
-        }
-
-        @if (userRole() === 'Student') {
-          <a
-            routerLink="student"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📊</span> لوحة التحكم للطالب
-          </a>
-          <a
-            routerLink="student/courses"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📚</span> دروسي
-          </a>
-
-          <a
-            routerLink="student/lessons"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📖</span> الدروس والوحدات
-          </a>
-
-          <a
-            routerLink="student/library"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📚</span> مكتبه الدروس
-          </a>
-
-          <a
-            routerLink="student/assignments"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📋</span> الواجبات
-          </a>
-
-          <a
-            routerLink="student/exams"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📝</span> الاختبارات
-          </a>
-
-          <a
-            routerLink="student/schedule"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📅</span> الجدول الأسبوعي
-          </a>
-        } @else if (userRole() === 'Teacher') {
-          <a
-            routerLink="teacher"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👨‍🏫</span> لوحة المدرس
-          </a>
-          <a
-            routerLink="teacher/courses"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👥</span> المقررات الدراسيه
-          </a>
-
-          <a
-            routerLink="teacher/lessons"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📚</span> الدروس
-          </a>
-
-          <a
-            routerLink="teacher/students"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👥</span> الطلاب
-          </a>
-
-          <a
-            routerLink="teacher/assignments"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📋</span> الواجبات
-          </a>
-
-          <a
-            routerLink="/dashboard/teacher/exams"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📝</span> الاختبارات
-          </a>
-
-          <a
-            routerLink="/dashboard/teacher/sessions"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🎥</span> الحصص المباشرة
-          </a>
-
-          <div class="border-t border-slate-100 pt-2 mt-2">
-            <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">التقييمات</p>
-            <a
-              routerLink="/dashboard/teacher/assessment/grading"
-              routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-            >
-              <span>✅</span> لوحة التصحيح
-            </a>
-            <a
-              routerLink="/dashboard/teacher/assessment/assignments/create"
-              routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-            >
-              <span>➕</span> إنشاء واجب
-            </a>
-            <a
-              routerLink="/dashboard/teacher/assessment/exams/create"
-              routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-            >
-              <span>📝</span> إنشاء اختبار
-            </a>
-            <a
-              routerLink="/dashboard/teacher/assessment/question-bank"
-              routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-              class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-            >
-              <span>📚</span> بنك الأسئلة
-            </a>
-          </div>
-        } @else if (userRole() === 'Admin') {
-          <a
-            routerLink="/dashboard/admin"
-            [routerLinkActiveOptions]="{ exact: true }"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👑</span> نظرة عامة للمدير
-          </a>
-
-          <a
-            routerLink="admin/users"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👥</span> إدارة المستخدمين
-          </a>
-
-          <a
-            routerLink="admin/teachers"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🧑‍🏫</span> دليل المعلمين
-          </a>
-
-          <a
-            routerLink="admin/academic"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🏫</span> الإدارة الأكاديمية
-          </a>
-
-          <a
-            routerLink="admin/schedule"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📅</span> جدول الحصص
-          </a>
-
-          <a
-            routerLink="admin/performance"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>📊</span> تقارير الأداء
-          </a>
-
-          <a
-            routerLink="admin/system-health"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>💻</span> حالة النظام
-          </a>
-
-          <a
-            routerLink="admin/content-moderation"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🛡️</span> إدارة المحتوى
-          </a>
-
-          <a
-            routerLink="admin/subscriptions"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🎫</span> إدارة الاشتراكات
-          </a>
-        } @else if (userRole() === 'Parent') {
-          <a
-            routerLink="parent"
-            [routerLinkActiveOptions]="{ exact: true }"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>🏠</span> الرئيسية
-          </a>
-          <a
-            routerLink="parent/children"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>👨‍👧‍👦</span> أبنائي
-          </a>
-          <a
-            routerLink="/chat"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>💬</span> المحادثات
-          </a>
-          <a
-            routerLink="parent/profile"
-            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
-          >
-            <span>⚙️</span> الإعدادات
-          </a>
-        }
-      </nav>
     </div>
 
-    <button
-      type="button"
-      (click)="logout()"
-      class="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition-colors"
-    >
-      <span>🚪</span> تسجيل الخروج
-    </button>
+    <!-- Navigation (Scrollable) -->
+    <nav class="space-y-2 flex-1 overflow-y-auto pr-2 -mr-2">
+      @if (userRole() === 'Student') {
+        <a
+          routerLink="/plans"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="credit-card" [size]="20"></app-icon> الخطط والاشتراكات
+        </a>
+      } @else if (userRole() === 'Parent') {
+        <a
+          routerLink="/dashboard/parent/subscriptions"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="credit-card" [size]="20"></app-icon> الخطط والاشتراكات
+        </a>
+      }
+
+      @if (userRole() === 'Student') {
+        <a
+          routerLink="student"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="chart" [size]="20"></app-icon> لوحة التحكم للطالب
+        </a>
+        <a
+          routerLink="student/courses"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="book" [size]="20"></app-icon> دروسي
+        </a>
+
+        <a
+          routerLink="student/lessons"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="book-open" [size]="20"></app-icon> الدروس والوحدات
+        </a>
+
+        <a
+          routerLink="student/library"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="archive" [size]="20"></app-icon> مكتبه الدروس
+        </a>
+
+        <a
+          routerLink="student/assignments"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="clipboard-document-list" [size]="20"></app-icon> الواجبات
+        </a>
+
+        <a
+          routerLink="student/exams"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="document-check" [size]="20"></app-icon> الاختبارات
+        </a>
+
+        <a
+          routerLink="student/schedule"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="calendar" [size]="20"></app-icon> الجدول الأسبوعي
+        </a>
+
+        <a
+          routerLink="student/insights"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="trend-up" [size]="20"></app-icon> رؤى التعلم
+        </a>
+      } @else if (userRole() === 'Teacher') {
+        <a
+          routerLink="teacher"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="chart" [size]="20"></app-icon> لوحة المدرس
+        </a>
+        <a
+          routerLink="teacher/courses"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="book-open" [size]="20"></app-icon> المقررات الدراسيه
+        </a>
+
+        <a
+          routerLink="teacher/lessons"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="academic-cap" [size]="20"></app-icon> الدروس
+        </a>
+
+        <a
+          routerLink="teacher/students"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="users" [size]="20"></app-icon> الطلاب
+        </a>
+
+        <a
+          routerLink="teacher/assignments"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="clipboard-document-list" [size]="20"></app-icon> الواجبات
+        </a>
+
+        <a
+          routerLink="/dashboard/teacher/exams"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="document-check" [size]="20"></app-icon> الاختبارات
+        </a>
+
+        <a
+          routerLink="/dashboard/teacher/sessions"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="video" [size]="20"></app-icon> الحصص المباشرة
+        </a>
+
+        <div class="border-t border-slate-100 pt-2 mt-2">
+          <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">التقييمات</p>
+          <a
+            routerLink="/dashboard/teacher/assessment/grading"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="check-badge" [size]="20"></app-icon> لوحة التصحيح
+          </a>
+          <a
+            routerLink="/dashboard/teacher/assessment/assignments/create"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="plus" [size]="20"></app-icon> إنشاء واجب
+          </a>
+          <a
+            routerLink="/dashboard/teacher/assessment/exams/create"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="pencil-square" [size]="20"></app-icon> إنشاء اختبار
+          </a>
+          <a
+            routerLink="/dashboard/teacher/assessment/question-bank"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="folder-open" [size]="20"></app-icon> بنك الأسئلة
+          </a>
+        </div>
+      } @else if (userRole() === 'Admin') {
+        <a
+          routerLink="/dashboard/admin"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="chart" [size]="20"></app-icon> نظرة عامة للمدير
+        </a>
+
+        <a
+          routerLink="admin/users"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="users" [size]="20"></app-icon> إدارة المستخدمين
+        </a>
+
+        <a
+          routerLink="admin/teachers"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="user" [size]="20"></app-icon> دليل المعلمين
+        </a>
+
+        <a
+          routerLink="admin/academic"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="building" [size]="20"></app-icon> الإدارة الأكاديمية
+        </a>
+
+        <a
+          routerLink="admin/schedule"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="calendar" [size]="20"></app-icon> جدول الحصص
+        </a>
+
+        <a
+          routerLink="admin/performance"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="trend-up" [size]="20"></app-icon> تقارير الأداء
+        </a>
+
+        <a
+          routerLink="admin/system-health"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="robot" [size]="20"></app-icon> حالة النظام
+        </a>
+
+        <a
+          routerLink="admin/content-moderation"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="shield" [size]="20"></app-icon> إدارة المحتوى
+        </a>
+
+        <a
+          routerLink="admin/subscriptions"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="credit-card" [size]="20"></app-icon> إدارة الاشتراكات
+        </a>
+
+        <div class="border-t border-slate-100 pt-2 mt-2">
+          <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">الذكاء الاصطناعي</p>
+          <a
+            routerLink="admin/platform-analytics"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="chart" [size]="20"></app-icon> تحليلات المنصة
+          </a>
+          <a
+            routerLink="admin/prompt-editor"
+            routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <app-icon name="robot" [size]="20"></app-icon> قوالب الذكاء الاصطناعي
+          </a>
+        </div>
+      } @else if (userRole() === 'Parent') {
+        <a
+          routerLink="parent"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="home" [size]="20"></app-icon> الرئيسية
+        </a>
+        <a
+          routerLink="parent/children"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="family" [size]="20"></app-icon> أبنائي
+        </a>
+        <a
+          routerLink="/chat"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="chat" [size]="20"></app-icon> المحادثات
+        </a>
+        <a
+          routerLink="parent/profile"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="settings" [size]="20"></app-icon> الإعدادات
+        </a>
+      }
+    </nav>
+
+    <!-- Logout (Fixed at bottom) -->
+    <div class="pt-4 mt-2 shrink-0 border-t border-slate-100">
+      <button
+        type="button"
+        (click)="logout()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition-colors"
+      >
+        <app-icon name="logout" [size]="20"></app-icon> تسجيل الخروج
+      </button>
+    </div>
   </aside>
 
+  <!-- Main Content Area -->
   <div class="flex-1 mr-64 flex flex-col min-h-screen">
     <header
       class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10"
@@ -297,7 +329,9 @@
           placeholder="ابحث عن أي شيء..."
           class="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <span class="absolute right-3 top-2.5 text-slate-400">🔍</span>
+        <span class="absolute right-3 top-2.5 text-slate-400">
+          <app-icon name="search" [size]="20"></app-icon>
+        </span>
       </div>
 
       <div class="flex items-center gap-4">
@@ -306,12 +340,6 @@
           <h4 class="font-bold text-slate-800">{{ userName()?.fullName ?? 'User' }}</h4>
           <p class="text-xs text-slate-500">{{ userRoleDisplay()?.role ?? 'User' }}</p>
         </div>
-        <!-- <img
-          [src]="userAvatar"
-          (error)="$event.target.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'%3E%3Cpath d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/%3E%3C/svg%3E'"
-          class="w-10 h-10 rounded-full object-cover border-2 border-blue-100 bg-slate-100"
-          alt="Avatar"
-        /> -->
       </div>
     </header>
 

@@ -80,8 +80,10 @@ export const STUDENT_ROUTES: Routes = [
   },
   {
     path: 'insights',
-    redirectTo: 'performance',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('../pages/learning-insights/learning-insights.component').then(
+        (m) => m.LearningInsightsComponent,
+      ),
   },
   {
     path: 'exams/:id',

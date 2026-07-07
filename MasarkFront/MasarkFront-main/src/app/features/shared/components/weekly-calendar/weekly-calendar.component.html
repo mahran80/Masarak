@@ -1,20 +1,15 @@
-<div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/60 overflow-hidden" dir="rtl">
-  <!-- Calendar Header -->
-  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100/50 bg-slate-50/80 backdrop-blur-md border-b border-slate-100/60">
-    @for (day of days; track day.date) {
-      <div class="px-4 py-5 text-center relative transition-colors duration-300" [ngClass]="{'bg-sky-50/60': day.isToday, 'hover:bg-slate-100/50': !day.isToday}">
-        <!-- Today Indicator Bar -->
-        @if (day.isToday) {
-          <div class="absolute bottom-0 left-0 right-0 h-1 bg-[#4F8CD4] rounded-t-full shadow-[0_0_10px_rgba(79,140,212,0.4)]"></div>
-        }
-        <p class="text-sm font-black tracking-wide" [ngClass]="day.isToday ? 'text-[#4F8CD4]' : 'text-slate-800'">{{ day.dayName }}</p>
-        <p class="text-xs font-semibold mt-1.5" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMM d' }}</p>
-      </div>
-    }
-  </div>
+<div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-x-auto" dir="rtl">
+  <div class="min-w-[900px]">
+    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 bg-slate-50 border-b border-slate-100">
+      @for (day of days; track day.date) {
+        <div class="px-4 py-4 text-center" [ngClass]="{'bg-sky-50/50': day.isToday}">
+          <p class="text-sm font-bold" [ngClass]="day.isToday ? 'text-sky-700' : 'text-slate-900'">{{ day.dayName }}</p>
+          <p class="text-xs font-semibold mt-1" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMMM d' }}</p>
+        </div>
+      }
+    </div>
 
-  <!-- Calendar Body -->
-  <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100/50 min-h-[550px] bg-[#fafafa]/30">
+    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 min-h-[500px]">
     @for (day of days; track day.date) {
       <div class="p-2 transition-colors duration-500 relative" [ngClass]="{'bg-sky-50/20': day.isToday, 'hover:bg-white/60': !day.isToday}">
         @if (day.sessions.length > 0) {
@@ -90,8 +85,11 @@
                         <button (click)="start.emit(s)" [disabled]="!canStartSession(s)" [ngClass]="{'opacity-50 cursor-not-allowed grayscale': !canStartSession(s)}" class="w-full bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-700 text-xs font-black px-2.5 py-2 rounded-xl transition-all duration-300 shadow-sm hover:shadow-emerald-200">بدء الحصة</button>
                       }
                       @if (s.status === 'Live') {
-                        <button (click)="join.emit(s)" class="w-full bg-indigo-50 hover:bg-indigo-500 hover:text-white text-indigo-700 text-xs font-black px-2.5 py-2 rounded-xl transition-all duration-300 shadow-sm hover:shadow-indigo-200">انضمام</button>
-                        <button (click)="complete.emit(s)" class="w-full bg-slate-50 hover:bg-slate-800 hover:text-white text-slate-700 text-xs font-black px-2.5 py-2 rounded-xl transition-all duration-300">إنهاء</button>
+                        <button (click)="join.emit(s)" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">انضمام</button>
+                        <button (click)="complete.emit(s)" class="w-full bg-blue-50 hover:bg-blue-100 text-[#4F8CD4] text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">إنهاء الحصة</button>
+                      }
+                      @if (s.status === 'Completed') {
+                        <button (click)="attendance.emit(s)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1.5 rounded-lg transition-colors">سجل الحضور</button>
                       }
                     }
 
@@ -117,18 +115,15 @@
             }
           </div>
         } @else {
-          <!-- Empty State -->
-          <div class="h-full min-h-[220px] flex flex-col items-center justify-center p-5 text-center border-2 border-dashed border-slate-200/60 rounded-[20px] bg-slate-50/30 hover:bg-slate-50/80 transition-all duration-500 group">
-            <div class="w-14 h-14 bg-white text-slate-300 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:-translate-y-1 group-hover:text-sky-400 group-hover:shadow-[0_10px_20px_rgba(56,189,248,0.15)] transition-all duration-500 shadow-sm">
-              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p class="text-sm font-black text-slate-600 group-hover:text-slate-800 transition-colors">لا توجد حصص</p>
-            <p class="text-[11px] font-bold text-slate-400 mt-1.5">استمتع بيومك!</p>
+          <!-- Empty Holiday state -->
+          <div class="h-full min-h-[200px] flex flex-col items-center justify-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500 p-2 text-center border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+            <app-icon name="sparkles" [size]="28" class="mx-auto mb-2 text-slate-300"></app-icon>
+            <p class="text-xs font-black text-slate-400">لا توجد حصص</p>
+            <p class="text-[10px] font-bold text-slate-300 mt-1">يوم حر</p>
           </div>
         }
       </div>
     }
+  </div>
   </div>
 </div>
