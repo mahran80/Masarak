@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -29,7 +30,7 @@ interface RecentActivity {
 @Component({
   selector: 'app-teacher',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   templateUrl: './teacher.html',
   styleUrl: './teacher.css',
 })

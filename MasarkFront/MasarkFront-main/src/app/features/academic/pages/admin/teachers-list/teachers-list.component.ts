@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
 @Component({
   selector: 'app-teachers-directory',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [IconComponent, CommonModule, FormsModule],
   template: `
     <div class="p-6 max-w-7xl mx-auto space-y-6" dir="rtl">
       <!-- Header -->
@@ -18,7 +19,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
           <p class="text-slate-500 text-sm mt-1">عرض جميع المعلمين المسجلين في النظام، تخصصاتهم، والمواد التي يدرسونها.</p>
         </div>
         <div class="bg-blue-50 text-blue-700 px-4 py-3 rounded-xl border border-blue-100 flex items-center gap-3">
-          <span class="text-2xl">👨‍🏫</span>
+          <span class="text-2xl"><app-icon name="academic-cap" size="1.2em"></app-icon></span>
           <div>
             <div class="text-xs text-blue-600 font-medium">إجمالي المعلمين</div>
             <div class="text-xl font-bold">{{ teachers().length }} معلم</div>
@@ -36,7 +37,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
             placeholder="البحث باسم المعلم، البريد الإلكتروني، أو التخصص..."
             class="w-full pr-10 pl-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 bg-slate-50 focus:bg-white transition-all"
           />
-          <span class="absolute right-3 top-2.5 text-slate-400">🔍</span>
+          <span class="absolute right-3 top-2.5 text-slate-400"><app-icon name="search" size="1.2em"></app-icon></span>
         </div>
         <div class="w-full md:w-48">
           <select [ngModel]="selectedSpecialization()" (ngModelChange)="selectedSpecialization.set($event)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none bg-slate-50 focus:bg-white transition-all">
@@ -82,11 +83,11 @@ import { TeacherDto } from '../../../../../models/academic.model';
                 <!-- Personal Details -->
                 <div class="space-y-2 text-sm">
                   <div class="flex items-center gap-2 text-slate-600">
-                    <span class="text-base">📧</span>
+                    <span class="text-base"><app-icon name="mail" size="1.2em"></app-icon></span>
                     <span class="truncate">{{ t.email }}</span>
                   </div>
                   <div class="flex items-center gap-2 text-slate-500 text-xs">
-                    <span class="text-base font-normal">📅</span>
+                    <span class="text-base font-normal"><app-icon name="calendar" size="1.2em"></app-icon></span>
                     <span>تاريخ التعيين: {{ t.hiringDate | date:'mediumDate' }}</span>
                   </div>
                 </div>
@@ -123,7 +124,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
             </div>
           } @empty {
             <div class="col-span-full py-16 text-center bg-white border border-slate-200 rounded-2xl shadow-sm">
-              <span class="text-4xl block mb-3">🔍</span>
+              <span class="text-4xl block mb-3"><app-icon name="search" size="1.2em"></app-icon></span>
               <p class="text-slate-500 text-sm font-medium">لم يتم العثور على معلمين يطابقون خيارات البحث.</p>
             </div>
           }

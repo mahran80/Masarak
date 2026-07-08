@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,7 +13,7 @@ import { QuestionEditorComponent } from '../question-editor/question-editor.comp
 @Component({
   selector: 'app-exam-creator',
   standalone: true,
-  imports: [ReactiveFormsModule, QuestionEditorComponent],
+  imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
   templateUrl: './exam-creator.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

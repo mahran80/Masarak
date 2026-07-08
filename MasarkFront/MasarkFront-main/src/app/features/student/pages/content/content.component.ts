@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import { StudentService } from '../../services/student.service';
 @Component({
   selector: 'app-student-content-page',
   standalone: true,
-  imports: [DatePipe],
+  imports: [IconComponent, DatePipe],
   templateUrl: './content.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -42,7 +42,13 @@
     <!-- Feedback Banner -->
     @if (feedbackMsg()) {
       <div [class]="feedbackType() === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'" class="p-4 mb-6 rounded-xl border flex items-center gap-3">
-        <span>{{ feedbackType() === 'success' ? '✅' : '❌' }}</span>
+        <span>
+          @if (feedbackType() === 'success') {
+            <app-icon name="check-circle" size="1.2em"></app-icon>
+          } @else {
+            <app-icon name="x-mark" size="1.2em"></app-icon>
+          }
+        </span>
         <span class="font-medium">{{ feedbackMsg() }}</span>
       </div>
     }
@@ -86,7 +92,7 @@
           @for (s of subjects(); track s.subjectId) {
             <div class="p-4 border border-slate-200 rounded-xl hover:border-blue-300 transition-all bg-slate-50 flex justify-between items-center">
               <span class="font-bold text-slate-700">{{ s.name }}</span>
-              <button (click)="openModal('subject', 'edit', s)" class="text-slate-400 hover:text-blue-600 p-1">✏️</button>
+              <button (click)="openModal('subject', 'edit', s)" class="text-slate-400 hover:text-blue-600 p-1"><app-icon name="pencil" size="1.2em"></app-icon>️</button>
             </div>
           } @empty {
             <p class="text-slate-500 col-span-full py-8 text-center bg-slate-50 rounded-lg">لا توجد مواد دراسية في هذه المرحلة.</p>
@@ -121,16 +127,16 @@
             <div class="p-4 border border-slate-200 rounded-xl hover:border-blue-300 transition-all bg-slate-50 flex flex-col gap-3">
               <div class="flex justify-between items-center">
                 <span class="font-bold text-slate-700">{{ c.name }}</span>
-                <button (click)="openModal('class', 'edit', c)" class="text-slate-400 hover:text-blue-600 p-1">✏️</button>
+                <button (click)="openModal('class', 'edit', c)" class="text-slate-400 hover:text-blue-600 p-1"><app-icon name="pencil" size="1.2em"></app-icon>️</button>
               </div>
               <div class="text-xs text-slate-500 mb-2">السنة: {{ c.academicYear }}</div>
               
               <div class="flex gap-2 mt-auto">
                 <button (click)="onClassSelect(c.classId); setTab('roster')" class="flex-1 bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-colors">
-                  👨‍🎓 إدارة الطلاب
+                  <app-icon name="academic-cap" size="1.2em"></app-icon> إدارة الطلاب
                 </button>
                 <button (click)="onClassSelect(c.classId); setTab('teachers')" class="flex-1 bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-colors">
-                  👨‍🏫 إدارة المعلمين
+                  <app-icon name="academic-cap" size="1.2em"></app-icon> إدارة المعلمين
                 </button>
               </div>
             </div>
@@ -252,7 +258,7 @@
                 </div>
               </div>
               <button (click)="unassignTeacher(t.id)" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="إلغاء التعيين">
-                ✕
+                <app-icon name="x-mark" size="1.2em"></app-icon>
               </button>
             </div>
           } @empty {
@@ -331,7 +337,7 @@
           {{ modalMode() === 'create' ? 'إضافة' : 'تعديل' }}
           {{ modalType() === 'grade' ? 'مرحلة دراسية' : modalType() === 'subject' ? 'مادة دراسية' : 'فصل دراسي' }}
         </h3>
-        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">✕</button>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors"><app-icon name="x-mark" size="1.2em"></app-icon></button>
       </div>
 
       <div class="p-6 space-y-4">
@@ -382,7 +388,7 @@
   <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
       <div class="p-6 border-b border-slate-100 flex items-center gap-3 bg-red-50/50">
-        <span class="text-red-500 text-xl">⚠️</span>
+        <span class="text-red-500 text-xl"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
         <h3 class="text-lg font-bold text-slate-800">تأكيد الإجراء</h3>
       </div>
       <div class="p-6 text-slate-700 font-medium text-center">

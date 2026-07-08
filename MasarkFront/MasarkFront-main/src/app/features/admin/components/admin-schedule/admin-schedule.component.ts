@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/compon
 @Component({
   selector: 'app-admin-schedule',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, WeeklyCalendarComponent],
+  imports: [IconComponent, CommonModule, FormsModule, DatePipe, WeeklyCalendarComponent],
   templateUrl: './admin-schedule.component.html',
 })
 export class AdminScheduleComponent implements OnInit {

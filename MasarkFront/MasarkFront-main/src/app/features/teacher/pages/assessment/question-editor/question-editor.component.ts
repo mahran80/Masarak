@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,7 +8,7 @@ import { AddQuestionRequest, QuestionType, TeacherQuestion, TeacherQuestionOptio
 @Component({
   selector: 'app-question-editor',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [IconComponent, ReactiveFormsModule],
   templateUrl: './question-editor.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

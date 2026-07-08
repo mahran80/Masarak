@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -7,7 +8,7 @@ import { GradeHeatmapDto } from '../../../../models/ai-analytics.model';
 @Component({
   selector: 'app-grade-heatmap',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
@@ -15,7 +16,7 @@ import { GradeHeatmapDto } from '../../../../models/ai-analytics.model';
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-orange-600">🗺️</span>
+              <span class="text-orange-600"><app-icon name="globe" size="1.2em"></app-icon>️</span>
               خريطة الأداء الحرارية
             </h1>
             <p class="text-sm text-slate-500 mt-1">عرض مرئي لمتوسط درجات كل فصل في كل مادة</p>
@@ -34,7 +35,7 @@ import { GradeHeatmapDto } from '../../../../models/ai-analytics.model';
 
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadHeatmap()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
             إعادة المحاولة
@@ -70,7 +71,7 @@ import { GradeHeatmapDto } from '../../../../models/ai-analytics.model';
 
         @if (data()!.classes.length === 0) {
           <div class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <span class="text-5xl block mb-3 opacity-50">🗺️</span>
+            <span class="text-5xl block mb-3 opacity-50"><app-icon name="globe" size="1.2em"></app-icon>️</span>
             <p class="text-slate-500 font-medium">لا توجد فصول مسجلة في هذا الصف</p>
           </div>
         } @else {

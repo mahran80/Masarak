@@ -18,7 +18,7 @@
     </div>
   } @else if (teachingAssignments().length === 0) {
     <div class="bg-amber-50 border border-amber-100 text-amber-700 p-4 rounded-xl text-sm font-bold">
-      ⚠️ لم يتم تعيينك في أي مقرر حتى الآن. يرجى التواصل مع الإدارة.
+      <app-icon name="exclamation-triangle" size="1.2em"></app-icon>️ لم يتم تعيينك في أي مقرر حتى الآن. يرجى التواصل مع الإدارة.
     </div>
   } @else {
     <div class="flex flex-wrap gap-2">
@@ -28,7 +28,7 @@
           [ngClass]="selectedTaId() === ta.id
             ? 'bg-[#4F8CD4] text-white border-[#4F8CD4] shadow-md shadow-blue-100'
             : 'bg-white text-slate-600 border-slate-200 hover:border-blue-200 hover:bg-blue-50/50'">
-          <span>📚</span>
+          <span><app-icon name="book-open" size="1.2em"></app-icon></span>
           <span>{{ ta.subjectName }}</span>
           <span class="text-[10px] opacity-70 font-medium">{{ ta.className }}</span>
         </button>
@@ -47,7 +47,7 @@
           [ngClass]="activeTab() === 'files'
             ? 'border-[#4F8CD4] text-[#4F8CD4] bg-white'
             : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-white/60'">
-          <span>📂</span>
+          <span><app-icon name="folder-open" size="1.2em"></app-icon></span>
           الملفات المرفوعة
           @if (contentItems().length > 0) {
             <span class="text-[10px] bg-[#4F8CD4]/10 text-[#4F8CD4] font-bold px-1.5 py-0.5 rounded-full">
@@ -60,7 +60,7 @@
           [ngClass]="activeTab() === 'upload'
             ? 'border-[#4F8CD4] text-[#4F8CD4] bg-white'
             : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-white/60'">
-          <span>📤</span>
+          <span><app-icon name="upload" size="1.2em"></app-icon></span>
           رفع محتوى جديد
         </button>
       </div>
@@ -84,7 +84,7 @@
             </div>
             <div class="flex items-center bg-slate-100 p-1 rounded-xl">
               <button (click)="viewMode.set('list')" class="p-2 rounded-lg text-sm transition-all"
-                [ngClass]="viewMode() === 'list' ? 'bg-white shadow-xs text-slate-700' : 'text-slate-400'">☰</button>
+                [ngClass]="viewMode() === 'list' ? 'bg-white shadow-xs text-slate-700' : 'text-slate-400'"><app-icon name="bars-3" size="1.2em"></app-icon></button>
               <button (click)="viewMode.set('grid')" class="p-2 rounded-lg text-sm transition-all"
                 [ngClass]="viewMode() === 'grid' ? 'bg-white shadow-xs text-slate-700' : 'text-slate-400'">⊞</button>
             </div>
@@ -136,21 +136,21 @@
                       </p>
                     </div>
                     <!-- Open indicator -->
-                    <span class="text-slate-300 group-hover:text-[#4F8CD4] transition-colors text-sm shrink-0 ml-2">↗</span>
+                    <span class="text-slate-300 group-hover:text-[#4F8CD4] transition-colors text-sm shrink-0 ml-2"><app-icon name="arrow-top-right-on-square" size="1.2em"></app-icon></span>
                   </a>
 
                   <!-- Delete button (separate, doesn't open file) -->
                   <button (click)="deleteContent(item.contentItemId)"
                     class="p-2 rounded-lg text-slate-200 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100 shrink-0"
                     title="حذف">
-                    🗑
+                    <app-icon name="trash" size="1.2em"></app-icon>
                   </button>
 
                 </div>
 
               } @empty {
                 <div class="text-center py-16 flex flex-col items-center gap-3">
-                  <span class="text-5xl">📂</span>
+                  <span class="text-5xl"><app-icon name="folder-open" size="1.2em"></app-icon></span>
                   <p class="font-bold text-slate-500">لا يوجد ملفات بعد</p>
                   <button (click)="switchTab('upload')" class="text-[#4F8CD4] text-sm font-bold underline">
                     ارفع أول ملف الآن
@@ -170,7 +170,7 @@
                   <!-- Delete button overlay -->
                   <button (click)="deleteContent(item.contentItemId)"
                     class="absolute top-2 left-2 z-10 p-1.5 rounded-lg bg-white/80 text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100 text-xs shadow-sm"
-                    title="حذف">✕</button>
+                    title="حذف"><app-icon name="x-mark" size="1.2em"></app-icon></button>
 
                   <!-- Clickable card body (opens file in new tab) -->
                   <a [href]="item.resourceUrl"
@@ -195,7 +195,7 @@
                        target="_blank"
                        rel="noopener noreferrer"
                        class="flex items-center justify-center gap-1.5 w-full text-[11px] font-bold text-[#4F8CD4] bg-blue-50 hover:bg-blue-100 py-2 rounded-xl transition-colors">
-                      ↗ فتح في تبويب جديد
+                      <app-icon name="arrow-top-right-on-square" size="1.2em"></app-icon> فتح في تبويب جديد
                     </a>
                   </div>
 
@@ -203,7 +203,7 @@
 
               } @empty {
                 <div class="col-span-4 text-center py-16 flex flex-col items-center gap-3">
-                  <span class="text-5xl">📂</span>
+                  <span class="text-5xl"><app-icon name="folder-open" size="1.2em"></app-icon></span>
                   <p class="font-bold text-slate-500">لا يوجد ملفات في هذه الفئة</p>
                   <button (click)="switchTab('upload')" class="text-[#4F8CD4] text-sm font-bold underline">
                     ارفع أول ملف الآن
@@ -227,12 +227,12 @@
             <button (click)="uploadMode.set('file')"
               class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all"
               [ngClass]="uploadMode() === 'file' ? 'bg-white text-[#4F8CD4] shadow-sm' : 'text-slate-500 hover:text-slate-700'">
-              📤 رفع ملف
+              <app-icon name="upload" size="1.2em"></app-icon> رفع ملف
             </button>
             <button (click)="uploadMode.set('url')"
               class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all"
               [ngClass]="uploadMode() === 'url' ? 'bg-white text-[#4F8CD4] shadow-sm' : 'text-slate-500 hover:text-slate-700'">
-              🔗 إضافة رابط
+              <app-icon name="link" size="1.2em"></app-icon> إضافة رابط
             </button>
           </div>
 
@@ -292,7 +292,7 @@
                     <p class="text-sm font-bold text-[#4F8CD4] truncate max-w-xs text-center">{{ uploadFile.name }}</p>
                     <p class="text-xs text-slate-400 mt-1">{{ formatBytes(uploadFile.size) }} · انقر لتغيير الملف</p>
                   } @else {
-                    <span class="text-3xl mb-2 text-slate-300">📁</span>
+                    <span class="text-3xl mb-2 text-slate-300"><app-icon name="folder" size="1.2em"></app-icon></span>
                     <p class="text-sm font-bold text-slate-600">انقر أو اسحب الملف هنا</p>
                     <p class="text-xs text-slate-400 mt-1">الحد الأقصى 500 ميغابايت</p>
                   }
@@ -314,7 +314,7 @@
             <!-- Feedback -->
             @if (uploadError()) {
               <div class="flex items-center gap-3 bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100">
-                ⚠️ {{ uploadError() }}
+                <app-icon name="exclamation-triangle" size="1.2em"></app-icon>️ {{ uploadError() }}
               </div>
             }
             @if (uploadSuccess()) {
@@ -330,8 +330,10 @@
                 @if (isUploading()) {
                   <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                   جارٍ الرفع...
+                } @else if (uploadMode() === 'file') {
+                  <app-icon name="upload" size="1.2em"></app-icon> رفع الملف
                 } @else {
-                  {{ uploadMode() === 'file' ? '📤 رفع الملف' : '🔗 إضافة الرابط' }}
+                  <app-icon name="link" size="1.2em"></app-icon> إضافة الرابط
                 }
               </button>
               <button (click)="switchTab('files')"

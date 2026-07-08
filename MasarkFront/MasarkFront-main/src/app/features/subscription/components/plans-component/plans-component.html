@@ -82,12 +82,12 @@
         <div class="mt-8 space-y-3">
 
           <div class="flex items-center gap-2">
-            <span class="text-green-500">✓</span>
+            <span class="text-green-500"><app-icon name="check" size="1.2em"></app-icon></span>
             <span>{{ plan.durationDays }} Days Access</span>
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="text-green-500">✓</span>
+            <span class="text-green-500"><app-icon name="check" size="1.2em"></app-icon></span>
             <span>AI Learning Assistant</span>
           </div>
 
@@ -95,14 +95,18 @@
             <span
               [class]="plan.hasLiveClass ? 'text-green-500' : 'text-red-500'"
             >
-              {{ plan.hasLiveClass ? '✓' : '✕' }}
+              @if (plan.hasLiveClass) {
+                <app-icon name="check" size="1.2em"></app-icon>
+              } @else {
+                <app-icon name="x-mark" size="1.2em"></app-icon>
+              }
             </span>
             <span>Live Classes</span>
           </div>
 
 
           <div class="flex items-center gap-2">
-            <span class="text-green-500">✓</span>
+            <span class="text-green-500"><app-icon name="check" size="1.2em"></app-icon></span>
             <span>{{ plan.maxSubjects }} Subjects</span>
           </div>
 

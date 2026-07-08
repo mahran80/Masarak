@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,7 +7,7 @@ import { ParentService } from '../../services/parent.service';
 @Component({
   selector: 'app-link-student',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8" dir="rtl">
       <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center relative overflow-hidden">
@@ -30,7 +31,7 @@ import { ParentService } from '../../services/parent.service';
         @else if (status() === 'success') {
           <div class="relative z-10 animate-fade-in">
             <div class="w-20 h-20 bg-emerald-100 rounded-full mx-auto flex items-center justify-center mb-6 shadow-sm border-4 border-white">
-              <span class="text-4xl">✅</span>
+              <span class="text-4xl"><app-icon name="check-circle" size="1.2em"></app-icon></span>
             </div>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">تم الربط بنجاح!</h2>
             <p class="text-slate-500 mb-8">تم ربط حساب الطالب بحسابك بنجاح. يتم الآن توجيهك إلى لوحة التحكم...</p>
@@ -43,7 +44,7 @@ import { ParentService } from '../../services/parent.service';
         @else if (status() === 'error') {
           <div class="relative z-10 animate-fade-in">
             <div class="w-20 h-20 bg-rose-100 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-sm">
-              <span class="text-4xl">❌</span>
+              <span class="text-4xl"><app-icon name="x-mark" size="1.2em"></app-icon></span>
             </div>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">فشل عملية الربط</h2>
             <p class="text-rose-600 bg-rose-50 p-4 rounded-xl text-sm mb-8 border border-rose-100">
@@ -59,7 +60,7 @@ import { ParentService } from '../../services/parent.service';
         @else if (status() === 'invalid_link') {
           <div class="relative z-10 animate-fade-in">
             <div class="w-20 h-20 bg-orange-100 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-sm">
-              <span class="text-4xl">🔗</span>
+              <span class="text-4xl"><app-icon name="link" size="1.2em"></app-icon></span>
             </div>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">رابط غير صالح</h2>
             <p class="text-slate-500 mb-8">الرابط الذي تحاول استخدامه غير صالح أو لا يحتوي على رمز الربط المطلوب. يرجى التأكد من الرابط الصحيح.</p>

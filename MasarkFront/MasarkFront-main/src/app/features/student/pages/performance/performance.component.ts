@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,7 +19,7 @@ import { StudentService } from '../../services/student.service';
 @Component({
   selector: 'app-student-performance-page',
   standalone: true,
-  imports: [StudentPerformanceTableComponent, PerformanceChartComponent],
+  imports: [IconComponent, StudentPerformanceTableComponent, PerformanceChartComponent],
   templateUrl: './performance.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

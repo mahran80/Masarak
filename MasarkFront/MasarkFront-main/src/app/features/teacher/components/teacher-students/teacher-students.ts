@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect, computed } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { TeacherStudentsService, StudentInClass } from '../../services/teacher-s
 @Component({
   selector: 'app-teacher-students',
   standalone: true,
-  imports: [NgClass, FormsModule],
+  imports: [IconComponent, NgClass, FormsModule],
   templateUrl: './teacher-students.html',
   styleUrl: './teacher-students.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

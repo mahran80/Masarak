@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -7,7 +8,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
 @Component({
   selector: 'app-student-insight',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
@@ -15,7 +16,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-indigo-600">🎓</span>
+              <span class="text-indigo-600"><app-icon name="academic-cap" size="1.2em"></app-icon></span>
               تفاصيل أداء الطالب
             </h1>
             <p class="text-sm text-slate-500 mt-1">تحليل الأداء مع اقتراحات تعليمية من الذكاء الاصطناعي</p>
@@ -37,7 +38,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
 
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadInsight()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
             إعادة المحاولة
@@ -49,7 +50,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
         <!-- Student Info -->
         <div class="bg-gradient-to-l from-indigo-600 to-violet-700 rounded-2xl p-6 text-white shadow-lg">
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center text-2xl">🎓</div>
+            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center text-2xl"><app-icon name="academic-cap" size="1.2em"></app-icon></div>
             <div>
               <h2 class="text-xl font-bold">{{ data()!.studentName }}</h2>
               <p class="text-indigo-200 text-sm">{{ data()!.subjectName }}</p>
@@ -60,11 +61,11 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
         <!-- Weak Topics -->
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <span>📋</span> نقاط الضعف المُحددة
+            <span><app-icon name="clipboard" size="1.2em"></app-icon></span> نقاط الضعف المُحددة
           </h3>
           @if (data()!.weakTopics.length === 0) {
             <div class="text-center py-8">
-              <span class="text-4xl block mb-2">✨</span>
+              <span class="text-4xl block mb-2"><app-icon name="sparkles" size="1.2em"></app-icon></span>
               <p class="text-slate-500 font-medium">لم نرصد نقاط ضعف محددة لهذا الطالب في هذه المادة</p>
             </div>
           } @else {
@@ -105,16 +106,16 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
         @if (data()!.activeAlerts.length > 0) {
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <span>🔔</span> تنبيهات نشطة
+              <span><app-icon name="bell" size="1.2em"></app-icon></span> تنبيهات نشطة
               <span class="text-xs bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">{{ data()!.activeAlerts.length }}</span>
             </h3>
             <div class="space-y-3">
               @for (alert of data()!.activeAlerts; track alert.performanceAlertId) {
                 <div class="flex items-center gap-3 p-3 rounded-xl border border-red-100 bg-red-50/50">
                   <span class="text-lg">
-                    @if (alert.alertType === 'LowAttendance') { 🕒 }
-                    @else if (alert.alertType === 'LowExamScore') { 📝 }
-                    @else { 📋 }
+                    @if (alert.alertType === 'LowAttendance') { <app-icon name="clock" size="1.2em"></app-icon> }
+                    @else if (alert.alertType === 'LowExamScore') { <app-icon name="pencil" size="1.2em"></app-icon> }
+                    @else { <app-icon name="clipboard" size="1.2em"></app-icon> }
                   </span>
                   <div class="flex-1">
                     <p class="text-sm font-bold text-slate-800">{{ alert.message }}</p>
@@ -130,7 +131,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span>💡</span> اقتراح تعليمي من الذكاء الاصطناعي
+              <span><app-icon name="sparkles" size="1.2em"></app-icon></span> اقتراح تعليمي من الذكاء الاصطناعي
             </h3>
             <button (click)="generateSuggestion()"
                     [disabled]="isGenerating()"
@@ -142,7 +143,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
                 </svg>
                 جاري التوليد...
               } @else {
-                ✨ توليد اقتراح جديد
+                <app-icon name="sparkles" size="1.2em"></app-icon> توليد اقتراح جديد
               }
             </button>
           </div>
@@ -154,7 +155,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
               <ul class="space-y-2">
                 @for (item of suggestion()!.actionItems; track item) {
                   <li class="flex items-start gap-2 text-sm text-slate-600">
-                    <span class="text-indigo-500 font-bold mt-0.5">✓</span>
+                    <span class="text-indigo-500 font-bold mt-0.5"><app-icon name="check" size="1.2em"></app-icon></span>
                     {{ item }}
                   </li>
                 }
@@ -163,7 +164,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
             </div>
           } @else {
             <div class="text-center py-8 text-slate-400">
-              <span class="text-4xl block mb-2">🤖</span>
+              <span class="text-4xl block mb-2"><app-icon name="robot" size="1.2em"></app-icon></span>
               <p class="font-medium">لا يوجد اقتراح حالياً. اضغط "توليد اقتراح جديد" للحصول على نصيحة تعليمية مخصصة.</p>
             </div>
           }

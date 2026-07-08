@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -7,7 +8,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
 @Component({
   selector: 'app-class-analytics',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
@@ -15,7 +16,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-emerald-600">📊</span>
+              <span class="text-emerald-600"><app-icon name="chart" size="1.2em"></app-icon></span>
               تحليلات الفصل
             </h1>
             <p class="text-sm text-slate-500 mt-1">عرض شامل لأداء الفصل والطلاب</p>
@@ -38,7 +39,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
       <!-- Error -->
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <h3 class="font-bold text-lg mb-1">عذراً، حدث خطأ</h3>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadAnalytics()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -82,7 +83,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
         <!-- Score Distribution -->
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h3 class="font-bold text-slate-800 text-lg mb-5 flex items-center gap-2">
-            <span>📊</span> توزيع الدرجات
+            <span><app-icon name="chart" size="1.2em"></app-icon></span> توزيع الدرجات
           </h3>
           <div class="flex items-end gap-3 h-40">
             @for (bucket of data()!.distribution; track bucket.label) {
@@ -107,7 +108,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
           <!-- Top 5 -->
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-              <span>🏆</span> أفضل 5 طلاب
+              <span><app-icon name="trophy" size="1.2em"></app-icon></span> أفضل 5 طلاب
             </h3>
             <div class="space-y-3">
               @for (student of data()!.topFive; track student.studentUserId; let i = $index) {
@@ -136,7 +137,7 @@ import { ClassAnalyticsDashboardDto } from '../../../../models/ai-analytics.mode
           <!-- Bottom 5 -->
           <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-              <span>⚠️</span> أقل 5 طلاب (يحتاجون دعم)
+              <span><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span> أقل 5 طلاب (يحتاجون دعم)
             </h3>
             <div class="space-y-3">
               @for (student of data()!.bottomFive; track student.studentUserId; let i = $index) {

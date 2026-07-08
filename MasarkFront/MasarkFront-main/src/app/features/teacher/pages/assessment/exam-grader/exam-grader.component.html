@@ -19,7 +19,7 @@
 
     @if (data.pendingAnswers.length === 0) {
       <div class="bg-white rounded-[24px] p-12 shadow-xs border border-slate-100 text-center">
-        <div class="text-4xl mb-4">✅</div>
+        <div class="text-4xl mb-4"><app-icon name="check-circle" size="1.2em"></app-icon></div>
         <h2 class="text-xl font-bold text-slate-900 mb-2">اكتمل التصحيح</h2>
         <p class="text-slate-500 font-bold mb-6">لا يوجد أسئلة مقالية بانتظار التصحيح لهذا الطالب.</p>
         <a routerLink="/dashboard/teacher/assessment/grading" class="bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md">
@@ -62,7 +62,7 @@
           @if (currentAnswer.fileUrl) {
             <div class="mt-4">
               <a [href]="currentAnswer.fileUrl" target="_blank" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-slate-200">
-                <span>📎</span> عرض المرفق
+                <span><app-icon name="link" size="1.2em"></app-icon></span> عرض المرفق
               </a>
             </div>
           }
@@ -105,7 +105,7 @@
             <button type="submit" [disabled]="isGrading()"
               class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all shadow-md flex items-center gap-2">
               {{ isGrading() ? 'جاري الحفظ...' : 'حفظ التقييم والانتقال للتالي' }}
-              <span [class.hidden]="isGrading()">⬅️</span>
+              <span [class.hidden]="isGrading()"><app-icon name="arrow-left" size="1.2em"></app-icon>️</span>
             </button>
           </div>
         </form>

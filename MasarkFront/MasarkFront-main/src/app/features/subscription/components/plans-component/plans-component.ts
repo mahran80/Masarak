@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, inject, signal, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -8,7 +9,7 @@ import { PlanDto } from '../../../../core/models/subscription.model';
 @Component({
   selector: 'plans-component',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   templateUrl: './plans-component.html',
 })
 export class PlansComponent implements OnInit {

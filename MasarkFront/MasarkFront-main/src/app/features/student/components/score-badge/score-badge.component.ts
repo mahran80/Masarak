@@ -1,10 +1,11 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-score-badge',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [class]="badgeClass()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border">
@@ -32,9 +33,9 @@ export class ScoreBadgeComponent {
 
   readonly icon = computed(() => {
     const p = this.percentage();
-    if (p >= 85) return '🌟';
-    if (p >= 65) return '👍';
-    if (p >= 50) return '⚠️';
-    return '💔';
+    if (p >= 85) return '<app-icon name="sparkles" size="1.2em"></app-icon>';
+    if (p >= 65) return '<app-icon name="check-badge" size="1.2em"></app-icon>';
+    if (p >= 50) return '<app-icon name="exclamation-triangle" size="1.2em"></app-icon>️';
+    return '<app-icon name="x-mark" size="1.2em"></app-icon>';
   });
 }

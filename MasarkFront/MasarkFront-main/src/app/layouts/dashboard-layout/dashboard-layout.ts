@@ -12,6 +12,7 @@ import { IconComponent } from '../../shared/components/icon/icon.component';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, IconComponent],
   templateUrl: './dashboard-layout.html',
+  styleUrl: './dashboard-layout.css',
 })
 export class DashboardLayoutComponent implements OnInit, OnDestroy {
   private readonly authApi = inject(AuthApiService);

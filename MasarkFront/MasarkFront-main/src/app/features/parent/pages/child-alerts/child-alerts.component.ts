@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -7,12 +8,12 @@ import { PerformanceAlertDto } from '../../../../models/ai-analytics.model';
 @Component({
   selector: 'app-child-alerts',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
         <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-2xl">
-          ⚠️
+          <app-icon name="exclamation-triangle" size="1.2em"></app-icon>️
         </div>
         <div>
           <h1 class="text-2xl font-bold text-slate-800">تنبيهات الأداء</h1>
@@ -34,7 +35,7 @@ import { PerformanceAlertDto } from '../../../../models/ai-analytics.model';
         </div>
       } @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <h3 class="font-bold text-lg mb-1">عذراً، حدث خطأ</h3>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadAlerts()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -43,7 +44,7 @@ import { PerformanceAlertDto } from '../../../../models/ai-analytics.model';
         </div>
       } @else if (alerts().length === 0) {
         <div class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm border-dashed">
-          <div class="text-6xl mb-4 text-emerald-400">✨</div>
+          <div class="text-6xl mb-4 text-emerald-400"><app-icon name="sparkles" size="1.2em"></app-icon></div>
           <h3 class="text-xl font-bold text-slate-700 mb-2">أداء ممتاز، لا توجد تنبيهات!</h3>
           <p class="text-slate-500 mb-6 max-w-md mx-auto">لم نرصد أي انخفاض في مستوى الطالب أو أي مشاكل في الحضور. استمروا في هذا الأداء الرائع.</p>
         </div>
@@ -69,9 +70,9 @@ import { PerformanceAlertDto } from '../../../../models/ai-analytics.model';
                 <div class="flex justify-between items-start mb-4">
                   <div class="flex items-center gap-2">
                     <span class="text-xl">
-                      @if (alert.alertType === 'LowAttendance') { 🕒 }
-                      @else if (alert.alertType === 'LowExamScore') { 📝 }
-                      @else { 📊 }
+                      @if (alert.alertType === 'LowAttendance') { <app-icon name="clock" size="1.2em"></app-icon> }
+                      @else if (alert.alertType === 'LowExamScore') { <app-icon name="pencil" size="1.2em"></app-icon> }
+                      @else { <app-icon name="chart" size="1.2em"></app-icon> }
                     </span>
                     <h3 class="font-bold text-slate-800 text-lg">
                       @if (alert.alertType === 'LowAttendance') { غياب متكرر }

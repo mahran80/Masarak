@@ -62,7 +62,7 @@
         <div class="flex items-center justify-between">
           <label class="block text-sm font-bold text-slate-700">الخيارات</label>
           @if (questionForm.get('type')?.value !== 'TrueFalse') {
-            <button type="button" (click)="addOption()" class="text-blue-500 hover:text-blue-700 text-xs font-bold">➕ إضافة خيار</button>
+            <button type="button" (click)="addOption()" class="text-blue-500 hover:text-blue-700 text-xs font-bold"><app-icon name="plus" size="1.2em"></app-icon> إضافة خيار</button>
           }
         </div>
 

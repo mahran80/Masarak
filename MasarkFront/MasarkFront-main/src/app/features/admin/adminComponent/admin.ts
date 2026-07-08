@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminApiService } from '../../../core/services/admin-api-service';
@@ -18,7 +19,7 @@ interface DashboardData {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })

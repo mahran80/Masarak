@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
 @Component({
   selector: 'app-prompt-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [IconComponent, CommonModule, FormsModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
@@ -16,7 +17,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-purple-600">🤖</span>
+              <span class="text-purple-600"><app-icon name="robot" size="1.2em"></app-icon></span>
               إدارة قوالب الذكاء الاصطناعي
             </h1>
             <p class="text-sm text-slate-500 mt-1">تعديل قوالب المطالبات المستخدمة في توليد التقارير والتحليلات</p>
@@ -39,7 +40,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
 
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadTemplates()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
             إعادة المحاولة
@@ -51,7 +52,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
         <!-- Success Message -->
         @if (successMessage()) {
           <div class="bg-emerald-50 text-emerald-700 p-4 rounded-2xl border border-emerald-200 flex items-center gap-2 text-sm font-bold">
-            ✅ {{ successMessage() }}
+            <app-icon name="check-circle" size="1.2em"></app-icon> {{ successMessage() }}
           </div>
         }
 
@@ -75,7 +76,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
               <!-- System Prompt -->
               <div class="space-y-1.5">
                 <label class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                  🔧 System Prompt
+                  <app-icon name="settings" size="1.2em"></app-icon> System Prompt
                 </label>
                 <textarea [(ngModel)]="editData[template.key].systemPrompt"
                           rows="3"
@@ -86,7 +87,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
               <!-- User Prompt Template -->
               <div class="space-y-1.5">
                 <label class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                  💬 User Prompt Template
+                  <app-icon name="chat" size="1.2em"></app-icon> User Prompt Template
                 </label>
                 <textarea [(ngModel)]="editData[template.key].userPromptTemplate"
                           rows="5"
@@ -123,7 +124,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
                     </svg>
                     جاري الحفظ...
                   } @else {
-                    💾 حفظ التغييرات
+                    <app-icon name="archive" size="1.2em"></app-icon> حفظ التغييرات
                   }
                 </button>
               </div>
@@ -133,7 +134,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
 
         @if (templates().length === 0) {
           <div class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <span class="text-5xl block mb-3 opacity-50">🤖</span>
+            <span class="text-5xl block mb-3 opacity-50"><app-icon name="robot" size="1.2em"></app-icon></span>
             <p class="text-slate-500 font-medium">لا توجد قوالب مسجلة في النظام</p>
           </div>
         }
@@ -153,9 +154,9 @@ export class PromptEditorComponent implements OnInit {
   editData: Record<string, { systemPrompt: string; userPromptTemplate: string; maxTokens: number; temperature: number }> = {};
 
   private readonly templateLabels: Record<string, string> = {
-    weakness_analysis: '📊 تحليل نقاط الضعف',
-    parent_report: '📄 تقرير ولي الأمر الشهري',
-    teaching_suggestion: '💡 اقتراح تعليمي للمعلم',
+    weakness_analysis: '<app-icon name="chart" size="1.2em"></app-icon> تحليل نقاط الضعف',
+    parent_report: '<app-icon name="document-text" size="1.2em"></app-icon> تقرير ولي الأمر الشهري',
+    teaching_suggestion: '<app-icon name="sparkles" size="1.2em"></app-icon> اقتراح تعليمي للمعلم',
   };
 
   getTemplateLabel(key: string): string {

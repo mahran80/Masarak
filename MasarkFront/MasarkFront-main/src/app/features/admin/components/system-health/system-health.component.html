@@ -7,7 +7,7 @@
       <span class="font-bold text-slate-800">حالة النظام</span>
     </div>
     <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-      <span class="text-blue-600">🖥️</span> مراقبة حالة النظام
+      <span class="text-blue-600"><app-icon name="globe" size="1.2em"></app-icon>️</span> مراقبة حالة النظام
     </h1>
     <p class="text-sm text-slate-500 mt-1">نظرة عامة على أداء المنصة والخدمات المرتبطة بها</p>
   </div>
@@ -35,7 +35,7 @@
     <!-- Queue & Jobs -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
       <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-        <span>⚙️</span> حالة الطابور والمهام (RabbitMQ)
+        <span><app-icon name="settings" size="1.2em"></app-icon>️</span> حالة الطابور والمهام (RabbitMQ)
       </h3>
 
       <div class="flex justify-between items-center py-3 border-b border-slate-100">
@@ -66,7 +66,7 @@
     <!-- Recent Errors -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
       <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-        <span class="text-red-500">⚠️</span> آخر الأخطاء المسجلة
+        <span class="text-red-500"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span> آخر الأخطاء المسجلة
       </h3>
 
       <div class="space-y-4">
@@ -82,7 +82,7 @@
       </div>
 
       <div *ngIf="recentErrors().length === 0" class="text-center py-12 bg-emerald-50 rounded-xl border border-emerald-100 border-dashed">
-        <div class="text-4xl mb-3">✅</div>
+        <div class="text-4xl mb-3"><app-icon name="check-circle" size="1.2em"></app-icon></div>
         <div class="font-bold text-emerald-800">النظام يعمل بشكل سليم</div>
         <div class="text-sm text-emerald-600 mt-1">لا توجد أخطاء مسجلة حالياً</div>
       </div>

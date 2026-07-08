@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -9,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-parent-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ChildSelectorComponent],
+  imports: [IconComponent, CommonModule, RouterLink, ChildSelectorComponent],
   template: `
     <div class="space-y-6 animate-fade-in">
       <div class="flex justify-between items-center">
@@ -18,14 +19,14 @@ import { environment } from '../../../../../environments/environment';
           <p class="text-slate-500 mt-1">تابع تقدم أبنائك الأكاديمي بكل سهولة</p>
         </div>
         <a routerLink="onboarding/add-student" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors shadow-sm shadow-blue-200 flex items-center gap-2">
-          <span>➕</span> إضافة طالب جديد
+          <span><app-icon name="plus" size="1.2em"></app-icon></span> إضافة طالب جديد
         </a>
       </div>
 
       <!-- Overview Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl">👨‍👧‍👦</div>
+          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl"><app-icon name="family" size="1.2em"></app-icon></div>
           <div>
             <p class="text-sm text-slate-500 font-medium">عدد الأبناء المرتبطين</p>
             <p class="text-2xl font-bold text-slate-800">{{ parentService.linkedStudents().length }}</p>
@@ -33,7 +34,7 @@ import { environment } from '../../../../../environments/environment';
         </div>
         
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl">✅</div>
+          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl"><app-icon name="check-circle" size="1.2em"></app-icon></div>
           <div>
             <p class="text-sm text-slate-500 font-medium">الاشتراكات الفعالة</p>
             <p class="text-2xl font-bold text-slate-800">{{ activeSubscriptionsCount }}</p>
@@ -41,7 +42,7 @@ import { environment } from '../../../../../environments/environment';
         </div>
 
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl">🎫</div>
+          <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl"><app-icon name="credit-card" size="1.2em"></app-icon></div>
           <div>
             <p class="text-sm text-slate-500 font-medium">الاشتراكات المنتهية</p>
             <p class="text-2xl font-bold text-slate-800">{{ inactiveSubscriptionsCount }}</p>
@@ -54,7 +55,7 @@ import { environment } from '../../../../../environments/environment';
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-8">
           <div class="flex items-center justify-between border-b border-slate-100 pb-6 mb-6">
             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span>👤</span> تفاصيل الطالب
+              <span><app-icon name="user" size="1.2em"></app-icon></span> تفاصيل الطالب
             </h2>
             <app-child-selector></app-child-selector>
           </div>
@@ -64,19 +65,19 @@ import { environment } from '../../../../../environments/environment';
               <!-- Student HAS subscription: show feature links -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <a [routerLink]="['reports', parentService.selectedStudentId()]" class="block p-5 rounded-xl border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group bg-slate-50">
-                  <div class="text-blue-500 mb-3 text-2xl group-hover:scale-110 transition-transform">📊</div>
+                  <div class="text-blue-500 mb-3 text-2xl group-hover:scale-110 transition-transform"><app-icon name="chart" size="1.2em"></app-icon></div>
                   <h3 class="font-bold text-slate-800 mb-1">التقارير الذكية</h3>
                   <p class="text-sm text-slate-500">تقارير أداء شهرية مدعومة بالذكاء الاصطناعي</p>
                 </a>
 
                 <a [routerLink]="['alerts', parentService.selectedStudentId()]" class="block p-5 rounded-xl border border-slate-100 hover:border-rose-200 hover:shadow-md transition-all group bg-slate-50">
-                  <div class="text-rose-500 mb-3 text-2xl group-hover:scale-110 transition-transform">⚠️</div>
+                  <div class="text-rose-500 mb-3 text-2xl group-hover:scale-110 transition-transform"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</div>
                   <h3 class="font-bold text-slate-800 mb-1">تنبيهات الأداء</h3>
                   <p class="text-sm text-slate-500">متابعة الانخفاض في المستوى أو الغياب</p>
                 </a>
 
                 <a [routerLink]="['attendance', parentService.selectedStudentId()]" class="block p-5 rounded-xl border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group bg-slate-50">
-                  <div class="text-emerald-500 mb-3 text-2xl group-hover:scale-110 transition-transform">📅</div>
+                  <div class="text-emerald-500 mb-3 text-2xl group-hover:scale-110 transition-transform"><app-icon name="calendar" size="1.2em"></app-icon></div>
                   <h3 class="font-bold text-slate-800 mb-1">سجل الحضور</h3>
                   <p class="text-sm text-slate-500">متابعة حضور غياب الطالب في الحصص</p>
                 </a>
@@ -84,7 +85,7 @@ import { environment } from '../../../../../environments/environment';
             } @else {
               <!-- Student has NO subscription: show subscribe prompt -->
               <div class="text-center py-10">
-                <div class="text-5xl mb-4">🔒</div>
+                <div class="text-5xl mb-4"><app-icon name="lock" size="1.2em"></app-icon></div>
                 <h3 class="text-lg font-bold text-slate-800 mb-2">الطالب {{ parentService.selectedStudent()?.fullName }} ليس لديه اشتراك فعال</h3>
                 <p class="text-slate-500 mb-6 max-w-md mx-auto">لعرض التقارير الذكية وتنبيهات الأداء وسجل الحضور، يرجى تفعيل اشتراك للطالب.</p>
                 
@@ -99,9 +100,9 @@ import { environment } from '../../../../../environments/environment';
                   [disabled]="isSubscribing()"
                   class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200">
                   @if (isSubscribing()) {
-                    <span class="animate-spin">⏳</span> جاري التحويل...
+                    <span class="animate-spin"><app-icon name="clock" size="1.2em"></app-icon></span> جاري التحويل...
                   } @else {
-                    <span>💳</span> تفعيل اشتراك للطالب
+                    <span><app-icon name="credit-card" size="1.2em"></app-icon></span> تفعيل اشتراك للطالب
                   }
                 </button>
               </div>
@@ -110,11 +111,11 @@ import { environment } from '../../../../../environments/environment';
         </div>
       } @else {
         <div class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-6xl mb-4">👦👧</div>
+          <div class="text-6xl mb-4"><app-icon name="family" size="1.2em"></app-icon></div>
           <h3 class="text-lg font-bold text-slate-800 mb-2">لا يوجد أبناء مرتبطين بحسابك</h3>
           <p class="text-slate-500 mb-6 max-w-sm mx-auto">قم بإضافة أبنائك أو ربط حساباتهم الموجودة مسبقاً لمتابعة أدائهم الأكاديمي.</p>
           <a routerLink="onboarding/add-student" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200">
-            <span>➕</span> إضافة طالب جديد
+            <span><app-icon name="plus" size="1.2em"></app-icon></span> إضافة طالب جديد
           </a>
         </div>
       }

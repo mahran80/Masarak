@@ -34,9 +34,11 @@ export interface AdminUser {
   } | null;
 }
 
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+
 @Component({
   selector: 'app-user-management',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css',
 })

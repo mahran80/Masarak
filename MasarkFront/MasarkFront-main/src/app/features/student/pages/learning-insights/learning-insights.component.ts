@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -13,7 +14,7 @@ import {
 @Component({
   selector: 'app-learning-insights',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
@@ -21,7 +22,7 @@ import {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-violet-600">🧠</span>
+              <span class="text-violet-600"><app-icon name="sparkles" size="1.2em"></app-icon></span>
               رؤى التعلم الذكية
             </h1>
             <p class="text-sm text-slate-500 mt-1">تحليل نقاط الضعف والقوة لديك مع توصيات مخصصة بالذكاء الاصطناعي</p>
@@ -47,7 +48,7 @@ import {
       <!-- Error -->
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <h3 class="font-bold text-lg mb-1">عذراً، حدث خطأ</h3>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadInsights()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -61,7 +62,7 @@ import {
         @if (data()!.activeAlerts.length > 0) {
           <div class="space-y-3">
             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span>🔔</span> تنبيهات الأداء
+              <span><app-icon name="bell" size="1.2em"></app-icon></span> تنبيهات الأداء
               <span class="text-xs bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">{{ data()!.activeAlerts.length }}</span>
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,9 +73,9 @@ import {
                      [class.border-r-blue-500]="alert.alertType === 'MissedAssignments'">
                   <div class="flex items-center gap-2 mb-2">
                     <span class="text-lg">
-                      @if (alert.alertType === 'LowAttendance') { 🕒 }
-                      @else if (alert.alertType === 'LowExamScore') { 📝 }
-                      @else { 📋 }
+                      @if (alert.alertType === 'LowAttendance') { <app-icon name="clock" size="1.2em"></app-icon> }
+                      @else if (alert.alertType === 'LowExamScore') { <app-icon name="pencil" size="1.2em"></app-icon> }
+                      @else { <app-icon name="clipboard" size="1.2em"></app-icon> }
                     </span>
                     <span class="font-bold text-slate-800">
                       @if (alert.alertType === 'LowAttendance') { انخفاض الحضور }
@@ -95,11 +96,11 @@ import {
         <!-- Weakness Analyses -->
         <div class="space-y-3">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span>📊</span> تحليل نقاط الضعف
+            <span><app-icon name="chart" size="1.2em"></app-icon></span> تحليل نقاط الضعف
           </h2>
           @if (data()!.subjectAnalyses.length === 0) {
             <div class="bg-emerald-50 text-emerald-700 p-6 rounded-2xl border border-emerald-200 text-center">
-              <span class="text-4xl mb-2 block">🌟</span>
+              <span class="text-4xl mb-2 block"><app-icon name="sparkles" size="1.2em"></app-icon></span>
               <p class="font-bold">لم نرصد أي نقاط ضعف حتى الآن. أداء رائع!</p>
             </div>
           } @else {
@@ -159,11 +160,11 @@ import {
         <!-- Content Recommendations -->
         <div class="space-y-3">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span>💡</span> محتوى موصى به
+            <span><app-icon name="sparkles" size="1.2em"></app-icon></span> محتوى موصى به
           </h2>
           @if (data()!.recommendations.length === 0) {
             <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <span class="text-4xl mb-2 block opacity-50">📚</span>
+              <span class="text-4xl mb-2 block opacity-50"><app-icon name="book-open" size="1.2em"></app-icon></span>
               <p class="text-slate-500 font-medium">لا توجد توصيات حالياً</p>
             </div>
           } @else {
@@ -172,10 +173,10 @@ import {
                 <div class="bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:border-violet-200 hover:shadow-md transition-all group">
                   <div class="flex items-center gap-3 mb-3">
                     <span class="text-2xl">
-                      @if (rec.contentType === 'Video') { 🎬 }
-                      @else if (rec.contentType === 'Document') { 📄 }
-                      @else if (rec.contentType === 'Quiz') { ✅ }
-                      @else { 📁 }
+                      @if (rec.contentType === 'Video') { <app-icon name="video" size="1.2em"></app-icon> }
+                      @else if (rec.contentType === 'Document') { <app-icon name="document-text" size="1.2em"></app-icon> }
+                      @else if (rec.contentType === 'Quiz') { <app-icon name="check-circle" size="1.2em"></app-icon> }
+                      @else { <app-icon name="folder" size="1.2em"></app-icon> }
                     </span>
                     <div class="min-w-0">
                       <p class="text-sm font-bold text-slate-800 truncate group-hover:text-violet-600 transition-colors">{{ rec.title }}</p>
@@ -198,11 +199,11 @@ import {
         <!-- Performance Trends -->
         <div class="space-y-3">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span>📈</span> اتجاهات الأداء
+            <span><app-icon name="chart" size="1.2em"></app-icon></span> اتجاهات الأداء
           </h2>
           @if (data()!.performanceTrends.length === 0) {
             <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <span class="text-4xl mb-2 block opacity-50">📉</span>
+              <span class="text-4xl mb-2 block opacity-50"><app-icon name="chart" size="1.2em"></app-icon></span>
               <p class="text-slate-500 font-medium">لا توجد بيانات أداء كافية لعرض الاتجاهات</p>
             </div>
           } @else {

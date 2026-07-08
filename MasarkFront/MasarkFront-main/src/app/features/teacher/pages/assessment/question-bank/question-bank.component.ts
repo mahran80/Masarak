@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,7 +11,7 @@ import { QuestionEditorComponent } from '../question-editor/question-editor.comp
 @Component({
   selector: 'app-question-bank',
   standalone: true,
-  imports: [ReactiveFormsModule, QuestionEditorComponent],
+  imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
   templateUrl: './question-bank.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

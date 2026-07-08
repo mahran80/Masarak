@@ -20,11 +20,11 @@
 
       <a routerLink="/dashboard/teacher/assessment/assignments/create"
          class="flex items-center justify-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100 active:scale-95">
-        ➕ إضافة واجب جديد
+        <app-icon name="plus" size="1.2em"></app-icon> إضافة واجب جديد
       </a>
       <a routerLink="/dashboard/teacher/assessment/exams/create"
          class="flex items-center justify-center gap-2 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-95">
-        📝 إنشاء اختبار
+        <app-icon name="pencil" size="1.2em"></app-icon> إنشاء اختبار
       </a>
     </div>
   </div>
@@ -97,7 +97,7 @@
               <tr>
                 <td colspan="6" class="text-center py-12 text-slate-400">
                   <div class="flex flex-col items-center gap-2">
-                    <span class="text-3xl">📋</span>
+                    <span class="text-3xl"><app-icon name="clipboard" size="1.2em"></app-icon></span>
                     <p class="font-bold">لا يوجد واجبات بعد</p>
                     <a routerLink="/dashboard/teacher/assessment/assignments/create"
                        class="text-[#4F8CD4] text-xs font-bold underline">أنشئ واجبك الأول</a>

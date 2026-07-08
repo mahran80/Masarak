@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -7,13 +8,13 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
 @Component({
   selector: 'app-platform-analytics',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <span class="text-blue-600">🏢</span>
+          <span class="text-blue-600"><app-icon name="building" size="1.2em"></app-icon></span>
           تحليلات المنصة
         </h1>
         <p class="text-sm text-slate-500 mt-1">نظرة شاملة على أداء المنصة والإحصائيات الرئيسية</p>
@@ -30,7 +31,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
 
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadAnalytics()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
             إعادة المحاولة
@@ -47,7 +48,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
             <div class="relative z-10">
               <p class="text-blue-100 text-xs font-bold mb-2">الطلاب النشطون</p>
               <p class="text-3xl font-black">{{ data()!.totalActiveStudents }}</p>
-              <span class="text-xl mt-2 block">👨‍🎓</span>
+              <span class="text-xl mt-2 block"><app-icon name="academic-cap" size="1.2em"></app-icon></span>
             </div>
           </div>
 
@@ -57,7 +58,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
             <div class="relative z-10">
               <p class="text-emerald-100 text-xs font-bold mb-2">المعلمون</p>
               <p class="text-3xl font-black">{{ data()!.totalTeachers }}</p>
-              <span class="text-xl mt-2 block">👩‍🏫</span>
+              <span class="text-xl mt-2 block"><app-icon name="academic-cap" size="1.2em"></app-icon></span>
             </div>
           </div>
 
@@ -67,7 +68,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
             <div class="relative z-10">
               <p class="text-violet-100 text-xs font-bold mb-2">اشتراكات نشطة</p>
               <p class="text-3xl font-black">{{ data()!.totalActiveSubscriptions }}</p>
-              <span class="text-xl mt-2 block">💳</span>
+              <span class="text-xl mt-2 block"><app-icon name="credit-card" size="1.2em"></app-icon></span>
             </div>
           </div>
 
@@ -77,7 +78,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
             <div class="relative z-10">
               <p class="text-amber-100 text-xs font-bold mb-2">إيرادات الشهر</p>
               <p class="text-2xl font-black">{{ data()!.totalRevenueThisMonth.toFixed(0) }}<span class="text-sm"> ج.م</span></p>
-              <span class="text-xl mt-2 block">💰</span>
+              <span class="text-xl mt-2 block"><app-icon name="wallet" size="1.2em"></app-icon></span>
             </div>
           </div>
 
@@ -87,7 +88,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
             <div class="relative z-10">
               <p class="text-rose-100 text-xs font-bold mb-2">نسبة إكمال الحصص</p>
               <p class="text-3xl font-black">{{ data()!.sessionCompletionRate.toFixed(0) }}%</p>
-              <span class="text-xl mt-2 block">📅</span>
+              <span class="text-xl mt-2 block"><app-icon name="calendar" size="1.2em"></app-icon></span>
             </div>
           </div>
         </div>
@@ -95,7 +96,7 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
         <!-- Enrollment by Grade -->
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
-            <span>🏫</span> توزيع الطلاب حسب الصف
+            <span></span> توزيع الطلاب حسب الصف
           </h3>
           @if (data()!.enrollmentByGrade.length === 0) {
             <p class="text-sm text-slate-400 text-center py-6">لا توجد بيانات تسجيل بعد</p>
@@ -120,14 +121,14 @@ import { PlatformAnalyticsDto } from '../../../../models/ai-analytics.model';
         <!-- Grade Heatmap Navigation -->
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <span>🗺️</span> خريطة حرارية حسب الصف
+            <span><app-icon name="globe" size="1.2em"></app-icon>️</span> خريطة حرارية حسب الصف
           </h3>
           <p class="text-sm text-slate-500 mb-4">اختر صفاً لعرض خريطة الأداء الحرارية لجميع الفصول والمواد</p>
           <div class="flex flex-wrap gap-3">
             @for (grade of data()!.enrollmentByGrade; track grade.gradeName; let i = $index) {
               <a [routerLink]="'/dashboard/admin/heatmap/' + (i + 1)"
                  class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-700 transition-all">
-                🏫 {{ grade.gradeName }}
+                 {{ grade.gradeName }}
                 <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full">{{ grade.studentCount }} طالب</span>
               </a>
             }

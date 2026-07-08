@@ -18,17 +18,23 @@
     class="um-feedback"
     [class.is-success]="feedbackType() === 'success'"
     [class.is-error]="feedbackType() === 'error'">
-    <span class="icon">{{ feedbackType() === 'success' ? '✓' : '✕' }}</span>
+    <span class="icon">
+      @if (feedbackType() === 'success') {
+        <app-icon name="check" size="1.2em"></app-icon>
+      } @else {
+        <app-icon name="x-mark" size="1.2em"></app-icon>
+      }
+    </span>
     {{ feedback() }}
   </div>
 
   <!-- ── Tabs ────────────────────────────────────────────────────── -->
   <div class="um-tabs">
     <button class="um-tab" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users')">
-      👥 المستخدمون
+      <app-icon name="users" size="1.2em"></app-icon> المستخدمون
     </button>
     <button class="um-tab" [class.active]="activeTab() === 'subscriptions'" (click)="activeTab.set('subscriptions')">
-      🎫 إضافة اشتراك
+      <app-icon name="credit-card" size="1.2em"></app-icon> إضافة اشتراك
     </button>
   </div>
 
@@ -38,7 +44,7 @@
     <!-- Toolbar -->
     <div class="um-toolbar">
       <div class="um-search-wrap">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><app-icon name="search" size="1.2em"></app-icon></span>
         <input
           class="um-search"
           placeholder="بحث بالاسم أو البريد..."
@@ -111,7 +117,7 @@
             </td>
             <!-- Subscription status -->
             <td>
-              <span *ngIf="user.subscription && user.subscription.status === 'Active'" class="sub-badge active">✓ مشترك</span>
+              <span *ngIf="user.subscription && user.subscription.status === 'Active'" class="sub-badge active"><app-icon name="check" size="1.2em"></app-icon> مشترك</span>
               <span *ngIf="user.subscription && user.subscription.status !== 'Active'" class="sub-badge expired">{{ subStatusLabel(user.subscription.status) }}</span>
               <span *ngIf="!user.subscription" class="sub-badge none">— لا يوجد</span>
             </td>
@@ -141,7 +147,7 @@
                   class="btn-cancel"
                   (click)="cancelSubscription(user.id, user.subscription.subscriptionId)"
                   title="إلغاء الاشتراك">
-                  🚫 إلغاء الاشتراك
+                  <app-icon name="x-mark" size="1.2em"></app-icon> إلغاء الاشتراك
                 </button>
               </div>
             </td>
@@ -189,7 +195,7 @@
             <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
               {{ student.name }}
               <ng-container *ngIf="student.email"> ({{ student.email }})</ng-container>
-              <ng-container *ngIf="student.subscription?.status === 'Active'"> ✓ مشترك بالفعل</ng-container>
+              <ng-container *ngIf="student.subscription?.status === 'Active'"> <app-icon name="check" size="1.2em"></app-icon> مشترك بالفعل</ng-container>
             </option>
           </select>
         </div>
@@ -201,7 +207,7 @@
               <div>
                 <p class="preview-name">{{ s.name }}</p>
                 <p class="preview-email">{{ s.email }}</p>
-                <span *ngIf="s.subscription?.status === 'Active'" class="sub-badge active small">✓ لديه اشتراك نشط: {{ s.subscription?.planName }}</span>
+                <span *ngIf="s.subscription?.status === 'Active'" class="sub-badge active small"><app-icon name="check" size="1.2em"></app-icon> لديه اشتراك نشط: {{ s.subscription?.planName }}</span>
               </div>
             </ng-container>
           </ng-container>
@@ -225,8 +231,8 @@
             <p class="plan-card-price">{{ plan.price }} <span>{{ plan.currency }}</span></p>
             <p class="plan-card-dur">{{ plan.durationDays }} يوم</p>
             <div class="plan-features">
-              <span *ngIf="plan.hasAi" class="feat">🤖 AI</span>
-              <span *ngIf="plan.hasLiveClass" class="feat">📹 حصص مباشرة</span>
+              <span *ngIf="plan.hasAi" class="feat"><app-icon name="robot" size="1.2em"></app-icon> AI</span>
+              <span *ngIf="plan.hasLiveClass" class="feat"><app-icon name="video" size="1.2em"></app-icon> حصص مباشرة</span>
             </div>
           </div>
           <div *ngIf="plans().length === 0" class="plans-empty">لا توجد خطط متاحة حالياً</div>
@@ -264,8 +270,8 @@
         (click)="assignSubscription()"
         [disabled]="assigning() || !selectedStudentId() || !selectedPlanId()"
       >
-        <span *ngIf="!assigning()">🎫 إضافة الاشتراك</span>
-        <span *ngIf="assigning()">⏳ جاري الإضافة...</span>
+        <span *ngIf="!assigning()"><app-icon name="credit-card" size="1.2em"></app-icon> إضافة الاشتراك</span>
+        <span *ngIf="assigning()"><app-icon name="clock" size="1.2em"></app-icon> جاري الإضافة...</span>
       </button>
 
       <!-- Subscription feedback (visible inside subscription tab) -->
@@ -273,7 +279,13 @@
         [class.is-success]="feedbackType() === 'success'"
         [class.is-error]="feedbackType() === 'error'"
         style="margin-top: 12px;">
-        <span class="icon">{{ feedbackType() === 'success' ? '✓' : '✕' }}</span>
+        <span class="icon">
+          @if (feedbackType() === 'success') {
+            <app-icon name="check" size="1.2em"></app-icon>
+          } @else {
+            <app-icon name="x-mark" size="1.2em"></app-icon>
+          }
+        </span>
         {{ feedback() }}
       </div>
     </div>
@@ -334,7 +346,7 @@
   <div class="um-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>{{ isEditing() ? 'تعديل المستخدم' : 'إضافة مستخدم جديد' }}</h2>
-      <button class="modal-close" (click)="closeModal()">✕</button>
+      <button class="modal-close" (click)="closeModal()"><app-icon name="x-mark" size="1.2em"></app-icon></button>
     </div>
 
     <div *ngIf="feedback()" class="um-feedback sm"
@@ -405,7 +417,7 @@
         <div class="selected-students" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;" *ngIf="form.studentIds.length > 0">
           <span *ngFor="let id of form.studentIds" style="background: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 16px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
             {{ getStudentName(id) }}
-            <button (click)="toggleStudentSelection(id)" style="color: #ef4444; border: none; background: transparent; cursor: pointer; font-weight: bold;">✕</button>
+            <button (click)="toggleStudentSelection(id)" style="color: #ef4444; border: none; background: transparent; cursor: pointer; font-weight: bold;"><app-icon name="x-mark" size="1.2em"></app-icon></button>
           </span>
         </div>
 
@@ -420,7 +432,7 @@
               <div style="font-weight: 500; font-size: 14px;">{{ s.name }}</div>
               <div style="font-size: 12px; color: #64748b;" *ngIf="s.email">{{ s.email }}</div>
             </div>
-            <span *ngIf="form.studentIds.includes(s.id)" style="color: #2563eb; font-weight: bold;">✓ مضاف</span>
+            <span *ngIf="form.studentIds.includes(s.id)" style="color: #2563eb; font-weight: bold;"><app-icon name="check" size="1.2em"></app-icon> مضاف</span>
             <span *ngIf="!form.studentIds.includes(s.id)" style="color: #64748b; font-size: 12px;">+ إضافة</span>
           </div>
           <div *ngIf="filteredStudentsForParent().length === 0" class="text-muted" style="font-size: 0.9em; text-align: center; padding: 10px;">لا توجد نتائج بحث مطابقة.</div>

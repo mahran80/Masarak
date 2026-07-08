@@ -182,7 +182,11 @@
                 (click)="copyCode()"
                 class="rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
               >
-                {{ copied() ? 'Copied ✓' : 'Copy' }}
+                @if (copied()) {
+                  Copied <app-icon name="check" size="1.2em"></app-icon>
+                } @else {
+                  Copy
+                }
               </button>
 
             </div>
@@ -202,7 +206,7 @@
       >
 
         <div class="text-6xl">
-          🎓
+          <app-icon name="academic-cap" size="1.2em"></app-icon>
         </div>
 
         <h2

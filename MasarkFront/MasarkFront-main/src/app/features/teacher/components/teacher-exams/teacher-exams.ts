@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -10,7 +11,7 @@ import { TeacherExam } from '../../models/teacher-assessment.model';
 @Component({
   selector: 'app-teacher-exams',
   standalone: true,
-  imports: [DatePipe, NgClass, RouterLink, FormsModule],
+  imports: [IconComponent, DatePipe, NgClass, RouterLink, FormsModule],
   templateUrl: './teacher-exams.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, inject, signal, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ import { SubscriptionApiService } from '../../../../core/services/subscription-a
 @Component({
   selector: 'app-parent-subscriptions',
   standalone: true,
-  imports: [CommonModule, FormsModule, PlansComponent],
+  imports: [IconComponent, CommonModule, FormsModule, PlansComponent],
   templateUrl: './parent-subscriptions.component.html'
 })
 export class ParentSubscriptionsComponent {

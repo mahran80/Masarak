@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,14 +8,14 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
 @Component({
   selector: 'app-smart-report',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <span class="text-blue-600">📊</span>
+            <span class="text-blue-600"><app-icon name="chart" size="1.2em"></app-icon></span>
             التقارير الذكية
           </h1>
           <p class="text-sm text-slate-500 mt-1">تقرير الأداء الشامل المدعوم بالذكاء الاصطناعي</p>
@@ -51,7 +52,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
               </svg>
               جاري التوليد...
             } @else {
-              <span>✨</span> توليد التقرير
+              <span><app-icon name="sparkles" size="1.2em"></app-icon></span> توليد التقرير
             }
           </button>
         </div>
@@ -75,7 +76,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
       <!-- State: Error -->
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <h3 class="font-bold text-lg mb-1">عذراً، حدث خطأ</h3>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadReport()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -87,7 +88,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
       <!-- State: Empty (No Report Found) -->
       @else if (!report()) {
         <div class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm border-dashed">
-          <div class="text-5xl mb-4 opacity-50">📄</div>
+          <div class="text-5xl mb-4 opacity-50"><app-icon name="document-text" size="1.2em"></app-icon></div>
           <h3 class="text-lg font-bold text-slate-700 mb-2">لا يوجد تقرير لهذا الشهر</h3>
           <p class="text-slate-500 mb-6 max-w-sm mx-auto">لم يتم العثور على تقرير للطالب في الشهر المحدد. يمكنك توليد تقرير جديد باستخدام الزر أعلاه.</p>
         </div>
@@ -105,7 +106,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
               </div>
               <div class="relative z-10">
                 <div class="flex items-center gap-2 mb-4 text-blue-100 text-sm font-medium">
-                  <span>✨</span> ملخص الذكاء الاصطناعي
+                  <span><app-icon name="sparkles" size="1.2em"></app-icon></span> ملخص الذكاء الاصطناعي
                   <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full ml-auto">تم التوليد: {{ r.generatedAt | date:'shortDate' }}</span>
                 </div>
                 <p class="text-lg leading-relaxed">{{ r.aiNarrative }}</p>
@@ -114,7 +115,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
 
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span>📚</span> تفاصيل المواد والتحليل الفردي
+                <span><app-icon name="book-open" size="1.2em"></app-icon></span> تفاصيل المواد والتحليل الفردي
               </h3>
               <div class="space-y-6">
                 @for (sub of r.subjects; track sub.subjectName) {
@@ -156,7 +157,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
                     
                     <!-- AI Narrative -->
                     <div class="text-slate-700 text-sm bg-gradient-to-l from-blue-50/80 to-indigo-50/80 p-4 rounded-xl border border-blue-100/50 mb-5 leading-relaxed relative overflow-hidden">
-                      <div class="absolute -left-2 -top-2 text-4xl opacity-10">✨</div>
+                      <div class="absolute -left-2 -top-2 text-4xl opacity-10"><app-icon name="sparkles" size="1.2em"></app-icon></div>
                       <span class="font-bold text-indigo-800 block mb-1 text-xs">رأي الذكاء الاصطناعي:</span>
                       {{ sub.aiSubjectNarrative }}
                     </div>
@@ -166,7 +167,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
                       @if (sub.weakLessons && sub.weakLessons.length > 0) {
                         <div>
                           <h5 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                            <span>📉</span> المهارات التي تحتاج تعزيز
+                            <span><app-icon name="chart" size="1.2em"></app-icon></span> المهارات التي تحتاج تعزيز
                           </h5>
                           <div class="space-y-2">
                             @for (wl of sub.weakLessons; track wl.lessonTitle) {
@@ -195,7 +196,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
                       @if (sub.recommendations && sub.recommendations.length > 0) {
                         <div>
                           <h5 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                            <span>💡</span> خطة التحسين المقترحة
+                            <span><app-icon name="sparkles" size="1.2em"></app-icon></span> خطة التحسين المقترحة
                           </h5>
                           <ul class="space-y-2.5">
                             @for (rec of sub.recommendations; track rec) {
@@ -242,7 +243,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-slate-500 font-semibold">معدل الحضور العام</h3>
-                <span class="text-2xl">📅</span>
+                <span class="text-2xl"><app-icon name="calendar" size="1.2em"></app-icon></span>
               </div>
               <div class="text-3xl font-bold text-slate-800 mb-2">{{ r.attendancePercentage }}%</div>
               <div class="w-full bg-slate-100 rounded-full h-2.5">

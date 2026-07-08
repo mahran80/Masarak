@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -6,14 +7,14 @@ import { ParentService } from '../../services/parent.service';
 @Component({
   selector: 'app-parent-attendance',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl">
-            📅
+            <app-icon name="calendar" size="1.2em"></app-icon>
           </div>
           <div>
             <h1 class="text-2xl font-bold text-slate-800">سجل الحضور والغياب</h1>
@@ -48,7 +49,7 @@ import { ParentService } from '../../services/parent.service';
       <!-- State: Error -->
       @else if (error()) {
         <div class="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 text-center">
-          <span class="text-3xl mb-2 block">⚠️</span>
+          <span class="text-3xl mb-2 block"><app-icon name="exclamation-triangle" size="1.2em"></app-icon>️</span>
           <h3 class="font-bold text-lg mb-1">عذراً، حدث خطأ</h3>
           <p class="text-sm mb-4">{{ error() }}</p>
           <button (click)="loadAttendance()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -60,7 +61,7 @@ import { ParentService } from '../../services/parent.service';
       <!-- State: Empty -->
       @else if (attendanceData().length === 0) {
         <div class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm border-dashed">
-          <div class="text-5xl mb-4 opacity-50">📋</div>
+          <div class="text-5xl mb-4 opacity-50"><app-icon name="clipboard" size="1.2em"></app-icon></div>
           <h3 class="text-lg font-bold text-slate-700 mb-2">لا توجد سجلات حضور</h3>
           <p class="text-slate-500 max-w-sm mx-auto">لم يتم تسجيل أي حضور أو غياب لهذا الطالب في العام الدراسي المحدد.</p>
         </div>

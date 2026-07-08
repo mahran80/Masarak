@@ -13,7 +13,8 @@
     </div>
 
     <!-- Navigation (Scrollable) -->
-    <nav class="space-y-2 flex-1 overflow-y-auto pr-2 -mr-2">
+    <nav class="flex-1 overflow-y-auto pr-2 -mr-2 nav-scrollable">
+      <div class="space-y-2 nav-content">
       @if (userRole() === 'Student') {
         <a
           routerLink="/plans"
@@ -333,6 +334,7 @@
           <app-icon name="settings" [size]="20"></app-icon> الإعدادات
         </a>
       }
+      </div>
     </nav>
 
     <!-- Logout (Fixed at bottom) -->

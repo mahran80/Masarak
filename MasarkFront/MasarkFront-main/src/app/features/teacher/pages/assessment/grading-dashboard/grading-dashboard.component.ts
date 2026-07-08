@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,7 +8,7 @@ import { PendingGradingDashboard } from '../../../models/teacher-assessment.mode
 @Component({
   selector: 'app-grading-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [IconComponent, RouterLink],
   templateUrl: './grading-dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

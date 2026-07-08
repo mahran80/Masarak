@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubscriptionApiService } from '../../../../core/services/subscription-api-service';
@@ -11,7 +12,7 @@ import {
 @Component({
   selector: 'my-subscription-component',
   standalone: true,
-  imports: [CommonModule],
+  imports: [IconComponent, CommonModule],
   templateUrl: './my-subscription-component.html',
 })
 export class MySubscriptionComponent implements OnInit {

@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, OnDestroy, inject, signal, ViewChild, effect, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,7 +14,7 @@ import { NgClass } from '@angular/common';
 @Component({
   selector: 'app-live-room',
   standalone: true,
-  imports: [WhiteboardComponent, NgClass],
+  imports: [IconComponent, WhiteboardComponent, NgClass],
   templateUrl: './live-room.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

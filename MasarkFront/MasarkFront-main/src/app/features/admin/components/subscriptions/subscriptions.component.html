@@ -10,7 +10,7 @@
         <span class="font-bold text-slate-800">الاشتراكات والمدفوعات</span>
       </div>
       <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-        <span class="text-blue-600">💳</span> إدارة الاشتراكات والمدفوعات
+        <span class="text-blue-600"><app-icon name="credit-card" size="1.2em"></app-icon></span> إدارة الاشتراكات والمدفوعات
       </h1>
       <p class="text-sm text-slate-500 mt-1">متابعة الاشتراكات النشطة والإيرادات الشهرية</p>
     </div>
@@ -44,7 +44,7 @@
     <!-- Toolbar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-slate-100 gap-4 bg-slate-50/50">
       <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <span>📄</span> سجل المدفوعات
+        <span><app-icon name="document-text" size="1.2em"></app-icon></span> سجل المدفوعات
       </h3>
       <div class="flex items-center gap-3">
         <div class="relative">
@@ -108,7 +108,7 @@
 
     <!-- Empty State -->
     <div *ngIf="filteredRecords().length === 0" class="p-12 text-center text-slate-500">
-      <div class="text-4xl mb-4">🔍</div>
+      <div class="text-4xl mb-4"><app-icon name="search" size="1.2em"></app-icon></div>
       <div class="font-bold text-slate-700 text-lg mb-1">لا توجد نتائج</div>
       <p class="text-sm">لم يتم العثور على أي اشتراكات مطابقة لعملية البحث.</p>
     </div>

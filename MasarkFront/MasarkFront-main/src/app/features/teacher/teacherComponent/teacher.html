@@ -3,17 +3,17 @@
   <!-- ── Top bar ──────────────────────────────────────────────────── -->
   <div class="tc-topbar">
     <div>
-      <h1 class="tc-greeting">مرحباً، أستاذ 👋</h1>
+      <h1 class="tc-greeting">مرحباً، أستاذ <app-icon name="hand" size="1.2em"></app-icon></h1>
       <p class="tc-date">{{ today }}</p>
     </div>
     <div class="flex items-center gap-3">
       <a routerLink="/dashboard/teacher/assessment/assignments/create"
          class="tc-btn-primary flex items-center gap-2">
-        ➕ إضافة واجب جديد
+        <app-icon name="plus" size="1.2em"></app-icon> إضافة واجب جديد
       </a>
       <a routerLink="/dashboard/teacher/assessment/exams/create"
          class="tc-btn-secondary flex items-center gap-2">
-        📝 إنشاء اختبار
+        <app-icon name="pencil" size="1.2em"></app-icon> إنشاء اختبار
       </a>
     </div>
   </div>
@@ -22,7 +22,7 @@
   <div class="tc-stats-grid">
     <!-- Pending grading — real data -->
     <div class="tc-stat-card" [style.--clr]="'#4f8cd4'" [style.--bg]="'#eff6ff'">
-      <div class="stat-icon">📋</div>
+      <div class="stat-icon"><app-icon name="clipboard" size="1.2em"></app-icon></div>
       <div>
         <p class="stat-label">التصحيح المعلق</p>
         @if (isLoadingStats()) {
@@ -34,21 +34,21 @@
     </div>
     <!-- Static stats -->
     <div class="tc-stat-card" [style.--clr]="'#059669'" [style.--bg]="'#ecfdf5'">
-      <div class="stat-icon">🎓</div>
+      <div class="stat-icon"><app-icon name="academic-cap" size="1.2em"></app-icon></div>
       <div>
         <p class="stat-label">إجمالي الطلاب</p>
         <p class="stat-value">{{ stats()?.totalStudents ?? '...' }}</p>
       </div>
     </div>
     <div class="tc-stat-card" [style.--clr]="'#7c3aed'" [style.--bg]="'#f5f3ff'">
-      <div class="stat-icon">📚</div>
+      <div class="stat-icon"><app-icon name="book-open" size="1.2em"></app-icon></div>
       <div>
         <p class="stat-label">المقررات النشطة</p>
         <p class="stat-value">{{ stats()?.activeCourses ?? '...' }}</p>
       </div>
     </div>
     <div class="tc-stat-card" [style.--clr]="'#d97706'" [style.--bg]="'#fffbeb'">
-      <div class="stat-icon">✅</div>
+      <div class="stat-icon"><app-icon name="check-circle" size="1.2em"></app-icon></div>
       <div>
         <p class="stat-label">متوسط الأداء</p>
         <p class="stat-value">{{ stats()?.averagePerformance ?? '...' }}٪</p>

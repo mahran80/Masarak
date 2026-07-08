@@ -1,3 +1,4 @@
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -7,14 +8,14 @@ import { ParentService } from '../../services/parent.service';
 @Component({
   selector: 'app-parent-profile',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule, RouterLink],
   template: `
     <div class="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-2xl border-2 border-white shadow-sm">
-            ⚙️
+            <app-icon name="settings" size="1.2em"></app-icon>️
           </div>
           <div>
             <h1 class="text-2xl font-bold text-slate-800">إعدادات الحساب</h1>
@@ -29,7 +30,7 @@ import { ParentService } from '../../services/parent.service';
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
               <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <span>👤</span> المعلومات الشخصية
+                <span><app-icon name="user" size="1.2em"></app-icon></span> المعلومات الشخصية
               </h2>
             </div>
             
@@ -73,7 +74,7 @@ import { ParentService } from '../../services/parent.service';
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
               <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <span>👨‍👧‍👦</span> الأبناء المرتبطين
+                <span><app-icon name="family" size="1.2em"></app-icon></span> الأبناء المرتبطين
               </h2>
               <a routerLink="/dashboard/parent/children" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 إدارة الأبناء
@@ -86,7 +87,7 @@ import { ParentService } from '../../services/parent.service';
                   @for (student of parentService.linkedStudents(); track student.studentUserId) {
                     <div class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50">
                       <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-lg border border-slate-100 shadow-sm">
-                        👦
+                        
                       </div>
                       <div>
                         <p class="text-sm font-bold text-slate-800">{{ student.fullName }}</p>
@@ -103,7 +104,7 @@ import { ParentService } from '../../services/parent.service';
               }
               
               <a routerLink="/dashboard/parent/onboarding/add-student" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                <span>➕</span> إضافة طالب جديد
+                <span><app-icon name="plus" size="1.2em"></app-icon></span> إضافة طالب جديد
               </a>
             </div>
           </div>
@@ -114,7 +115,7 @@ import { ParentService } from '../../services/parent.service';
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-2">
             <a routerLink="/dashboard/change-password" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
               <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                🔐
+                <app-icon name="lock" size="1.2em"></app-icon>
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-slate-800 text-sm">تغيير كلمة المرور</h3>
@@ -129,7 +130,7 @@ import { ParentService } from '../../services/parent.service';
 
             <a routerLink="/plans" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
               <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
-                💳
+                <app-icon name="credit-card" size="1.2em"></app-icon>
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-slate-800 text-sm">الاشتراكات والباقات</h3>
@@ -144,7 +145,7 @@ import { ParentService } from '../../services/parent.service';
 
             <a routerLink="/dashboard/chat" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
               <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                💬
+                <app-icon name="chat" size="1.2em"></app-icon>
               </div>
               <div class="flex-1">
                 <h3 class="font-bold text-slate-800 text-sm">التواصل والدعم</h3>
