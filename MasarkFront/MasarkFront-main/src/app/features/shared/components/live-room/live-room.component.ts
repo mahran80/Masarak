@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, OnDestroy, inject, signal, ViewChild, effect, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, OnDestroy, inject, signal, ViewChild, effect, computed, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -26,6 +26,7 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   public readonly liveSessionService = inject(LiveSessionService);
   public readonly authState = inject(AuthStateService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly isLoading = signal(true);
   readonly errorMessage = signal<string | null>(null);
@@ -126,18 +127,18 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     this.client.on('user-published', async (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
       await this.client.subscribe(user, mediaType);
       
+      this.updateRemoteUsers();
+      
       if (mediaType === 'video') {
         const remoteVideoTrack = user.videoTrack;
         setTimeout(() => {
           remoteVideoTrack?.play(`remote-player-${user.uid}`);
-        }, 100);
+        }, 500);
       }
       if (mediaType === 'audio') {
         const remoteAudioTrack = user.audioTrack;
         remoteAudioTrack?.play();
       }
-      
-      this.updateRemoteUsers();
     });
 
     this.client.on('user-unpublished', (user: IAgoraRTCRemoteUser) => {
@@ -152,15 +153,34 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     const APP_ID = "1cd09ce2f89b49a8954996d4cc189a85"; 
 
     try {
-      await this.client.join(APP_ID, channel, token, uid);
+      // Agora token generated without UID means it accepts integer UIDs
+      await this.client.join(APP_ID, channel, token, Number(uid));
+      console.log('Agora joined successfully');
       
-      this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-      this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+      try {
+        this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+      } catch (audioErr) {
+        console.warn('Microphone not available or permission denied:', audioErr);
+      }
       
-      await this.client.publish([this.localAudioTrack, this.localVideoTrack]);
+      try {
+        this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+      } catch (videoErr) {
+        console.warn('Camera not available or permission denied:', videoErr);
+      }
+      
+      const tracksToPublish = [];
+      if (this.localAudioTrack) tracksToPublish.push(this.localAudioTrack);
+      if (this.localVideoTrack) tracksToPublish.push(this.localVideoTrack);
+      
+      if (tracksToPublish.length > 0) {
+        await this.client.publish(tracksToPublish);
+      }
       
       // Play local video
-      this.localVideoTrack.play('local-player');
+      if (this.localVideoTrack) {
+        this.localVideoTrack.play('local-player');
+      }
       
       this.isLoading.set(false);
 
@@ -175,6 +195,7 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
 
   private updateRemoteUsers(): void {
     this.remoteUsers.set([...this.client.remoteUsers]);
+    this.cdr.detectChanges();
   }
 
   async toggleMic(): Promise<void> {
