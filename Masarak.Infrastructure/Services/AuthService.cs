@@ -56,12 +56,16 @@ namespace Masarak.Infrastructure.Services
 
             if (role.Name == AppRoles.Student)
             {
+                if (!request.GradeId.HasValue) return Fail("Grade selection is required for student registration.");
+                var gradeExists = await _db.Grades.AnyAsync(g => g.GradeId == request.GradeId.Value);
+                if (!gradeExists) return Fail("Selected grade is invalid.");
+                
                 user.StudentLinkageCode = Masarak.Domain.ValueObjects.StudentLinkageCode.Generate().Value;
             }
 
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
-            await CreateRoleProfileAsync(user, role.Name);
+            await CreateRoleProfileAsync(user, role.Name, request.GradeId);
             return await IssueTokensAsync(user, role.Name);
         }
 
@@ -262,17 +266,16 @@ namespace Masarak.Infrastructure.Services
             };
         }
 
-        private async Task CreateRoleProfileAsync(User user, string roleName)
+        private async Task CreateRoleProfileAsync(User user, string roleName, int? gradeId = null)
         {
             switch (roleName)
             {
                 case AppRoles.Student:
-                    var grade = await _db.Grades.OrderBy(g => g.Order).FirstOrDefaultAsync();
-                    if (grade != null)
+                    if (gradeId.HasValue)
                     {
                         await _db.Students.AddAsync(new Student
                         {
-                            UserId = user.UserId, GradeId = grade.GradeId,
+                            UserId = user.UserId, GradeId = gradeId.Value,
                             EnrollmentDate = DateTime.UtcNow.Date, AcademicStatus = "Active"
                         });
                         await _db.SaveChangesAsync();

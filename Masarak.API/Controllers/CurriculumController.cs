@@ -23,6 +23,7 @@ namespace Masarak.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(IEnumerable<GradeDto>), 200)]
         public async Task<IActionResult> GetAllGrades(CancellationToken ct)
         {

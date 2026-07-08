@@ -26,6 +26,8 @@ namespace Masarak.Application.DTOs
         /// <summary>Role name: Admin | Teacher | Student | Parent</summary>
         [Required]
         public string Role { get; set; } = null!;
+
+        public int? GradeId { get; set; }
     }
 
     // ─── Login ───────────────────────────────────────────────────────────────────
