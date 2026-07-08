@@ -139,6 +139,11 @@ namespace Masarak.Application.DTOs
         int QuestionId, string QuestionText, string? YourAnswer, string? CorrectAnswer, 
         decimal MarksAwarded, decimal MaxMarks, AnswerGradingStatus GradingStatus, string? Feedback);
 
+    public record StudentExamGradeDto(
+        int StudentExamId, int ExamId, string ExamTitle, string SubjectName, 
+        decimal FinalScore, decimal TotalMarks, decimal Percentage, 
+        DateTime? SubmittedAt, bool HasPendingManualGrading);
+
     // ═══════════════════════════════════════════════════════════════════════════
     // Performance DTOs
     // ═══════════════════════════════════════════════════════════════════════════

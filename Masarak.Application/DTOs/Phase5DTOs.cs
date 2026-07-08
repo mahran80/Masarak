@@ -32,14 +32,22 @@ namespace Masarak.Application.DTOs
         decimal AttendancePercentage,
         IEnumerable<SubjectSummaryDto> Subjects,
         string AiNarrative,
-        IEnumerable<string> RecommendedActions,
         DateTime GeneratedAt);
 
     public record SubjectSummaryDto(
         string SubjectName,
         decimal AverageScore,
         decimal AttendancePercentage,
-        string AiSubjectNarrative);
+        string PerformanceLevel,
+        string AiSubjectNarrative,
+        IEnumerable<LessonMasteryDto> WeakLessons,
+        IEnumerable<LessonMasteryDto> StrongLessons,
+        IEnumerable<string> Recommendations);
+
+    public record LessonMasteryDto(
+        string LessonTitle,
+        decimal MasteryPercentage,
+        IEnumerable<string> WeakTopics);
 
     public record TeachingSuggestionDto(
         string StudentName,

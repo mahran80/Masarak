@@ -49,6 +49,7 @@ namespace Masarak.Application.Interfaces
         Task SaveAnswerAsync(int studentUserId, int studentExamId, SaveAnswerRequest request, Stream? fileStream, string? fileName, string? contentType, CancellationToken ct = default);
         Task<ExamResultDto> SubmitExamAsync(int studentUserId, int studentExamId, CancellationToken ct = default);
         Task<ExamResultDto> GetStudentExamResultAsync(int studentUserId, int studentExamId, CancellationToken ct = default);
+        Task<IEnumerable<StudentExamGradeDto>> GetStudentExamGradesAsync(int studentUserId, CancellationToken ct = default);
 
         // ── Performance & Reports ─────────────────────────────────────────────
         Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceAsync(int studentUserId, string academicYear, CancellationToken ct = default);

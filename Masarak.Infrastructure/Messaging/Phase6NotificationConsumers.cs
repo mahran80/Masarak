@@ -115,7 +115,7 @@ namespace Masarak.Infrastructure.Messaging
                 NotificationType.ExamGraded,
                 "Exam Graded",
                 "Your exam has been graded. Check your results now.",
-                $"/student/exams/{msg.StudentExamId}",
+                $"/student/exams/result/{msg.StudentExamId}",
                 context.CancellationToken);
 
             // Notify linked parents

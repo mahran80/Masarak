@@ -1,6 +1,6 @@
 import { Injectable, DestroyRef, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { interval, Subject } from 'rxjs';
+import { interval, Subject, Observable, of } from 'rxjs';
 import { filter, switchMap, throttleTime } from 'rxjs/operators';
 import { StudentService } from './student.service';
 import { 
@@ -157,8 +157,10 @@ export class ExamAttemptStore {
     }
   }
 
-  forceSaveNow(): void {
-    this.autoSaveTrigger.next();
+  forceSaveNow(): Observable<any> {
+    const examId = this.exam()?.studentExamId;
+    if (!examId) return of(null);
+    return this.studentService.saveExamAnswers(examId, { answers: this.answersList() });
   }
 
   private updateState(partialState: Partial<ExamAttemptState>): void {

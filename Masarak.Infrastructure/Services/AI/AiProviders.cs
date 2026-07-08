@@ -199,6 +199,7 @@ namespace Masarak.Infrastructure.Services.AI
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync(ct);
+            _logger.LogInformation("Gemini raw response: {Response}", responseJson);
             using var doc = JsonDocument.Parse(responseJson);
             var root = doc.RootElement;
 

@@ -60,7 +60,6 @@ export interface ParentReportDto {
   attendancePercentage: number;
   subjects: SubjectSummaryDto[];
   aiNarrative: string;
-  recommendedActions: string[];
   generatedAt: string;
 }
 
@@ -68,7 +67,17 @@ export interface SubjectSummaryDto {
   subjectName: string;
   averageScore: number;
   attendancePercentage: number;
+  performanceLevel: string;
   aiSubjectNarrative: string;
+  weakLessons: LessonMasteryDto[];
+  strongLessons: LessonMasteryDto[];
+  recommendations: string[];
+}
+
+export interface LessonMasteryDto {
+  lessonTitle: string;
+  masteryPercentage: number;
+  weakTopics: string[];
 }
 
 export interface TeachingSuggestionDto {

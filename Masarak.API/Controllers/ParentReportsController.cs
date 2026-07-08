@@ -26,7 +26,10 @@ namespace Masarak.API.Controllers
             try
             {
                 var result = await _aiService.GetParentReportAsync(GetUserId(), studentId, month, ct);
-                if (result == null) return NotFound(new { message = "Report not found. Generate one first." });
+                if (result == null) 
+                {
+                    result = await _aiService.GenerateParentReportAsync(GetUserId(), studentId, month, ct);
+                }
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }

@@ -36,6 +36,7 @@ namespace Masarak.Infrastructure.Persistence.Repositories
             return await _context.StudentExams
                 .Include(se => se.Exam)
                 .Include(se => se.StudentAnswers)
+                .Include(se => se.Student).ThenInclude(s => s.User)
                 .Where(se => se.Exam.TeachingAssignment.Teacher.UserId == teacherUserId && se.HasPendingManualGrading)
                 .ToListAsync(ct);
         }

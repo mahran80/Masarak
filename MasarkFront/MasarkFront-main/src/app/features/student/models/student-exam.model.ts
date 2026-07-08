@@ -72,6 +72,17 @@ export interface SaveStudentExamAnswersResponse {
   message?: string;
 }
 
+export interface StudentExamAnswerResult {
+  questionId: number;
+  questionText: string;
+  yourAnswer?: string;
+  correctAnswer?: string;
+  marksAwarded: number;
+  maxMarks: number;
+  gradingStatus: string;
+  feedback?: string;
+}
+
 export interface StudentExamResult {
   studentExamId: StudentEntityId;
   examId?: StudentEntityId;
@@ -82,6 +93,19 @@ export interface StudentExamResult {
   passed?: boolean;
   submittedAt?: string;
   hasPendingManualGrading?: boolean;
+  answers?: StudentExamAnswerResult[];
 }
 
 export type SubmitStudentExamResponse = StudentExamResult;
+
+export interface StudentExamGrade {
+  studentExamId: StudentEntityId;
+  examId: StudentEntityId;
+  examTitle: string;
+  subjectName: string;
+  finalScore: number;
+  totalMarks: number;
+  percentage: number;
+  submittedAt?: string;
+  hasPendingManualGrading: boolean;
+}

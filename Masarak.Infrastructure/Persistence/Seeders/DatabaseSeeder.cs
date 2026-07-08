@@ -407,7 +407,7 @@ namespace Masarak.Infrastructure.Persistence.Seeders
                 {
                     Key = "weakness_analysis",
                     SystemPrompt = "You are an educational analyst for Egyptian K-12 curriculum. Analyze student performance data and identify specific topic weaknesses. Respond only in JSON.",
-                    UserPromptTemplate = "Student: {student_name}, Subject: {subject_name}, Grade: {grade_name}. Exam results: {exam_results_json}. Assignment results: {assignment_results_json}. Identify top 3 weak topics, provide error rate per topic (0-1), and 2 specific recommended actions per topic in {language}. Return JSON matching schema: {schema}.",
+                    UserPromptTemplate = "Analyze this student's performance data and return JSON.\nStudent context: {student_context_json}\nReturn ONLY valid JSON matching this schema: {schema}\nIdentify weak lessons, strong lessons, topics where the student makes errors, and provide 3 specific personalized recommendations referencing lesson names in {language}.",
                     MaxTokens = 1000,
                     Temperature = 0.3m,
                     UpdatedAt = DateTime.UtcNow,
@@ -417,7 +417,7 @@ namespace Masarak.Infrastructure.Persistence.Seeders
                 {
                     Key = "parent_report",
                     SystemPrompt = "You are a student academic advisor writing a monthly report for an Egyptian parent. Be encouraging, clear, and specific. Write in {language}.",
-                    UserPromptTemplate = "Student: {student_name}, Report month: {month}. Performance data: {performance_json}. Attendance: {attendance_json}. Write a 200-word narrative summary and 3 specific recommended actions for the parent.",
+                    UserPromptTemplate = "Student: {student_name}, Report month: {month}. Subject: {subject_name}. Analysis context: {analysis_context_json}. Write a 100-word narrative summary of the student's performance in this specific subject for the parent.",
                     MaxTokens = 800,
                     Temperature = 0.7m,
                     UpdatedAt = DateTime.UtcNow,
