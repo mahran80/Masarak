@@ -1,74 +1,90 @@
-<div class="sys-health">
-  <div class="sys-health__breadcrumb">
-    <span>الرئيسية</span>
-    <app-icon name="chevron-left" [size]="13"></app-icon>
-    <span class="sys-health__breadcrumb-current">حالة النظام</span>
+<div class="space-y-6 animate-fade-in pb-12">
+  <!-- Header -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+    <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+      <span>الرئيسية</span>
+      <app-icon name="chevron-left" [size]="14"></app-icon>
+      <span class="font-bold text-slate-800">حالة النظام</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+      <span class="text-blue-600">🖥️</span> مراقبة حالة النظام
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">نظرة عامة على أداء المنصة والخدمات المرتبطة بها</p>
   </div>
 
-  <h1 class="sys-health__title">مراقبة حالة النظام</h1>
-  <p class="sys-health__subtitle">نظرة عامة على أداء المنصة والخدمات المرتبطة بها</p>
-
   <!-- KPI Cards -->
-  <div class="sys-health__kpis">
-    <div class="card sys-kpi" *ngFor="let m of metrics()">
-      <span class="sys-kpi__icon" [class]="'sys-kpi__icon--' + m.color">
-        <app-icon [name]="m.icon" [size]="22"></app-icon>
-      </span>
-      <div class="sys-kpi__body">
-        <span class="sys-kpi__label">{{ m.label }}</span>
-        <span class="sys-kpi__value">{{ m.value }}</span>
-        <span class="sys-kpi__status" [class]="'sys-kpi__status--' + m.statusColor">
-          <span class="status-dot"></span>{{ m.statusLabel }}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div *ngFor="let m of metrics()" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" 
+           [class]="'bg-' + m.color + '-50 text-' + m.color + '-600'">
+        <app-icon [name]="m.icon" [size]="24"></app-icon>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-semibold text-slate-500 mb-1">{{ m.label }}</span>
+        <span class="text-3xl font-bold text-slate-800 mb-2">{{ m.value }}</span>
+        <span class="inline-flex items-center gap-1.5 text-xs font-bold"
+              [class]="'text-' + m.statusColor + '-600'">
+          <span class="w-2 h-2 rounded-full bg-current"></span>
+          {{ m.statusLabel }}
         </span>
       </div>
     </div>
   </div>
 
-  <div class="sys-health__grid">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Queue & Jobs -->
-    <div class="card sys-health__card">
-      <h3 class="sys-health__card-title">حالة الطابور والمهام (RabbitMQ / Background Jobs)</h3>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <span>⚙️</span> حالة الطابور والمهام (RabbitMQ)
+      </h3>
 
-      <div class="sys-row">
-        <span class="sys-row__label">عمق الطابور الحالي</span>
-        <span class="sys-row__value">{{ queueDepth() }} رسالة</span>
+      <div class="flex justify-between items-center py-3 border-b border-slate-100">
+        <span class="font-medium text-slate-600">عمق الطابور الحالي</span>
+        <span class="font-bold text-slate-800 bg-slate-50 px-3 py-1 rounded-lg">{{ queueDepth() }} رسالة</span>
       </div>
 
-      <div class="sys-row">
-        <span class="sys-row__label">اتصالات SignalR النشطة</span>
-        <span class="sys-row__value">{{ signalRConnections() }} اتصال</span>
+      <div class="flex justify-between items-center py-3 border-b border-slate-100 mb-4">
+        <span class="font-medium text-slate-600">اتصالات SignalR النشطة</span>
+        <span class="font-bold text-slate-800 bg-slate-50 px-3 py-1 rounded-lg">{{ signalRConnections() }} اتصال</span>
       </div>
 
-      <div class="sys-health__jobs-title">المهام النشطة حاليًا</div>
+      <h4 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">المهام النشطة حاليًا</h4>
 
-      <div class="sys-job-row" *ngFor="let job of activeJobs()">
-        <span class="sys-job-row__name">{{ job.name }}</span>
-        <span class="sys-job-row__status" [class]="'sys-job-row__status--' + job.statusColor">
+      <div *ngFor="let job of activeJobs()" class="flex justify-between items-center py-2">
+        <span class="font-medium text-slate-700">{{ job.name }}</span>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full"
+              [class]="'bg-' + job.statusColor + '-50 text-' + job.statusColor + '-600'">
           {{ job.statusLabel }}
         </span>
       </div>
 
-      <div *ngIf="activeJobs().length === 0" class="sys-health__empty">
+      <div *ngIf="activeJobs().length === 0" class="text-center py-8 text-slate-500 text-sm bg-slate-50 rounded-xl border border-slate-100 border-dashed mt-2">
         لا توجد مهام نشطة حاليًا.
       </div>
     </div>
 
     <!-- Recent Errors -->
-    <div class="card sys-health__card">
-      <h3 class="sys-health__card-title">آخر الأخطاء المسجلة</h3>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <span class="text-red-500">⚠️</span> آخر الأخطاء المسجلة
+      </h3>
 
-      <div class="sys-error-row" *ngFor="let err of recentErrors()">
-        <span class="sys-error-row__icon">
-          <app-icon name="alert-triangle" [size]="16"></app-icon>
-        </span>
-        <div class="sys-error-row__body">
-          <span class="sys-error-row__message">{{ err.message }}</span>
-          <span class="sys-error-row__time">{{ err.time }}</span>
+      <div class="space-y-4">
+        <div *ngFor="let err of recentErrors()" class="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-100">
+          <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+            <app-icon name="alert-triangle" [size]="16"></app-icon>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-semibold text-slate-800 text-sm">{{ err.message }}</span>
+            <span class="text-xs text-slate-500 mt-1">{{ err.time }}</span>
+          </div>
         </div>
       </div>
 
-      <div *ngIf="recentErrors().length === 0" class="sys-health__empty">
-        لا توجد أخطاء مسجلة. النظام يعمل بشكل سليم ✅
+      <div *ngIf="recentErrors().length === 0" class="text-center py-12 bg-emerald-50 rounded-xl border border-emerald-100 border-dashed">
+        <div class="text-4xl mb-3">✅</div>
+        <div class="font-bold text-emerald-800">النظام يعمل بشكل سليم</div>
+        <div class="text-sm text-emerald-600 mt-1">لا توجد أخطاء مسجلة حالياً</div>
       </div>
     </div>
   </div>

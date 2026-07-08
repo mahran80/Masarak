@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { ParentService } from '../../services/parent.service';
 import { ChildSelectorComponent } from '../../components/child-selector/child-selector.component';
 import { AuthStateService } from '../../../../core/services/auth-state-service';
@@ -124,6 +124,7 @@ import { environment } from '../../../../../environments/environment';
 export class ParentDashboardComponent implements OnInit {
   public parentService = inject(ParentService);
   private authState = inject(AuthStateService);
+  private router = inject(Router);
 
   isSubscribing = signal(false);
   subscribingError = signal<string | null>(null);
@@ -148,25 +149,7 @@ export class ParentDashboardComponent implements OnInit {
     const studentId = this.parentService.selectedStudentId();
     if (!studentId) return;
 
-    this.isSubscribing.set(true);
-    this.subscribingError.set(null);
-
-    // Use planId=1 (Monthly plan) as default. The parent checkout flow
-    // creates the subscription on the student's userId.
-    this.parentService.subscribeForChild(
-      studentId,
-      1,
-      environment.stripeSuccessUrl,
-      environment.stripeCancelUrl
-    ).subscribe({
-      next: (result) => {
-        this.isSubscribing.set(false);
-        window.location.href = result.checkoutUrl;
-      },
-      error: (err) => {
-        this.isSubscribing.set(false);
-        this.subscribingError.set(err?.error?.message ?? 'حدث خطأ أثناء إنشاء الاشتراك. حاول مرة أخرى.');
-      }
-    });
+    // Navigate to the new parent subscriptions page where they can select a plan
+    this.router.navigate(['/dashboard/parent/subscriptions']);
   }
 }

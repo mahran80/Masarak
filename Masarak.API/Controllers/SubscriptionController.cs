@@ -41,9 +41,18 @@ namespace Masarak.API.Controllers
             }
             catch (Exception ex)
             {
-                // Return the exact exception to the frontend to easily debug Stripe errors
                 return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
+        }
+
+        [HttpPost("verify")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> VerifyCheckoutSession([FromQuery] string sessionId, CancellationToken ct)
+        {
+            var success = await _subscriptionService.VerifyCheckoutSessionAsync(sessionId, ct);
+            if (success) return Ok(new { message = "Subscription verified and activated successfully." });
+            return BadRequest(new { message = "Payment not completed or invalid session." });
         }
 
         // POST /api/subscriptions/webhook

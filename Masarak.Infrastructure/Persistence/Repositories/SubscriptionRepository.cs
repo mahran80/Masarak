@@ -40,6 +40,14 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(s => s.StripeSessionId == sessionId, ct);
         }
 
+        public async Task<Subscription?> GetByStripeSubscriptionIdAsync(string stripeSubscriptionId, CancellationToken ct = default)
+        {
+            return await _context.Subscriptions
+                .Include(s => s.Plan)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.StripeSubscriptionId == stripeSubscriptionId, ct);
+        }
+
         public async Task<IEnumerable<Subscription>> GetByUserIdAsync(int userId, CancellationToken ct = default)
         {
             return await _context.Subscriptions

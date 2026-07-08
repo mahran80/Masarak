@@ -118,13 +118,19 @@
 
         <button
           (click)="onSelectPlan(plan)"
-          [disabled]="checkingOutPlanId() === plan.planId"
-          class="w-full mt-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-xl font-semibold transition"
+          [disabled]="checkingOutPlanId() === plan.planId || disabledPlanId === plan.planId || isProcessingPlanId === plan.planId"
+          class="w-full mt-8 py-3 rounded-xl font-semibold transition"
+          [ngClass]="{
+            'bg-slate-300 text-slate-500 cursor-not-allowed': disabledPlanId === plan.planId,
+            'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50': disabledPlanId !== plan.planId
+          }"
         >
-          @if (checkingOutPlanId() === plan.planId) {
-          Processing...
+          @if (checkingOutPlanId() === plan.planId || isProcessingPlanId === plan.planId) {
+            Processing...
+          } @else if (disabledPlanId === plan.planId) {
+            Current Plan
           } @else {
-          Subscribe Now
+            Select Plan
           }
         </button>
       </div>

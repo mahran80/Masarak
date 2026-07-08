@@ -11,6 +11,7 @@ namespace Masarak.Application.Interfaces
     {
         // ── Checkout ─────────────────────────────────────────────────────────
         Task<CheckoutResult> InitiateCheckoutAsync(int userId, InitiateCheckoutRequest request, CancellationToken ct = default);
+        Task<bool> VerifyCheckoutSessionAsync(string sessionId, CancellationToken ct = default);
         Task HandleStripeWebhookAsync(string payload, string signature, CancellationToken ct = default);
 
         // ── Admin ────────────────────────────────────────────────────────────
@@ -21,6 +22,7 @@ namespace Masarak.Application.Interfaces
         // ── User ─────────────────────────────────────────────────────────────
         Task<SubscriptionDto?> GetActiveSubscriptionAsync(int userId, CancellationToken ct = default);
         Task<IEnumerable<SubscriptionDto>> GetSubscriptionHistoryAsync(int userId, CancellationToken ct = default);
+        Task<string?> ChangeSubscriptionAsync(int parentId, int childId, int newPlanId, CancellationToken ct = default);
 
         // ── Plans ────────────────────────────────────────────────────────────
         Task<IEnumerable<PlanDto>> GetAllPlansAsync(CancellationToken ct = default);

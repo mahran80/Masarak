@@ -218,6 +218,44 @@ namespace Masarak.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        [HttpPost("subscribe/verify")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> VerifyCheckoutSession([FromQuery] string sessionId, [FromServices] ISubscriptionService subService, CancellationToken ct)
+        {
+            var success = await subService.VerifyCheckoutSessionAsync(sessionId, ct);
+            if (success) return Ok(new { message = "Subscription verified and activated successfully." });
+            return BadRequest(new { message = "Payment not completed or invalid session." });
+        }
+
+        [HttpGet("children/{childId}/subscription")]
+        [ProducesResponseType(typeof(Masarak.Application.DTOs.SubscriptionDto), 200)]
+        public async Task<IActionResult> GetChildSubscription(int childId, [FromServices] ISubscriptionService subService, [FromServices] Masarak.Application.Interfaces.IParentStudentLinkRepository linkRepo, CancellationToken ct)
+        {
+            var parentId = int.Parse(User.FindFirstValue("userid") ?? "0");
+            if (!await linkRepo.LinkExistsAsync(parentId, childId, ct)) return Forbid();
+            
+            var sub = await subService.GetActiveSubscriptionAsync(childId, ct);
+            return Ok(new Masarak.Application.DTOs.SubscriptionStatusResponse(sub != null, sub));
+        }
+
+        public record ChangePlanRequest(int NewPlanId);
+
+        [HttpPost("children/{childId}/subscribe/change")]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ChangeChildSubscription(int childId, [FromBody] ChangePlanRequest request, [FromServices] ISubscriptionService subService, CancellationToken ct)
+        {
+            var parentId = int.Parse(User.FindFirstValue("userid") ?? "0");
+            try
+            {
+                var checkoutUrl = await subService.ChangeSubscriptionAsync(parentId, childId, request.NewPlanId, ct);
+                return Ok(new { checkoutUrl, message = "Subscription change processed." });
+            }
+            catch (UnauthorizedAccessException ex) { return Forbid(ex.Message); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         private object GetUserInfo() => new
         {
             UserId = User.FindFirstValue("userid"),

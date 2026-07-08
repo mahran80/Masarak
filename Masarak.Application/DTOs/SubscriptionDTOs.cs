@@ -14,7 +14,8 @@ namespace Masarak.Application.DTOs
         DateTime StartDate,
         DateTime EndDate,
         ActivationMethod ActivationMethod,
-        string? AdminNote
+        string? AdminNote,
+        bool IsStripeManaged
     );
 
     public record PlanDto(

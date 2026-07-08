@@ -69,6 +69,21 @@ export const STUDENT_ROUTES: Routes = [
       import('../pages/profile/profile.component').then((m) => m.StudentProfilePageComponent),
   },
   {
+    path: 'subscription',
+    redirectTo: 'profile',
+    pathMatch: 'full',
+  },
+  {
+    path: 'insights',
+    redirectTo: 'performance',
+    pathMatch: 'full',
+  },
+  {
+    path: 'exams/:id',
+    redirectTo: 'exams',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     redirectTo: '',
   },

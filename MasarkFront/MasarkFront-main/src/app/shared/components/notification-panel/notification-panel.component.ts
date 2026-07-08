@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 import { IconComponent } from '../icon/icon.component';
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -34,14 +35,29 @@ export class NotificationPanelComponent {
 
   @Output() close = new EventEmitter<void>();
 
+  private router = inject(Router);
+
   constructor(public notificationService: NotificationService) {}
 
   iconFor(type: string): string {
     return NOTIFICATION_ICON_MAP[type] ?? 'bell';
   }
 
-  onMarkRead(id: number): void {
-    this.notificationService.markAsRead(id);
+  onMarkRead(notification: any): void {
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.notificationId);
+    }
+    if (notification.actionUrl) {
+      // Ensure the URL is correctly routed under the dashboard layout
+      let finalUrl = notification.actionUrl;
+      if (!finalUrl.startsWith('/dashboard') && finalUrl.startsWith('/')) {
+        finalUrl = '/dashboard' + finalUrl;
+      } else if (!finalUrl.startsWith('/dashboard')) {
+        finalUrl = '/dashboard/' + finalUrl;
+      }
+      this.router.navigateByUrl(finalUrl);
+      this.close.emit();
+    }
   }
 
   onMarkAllRead(): void {

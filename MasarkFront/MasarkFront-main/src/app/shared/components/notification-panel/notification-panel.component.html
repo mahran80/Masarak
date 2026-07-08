@@ -13,7 +13,7 @@
       class="notif-item"
       *ngFor="let n of notificationService.notifications()"
       [class.notif-item--unread]="!n.isRead"
-      (click)="onMarkRead(n.notificationId)">
+      (click)="onMarkRead(n)">
 
       <span class="notif-item__icon">
         <app-icon [name]="iconFor(n.type)" [size]="16"></app-icon>
