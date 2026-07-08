@@ -12,6 +12,11 @@ export const STUDENT_ROUTES: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'exams/result/:id',
+    loadComponent: () =>
+      import('../pages/exam-result/exam-result.component').then((m) => m.StudentExamResultPageComponent),
+  },
+  {
     path: 'courses',
     loadComponent: () =>
       import('../pages/courses/courses.component').then((m) => m.StudentCoursesPageComponent),
@@ -42,6 +47,11 @@ export const STUDENT_ROUTES: Routes = [
     path: 'exams',
     loadComponent: () =>
       import('../pages/exams/exams.component').then((m) => m.StudentExamsPageComponent),
+  },
+  {
+    path: 'grades',
+    loadComponent: () =>
+      import('../pages/grades/grades.component').then((m) => m.StudentGradesPageComponent),
   },
   {
     path: 'attendance',

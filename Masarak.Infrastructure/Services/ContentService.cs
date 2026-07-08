@@ -70,8 +70,9 @@ namespace Masarak.Infrastructure.Services
             await VerifyTeacherOwnership(teacherUserId, teachingAssignmentId, ct);
 
             // Determine container and validate file size
-            var container = type == ContentType.Video ? VideoContainer : DocumentContainer;
-            var maxSize = type == ContentType.Video ? MaxVideoSizeBytes : MaxDocumentSizeBytes;
+            bool isVideo = type == ContentType.Video;
+            var container = isVideo ? VideoContainer : DocumentContainer;
+            var maxSize = isVideo ? MaxVideoSizeBytes : MaxDocumentSizeBytes;
 
             if (fileStream.Length > maxSize)
                 throw new InvalidOperationException($"File exceeds maximum size of {maxSize / (1024 * 1024)} MB.");

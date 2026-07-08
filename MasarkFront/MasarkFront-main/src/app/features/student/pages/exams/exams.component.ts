@@ -141,31 +141,28 @@ export class StudentExamsPageComponent implements OnInit {
   submitActiveExam(): void {
     const activeExam = this.store.exam();
 
-    if (!activeExam) {
+    if (!activeExam || this.isSubmitting()) {
       return;
     }
 
     this.isSubmitting.set(true);
     this.actionMessage.set(null);
     
-    // Force one last save before submit
-    this.store.forceSaveNow();
-
-    this.studentService
-      .submitExam(activeExam.studentExamId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (result) => {
-          this.examResult.set(result);
-          this.store.clearExam();
-          this.isSubmitting.set(false);
-          this.actionMessage.set('Exam submitted successfully.');
-        },
-        error: (error: unknown) => {
-          this.isSubmitting.set(false);
-          this.actionMessage.set(this.studentService.resolveErrorMessage(error));
-        },
-      });
+    this.store.forceSaveNow().pipe(
+      switchMap(() => this.studentService.submitExam(activeExam.studentExamId)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (result) => {
+        this.examResult.set(result);
+        this.store.clearExam();
+        this.isSubmitting.set(false);
+        this.actionMessage.set('تم تسليم الاختبار بنجاح.');
+      },
+      error: (error: unknown) => {
+        this.isSubmitting.set(false);
+        this.actionMessage.set(this.studentService.resolveErrorMessage(error));
+      },
+    });
   }
 
   private firstExamId(groups: StudentExamGroup[]): StudentEntityId | null {

@@ -56,7 +56,7 @@ namespace Masarak.Application.DTOs
         int SessionId, string Title, string? Description,
         DateTime ScheduledAt, int DurationMinutes, DateTime EndsAt,
         string? EmbedUrl, SessionStatus Status,
-        string SubjectName, int ClassId, string ClassName, string TeacherName);
+        string SubjectName, int ClassId, string ClassName, string TeacherName, int AssignmentId);
 
     public record WeeklyScheduleDto(
         DateTime WeekStart, DateTime WeekEnd,

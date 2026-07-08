@@ -1,12 +1,13 @@
 namespace Masarak.Domain.Enums
 {
     /// <summary>
-    /// Phase 4: Source type for content items — URL-based or Azure Blob.
+    /// Source type for content items — URL-based, Azure Blob, or Local File.
     /// </summary>
     public enum ContentSourceType
     {
         YouTubeUrl,
         VimeoUrl,
-        AzureBlob
+        AzureBlob,
+        LocalFile
     }
 }

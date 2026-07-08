@@ -517,11 +517,11 @@ namespace Masarak.Infrastructure.Services
             var pendingExams = await _studentExamRepo.GetPendingManualGradingForTeacherAsync(teacherUserId, ct);
             
             int totalExams = pendingExams.Sum(e => e.StudentAnswers.Count(a => a.GradingStatus == AnswerGradingStatus.PendingReview));
-            var examSummaries = pendingExams.GroupBy(e => e.ExamId)
-                .Select(g => new PendingExamSummaryDto(
-                    g.Key, 
-                    g.First().Exam.Title, 
-                    g.Sum(e => e.StudentAnswers.Count(a => a.GradingStatus == AnswerGradingStatus.PendingReview))
+            var examSummaries = pendingExams
+                .Select(e => new PendingExamSummaryDto(
+                    e.StudentExamId, 
+                    e.Exam.Title + " - " + (e.Student?.User?.FullName ?? "Student"), 
+                    e.StudentAnswers.Count(a => a.GradingStatus == AnswerGradingStatus.PendingReview)
                 ));
 
             // Similarly for assignments
@@ -562,6 +562,7 @@ namespace Masarak.Infrastructure.Services
         {
             var answer = await _context.StudentAnswers
                 .Include(a => a.StudentExam).ThenInclude(se => se.Exam).ThenInclude(e => e.TeachingAssignment).ThenInclude(ta => ta.Teacher)
+                .Include(a => a.StudentExam).ThenInclude(se => se.Student)
                 .Include(a => a.Question)
                 .FirstOrDefaultAsync(a => a.AnswerId == answerId, ct);
 
@@ -647,6 +648,9 @@ namespace Masarak.Infrastructure.Services
             // if (now < exam.StartTime || now > exam.EndTime) throw new InvalidOperationException("Outside exam window.");
 
             var attempt = await _studentExamRepo.GetByStudentAndExamAsync(studentId, examId, ct);
+            if (attempt != null && attempt.Status != StudentExamStatus.InProgress)
+                throw new InvalidOperationException("You have already submitted this exam.");
+
             if (attempt == null)
             {
                 attempt = StudentExam.Begin(examId, studentId, exam.DurationMins);
@@ -670,8 +674,10 @@ namespace Masarak.Infrastructure.Services
             var attempt = await _studentExamRepo.GetByIdWithAnswersAsync(studentExamId, ct);
             if (attempt == null || attempt.StudentId != studentId) throw new UnauthorizedAccessException();
 
-            if (attempt.Status != StudentExamStatus.InProgress || !_timerEnforcer.IsWithinTimeWindow(attempt))
+            if (!_timerEnforcer.IsWithinTimeWindow(attempt))
                 throw new InvalidOperationException("Exam is closed or expired.");
+            if (attempt.Status != StudentExamStatus.InProgress)
+                return; // Return silently if already submitted to prevent race conditions
 
             var answer = attempt.StudentAnswers.FirstOrDefault(a => a.QuestionId == request.QuestionId);
             if (answer == null)
@@ -705,16 +711,12 @@ namespace Masarak.Infrastructure.Services
             attempt.MarkSubmitted();
 
             decimal totalAutoScore = 0;
-            bool needsManualGrading = false;
+            bool needsManualGrading = attempt.Exam.Questions.Any(q => !q.IsAutoGraded);
             foreach(var ans in attempt.StudentAnswers)
             {
                 if (ans.Question.IsAutoGraded)
                 {
                     totalAutoScore += _autoGradingService.Grade(ans.Question, ans);
-                }
-                else
-                {
-                    needsManualGrading = true;
                 }
             }
 
@@ -755,6 +757,30 @@ namespace Masarak.Infrastructure.Services
                     a.MarksAwarded ?? 0, a.Question.Marks, a.GradingStatus, a.TeacherFeedback
                 ))
             );
+        }
+
+        public async Task<IEnumerable<StudentExamGradeDto>> GetStudentExamGradesAsync(int studentUserId, CancellationToken ct = default)
+        {
+            var studentId = await GetStudentIdAsync(studentUserId, ct);
+            
+            var gradedExams = await _context.StudentExams
+                .Include(se => se.Exam).ThenInclude(e => e.TeachingAssignment).ThenInclude(ta => ta.Subject)
+                .Where(se => se.StudentId == studentId && 
+                            (se.Status == StudentExamStatus.Graded || se.Status == StudentExamStatus.Submitted))
+                .OrderByDescending(se => se.SubmittedAt)
+                .ToListAsync(ct);
+
+            return gradedExams.Select(se => new StudentExamGradeDto(
+                se.StudentExamId,
+                se.ExamId,
+                se.Exam.Title,
+                se.Exam.TeachingAssignment.Subject.Name,
+                se.FinalScore ?? 0,
+                se.Exam.TotalMarks,
+                se.Exam.TotalMarks > 0 ? ((se.FinalScore ?? 0) / se.Exam.TotalMarks) * 100 : 0,
+                se.SubmittedAt,
+                se.HasPendingManualGrading
+            ));
         }
 
         // ── Performance & Reports ─────────────────────────────────────────────

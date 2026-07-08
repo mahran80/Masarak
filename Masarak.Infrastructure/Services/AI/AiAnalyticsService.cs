@@ -71,7 +71,7 @@ namespace Masarak.Infrastructure.Services.AI
                 return new WeaknessAnalysisDto(
                     r.SubjectId ?? 0,
                     r.Subject?.Name ?? "Unknown",
-                    data?.WeakTopics?.Select(w => new WeakTopicDto(w.TopicName, w.ErrorRate, w.RecommendedActions ?? Enumerable.Empty<string>())) ?? Enumerable.Empty<WeakTopicDto>(),
+                    data?.WeakLessons?.Select(w => new WeakTopicDto(w.LessonTitle, (100m - w.MasteryPercentage) / 100m, w.WeakTopics ?? Enumerable.Empty<string>())) ?? Enumerable.Empty<WeakTopicDto>(),
                     data?.NarrativeSummary ?? "",
                     r.GeneratedAt);
             }).ToList();
@@ -139,7 +139,6 @@ namespace Masarak.Infrastructure.Services.AI
         {
             await ValidateParentStudentLinkAsync(parentUserId, studentUserId, ct);
 
-            // Check cache first (24h TTL)
             var cacheKey = $"parent_report:{studentUserId}:{reportMonth}";
             var cached = await _cache.GetStringAsync(cacheKey, ct);
             if (cached != null)
@@ -155,48 +154,76 @@ namespace Masarak.Infrastructure.Services.AI
                 .Where(p => p.StudentId == student.StudentId)
                 .ToListAsync(ct);
 
-            var attendanceRate = performances.Any()
-                ? performances.Average(p => p.AttendanceRate) : 0m;
-
-            var subjectSummaries = performances.Select(p => new SubjectSummaryDto(
-                p.Subject?.Name ?? "Unknown", p.AvgExam, p.AttendanceRate,
-                $"Average score: {p.AvgExam:F1}%")).ToList();
-
+            var attendanceRate = performances.Any() ? performances.Average(p => p.AttendanceRate) : 0m;
             var overallScore = performances.Any() ? performances.Average(p => p.AvgExam) : 0m;
 
-            // Try AI narrative generation
-            string narrative;
-            try
+            var subjectSummaries = new List<SubjectSummaryDto>();
+
+            foreach (var p in performances)
             {
-                narrative = await GenerateAiNarrativeAsync("parent_report",
-                    new Dictionary<string, string>
-                    {
-                        { "student_name", student.User.FullName },
-                        { "month", reportMonth },
-                        { "performance_json", JsonSerializer.Serialize(subjectSummaries) },
-                        { "attendance_json", JsonSerializer.Serialize(new { rate = attendanceRate }) },
-                        { "language", "English" }
-                    }, ct);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "AI narrative generation failed, using fallback");
-                narrative = $"Performance report for {student.User.FullName} - {reportMonth}. " +
-                    $"Overall score: {overallScore:F1}%, Attendance: {attendanceRate:F1}%.";
+                var subjectId = p.SubjectId;
+                var subjectName = p.Subject?.Name ?? "Unknown";
+
+                // Get weakness analysis (AI JSON)
+                var weaknessRec = await _recRepo.GetActiveByStudentAndTypeAsync(studentUserId, subjectId, RecommendationType.WeaknessAnalysis, ct);
+                
+                if (weaknessRec == null)
+                {
+                    await GenerateWeaknessAnalysisAsync(studentUserId, subjectId, p.ClassId ?? 0, ct);
+                    weaknessRec = await _recRepo.GetActiveByStudentAndTypeAsync(studentUserId, subjectId, RecommendationType.WeaknessAnalysis, ct);
+                }
+
+                WeaknessAnalysisPayload? weaknessData = null;
+                if (weaknessRec != null)
+                {
+                    weaknessData = TryDeserialize<WeaknessAnalysisPayload>(weaknessRec.Payload);
+                }
+
+                // AI Narrative for Subject
+                string aiSubjectNarrative;
+                try
+                {
+                    var rawContextData = await BuildStudentSubjectContextAsync(studentUserId, subjectId, reportMonth, ct);
+                    var combinedContext = new {
+                        WeaknessData = weaknessData,
+                        RawData = rawContextData
+                    };
+                    var analysisContext = JsonSerializer.Serialize(combinedContext);
+                    aiSubjectNarrative = await GenerateAiNarrativeAsync("parent_report",
+                        new Dictionary<string, string>
+                        {
+                            { "student_name", student.User.FullName },
+                            { "month", reportMonth },
+                            { "subject_name", subjectName },
+                            { "analysis_context_json", analysisContext },
+                            { "language", "Arabic" }
+                        }, ct);
+                }
+                catch
+                {
+                    aiSubjectNarrative = $"مستوى الطالب في {subjectName} هو {p.AvgExam:F1}% ونسبة الحضور {p.AttendanceRate:F1}%.";
+                }
+
+                var perfLevel = p.AvgExam >= 85 ? "Strong" : p.AvgExam >= 70 ? "Average" : p.AvgExam >= 50 ? "NeedsImprovement" : "AtRisk";
+
+                var weakLessons = weaknessData?.WeakLessons?.Select(l => new LessonMasteryDto(l.LessonTitle, l.MasteryPercentage, l.WeakTopics ?? new List<string>())) ?? new List<LessonMasteryDto>();
+                var strongLessons = weaknessData?.StrongLessons?.Select(l => new LessonMasteryDto(l.LessonTitle, l.MasteryPercentage, new List<string>())) ?? new List<LessonMasteryDto>();
+                var recs = weaknessData?.Recommendations ?? new List<string> { $"مراجعة الدروس الضعيفة في مادة {subjectName}." };
+
+                subjectSummaries.Add(new SubjectSummaryDto(
+                    subjectName, p.AvgExam, p.AttendanceRate, perfLevel, aiSubjectNarrative,
+                    weakLessons, strongLessons, recs));
             }
 
             var report = new ParentReportDto(
                 student.User.FullName, reportMonth, overallScore, attendanceRate,
-                subjectSummaries, narrative,
-                new[] { "Review weak subjects", "Maintain attendance", "Practice regularly" },
+                subjectSummaries, "تم إعداد هذا التقرير التفصيلي باستخدام الذكاء الاصطناعي بناءً على أداء الطالب في الامتحانات.",
                 DateTime.UtcNow);
 
-            // Cache for 24 hours
             var reportJson = JsonSerializer.Serialize(report);
             await _cache.SetStringAsync(cacheKey, reportJson,
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24) }, ct);
 
-            // Store as recommendation
             var rec = AiRecommendation.Create(studentUserId, null,
                 RecommendationType.ParentReport, reportJson, "system", 0, 0, 24);
             await _recRepo.AddAsync(rec, ct);
@@ -308,7 +335,7 @@ namespace Masarak.Infrastructure.Services.AI
             if (weaknessRec != null)
             {
                 var data = TryDeserialize<WeaknessAnalysisPayload>(weaknessRec.Payload);
-                weakTopics = data?.WeakTopics?.Select(w => new WeakTopicDto(w.TopicName, w.ErrorRate, w.RecommendedActions ?? Enumerable.Empty<string>())) ?? Enumerable.Empty<WeakTopicDto>();
+                weakTopics = data?.WeakLessons?.Select(w => new WeakTopicDto(w.LessonTitle, (100m - w.MasteryPercentage) / 100m, w.WeakTopics ?? Enumerable.Empty<string>())) ?? Enumerable.Empty<WeakTopicDto>();
             }
 
             // Get alerts
@@ -475,28 +502,50 @@ namespace Masarak.Infrastructure.Services.AI
         public async Task GenerateWeaknessAnalysisAsync(
             int studentUserId, int subjectId, int classId, CancellationToken ct)
         {
-            // Invalidate cache
             await _cache.RemoveAsync($"weakness:{studentUserId}:{subjectId}", ct);
-
             var subject = await _context.Subjects.FindAsync(new object[] { subjectId }, ct);
             if (subject == null) return;
-
-            // Deactivate old
+            
             await _recRepo.DeactivateAsync(studentUserId, subjectId, RecommendationType.WeaknessAnalysis, ct);
 
-            // Create placeholder analysis (AI call would go here with real API keys)
-            var payload = new WeaknessAnalysisPayload
+            var contextData = await BuildStudentSubjectContextAsync(studentUserId, subjectId, null, ct);
+            var contextJson = JsonSerializer.Serialize(contextData);
+            
+            // Expected output schema definition for prompt
+            var schema = @"{
+  ""weakLessons"": [{ ""lessonTitle"": ""string"", ""masteryPercentage"": 0, ""weakTopics"": [""string""], ""errorRate"": 0.0, ""wrongQuestions"": [""string""] }],
+  ""strongLessons"": [{ ""lessonTitle"": ""string"", ""masteryPercentage"": 0 }],
+  ""recommendations"": [""string""],
+  ""narrativeSummary"": ""string""
+}";
+
+            string narrativeJson;
+            try
             {
-                WeakTopics = new List<WeakTopicPayload>
-                {
-                    new() { TopicName = "General Review", ErrorRate = 0.3m, RecommendedActions = new[] { "Review fundamentals", "Practice more" } }
-                },
-                NarrativeSummary = $"Analysis pending for {subject.Name}. Performance data has been updated."
-            };
+                narrativeJson = await GenerateAiNarrativeAsync("weakness_analysis",
+                    new Dictionary<string, string>
+                    {
+                        { "student_context_json", contextJson },
+                        { "schema", schema },
+                        { "language", "Arabic" }
+                    }, ct);
+                
+                // Cleanup markdown code blocks if any
+                if (narrativeJson.StartsWith("```json")) {
+                    narrativeJson = narrativeJson.Replace("```json", "").Replace("```", "").Trim();
+                } else if (narrativeJson.StartsWith("```")) {
+                    narrativeJson = narrativeJson.Replace("```", "").Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate weakness analysis via AI");
+                return;
+            }
 
             var rec = AiRecommendation.Create(studentUserId, subjectId,
                 RecommendationType.WeaknessAnalysis,
-                JsonSerializer.Serialize(payload), "system", 0, 0, 24);
+                narrativeJson, "system", 0, 0, 24);
             await _recRepo.AddAsync(rec, ct);
 
             _logger.LogInformation("Weakness analysis generated for student {StudentUserId} subject {SubjectId}", studentUserId, subjectId);
@@ -520,6 +569,78 @@ namespace Masarak.Infrastructure.Services.AI
             return alerts.Select(a => MapAlertDto(a, student?.FullName ?? "Unknown", a.Subject?.Name)).ToList();
         }
 
+        private async Task<object> BuildStudentSubjectContextAsync(int studentUserId, int subjectId, string? reportMonth, CancellationToken ct)
+        {
+            var student = await _context.Students.Include(s => s.User).Include(s => s.Grade)
+                .FirstOrDefaultAsync(s => s.UserId == studentUserId, ct);
+            var subject = await _context.Subjects.FindAsync(new object[] { subjectId }, ct);
+            if (student == null || subject == null) return new { };
+
+            var studentId = student.StudentId;
+
+            var query = _context.StudentExams
+                .Include(se => se.Exam).ThenInclude(e => e.Lesson).ThenInclude(l => l.ContentItems)
+                .Include(se => se.StudentAnswers).ThenInclude(sa => sa.Question)
+                .Where(se => se.StudentId == studentId && se.Exam.TeachingAssignment.SubjectId == subjectId && se.Status == StudentExamStatus.Graded);
+
+            if (!string.IsNullOrEmpty(reportMonth))
+            {
+                // reportMonth format is YYYY-MM
+                if (int.TryParse(reportMonth.Split('-')[0], out int year) && int.TryParse(reportMonth.Split('-')[1], out int month))
+                {
+                    query = query.Where(se => se.Exam.StartTime.Year == year && se.Exam.StartTime.Month == month);
+                }
+            }
+
+            var exams = await query.OrderBy(se => se.Exam.StartTime).ToListAsync(ct);
+
+            var performance = await _context.StudentPerformances
+                .FirstOrDefaultAsync(p => p.StudentId == studentId && p.SubjectId == subjectId, ct);
+
+            var lessons = exams.Select(se => se.Exam.Lesson).Where(l => l != null).DistinctBy(l => l.LessonId)
+                .Select(l => new {
+                    l.LessonId,
+                    l.Title,
+                    l.Description,
+                    ContentItems = l.ContentItems.Select(c => new { c.Title, c.Description, Type = c.Type.ToString() })
+                });
+
+            var contextData = new
+            {
+                Student = new { Name = student.User.FullName, Grade = student.Grade?.Name },
+                Subject = new { Name = subject.Name, Id = subjectId },
+                Lessons = lessons,
+                Exams = exams.Select(se => new
+                {
+                    se.Exam.ExamId,
+                    se.Exam.Title,
+                    LessonTitle = se.Exam.Lesson?.Title,
+                    se.TotalScore,
+                    se.FinalScore,
+                    Percentage = se.Exam.TotalMarks > 0 ? (se.FinalScore / se.Exam.TotalMarks) * 100 : 0,
+                    Questions = se.StudentAnswers.Select(sa => new
+                    {
+                        QuestionText = sa.Question.QuestionText,
+                        Type = sa.Question.Type.ToString(),
+                        Marks = sa.Question.Marks,
+                        CorrectAnswer = sa.Question.CorrectAns,
+                        StudentAnswer = sa.SelectedOptionId ?? sa.AnswerText,
+                        MarksAwarded = sa.MarksAwarded,
+                        IsCorrect = sa.IsCorrect
+                    })
+                }),
+                OverallStats = new
+                {
+                    AvgExam = performance?.AvgExam ?? 0,
+                    AvgAssignment = performance?.AvgAssignment ?? 0,
+                    AttendanceRate = performance?.AttendanceRate ?? 0,
+                    TotalExamsTaken = performance?.TotalExamsTaken ?? 0
+                }
+            };
+
+            return contextData;
+        }
+
         private async Task<List<PerformanceTrendDto>> GetPerformanceTrendsAsync(int studentId, CancellationToken ct)
         {
             var exams = await _context.StudentExams
@@ -541,14 +662,13 @@ namespace Masarak.Infrastructure.Services.AI
             var template = await _templateRepo.GetByKeyAsync(templateKey, ct);
             if (template == null)
                 return "No template configured.";
-
             var userPrompt = template.UserPromptTemplate;
             foreach (var kv in placeholders)
-                userPrompt = userPrompt.Replace($"{{{kv.Key}}}", SanitizeInput(kv.Value));
+                userPrompt = userPrompt.Replace($"{{{kv.Key}}}", kv.Value);
 
             var request = new AiPromptRequest(template.SystemPrompt, userPrompt, template.MaxTokens, template.Temperature);
 
-            var provider = _providerFactory.GetProvider(AiProvider.OpenAI);
+            var provider = _providerFactory.GetProvider(AiProvider.Gemini);
             try
             {
                 var result = await provider.CompleteAsync(request, ct);
@@ -557,14 +677,11 @@ namespace Masarak.Infrastructure.Services.AI
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Primary AI provider failed, trying fallback");
-                var fallback = _providerFactory.GetFallbackProvider(AiProvider.OpenAI);
+                var fallback = _providerFactory.GetFallbackProvider(AiProvider.Gemini);
                 var result = await fallback.CompleteAsync(request, ct);
                 return result.Content;
             }
         }
-
-        private static string SanitizeInput(string input) =>
-            input.Replace("{", "").Replace("}", "").Replace("\n", " ").Replace("\r", "");
 
         private static PerformanceAlertDto MapAlertDto(PerformanceAlert a, string studentName, string? subjectName) =>
             new(a.PerformanceAlertId, a.StudentUserId, studentName,
@@ -573,22 +690,30 @@ namespace Masarak.Infrastructure.Services.AI
 
         private static T? TryDeserialize<T>(string json) where T : class
         {
-            try { return JsonSerializer.Deserialize<T>(json); }
+            try 
+            { 
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<T>(json, options); 
+            }
             catch { return null; }
         }
 
         // ── Internal payload types for JSON serialization ────────────────────
         private class WeaknessAnalysisPayload
         {
-            public List<WeakTopicPayload>? WeakTopics { get; set; }
+            public List<LessonMasteryPayload>? WeakLessons { get; set; }
+            public List<LessonMasteryPayload>? StrongLessons { get; set; }
+            public List<string>? Recommendations { get; set; }
             public string? NarrativeSummary { get; set; }
         }
 
-        private class WeakTopicPayload
+        private class LessonMasteryPayload
         {
-            public string TopicName { get; set; } = "";
-            public decimal ErrorRate { get; set; }
-            public IEnumerable<string>? RecommendedActions { get; set; }
+            public string LessonTitle { get; set; } = "";
+            public decimal MasteryPercentage { get; set; }
+            public List<string>? WeakTopics { get; set; }
+            public decimal? ErrorRate { get; set; }
+            public List<string>? WrongQuestions { get; set; }
         }
 
         private class ContentRecPayload

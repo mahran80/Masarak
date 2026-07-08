@@ -7,6 +7,7 @@ namespace Masarak.Application.Interfaces
         Task<Session?> GetByIdAsync(int sessionId, CancellationToken ct = default);
         Task<Session?> GetByIdWithDetailsAsync(int sessionId, CancellationToken ct = default);
         Task<IEnumerable<Session>> GetByClassIdAsync(int classId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetAllAsync(DateTime from, DateTime to, CancellationToken ct = default);
         Task<IEnumerable<Session>> GetByTeachingAssignmentIdAsync(int assignmentId, CancellationToken ct = default);
         Task<IEnumerable<Session>> GetUpcomingByClassIdAsync(int classId, DateTime after, CancellationToken ct = default);
         Task<IEnumerable<Session>> GetByTeacherIdAsync(int teacherId, DateTime from, DateTime to, CancellationToken ct = default);

@@ -81,6 +81,30 @@ namespace Masarak.Domain.Entities
             };
         }
 
+        /// <summary>
+        /// Creates a local file-based content item.
+        /// </summary>
+        public static ContentItem CreateLocalBased(
+            int teachingAssignmentId, int? sessionId,
+            ContentType type, string title, string? description,
+            string fileName, string fileUrl, long fileSizeBytes)
+        {
+            return new ContentItem
+            {
+                TeachingAssignmentId = teachingAssignmentId,
+                SessionId            = sessionId,
+                Type                 = type,
+                SourceType           = ContentSourceType.LocalFile,
+                Title                = title,
+                Description          = description,
+                ResourceUrl          = fileUrl,
+                BlobName             = fileName, // Reusing BlobName to store the filename
+                FileSizeBytes        = fileSizeBytes,
+                IsActive             = true,
+                CreatedAt            = DateTime.UtcNow
+            };
+        }
+
         // ── Domain Methods ──────────────────────────────────────────────────
         public void Deactivate() => IsActive = false;
 

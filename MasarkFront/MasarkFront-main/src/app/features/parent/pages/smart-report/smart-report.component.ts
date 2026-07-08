@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import { ParentReportDto } from '../../../../models/ai-analytics.model';
 
@@ -32,6 +32,12 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
             <option value="2026-04">أبريل 2026</option>
             <option value="2026-05">مايو 2026</option>
             <option value="2026-06">يونيو 2026</option>
+            <option value="2026-07">يوليو 2026</option>
+            <option value="2026-08">أغسطس 2026</option>
+            <option value="2026-09">سبتمبر 2026</option>
+            <option value="2026-10">أكتوبر 2026</option>
+            <option value="2026-11">نوفمبر 2026</option>
+            <option value="2026-12">ديسمبر 2026</option>
           </select>
           <button 
             (click)="generateReport()"
@@ -108,41 +114,102 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
 
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span>🎯</span> التوصيات المقترحة ({{ r.recommendedActions.length }})
+                <span>📚</span> تفاصيل المواد والتحليل الفردي
               </h3>
-              <ul class="space-y-3">
-                @for (action of r.recommendedActions; track action) {
-                  <li class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                    <span class="text-blue-500 mt-0.5">🔹</span>
-                    <span class="text-slate-700 font-medium leading-relaxed">{{ action }}</span>
-                  </li>
-                }
-              </ul>
-            </div>
-            
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-              <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span>📚</span> تفاصيل المواد
-              </h3>
-              <div class="space-y-4">
+              <div class="space-y-6">
                 @for (sub of r.subjects; track sub.subjectName) {
-                  <div class="border border-slate-100 rounded-xl p-4 hover:border-blue-200 transition-colors">
-                    <div class="flex justify-between items-center mb-2">
-                      <h4 class="font-bold text-slate-800 text-lg">{{ sub.subjectName }}</h4>
-                      <span class="font-bold text-lg" 
-                            [class.text-emerald-600]="sub.averageScore >= 85"
-                            [class.text-blue-600]="sub.averageScore >= 70 && sub.averageScore < 85"
-                            [class.text-orange-600]="sub.averageScore >= 50 && sub.averageScore < 70"
-                            [class.text-red-600]="sub.averageScore < 50">
-                        {{ sub.averageScore }}%
-                      </span>
+                  <div class="border border-slate-200 rounded-2xl p-5 hover:border-blue-300 transition-colors bg-white shadow-sm">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+                      <div class="flex items-center gap-3">
+                        <h4 class="font-bold text-slate-800 text-xl">{{ sub.subjectName }}</h4>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold border"
+                              [class.bg-emerald-50]="sub.performanceLevel === 'Strong'"
+                              [class.text-emerald-700]="sub.performanceLevel === 'Strong'"
+                              [class.border-emerald-200]="sub.performanceLevel === 'Strong'"
+                              [class.bg-blue-50]="sub.performanceLevel === 'Average'"
+                              [class.text-blue-700]="sub.performanceLevel === 'Average'"
+                              [class.border-blue-200]="sub.performanceLevel === 'Average'"
+                              [class.bg-orange-50]="sub.performanceLevel === 'NeedsImprovement'"
+                              [class.text-orange-700]="sub.performanceLevel === 'NeedsImprovement'"
+                              [class.border-orange-200]="sub.performanceLevel === 'NeedsImprovement'"
+                              [class.bg-red-50]="sub.performanceLevel === 'AtRisk'"
+                              [class.text-red-700]="sub.performanceLevel === 'AtRisk'"
+                              [class.border-red-200]="sub.performanceLevel === 'AtRisk'">
+                           @if(sub.performanceLevel === 'Strong') { ممتاز }
+                           @else if(sub.performanceLevel === 'Average') { جيد }
+                           @else if(sub.performanceLevel === 'NeedsImprovement') { يحتاج تحسين }
+                           @else { في خطر }
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <span class="font-bold text-2xl block" 
+                              [class.text-emerald-600]="sub.averageScore >= 85"
+                              [class.text-blue-600]="sub.averageScore >= 70 && sub.averageScore < 85"
+                              [class.text-orange-600]="sub.averageScore >= 50 && sub.averageScore < 70"
+                              [class.text-red-600]="sub.averageScore < 50">
+                          {{ sub.averageScore }}%
+                        </span>
+                        <span class="text-xs font-medium text-slate-500">حضور: {{ sub.attendancePercentage }}%</span>
+                      </div>
                     </div>
-                    <div class="flex items-center gap-4 text-sm text-slate-500 mb-3">
-                      <span>حضور: {{ sub.attendancePercentage }}%</span>
-                    </div>
-                    <p class="text-slate-600 text-sm bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    
+                    <!-- AI Narrative -->
+                    <div class="text-slate-700 text-sm bg-gradient-to-l from-blue-50/80 to-indigo-50/80 p-4 rounded-xl border border-blue-100/50 mb-5 leading-relaxed relative overflow-hidden">
+                      <div class="absolute -left-2 -top-2 text-4xl opacity-10">✨</div>
+                      <span class="font-bold text-indigo-800 block mb-1 text-xs">رأي الذكاء الاصطناعي:</span>
                       {{ sub.aiSubjectNarrative }}
-                    </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                      <!-- Weaknesses -->
+                      @if (sub.weakLessons && sub.weakLessons.length > 0) {
+                        <div>
+                          <h5 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            <span>📉</span> المهارات التي تحتاج تعزيز
+                          </h5>
+                          <div class="space-y-2">
+                            @for (wl of sub.weakLessons; track wl.lessonTitle) {
+                              <div class="bg-white rounded-lg p-3 border border-red-100 shadow-sm relative overflow-hidden">
+                                <div class="absolute right-0 top-0 bottom-0 w-1 bg-red-400"></div>
+                                <div class="flex justify-between items-center mb-1.5 pl-2">
+                                  <span class="font-bold text-slate-800 text-sm">{{ wl.lessonTitle }}</span>
+                                  <span class="text-xs font-bold px-2 py-0.5 bg-red-50 text-red-700 rounded-md">{{ wl.masteryPercentage }}% إتقان</span>
+                                </div>
+                                @if (wl.weakTopics && wl.weakTopics.length > 0) {
+                                  <div class="flex flex-wrap gap-1.5 mt-2 pl-2">
+                                    @for (topic of wl.weakTopics; track topic) {
+                                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                        {{ topic }}
+                                      </span>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Recommendations -->
+                      @if (sub.recommendations && sub.recommendations.length > 0) {
+                        <div>
+                          <h5 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                            <span>💡</span> خطة التحسين المقترحة
+                          </h5>
+                          <ul class="space-y-2.5">
+                            @for (rec of sub.recommendations; track rec) {
+                              <li class="flex items-start gap-2.5 text-sm text-slate-700 bg-white p-3 rounded-lg border border-emerald-100/50 shadow-sm">
+                                <span class="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 mt-0.5">
+                                  <i class="fa-solid fa-check text-[10px]"></i>
+                                </span>
+                                <span class="leading-relaxed">{{ rec }}</span>
+                              </li>
+                            }
+                          </ul>
+                        </div>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -205,6 +272,7 @@ import { ParentReportDto } from '../../../../models/ai-analytics.model';
 })
 export class SmartReportComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private aiService = inject(AiAnalyticsService);
 
   studentId = signal<number>(0);
@@ -243,7 +311,7 @@ export class SmartReportComponent implements OnInit {
     const target = event.target as HTMLSelectElement;
     if (target.value) {
       this.selectedMonth.set(target.value);
-      this.loadReport();
+      this.router.navigate(['/dashboard/parent/reports', this.studentId(), target.value]);
     }
   }
 

@@ -98,7 +98,7 @@ export class StudentSchedulePageComponent implements OnInit {
     this.studentService
       .getMyClass()
       .pipe(
-        switchMap((classInfo) => this.studentService.getSchedule(classInfo?.academicYear)),
+        switchMap((classInfo) => this.studentService.getSchedule(classInfo?.academicYear, this.toDateString(this.weekStart()))),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({

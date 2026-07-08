@@ -15,9 +15,11 @@ namespace Masarak.Application.Interfaces
         Task CompleteSessionAsync(int userId, int sessionId, CancellationToken ct = default);
         Task CancelSessionAsync(int userId, int sessionId, CancellationToken ct = default);
         Task<IEnumerable<SessionDto>> GetTeacherSessionsAsync(int userId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task<SessionDto> GetTeacherSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default);
 
         // ── Student ─────────────────────────────────────────────────────────
         Task<StudentEnrollmentDto?> GetStudentEnrollmentAsync(int userId, int academicYear, CancellationToken ct = default);
         Task<WeeklyScheduleDto> GetStudentScheduleAsync(int userId, int academicYear, DateTime weekStart, CancellationToken ct = default);
+        Task<SessionDto> GetStudentSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default);
     }
 }

@@ -22,6 +22,7 @@ import {
   StudentExam,
   StudentExamAnswer,
   StudentExamChoice,
+  StudentExamGrade,
   StudentExamGroup,
   StudentExamQuestion,
   StudentExamResult,
@@ -69,6 +70,7 @@ interface SessionDto {
   subjectName?: string | null;
   className?: string | null;
   teacherName?: string | null;
+  assignmentId?: number;
 }
 
 interface SubjectAttendanceDto {
@@ -160,6 +162,7 @@ interface ExamResultDto {
   totalMarks?: number;
   percentage?: number;
   hasPendingManualGrading?: boolean;
+  answers?: any[];
 }
 
 interface SubjectPerformanceDto {
@@ -349,6 +352,10 @@ export class StudentService {
         )}/result`,
       )
       .pipe(map((result) => this.mapExamResult(result, studentExamId)));
+  }
+
+  getExamGrades(): Observable<StudentExamGrade[]> {
+    return this.http.get<StudentExamGrade[]>(`${this.baseUrl}/assessment/exams/grades`);
   }
 
   joinSession(sessionId: StudentEntityId): Observable<StudentAttendanceRecord> {
@@ -741,6 +748,16 @@ export class StudentService {
       percentage,
       gradeLetter: this.toGradeLetter(percentage),
       hasPendingManualGrading: result.hasPendingManualGrading,
+      answers: result.answers?.map((a: any) => ({
+        questionId: a.questionId,
+        questionText: a.questionText,
+        yourAnswer: a.yourAnswer,
+        correctAnswer: a.correctAnswer,
+        marksAwarded: a.marksAwarded,
+        maxMarks: a.maxMarks,
+        gradingStatus: a.gradingStatus,
+        feedback: a.feedback
+      })) ?? [],
     };
   }
 

@@ -66,6 +66,15 @@ namespace Masarak.API.Controllers
             return Ok(sessions);
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<SessionDto>), 200)]
+        public async Task<IActionResult> GetAllSessions(
+            [FromQuery] DateTime from, [FromQuery] DateTime to, CancellationToken ct)
+        {
+            var sessions = await _sessionAdminService.GetAllScheduleAsync(from, to, ct);
+            return Ok(sessions);
+        }
+
         [HttpGet("teacher/{teacherId}")]
         [ProducesResponseType(typeof(IEnumerable<SessionDto>), 200)]
         public async Task<IActionResult> GetTeacherSchedule(
@@ -83,11 +92,23 @@ namespace Masarak.API.Controllers
         {
             try
             {
+                Console.WriteLine($"[Admin] ReactivateSession called for sessionId: {sessionId}");
                 await _sessionAdminService.ReactivateSessionAsync(sessionId, ct);
+                Console.WriteLine($"[Admin] ReactivateSession succeeded for sessionId: {sessionId}");
                 return NoContent();
             }
-            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            catch (KeyNotFoundException ex) { 
+                Console.WriteLine($"[Admin] ReactivateSession KeyNotFound: {ex.Message}");
+                return NotFound(new { message = ex.Message }); 
+            }
+            catch (InvalidOperationException ex) { 
+                Console.WriteLine($"[Admin] ReactivateSession InvalidOp: {ex.Message}");
+                return BadRequest(new { message = ex.Message }); 
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"[Admin] ReactivateSession Error: {ex.Message}\n{ex.StackTrace}");
+                throw;
+            }
         }
     }
 }

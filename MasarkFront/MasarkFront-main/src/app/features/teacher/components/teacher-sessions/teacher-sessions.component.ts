@@ -23,20 +23,12 @@ export class TeacherSessionsComponent implements OnInit {
   private readonly router = inject(Router);
 
   readonly sessions = signal<SessionDto[]>([]);
-  readonly calendarSessions = signal<CalendarSession[]>([]);
+
+  
+  // UI signals
+  isSidebarOpen = signal(true);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
-
-  // Form State
-  readonly showForm = signal(false);
-  readonly isEditing = signal(false);
-  readonly editingSessionId = signal<number | null>(null);
-  readonly formAssignmentId = signal<number | null>(null);
-  readonly formTitle = signal('');
-  readonly formDescription = signal('');
-  readonly formScheduledAt = signal('');
-  readonly formDurationMinutes = signal(60);
-  readonly isSubmitting = signal(false);
 
   private getStartOfWeek(date: Date): Date {
     const d = new Date(date);
@@ -152,6 +144,19 @@ export class TeacherSessionsComponent implements OnInit {
     return this.sessions().filter(s => s.classId === cid);
   });
 
+  readonly calendarSessions = computed<any[]>(() => {
+    return this.filteredSessions().map(s => ({
+      id: s.sessionId,
+      title: s.title,
+      subjectName: s.subjectName,
+      className: s.className,
+      status: s.status,
+      scheduledAt: new Date(s.scheduledAt),
+      durationMinutes: s.durationMinutes,
+      originalData: s
+    }));
+  });
+
   ngOnInit(): void {
     this.contextService.loadAssignments();
     this.loadSessions();
@@ -163,7 +168,12 @@ export class TeacherSessionsComponent implements OnInit {
       this.selectedClassId.set(null);
     } else {
       this.selectedGradeId.set(gradeId);
-      this.selectedClassId.set(null);
+      const classes = this.classes();
+      if (classes && classes.length > 0) {
+        this.selectedClassId.set(classes[0].classId);
+      } else {
+        this.selectedClassId.set(null);
+      }
     }
   }
 
@@ -177,7 +187,7 @@ export class TeacherSessionsComponent implements OnInit {
 
     const fromDateStr = this.formatDateForApi(this.weekStart());
     const endDate = new Date(this.weekStart());
-    endDate.setDate(endDate.getDate() + 6);
+    endDate.setDate(endDate.getDate() + 7); // Add 7 days to cover up to 00:00 of the next Sunday
     const toDateStr = this.formatDateForApi(endDate);
 
     this.sessionService
@@ -186,16 +196,6 @@ export class TeacherSessionsComponent implements OnInit {
       .subscribe({
         next: (sessions) => {
           this.sessions.set(sessions);
-          this.calendarSessions.set(sessions.map(s => ({
-            id: s.sessionId,
-            title: s.title,
-            subjectName: s.subjectName,
-            className: s.className,
-            status: s.status,
-            scheduledAt: new Date(s.scheduledAt),
-            durationMinutes: s.durationMinutes,
-            originalData: s
-          })));
           this.isLoading.set(false);
         },
         error: (err) => {
@@ -205,87 +205,6 @@ export class TeacherSessionsComponent implements OnInit {
         },
       });
   }
-
-
-
-  openEditForm(session: SessionDto): void {
-    this.isEditing.set(true);
-    this.editingSessionId.set(session.sessionId);
-    this.formTitle.set(session.title);
-    this.formDescription.set(session.description || '');
-    
-    const d = new Date(session.scheduledAt);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    this.formScheduledAt.set(d.toISOString().slice(0, 16));
-    
-    this.formDurationMinutes.set(session.durationMinutes);
-    this.showForm.set(true);
-  }
-
-  closeForm(): void {
-    this.showForm.set(false);
-  }
-
-  submitForm(): void {
-    if (!this.formTitle() || !this.formScheduledAt() || (!this.formAssignmentId() && !this.isEditing())) {
-      alert('Please fill all required fields');
-      return;
-    }
-
-    this.isSubmitting.set(true);
-    const date = new Date(this.formScheduledAt());
-    const isoString = date.toISOString();
-
-    if (this.isEditing()) {
-      this.sessionService.updateSession(this.editingSessionId()!, {
-        title: this.formTitle(),
-        description: this.formDescription(),
-        scheduledAt: isoString,
-        durationMinutes: this.formDurationMinutes(),
-        embedUrl: ''
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => {
-          this.isSubmitting.set(false);
-          this.showForm.set(false);
-          this.loadSessions();
-        },
-        error: (err) => {
-          this.isSubmitting.set(false);
-          alert(err.error?.message || 'Failed to update session');
-        }
-      });
-    } else {
-      this.sessionService.scheduleSession({
-        teachingAssignmentId: this.formAssignmentId()!,
-        title: this.formTitle(),
-        description: this.formDescription(),
-        scheduledAt: isoString,
-        durationMinutes: this.formDurationMinutes(),
-        embedUrl: ''
-      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-        next: () => {
-          this.isSubmitting.set(false);
-          this.showForm.set(false);
-          this.loadSessions();
-        },
-        error: (err) => {
-          this.isSubmitting.set(false);
-          alert(err.error?.message || 'Failed to schedule session');
-        }
-      });
-    }
-  }
-
-  cancelSession(sessionId: number): void {
-    if (!confirm('Are you sure you want to cancel this session?')) return;
-    this.sessionService.cancelSession(sessionId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.loadSessions(),
-        error: (err) => alert(err.error?.message || 'Failed to cancel session')
-      });
-  }
-
   canStartSession(session: SessionDto): boolean {
     const now = new Date();
     const scheduledAt = new Date(session.scheduledAt);
@@ -337,15 +256,6 @@ export class TeacherSessionsComponent implements OnInit {
     this.router.navigate(['/dashboard/teacher/sessions', s.id, 'live']);
   }
 
-  onCalendarEdit(s: CalendarSession): void {
-    if (s.originalData) {
-      this.openEditForm(s.originalData);
-    }
-  }
-
-  onCalendarCancel(s: CalendarSession): void {
-    this.cancelSession(Number(s.id));
-  }
 
   onCalendarComplete(s: CalendarSession): void {
     this.completeSession(Number(s.id));

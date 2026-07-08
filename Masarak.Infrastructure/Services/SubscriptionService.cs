@@ -311,7 +311,7 @@ namespace Masarak.Infrastructure.Services
             var plans = await _planRepository.GetAllActiveAsync(ct);
             return plans.Select(p => new PlanDto(
                 p.PlanId, p.Name, p.Description, p.Type, p.PriceMonthly, p.Currency, 
-                p.DurationDays, p.MaxSubjects, p.HasAi, p.HasLiveClass, p.HasRecordings));
+                p.DurationDays, p.MaxSubjects, p.HasAi, p.HasLiveClass));
         }
 
         public async Task<ParentStudentLinkDto> LinkParentToStudentAsync(int parentUserId, string studentLinkageCode, CancellationToken ct = default)

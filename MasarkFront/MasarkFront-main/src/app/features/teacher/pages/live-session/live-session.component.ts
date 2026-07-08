@@ -41,6 +41,7 @@ export class LiveSessionComponent implements OnInit {
         durationMinutes: 45,
         endsAt: new Date().toISOString(),
         status: 'Live',
+        assignmentId: 0
       });
       this.isLoading.set(false);
       return;

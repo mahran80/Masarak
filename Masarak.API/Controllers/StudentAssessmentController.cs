@@ -103,6 +103,14 @@ namespace Masarak.API.Controllers
             return Ok(dto);
         }
 
+        [HttpGet("exams/grades")]
+        [ProducesResponseType(typeof(IEnumerable<StudentExamGradeDto>), 200)]
+        public async Task<IActionResult> GetExamGrades(CancellationToken ct)
+        {
+            var dtos = await _assessmentService.GetStudentExamGradesAsync(GetUserId(), ct);
+            return Ok(dtos);
+        }
+
         // ── Performance ────────────────────────────────────────────────────────
 
         [HttpGet("performance")]

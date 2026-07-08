@@ -30,6 +30,8 @@ export class AdminScheduleComponent implements OnInit {
   fromDate = signal<string>(this.getDefaultFromDate());
   toDate = signal<string>(this.getDefaultToDate());
 
+  isSidebarOpen = signal(true);
+
   calendarSessions = signal<CalendarSession[]>([]);
 
   // Modal state
@@ -95,11 +97,22 @@ export class AdminScheduleComponent implements OnInit {
   }
 
   onGradeSelect(gradeId: number): void {
+    if (this.selectedGradeId() === gradeId) {
+      this.selectedGradeId.set(null);
+      this.selectedClassId.set(null);
+      this.sessions.set([]);
+      this.classes.set([]);
+      return;
+    }
+    
     this.selectedGradeId.set(gradeId);
     this.selectedClassId.set(null);
     this.sessions.set([]);
     this.academicApi.getClassesByGrade(gradeId, new Date().getFullYear()).subscribe(res => {
       this.classes.set(res);
+      if (res && res.length > 0) {
+        this.onClassSelect(res[0].classId);
+      }
     });
   }
 
@@ -112,20 +125,27 @@ export class AdminScheduleComponent implements OnInit {
   }
 
   loadSessions() {
-    if (!this.selectedClassId()) return;
-
     let fromStr = this.fromDate();
     let toStr = this.toDate();
 
     if (this.viewMode() === 'week') {
+      if (!this.selectedClassId()) {
+        this.sessions.set([]);
+        this.calendarSessions.set([]);
+        return;
+      }
       const wStart = this.weekStart();
       fromStr = this.formatDate(wStart);
       const wEnd = new Date(wStart);
-      wEnd.setDate(wEnd.getDate() + 6);
+      wEnd.setDate(wEnd.getDate() + 7);
       toStr = this.formatDate(wEnd);
     }
 
-    this.sessionApi.getClassSchedule(this.selectedClassId()!, fromStr, toStr).subscribe({
+    const request$ = this.selectedClassId() 
+      ? this.sessionApi.getClassSchedule(this.selectedClassId()!, fromStr, toStr)
+      : this.sessionApi.getAllSessions(fromStr, toStr);
+
+    request$.subscribe({
       next: res => {
         this.sessions.set(res);
         this.calendarSessions.set(res.map(s => ({
@@ -234,24 +254,18 @@ export class AdminScheduleComponent implements OnInit {
     }
   }
 
-  onCalendarEdit(s: CalendarSession) {
+  onCalendarCancel(s: CalendarSession) {
     if (s.originalData) {
-      if (s.status === 'Cancelled' || s.status === 'Completed') {
-         this.reactivateSession(s.originalData);
-      } else {
-        // We do not have a dedicated edit form in this implementation yet, but could map to cancel.
-        // Or if we do, this is where we would wire it.
+      if (s.status === 'Scheduled') {
+         this.cancelSession(s.originalData, false);
       }
     }
   }
 
-  onCalendarCancel(s: CalendarSession) {
+  onCalendarEdit(s: CalendarSession) {
     if (s.originalData) {
-      if (s.status === 'Cancelled' || s.status === 'Completed') {
-         this.reactivateSession(s.originalData);
-      } else {
-        // We do not have a dedicated edit form in this implementation yet, but could map to cancel.
-        // Or if we do, this is where we would wire it.
+      if (s.status === 'Completed' || s.status === 'Cancelled') {
+        this.reactivateSession(s.originalData);
       }
     }
   }

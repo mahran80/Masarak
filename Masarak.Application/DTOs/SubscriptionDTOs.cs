@@ -28,8 +28,7 @@ namespace Masarak.Application.DTOs
         int DurationDays,
         int MaxSubjects,
         bool HasAi,
-        bool HasLiveClass,
-        bool HasRecordings
+        bool HasLiveClass
     );
 
     public record ParentStudentLinkDto(

@@ -68,7 +68,7 @@ export class AdminApiService {
   /** GET /api/admin/users?page=&pageSize=&role= */
   getUsers(
     page = 1,
-    pageSize = 100,
+    pageSize = 2000,
     role?: string,
   ): Observable<AdminUsersPagedResult | AdminUserDto[]> {
     let params = new HttpParams()

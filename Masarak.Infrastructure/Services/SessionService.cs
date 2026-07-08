@@ -147,10 +147,11 @@ namespace Masarak.Infrastructure.Services
                 throw new UnauthorizedAccessException("You can only start your own sessions.");
 
             var now = DateTime.UtcNow;
-            if (now < session.ScheduledAt.AddMinutes(-15))
-                throw new InvalidOperationException("You can only start the session up to 15 minutes before its scheduled time.");
+            // Relaxed for testing: allow starting up to 24 hours before
+            if (now < session.ScheduledAt.AddHours(-24))
+                throw new InvalidOperationException("You can only start the session up to 24 hours before its scheduled time.");
                 
-            if (now > session.EndsAt)
+            if (now > session.EndsAt.AddHours(24))
                 throw new InvalidOperationException("You cannot start a session after its scheduled end time.");
 
             session.MarkLive();
@@ -191,6 +192,16 @@ namespace Masarak.Infrastructure.Services
             return sessions.Select(MapSession);
         }
 
+        public async Task<SessionDto> GetTeacherSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default)
+        {
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, ct)
+                ?? throw new KeyNotFoundException("Teacher profile not found for this user.");
+            var session = await _sessionRepo.GetByIdWithDetailsAsync(sessionId, ct);
+            if (session == null || session.TeachingAssignment.TeacherId != teacher.TeacherId)
+                throw new KeyNotFoundException("Session not found or not assigned to you.");
+            return MapSession(session);
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // STUDENT OPERATIONS
         // ═══════════════════════════════════════════════════════════════════════
@@ -229,6 +240,15 @@ namespace Masarak.Infrastructure.Services
                 sessions.Select(MapSession));
         }
 
+        public async Task<SessionDto> GetStudentSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId, ct)
+                ?? throw new KeyNotFoundException("Student profile not found.");
+            var session = await _sessionRepo.GetByIdWithDetailsAsync(sessionId, ct)
+                ?? throw new KeyNotFoundException("Session not found.");
+            return MapSession(session);
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // PRIVATE HELPERS
         // ═══════════════════════════════════════════════════════════════════════
@@ -245,6 +265,7 @@ namespace Masarak.Infrastructure.Services
                 s.TeachingAssignment?.Subject?.Name ?? "",
                 s.ClassId,
                 s.Class?.Name ?? "",
-                s.TeachingAssignment?.Teacher?.User?.FullName ?? "");
+                s.TeachingAssignment?.Teacher?.User?.FullName ?? "",
+                s.AssignmentId);
     }
 }
