@@ -103,6 +103,13 @@
         >
           <app-icon name="trend-up" [size]="20"></app-icon> رؤى التعلم
         </a>
+        <a
+          routerLink="/dashboard/chat"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          <app-icon name="chat" [size]="20"></app-icon> المحادثات
+        </a>
       } @else if (userRole() === 'Teacher') {
         <a
           routerLink="teacher"
@@ -190,6 +197,13 @@
             <app-icon name="folder-open" [size]="20"></app-icon> بنك الأسئلة
           </a>
         </div>
+        <a
+          routerLink="/dashboard/chat"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors mt-2"
+        >
+          <app-icon name="chat" [size]="20"></app-icon> المحادثات
+        </a>
       } @else if (userRole() === 'Admin') {
         <a
           routerLink="/dashboard/admin"
@@ -281,6 +295,13 @@
             <app-icon name="robot" [size]="20"></app-icon> قوالب الذكاء الاصطناعي
           </a>
         </div>
+        <a
+          routerLink="/dashboard/chat"
+          routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors mt-2"
+        >
+          <app-icon name="chat" [size]="20"></app-icon> المحادثات
+        </a>
       } @else if (userRole() === 'Parent') {
         <a
           routerLink="parent"
@@ -298,7 +319,7 @@
           <app-icon name="family" [size]="20"></app-icon> أبنائي
         </a>
         <a
-          routerLink="/chat"
+          routerLink="/dashboard/chat"
           routerLinkActive="bg-[#E2EDFA] text-[#4F8CD4]"
           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
         >

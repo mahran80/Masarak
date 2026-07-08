@@ -56,4 +56,9 @@ export class AuthApiService {
   getMyLinkageCode(): Observable<LinkageCodeResponse> {
     return this.http.get<LinkageCodeResponse>(`${this.base}/my-linkage-code`);
   }
+
+  /** GET /api/grades — Publicly accessible */
+  getPublicGrades(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/grades`);
+  }
 }

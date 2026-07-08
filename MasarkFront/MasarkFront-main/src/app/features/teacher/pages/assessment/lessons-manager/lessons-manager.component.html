@@ -150,7 +150,7 @@
                 <app-icon name="document-text" [size]="16" class="text-indigo-500"></app-icon>
                 المحتوى التعليمي
               </h4>
-              <ul *ngIf="detail.contentItems?.length; else noContent" class="space-y-2">
+              <ul *ngIf="detail.contentItems.length; else noContent" class="space-y-2">
                 <li *ngFor="let item of detail.contentItems" class="flex justify-between items-center bg-white dark:bg-gray-800 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
                   <span class="text-sm text-gray-800 dark:text-gray-200 truncate min-w-0">{{ item.title }}</span>
                   <button (click)="detachContent(lesson.lessonId, item.contentItemId)"
@@ -169,7 +169,7 @@
                 <app-icon name="document-check" [size]="16" class="text-emerald-500"></app-icon>
                 الاختبارات
               </h4>
-              <ul *ngIf="detail.exams?.length; else noExams" class="space-y-2">
+              <ul *ngIf="detail.exams.length; else noExams" class="space-y-2">
                 <li *ngFor="let item of detail.exams" class="flex justify-between items-center bg-white dark:bg-gray-800 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
                   <span class="text-sm text-gray-800 dark:text-gray-200 truncate min-w-0">{{ item.title }}</span>
                   <button (click)="detachExam(lesson.lessonId, item.examId)"
@@ -188,7 +188,7 @@
                 <app-icon name="clipboard-document-list" [size]="16" class="text-orange-500"></app-icon>
                 الواجبات
               </h4>
-              <ul *ngIf="detail.assignments?.length; else noAssig" class="space-y-2">
+              <ul *ngIf="detail.assignments.length; else noAssig" class="space-y-2">
                 <li *ngFor="let item of detail.assignments" class="flex justify-between items-center bg-white dark:bg-gray-800 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700">
                   <span class="text-sm text-gray-800 dark:text-gray-200 truncate min-w-0">{{ item.title }}</span>
                   <button (click)="detachAssignment(lesson.lessonId, item.assignmentId)"

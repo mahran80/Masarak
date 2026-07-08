@@ -21,6 +21,7 @@ export class Signup {
   private route = inject(ActivatedRoute);
   
   mode: 'Parent' | 'Student' = 'Parent';
+  grades: any[] = [];
 
   countryCodes = [
     { code: '+20', name: 'مصر (+20)', pattern: '^01[0125]\\d{8}$' },
@@ -42,6 +43,7 @@ export class Signup {
     phone: [''],
     country: ['Egypt'],
     role: ['Parent' as 'Student' | 'Parent', [Validators.required]],
+    gradeId: ['', []],
   });
 
   ngOnInit() {
@@ -50,6 +52,13 @@ export class Signup {
     if (routeMode === 'Student') {
       this.mode = 'Student';
       this.registerForm.controls.role.setValue('Student');
+      this.registerForm.controls.gradeId.setValidators([Validators.required]);
+      this.registerForm.controls.gradeId.updateValueAndValidity();
+      
+      this.authApi.getPublicGrades().subscribe({
+        next: (res) => this.grades = res,
+        error: (err) => console.error('Failed to load grades', err)
+      });
     } else {
       this.mode = 'Parent';
       this.registerForm.controls.role.setValue('Parent');
@@ -107,6 +116,7 @@ export class Signup {
       phone: finalPhone,
       country: formValues.country || undefined,
       role: formValues.role,
+      gradeId: formValues.gradeId ? Number(formValues.gradeId) : undefined,
     };
 
     this.authApi.register(requestData).subscribe({

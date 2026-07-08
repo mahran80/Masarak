@@ -132,11 +132,16 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/parent/routes/parent.routes').then((m) => m.PARENT_ROUTES),
       },
+      {
+        path: 'chat',
+        component: Chat,
+      },
     ],
   },
   {
     path: 'chat',
-    component: Chat,
+    redirectTo: '/dashboard/chat',
+    pathMatch: 'full',
   },
 
   {

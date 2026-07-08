@@ -13,6 +13,7 @@ export interface RegisterRequest {
   phone?: string;
   country?: string;
   role: 'Admin' | 'Teacher' | 'Student' | 'Parent';
+  gradeId?: number;
 }
 
 export interface RefreshTokenRequest {

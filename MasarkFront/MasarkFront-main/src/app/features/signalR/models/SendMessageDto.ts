@@ -5,3 +5,8 @@ export interface ChatRoom {
   gradeId?: number;
   messageCount: number;
 }
+
+export interface ChatRoomGroup {
+  groupName: string;
+  rooms: ChatRoom[];
+}

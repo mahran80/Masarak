@@ -1,18 +1,19 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatApiService } from '../../services/chat-api-service';
 import { ChatSignalRService } from '../../../../core/services/signalr';
 import { ChatStore } from '../../services/chat.store';
 import { AuthStateService } from '../../../../core/services/auth-state-service';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, IconComponent],
   templateUrl: './chat.html',
+  styleUrls: ['./chat.css']
 })
 export class Chat implements OnInit, OnDestroy {
   private api = inject(ChatApiService);
@@ -20,7 +21,6 @@ export class Chat implements OnInit, OnDestroy {
   store = inject(ChatStore);
   authState = inject(AuthStateService);
 
-  roomId: number = 0;
   message = '';
   private messageSub?: Subscription;
 
@@ -28,27 +28,26 @@ export class Chat implements OnInit, OnDestroy {
     return this.authState.user()?.userId || 0;
   }
 
+  selectedRoom = computed(() => {
+    const roomId = this.store.selectedRoomId();
+    return this.store.rooms().find(r => r.chatRoomId === roomId);
+  });
+
   async ngOnInit() {
     const token = localStorage.getItem('masarak_access_token')!;
 
     try {
-      // Fetch available rooms for the user first to avoid unauthorized access
       this.api.getRooms().subscribe({
         next: async (rooms) => {
+          this.store.rooms.set(rooms);
           if (rooms && rooms.length > 0) {
-            this.roomId = rooms[0].chatRoomId; // Dynamically assign the first available room
-
             await this.signalr.startConnection(token);
-            await this.signalr.joinRoom(this.roomId);
-
-            this.loadMessages();
+            this.selectRoom(rooms[0].chatRoomId);
 
             this.messageSub = this.signalr.messages$.subscribe((msg) => {
               if (!msg) return;
               this.store.addMessage(msg);
             });
-          } else {
-            console.warn('No chat rooms available for this user.');
           }
         },
         error: (err) => console.error('Failed to load chat rooms:', err)
@@ -58,30 +57,52 @@ export class Chat implements OnInit, OnDestroy {
     }
   }
 
+  async selectRoom(roomId: number) {
+    if (this.store.selectedRoomId() === roomId) return;
+
+    const oldRoomId = this.store.selectedRoomId();
+    if (oldRoomId) {
+      await this.signalr.leaveRoom(oldRoomId);
+    }
+
+    this.store.selectedRoomId.set(roomId);
+    this.store.clear();
+    
+    await this.signalr.joinRoom(roomId);
+    this.loadMessages();
+  }
+
   ngOnDestroy() {
     if (this.messageSub) {
       this.messageSub.unsubscribe();
     }
+    const currentRoom = this.store.selectedRoomId();
+    if (currentRoom) {
+      this.signalr.leaveRoom(currentRoom);
+    }
   }
 
   loadMessages() {
-    if (this.roomId === 0) return;
-    this.api.getMessages(this.roomId).subscribe({
-      next: (res) => {
-        console.log('MESSAGES', res);
-        this.store.setMessages(res.items);
-      },
-      error: (err) => {
-        console.error('LOAD ERROR', err);
-      },
+    const roomId = this.store.selectedRoomId();
+    if (!roomId) return;
+    this.api.getMessages(roomId).subscribe({
+      next: (res) => this.store.setMessages(res.items),
+      error: (err) => console.error('LOAD ERROR', err),
     });
   }
 
+  handleEnter(event: Event) {
+    const keyboardEvent = event as KeyboardEvent;
+    if (!keyboardEvent.shiftKey) {
+      keyboardEvent.preventDefault();
+      this.send();
+    }
+  }
+
   send() {
-    if (!this.message.trim() || this.roomId === 0) return;
-
-    this.signalr.sendMessage(this.roomId, this.message);
-
+    const roomId = this.store.selectedRoomId();
+    if (!this.message.trim() || !roomId) return;
+    this.signalr.sendMessage(roomId, this.message);
     this.message = '';
   }
 }

@@ -1,62 +1,120 @@
-<div class="flex flex-col h-[calc(100vh-8rem)] w-full max-w-5xl bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mx-auto mt-4">
-
-  <!-- Header -->
-  <div class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-    <h2 class="text-lg font-bold text-slate-800">مجتمع الاباء</h2>
-    <div class="flex items-center gap-2">
-      <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-      <span class="text-sm font-medium text-slate-500">متصل</span>
+<div class="flex h-[calc(100vh-8rem)] w-full bg-[#f4f5f7] rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-4 text-slate-800" dir="rtl">
+  
+  <!-- Channels Sidebar -->
+  <div class="w-72 bg-white border-s border-slate-200 flex flex-col shrink-0">
+    <div class="h-16 flex items-center px-6 border-b border-slate-100 shrink-0">
+      <h2 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+        <app-icon name="chat" [size]="20" class="text-blue-500"></app-icon>
+        المحادثات
+      </h2>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+      @for (group of store.groupedRooms(); track group.groupName) {
+        <div>
+          <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3 flex items-center gap-2">
+            {{ group.groupName }}
+          </h3>
+          <div class="space-y-0.5">
+            @for (room of group.rooms; track room.chatRoomId) {
+              <button 
+                (click)="selectRoom(room.chatRoomId)"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group relative text-start"
+                [ngClass]="store.selectedRoomId() === room.chatRoomId ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-50 text-slate-600 font-medium'">
+                <app-icon name="hashtag" [size]="18" [class]="store.selectedRoomId() === room.chatRoomId ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-600'"></app-icon>
+                <span class="truncate text-[15px] flex-1">{{ room.name }}</span>
+                @if (room.messageCount > 0) {
+                  <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center justify-center min-w-[1.25rem]">
+                    {{ room.messageCount > 99 ? '99+' : room.messageCount }}
+                  </span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
     </div>
   </div>
 
-  <!-- Messages -->
-  <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8f9fb]">
-
-    @for (msg of store.messages(); track msg.messageId) {
-
-      <div class="flex flex-col w-full" [ngClass]="msg.senderUserId === currentUserId ? 'items-end' : 'items-start'">
-
-        <span class="text-[11px] text-slate-400 mb-1 px-1">
-          {{ msg.senderUserId === currentUserId ? 'أنت' : msg.senderName }}
-        </span>
-
-        <div
-          class="max-w-[85%] px-4 py-3 text-[15px] shadow-sm border"
-          [ngClass]="msg.senderUserId === currentUserId 
-            ? 'bg-blue-600 text-white rounded-2xl rounded-tl-sm border-blue-600' 
-            : 'bg-white text-slate-800 rounded-2xl rounded-tr-sm border-slate-200'">
-
-          {{ msg.content }}
-
+  <!-- Main Chat Area -->
+  <div class="flex-1 flex flex-col bg-[#f4f5f7]">
+    @if (store.selectedRoomId()) {
+      <!-- Chat Header -->
+      <div class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div class="flex items-center gap-3">
+          <app-icon name="hashtag" [size]="24" class="text-slate-400"></app-icon>
+          <div>
+            <h2 class="font-bold text-slate-800 text-lg leading-tight">{{ selectedRoom()?.name }}</h2>
+            <p class="text-[13px] text-slate-500 font-medium">{{ selectedRoom()?.roomType === 'GradeCommunity' ? 'مجتمع المرحلة الدراسية' : 'مجتمع المعلمين' }}</p>
+          </div>
         </div>
-
       </div>
 
+      <!-- Messages Area -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar" id="messages-container">
+        @if (store.messages().length === 0) {
+          <div class="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
+            <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center">
+              <app-icon name="chat" [size]="40" class="text-slate-300"></app-icon>
+            </div>
+            <p class="text-[15px] font-medium text-slate-500">لا توجد رسائل سابقة. كن أول من يشارك!</p>
+          </div>
+        } @else {
+          @for (msg of store.messages(); track msg.messageId) {
+            <div class="flex flex-col max-w-[80%]" 
+                 [ngClass]="msg.senderUserId === currentUserId ? 'ms-auto items-end' : 'me-auto items-start'">
+              
+              <div class="flex items-center gap-2 mb-1.5 px-1">
+                <span class="text-[13px] font-bold text-slate-700">
+                  {{ msg.senderUserId === currentUserId ? 'أنت' : msg.senderName }}
+                </span>
+                <span class="text-[11px] font-medium text-slate-400">
+                  {{ msg.sentAt | date:'shortTime' }}
+                </span>
+              </div>
+
+              <div class="px-4 py-3 text-[15px] shadow-sm leading-relaxed"
+                   [ngClass]="msg.senderUserId === currentUserId 
+                     ? 'bg-blue-600 text-white rounded-2xl rounded-te-sm border border-blue-700' 
+                     : 'bg-white text-slate-800 rounded-2xl rounded-ts-sm border border-slate-200'">
+                {{ msg.content }}
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Message Input -->
+      <div class="bg-white p-4 shrink-0">
+        <div class="max-w-4xl mx-auto flex items-end gap-3 bg-slate-50 border border-slate-200 rounded-2xl p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all shadow-sm">
+          <textarea
+            [(ngModel)]="message"
+            (keydown.enter)="handleEnter($event)"
+            placeholder="اكتب رسالة في #{{ selectedRoom()?.name }}..."
+            rows="1"
+            class="flex-1 bg-transparent border-none px-3 py-2 text-[15px] outline-none resize-none max-h-32 custom-scrollbar"
+            style="min-height: 44px;"></textarea>
+            
+          <button
+            (click)="send()"
+            [disabled]="!message.trim()"
+            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="message.trim() ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5' : 'bg-slate-200 text-slate-400'">
+            <app-icon name="paper-airplane" [size]="20" class="transform -rotate-90 ms-1"></app-icon>
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <span class="text-[11px] text-slate-400 font-medium">اضغط <kbd class="font-sans bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm">Enter</kbd> للإرسال، و <kbd class="font-sans bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm">Shift + Enter</kbd> لسطر جديد</span>
+        </div>
+      </div>
+    } @else {
+      <!-- No Room Selected State -->
+      <div class="flex-1 flex flex-col items-center justify-center text-slate-400 space-y-4">
+        <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center">
+          <app-icon name="chat-bubble-start-right" [size]="48" class="text-slate-300"></app-icon>
+        </div>
+        <p class="text-lg font-medium text-slate-500">اختر قناة للبدء في المحادثة</p>
+      </div>
     }
-
   </div>
-
-  <!-- Input -->
-  <div class="border-t border-slate-100 bg-white p-4">
-
-    <div class="flex items-center gap-3">
-
-      <input
-        [(ngModel)]="message"
-        (keyup.enter)="send()"
-        placeholder="اكتب رسالتك هنا..."
-        class="flex-1 rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-[15px] outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-50 transition-all" />
-
-      <button
-        (click)="send()"
-        class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-200 transition-colors shrink-0">
-
-        <svg class="w-5 h-5 -ml-1 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-
-      </button>
-
-    </div>
-
-  </div>
-
 </div>
