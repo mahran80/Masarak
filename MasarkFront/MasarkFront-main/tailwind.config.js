@@ -32,7 +32,7 @@ module.exports = {
         "container-max": "1440px",
       },
       fontFamily: {
-        sans: ["Cairo", "sans-serif"],
+        sans: ["Inter", "Tajawal", "sans-serif"],
       },
       fontSize: {
         "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],

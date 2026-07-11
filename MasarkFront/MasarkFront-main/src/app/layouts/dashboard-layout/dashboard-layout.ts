@@ -27,6 +27,34 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   readonly userAvatar = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
   readonly userRoleDisplay = this.authState.user;
 
+  isExploreMenuOpen = false;
+  isUserMenuOpen = false;
+
+  toggleExploreMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isExploreMenuOpen = !this.isExploreMenuOpen;
+    if (this.isExploreMenuOpen) {
+      this.isUserMenuOpen = false;
+    }
+  }
+
+  toggleUserMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    if (this.isUserMenuOpen) {
+      this.isExploreMenuOpen = false;
+    }
+  }
+
+  closeMenus(): void {
+    this.isExploreMenuOpen = false;
+    this.isUserMenuOpen = false;
+  }
+
   ngOnInit(): void {
     // Load existing notifications
     this.notificationService.loadNotifications();
