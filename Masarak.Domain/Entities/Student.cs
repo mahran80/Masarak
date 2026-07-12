@@ -19,6 +19,8 @@ namespace Masarak.Domain.Entities
         public int      GradeId        { get; set; }   // FK → grades.GradeId
         public DateTime EnrollmentDate { get; set; }
         public string   AcademicStatus { get; set; } = "Active";
+        public string?  Bio            { get; set; }
+        public string?  Headline       { get; set; }
 
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual User    User  { get; set; } = null!;

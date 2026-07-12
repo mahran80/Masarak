@@ -113,6 +113,7 @@ namespace Masarak.Application.DTOs
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? StudentLinkageCode { get; set; }
+        public string? AvatarUrl { get; set; }
     }
 
     public class MessageResponse

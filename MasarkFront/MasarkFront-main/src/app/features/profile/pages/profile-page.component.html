@@ -1,0 +1,200 @@
+<div class="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12" dir="rtl">
+  <!-- Header -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border border-blue-100 shadow-sm">
+        <app-icon name="user" size="1.2em"></app-icon>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">حسابي</h1>
+        <p class="text-sm text-slate-500 mt-1">
+          @if (isReadOnly()) {
+            عرض المعلومات الشخصية
+          } @else {
+            إدارة بياناتك الشخصية
+          }
+        </p>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="h-80 animate-pulse rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"></div>
+  } @else {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Profile Picture and Status -->
+      <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center text-center">
+          <!-- Avatar -->
+          <div class="relative group">
+            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-slate-100">
+              @if (profile()?.avatarUrl) {
+                <img [src]="profile()?.avatarUrl" (error)="onAvatarError($event)" class="w-full h-full object-cover" alt="Profile avatar">
+              } @else {
+                <img [src]="defaultAvatar" class="w-full h-full object-cover" alt="Default avatar">
+              }
+            </div>
+
+            <!-- Upload Overlay (Not for students) -->
+            @if (!isReadOnly()) {
+              <label class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.gif" (change)="onFileSelected($event)" [disabled]="isUploading()">
+                <div class="flex flex-col items-center">
+                  @if (isUploading()) {
+                    <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  } @else {
+                    <app-icon name="camera" size="1.5em"></app-icon>
+                    <span class="text-xs mt-1 font-semibold">تغيير الصورة</span>
+                  }
+                </div>
+              </label>
+            }
+          </div>
+          
+          <h2 class="mt-4 text-xl font-bold text-slate-800">{{ profile()?.fullName }}</h2>
+          <span class="inline-block mt-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-100">
+            {{ profile()?.role === 'Admin' ? 'مدير النظام' : profile()?.role === 'Teacher' ? 'معلم' : profile()?.role === 'Parent' ? 'ولي أمر' : 'طالب' }}
+          </span>
+
+          @if (!isReadOnly() && profile()?.avatarUrl) {
+            <button (click)="removeAvatar()" [disabled]="isUploading()" class="mt-4 text-sm font-semibold text-rose-500 hover:text-rose-600 transition-colors bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-lg w-full text-center">
+              إزالة الصورة
+            </button>
+          }
+        </div>
+
+        @if (userRole() === 'Teacher') {
+          <div class="bg-blue-50 rounded-2xl border border-blue-100 shadow-sm p-5">
+            <h3 class="text-sm font-bold text-blue-800 mb-2">تاريخ الانضمام</h3>
+            <p class="text-blue-600 font-semibold text-sm">{{ profile()?.teacherDetails?.hiringDate | date:'mediumDate' }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Main Content (Forms / Readonly Details) -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+              <app-icon name="document-text" size="1.2em"></app-icon>
+              المعلومات الأساسية
+            </h2>
+          </div>
+          
+          <div class="p-6">
+            @if (isReadOnly()) {
+              <!-- Read-only View for Student -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الاسم الكامل</label>
+                  <p class="text-slate-800 font-medium">{{ profile()?.fullName }}</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">البريد الإلكتروني</label>
+                  <p class="text-slate-800 font-medium" dir="ltr">{{ profile()?.email }}</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">نبذة مختصرة</label>
+                  <p class="text-slate-800 font-medium">{{ profile()?.bio || 'لا يوجد' }}</p>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الحالة الأكاديمية</label>
+                  <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                    {{ profile()?.studentDetails?.academicStatus }}
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <!-- Edit Form for Teacher/Parent -->
+              <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="space-y-5">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-slate-700">الاسم الكامل <span class="text-rose-500">*</span></label>
+                    <input type="text" formControlName="fullName" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                  </div>
+                  
+                  <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-slate-700">البريد الإلكتروني</label>
+                    <!-- Email is usually non-editable in profile unless there's an email change flow, so make it read-only here -->
+                    <input type="email" [value]="profile()?.email" readonly class="w-full bg-slate-100 border border-slate-200 text-slate-500 rounded-xl px-4 py-2.5 cursor-not-allowed">
+                  </div>
+
+                  <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-slate-700">رقم الهاتف</label>
+                    <input type="text" formControlName="phone" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" dir="ltr">
+                  </div>
+
+                  <div class="space-y-1">
+                    <label class="block text-sm font-semibold text-slate-700">الدولة</label>
+                    <input type="text" formControlName="country" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                  </div>
+
+                  <div class="space-y-1 md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700">
+                      {{ userRole() === 'Teacher' ? 'المسمى الوظيفي (Specialization)' : 'العنوان الوصفي (Headline)' }}
+                    </label>
+                    <input type="text" formControlName="headline" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                  </div>
+
+                  <div class="space-y-1 md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700">نبذة شخصية (Bio)</label>
+                    <textarea formControlName="bio" rows="4" class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+                  </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-end">
+                  <button type="submit" [disabled]="profileForm.invalid || isSaving()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    @if (isSaving()) {
+                      <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      جاري الحفظ...
+                    } @else {
+                      <app-icon name="check" size="1.2em"></app-icon>
+                      حفظ التغييرات
+                    }
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        </div>
+
+        <!-- Linked Children for Parents -->
+        @if (userRole() === 'Parent' && profile()?.linkedChildren?.length) {
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+              <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                <app-icon name="family" size="1.2em"></app-icon>
+                الأبناء المرتبطين
+              </h2>
+            </div>
+            
+            <div class="p-6">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (child of profile()?.linkedChildren; track child.studentId) {
+                  <a [routerLink]="['/dashboard/parent/child-profile', child.userId]" class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl bg-slate-50 hover:bg-white hover:border-blue-200 transition-colors cursor-pointer">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border border-slate-200 bg-white flex-shrink-0">
+                      @if (child.avatarUrl) {
+                        <img [src]="child.avatarUrl" (error)="onAvatarError($event)" class="w-full h-full object-cover">
+                      } @else {
+                        <img [src]="defaultAvatar" class="w-full h-full object-cover">
+                      }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-bold text-slate-800 text-sm truncate">{{ child.fullName }}</h3>
+                      <p class="text-xs text-slate-500 truncate">{{ child.gradeName || 'غير محدد' }} - {{ child.className || 'غير محدد' }}</p>
+                    </div>
+                    <div>
+                      <span class="inline-block w-2.5 h-2.5 rounded-full" [ngClass]="child.hasActiveSubscription ? 'bg-emerald-500' : 'bg-orange-500'"></span>
+                    </div>
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

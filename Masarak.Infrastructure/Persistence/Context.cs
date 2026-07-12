@@ -124,6 +124,9 @@ namespace Masarak.Infrastructure.Persistence
                 e.Property(x => x.FailedLoginCount).HasDefaultValue(0);
                 e.Property(x => x.LockoutEnd).IsRequired(false);
 
+                // ── Profile feature columns ──────────────────────────────────
+                e.Property(x => x.AvatarUrl).HasMaxLength(500);
+
                 // ── Phase 1 additions ← Subscription phase ─────────────────
                 e.Property(x => x.StudentLinkageCode).HasMaxLength(8);
                 e.HasIndex(x => x.StudentLinkageCode)
@@ -148,6 +151,8 @@ namespace Masarak.Infrastructure.Persistence
                 e.Property(x => x.StudentId).ValueGeneratedOnAdd();
                 e.Property(x => x.EnrollmentDate).IsRequired();
                 e.Property(x => x.AcademicStatus).HasMaxLength(50).HasDefaultValue("Active").IsRequired();
+                e.Property(x => x.Bio).HasColumnType("nvarchar(max)");
+                e.Property(x => x.Headline).HasMaxLength(150);
                 e.HasIndex(x => x.UserId).IsUnique().HasDatabaseName("UX_students_UserId");
 
                 e.HasOne(x => x.User)
@@ -188,6 +193,8 @@ namespace Masarak.Infrastructure.Persistence
                 e.ToTable("parents");
                 e.HasKey(x => x.ParentId);
                 e.Property(x => x.ParentId).ValueGeneratedOnAdd();
+                e.Property(x => x.Bio).HasColumnType("nvarchar(max)");
+                e.Property(x => x.Headline).HasMaxLength(150);
                 e.HasIndex(x => x.UserId).IsUnique().HasDatabaseName("UX_parents_UserId");
 
                 e.HasOne(x => x.User)

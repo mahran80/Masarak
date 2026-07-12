@@ -326,7 +326,8 @@ namespace Masarak.Infrastructure.Services
             UserId = user.UserId, FullName = user.FullName, Email = user.Email,
             Role = roleName, Phone = user.Phone, Country = user.Country,
             IsActive = user.IsActive, CreatedAt = user.CreatedAt,
-            StudentLinkageCode = user.StudentLinkageCode
+            StudentLinkageCode = user.StudentLinkageCode,
+            AvatarUrl = user.AvatarUrl
         };
 
         private static AuthResponse    Fail(string e)  => new() { Success = false, Error   = e };

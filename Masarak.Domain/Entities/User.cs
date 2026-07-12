@@ -22,6 +22,7 @@ namespace Masarak.Domain.Entities
         public string PasswordHash { get; set; } = null!;   // PBKDF2-SHA512 (Phase 2)
         public string? Phone       { get; set; }
         public string? Country     { get; set; }
+        public string? AvatarUrl   { get; set; }
         public DateTime CreatedAt  { get; set; }
         public bool   IsActive     { get; set; } = true;
 

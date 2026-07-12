@@ -60,6 +60,7 @@ export interface UserInfoDto {
   country: string | null;
   isActive: boolean;
   createdAt: string;
+  avatarUrl?: string | null;
 }
 
 export interface MessageResponse {

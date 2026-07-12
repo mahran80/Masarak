@@ -170,6 +170,7 @@ namespace Masarak.API.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<IProfileService, ProfileService>();
 
             // Email Service
             services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));

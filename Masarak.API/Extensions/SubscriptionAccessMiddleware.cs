@@ -38,7 +38,9 @@ namespace Masarak.API.Extensions
                 path.StartsWith("/api/subscriptions/checkout") ||
                 path.StartsWith("/api/subscriptions/me") ||
                 path.StartsWith("/api/parent/link-student") ||
-                path.StartsWith("/api/parent/linked-students"))
+                path.StartsWith("/api/parent/linked-students") ||
+                path.StartsWith("/api/notifications") ||
+                path.StartsWith("/hubs/notifications"))
             {
                 await _next(context);
                 return;

@@ -133,6 +133,10 @@ export const routes: Routes = [
           import('./features/parent/routes/parent.routes').then((m) => m.PARENT_ROUTES),
       },
       {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/pages/profile-page.component').then(m => m.ProfilePageComponent)
+      },
+      {
         path: 'chat',
         component: Chat,
       },

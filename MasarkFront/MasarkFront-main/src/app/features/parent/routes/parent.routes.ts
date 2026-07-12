@@ -43,6 +43,10 @@ export const PARENT_ROUTES: Routes = [
     loadComponent: () => import('../pages/subscriptions/parent-subscriptions.component').then(m => m.ParentSubscriptionsComponent)
   },
   {
+    path: 'child-profile/:id',
+    loadComponent: () => import('../../profile/pages/profile-page.component').then(m => m.ProfilePageComponent)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

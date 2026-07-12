@@ -14,6 +14,8 @@ namespace Masarak.Domain.Entities
     {
         public int ParentId { get; set; }
         public int UserId   { get; set; }   // FK → users.UserId
+        public string? Bio      { get; set; }
+        public string? Headline { get; set; }
 
         // ── Navigation ──────────────────────────────────────────────────────
         public virtual User User { get; set; } = null!;

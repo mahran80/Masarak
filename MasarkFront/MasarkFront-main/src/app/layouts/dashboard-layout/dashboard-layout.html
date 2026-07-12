@@ -39,7 +39,11 @@
           class="flex items-center gap-2 focus:outline-none hover:opacity-80 transition-opacity"
         >
           <div class="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold overflow-hidden">
-            {{ userName()?.fullName?.[0] || 'U' }}
+            @if (userName()?.avatarUrl) {
+              <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
+            } @else {
+              {{ userName()?.fullName?.[0] || 'U' }}
+            }
           </div>
         </button>
 
@@ -181,7 +185,7 @@
             }
 
             <div class="border-t border-slate-100 mt-2 pt-2">
-              <a routerLink="/profile" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+              <a routerLink="/dashboard/profile" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                 <app-icon name="user" [size]="18"></app-icon> حسابي
               </a>
               <a routerLink="/settings" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">

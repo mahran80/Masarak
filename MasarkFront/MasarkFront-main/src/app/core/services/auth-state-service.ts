@@ -41,6 +41,24 @@ export class AuthStateService {
     this._accessToken.set(accessToken);
   }
 
+  updateAvatar(url: string | null): void {
+    const currentUser = this._user();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, avatarUrl: url };
+      this._user.set(updatedUser);
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    }
+  }
+
+  updateProfileDetails(fullName: string): void {
+    const currentUser = this._user();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, fullName };
+      this._user.set(updatedUser);
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    }
+  }
+
   clearAuth(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
