@@ -1,0 +1,2135 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Response DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record GradeDto(
+        int GradeId, string Name, string? NameAr,
+        GradeStage Stage, int Order, bool IsActive);
+
+    public record GradeDetailDto(
+        int GradeId, string Name, string? NameAr,
+        IEnumerable<SubjectDto> Subjects, IEnumerable<ClassDto> Classes);
+
+    // â”€â”€ Categories â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public record SubjectCategoryDto(
+        int SubjectCategoryId,
+        string Name,
+        string? NameAr,
+        bool IsActive
+    );
+
+    // â”€â”€ Subjects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public record SubjectDto(
+        int SubjectId,
+        int GradeId,
+        string GradeName,
+        int SubjectCategoryId,
+        string Name,
+        string? NameAr,
+        string Code,
+        bool IsActive
+    );
+
+    public record ClassDto(
+        int ClassId, int GradeId, string GradeName, string Name,
+        int MaxCapacity, int AcademicYear, int EnrollmentCount, bool IsActive);
+
+    public record TeachingAssignmentDto(
+        int Id, int TeacherId, string TeacherName,
+        int ClassId, string ClassName, int SubjectId, string SubjectName, int AcademicYear, bool IsActive,
+        int GradeId = 0, string GradeName = "");
+
+    public record StudentClassDto(
+        int StudentClassId, int StudentId, string StudentName,
+        int ClassId, string ClassName);
+
+    public record StudentInClassDto(
+        int StudentClassId, int StudentId, int UserId, string FullName, string Email,
+        EnrollmentType EnrollmentType, IEnumerable<string> EnrolledSubjects);
+
+    public record SessionDto(
+        int SessionId, string Title, string? Description,
+        DateTime ScheduledAt, int DurationMinutes, DateTime EndsAt,
+        string? EmbedUrl, SessionStatus Status,
+        string SubjectName, int ClassId, string ClassName, string TeacherName, int AssignmentId);
+
+    public record WeeklyScheduleDto(
+        DateTime WeekStart, DateTime WeekEnd,
+        IEnumerable<SessionDto> Sessions);
+
+    public record StudentEnrollmentDto(
+        int ClassId, string ClassName, string GradeName, int AcademicYear);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Request DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public class CreateGradeRequest
+    {
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string? NameAr { get; set; }
+
+        [Required]
+        public GradeStage Stage { get; set; }
+
+        [Required, Range(1, 100)]
+        public int Order { get; set; }
+    }
+
+    public class UpdateGradeRequest
+    {
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = null!;
+
+        [MaxLength(100)]
+        public string? NameAr { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class CreateSubjectRequest
+    {
+        [Required]
+        public int GradeId { get; set; }
+
+        [Required]
+        public int SubjectCategoryId { get; set; }
+
+        [Required, MaxLength(150)]
+        public string Name { get; set; } = null!;
+
+        [MaxLength(150)]
+        public string? NameAr { get; set; }
+
+        [Required, MaxLength(20)]
+        public string Code { get; set; } = null!;
+    }
+
+    public class UpdateSubjectRequest
+    {
+        [Required, MaxLength(150)]
+        public string Name { get; set; } = null!;
+
+        [MaxLength(150)]
+        public string? NameAr { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class CreateClassRequest
+    {
+        [Required]
+        public int GradeId { get; set; }
+
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = null!;
+
+        [Required, Range(1, 500)]
+        public int MaxCapacity { get; set; } = 30;
+
+        [Required, Range(2020, 2100)]
+        public int AcademicYear { get; set; }
+    }
+
+    public class UpdateClassRequest
+    {
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = null!;
+
+        [Required, Range(1, 500)]
+        public int MaxCapacity { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class AssignTeacherRequest
+    {
+        [Required]
+        public int TeacherId { get; set; }
+
+        [Required]
+        public int ClassId { get; set; }
+
+        [Required]
+        public int SubjectId { get; set; }
+
+        [Required, Range(2020, 2100)]
+        public int AcademicYear { get; set; }
+    }
+
+    public class EnrollStudentRequest
+    {
+        [Required]
+        public int StudentId { get; set; }
+
+        [Required]
+        public int ClassId { get; set; }
+
+        [Required, Range(2020, 2100)]
+        public int AcademicYear { get; set; }
+    }
+
+    public class UpdateTeacherSpecializationRequest
+    {
+        [Required]
+        public List<int> SubjectIds { get; set; } = new();
+    }
+
+    public class ScheduleSessionRequest
+    {
+        [Required]
+        public int TeachingAssignmentId { get; set; }
+
+        [Required, MaxLength(255)]
+        public string Title { get; set; } = null!;
+
+        public string? Description { get; set; }
+
+        [Required]
+        public DateTime ScheduledAt { get; set; }
+
+        [Required, Range(15, 300)]
+        public int DurationMinutes { get; set; }
+
+        [MaxLength(500)]
+        public string? EmbedUrl { get; set; }
+    }
+
+    public class UpdateSessionRequest
+    {
+        [Required, MaxLength(255)]
+        public string Title { get; set; } = null!;
+
+        public string? Description { get; set; }
+
+        [Required]
+        public DateTime ScheduledAt { get; set; }
+
+        [Required, Range(15, 300)]
+        public int DurationMinutes { get; set; }
+
+        [MaxLength(500)]
+        public string? EmbedUrl { get; set; }
+    }
+
+    public class AdminScheduleSessionRequest
+    {
+        [Required]
+        public int ClassId { get; set; }
+
+        [Required]
+        public int SubjectId { get; set; }
+
+        [Required, MaxLength(100)]
+        public string Title { get; set; } = null!;
+
+        [MaxLength(500)]
+        public string? Description { get; set; }
+
+        [Required]
+        public DateTime ScheduledAt { get; set; }
+
+        [Required, Range(15, 300)]
+        public int DurationMinutes { get; set; }
+
+        public bool IsRecurring { get; set; }
+        public DateTime? RecurUntil { get; set; }
+    }
+}
+
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+
+
+    public record AdminCreateUserRequest
+    {
+        public string Email { get; init; } = null!;
+        public string Password { get; init; } = null!;
+        public string FullName { get; init; } = null!;
+        public string Role { get; init; } = null!; // "Student", "Teacher", "Parent", "Admin"
+        public string? Phone { get; init; }
+        public string? Country { get; init; }
+        public int? GradeId { get; init; }
+        public string? Specialization { get; init; }
+        public List<int>? StudentIds { get; init; }
+    }
+
+    public record TeacherDto(
+        int TeacherId,
+        int UserId,
+        string FullName,
+        string Email,
+        string? Specialization,
+        DateTime HiringDate,
+        string? Bio,
+        bool IsActive
+    );
+}
+using System.ComponentModel.DataAnnotations;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Teacher - Assignment DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public record AssignmentDto(
+        int AssignmentId, string Title, DateTime DueDate, decimal MaxScore, 
+        AssignmentStatus Status, string SubjectName, string ClassName, int SubmissionCount);
+
+    public record SubmissionDetailDto(
+        int SubmissionId, int StudentId, string StudentName, SubmissionStatus Status, 
+        decimal? Score, DateTime SubmittedAt, bool HasFile, decimal MaxScore);
+
+    public class CreateAssignmentRequest
+    {
+        [Required] public int TeachingAssignmentId { get; set; }
+        public int? LessonId { get; set; }
+        [Required, MaxLength(255)] public string Title { get; set; } = null!;
+        public string? Instructions { get; set; }
+        [Required] public DateTime DueDate { get; set; }
+        [Range(0, 1000)] public decimal MaxScore { get; set; } = 100;
+    }
+
+    public class GradeSubmissionRequest
+    {
+        [Required, Range(0, 1000)] public decimal MarksAwarded { get; set; }
+        public string? Feedback { get; set; }
+    }
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Teacher - Exam DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public record ExamDto(
+        int ExamId, string Title, DateTime StartTime, DateTime EndTime, 
+        int DurationMinutes, decimal TotalMarks, ExamStatus Status, int QuestionCount);
+
+    public record QuestionDto(
+        int QuestionId, QuestionType Type, string Text, decimal Marks, 
+        DifficultyLevel Difficulty, int Order, IEnumerable<QuestionOptionDto>? Options);
+
+    public record QuestionOptionDto(string Label, string Text);
+
+    public class CreateExamRequest
+    {
+        [Required] public int TeachingAssignmentId { get; set; }
+        public int? LessonId { get; set; }
+        [Required, MaxLength(255)] public string Title { get; set; } = null!;
+        public string? Instructions { get; set; }
+        [Required] public DateTime StartTime { get; set; }
+        [Required] public DateTime EndTime { get; set; }
+        [Required, Range(1, 600)] public int DurationMinutes { get; set; }
+    }
+
+    public class AddQuestionRequest
+    {
+        [Required] public QuestionType Type { get; set; }
+        [Required] public string Text { get; set; } = null!;
+        [Range(0, 100)] public decimal Marks { get; set; } = 1;
+        public DifficultyLevel Difficulty { get; set; } = DifficultyLevel.Medium;
+        public int Order { get; set; } = 1;
+        public string? CorrectAnswer { get; set; }
+        public string? ImageUrl { get; set; }
+        public IEnumerable<QuestionOptionDto>? Options { get; set; }
+    }
+
+    public class UpdateQuestionRequest : AddQuestionRequest { }
+
+    public class AddQuestionsFromBankRequest
+    {
+        [Required]
+        public IEnumerable<int> QuestionBankIds { get; set; } = new List<int>();
+    }
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Teacher - Grading Dashboard DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public record PendingGradingDashboardDto(
+        int TotalPendingExamAnswers, 
+        int TotalPendingSubmissions, 
+        IEnumerable<PendingExamSummaryDto> Exams, 
+        IEnumerable<PendingAssignmentSummaryDto> Assignments);
+
+    public record PendingExamSummaryDto(int ExamId, string ExamTitle, int PendingAnswersCount);
+    public record PendingAssignmentSummaryDto(int AssignmentId, string AssignmentTitle, int PendingSubmissionsCount);
+
+    public record ExamGradingReviewDto(
+        int StudentExamId, string StudentName, string ExamTitle, 
+        decimal TotalAutoScore, IEnumerable<PendingAnswerDto> PendingAnswers);
+
+    public record PendingAnswerDto(
+        int AnswerId, int QuestionId, string QuestionText, decimal MaxMarks, 
+        string? AnswerText, string? FileUrl);
+
+    public class GradeStudentAnswerRequest
+    {
+        [Required, Range(0, 1000)] public decimal MarksAwarded { get; set; }
+        public string? Feedback { get; set; }
+    }
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Student - Assignment DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public class SubmitAssignmentRequest
+    {
+        public string? TextContent { get; set; }
+        // Note: For file uploads, API controller handles IFormFile, service takes Stream + filename
+    }
+
+    public record SubmissionDto(
+        int SubmissionId, int AssignmentId, SubmissionStatus Status, 
+        DateTime SubmittedAt, decimal? Score, string? Feedback, string? FileUrl);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Student - Exam DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public record ExamAttemptDto(
+        int StudentExamId, int ExamId, string ExamTitle, DateTime ExpiresAt, 
+        int SecondsRemaining, IEnumerable<QuestionDto> Questions, 
+        IEnumerable<SavedAnswerDto> SavedAnswers);
+
+    public record SavedAnswerDto(int QuestionId, string? AnswerText, string? SelectedOptionId);
+
+    public class SaveAnswerRequest
+    {
+        public int QuestionId { get; set; }
+        public string? AnswerText { get; set; }
+        public string? SelectedOptionId { get; set; }
+        // File handling separate
+    }
+
+    public record ExamResultDto(
+        int StudentExamId, decimal FinalScore, decimal TotalMarks, decimal Percentage, 
+        bool HasPendingManualGrading, IEnumerable<AnswerResultDto> Answers);
+
+    public record AnswerResultDto(
+        int QuestionId, string QuestionText, string? YourAnswer, string? CorrectAnswer, 
+        decimal MarksAwarded, decimal MaxMarks, AnswerGradingStatus GradingStatus, string? Feedback);
+
+    public record StudentExamGradeDto(
+        int StudentExamId, int ExamId, string ExamTitle, string SubjectName, 
+        decimal FinalScore, decimal TotalMarks, decimal Percentage, 
+        DateTime? SubmittedAt, bool HasPendingManualGrading);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Performance DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    public record SubjectPerformanceDto(
+        int SubjectId, string SubjectName, decimal AverageExamScore, 
+        decimal AverageAssignmentScore, int TotalExamsTaken, int TotalAssignmentsSubmitted);
+
+    public record ClassPerformanceReportDto(
+        int ClassId, string ClassName, string SubjectName, 
+        decimal ClassAverageScore, IEnumerable<StudentScoreDto> StudentScores);
+
+    public record StudentScoreDto(int StudentId, string StudentName, decimal FinalScore);
+}
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Masarak.Application.DTOs
+{
+    // â”€â”€â”€ Register â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class RegisterRequest
+    {
+        [Required, MaxLength(150)]
+        public string FullName { get; set; } = null!;
+
+        [Required, EmailAddress, MaxLength(255)]
+        public string Email { get; set; } = null!;
+
+        [Required, MinLength(8), MaxLength(100)]
+        public string Password { get; set; } = null!;
+
+        [Required, Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmPassword { get; set; } = null!;
+
+        [MaxLength(30)]
+        public string? Phone { get; set; }
+
+        [MaxLength(100)]
+        public string? Country { get; set; }
+
+        /// <summary>Role name: Admin | Teacher | Student | Parent</summary>
+        [Required]
+        public string Role { get; set; } = null!;
+
+        public int? GradeId { get; set; }
+    }
+
+    // â”€â”€â”€ Login â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class LoginRequest
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = null!;
+
+        [Required]
+        public string Password { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Refresh â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class RefreshTokenRequest
+    {
+        [Required]
+        public string AccessToken { get; set; } = null!;
+
+        [Required]
+        public string RefreshToken { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Revoke â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class RevokeTokenRequest
+    {
+        [Required]
+        public string RefreshToken { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Change Password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class ChangePasswordRequest
+    {
+        [Required]
+        public string CurrentPassword { get; set; } = null!;
+
+        [Required, MinLength(8)]
+        public string NewPassword { get; set; } = null!;
+
+        [Required, Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmNewPassword { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Forgot Password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class ForgotPasswordRequest
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Reset Password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class ResetPasswordRequest
+    {
+        [Required]
+        public string Token { get; set; } = null!;
+
+        [Required, MinLength(8)]
+        public string NewPassword { get; set; } = null!;
+
+        [Required, Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match.")]
+        public string ConfirmNewPassword { get; set; } = null!;
+    }
+
+    // â”€â”€â”€ Responses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    public class AuthResponse
+    {
+        public bool Success { get; set; }
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? AccessTokenExpiry { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
+        public UserInfoDto? User { get; set; }
+        public string? Error { get; set; }
+    }
+
+    public class UserInfoDto
+    {
+        public int UserId { get; set; }
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Role { get; set; } = null!;
+        public string? Phone { get; set; }
+        public string? Country { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? StudentLinkageCode { get; set; }
+    }
+
+    public class MessageResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = null!;
+    }
+}
+
+using System.ComponentModel.DataAnnotations;
+
+namespace Masarak.Application.DTOs
+{
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Teacher & Student - Lesson DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record LessonDto(
+        int LessonId,
+        int TeachingAssignmentId,
+        string Title,
+        string? Description,
+        int OrderNum,
+        bool IsPublished,
+        DateTime CreatedAt,
+        int ContentCount,
+        int ExamCount,
+        int AssignmentCount
+    );
+
+    public record LessonDetailDto(
+        int LessonId,
+        int TeachingAssignmentId,
+        string Title,
+        string? Description,
+        int OrderNum,
+        bool IsPublished,
+        DateTime CreatedAt,
+        IEnumerable<ContentItemDto> ContentItems,
+        IEnumerable<ExamDto> Exams,
+        IEnumerable<AssignmentDto> Assignments
+    );
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Teacher - Requests
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public class CreateLessonRequest
+    {
+        [Required] public int TeachingAssignmentId { get; set; }
+        [Required, MaxLength(255)] public string Title { get; set; } = null!;
+        public string? Description { get; set; }
+    }
+
+    public class UpdateLessonRequest
+    {
+        [Required, MaxLength(255)] public string Title { get; set; } = null!;
+        public string? Description { get; set; }
+    }
+
+    public class ReorderLessonsRequest
+    {
+        [Required]
+        public IEnumerable<int> LessonIdsInOrder { get; set; } = new List<int>();
+    }
+
+    public class CloneLessonRequest
+    {
+        [Required]
+        public IEnumerable<int> TargetTeachingAssignmentIds { get; set; } = new List<int>();
+    }
+}
+
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 4 â€” Attendance DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record AttendanceDto(
+        int AttendanceId,
+        int SessionId,
+        string SessionTitle,
+        int StudentUserId,
+        string StudentName,
+        AttendanceStatus Status,
+        DateTime? JoinedAt,
+        string? TeacherNote);
+
+    public record SessionAttendanceDto(
+        int SessionId,
+        string SessionTitle,
+        DateTime ScheduledAt,
+        int TotalEnrolled,
+        int PresentCount,
+        int AbsentCount,
+        int ExcusedCount,
+        IEnumerable<AttendanceDto> Records);
+
+    public record SubjectAttendanceDto(
+        int SubjectId,
+        string SubjectName,
+        int TotalSessions,
+        int PresentCount,
+        int AbsentCount,
+        int ExcusedCount,
+        decimal AttendancePercentage);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 4 â€” Content Library DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record ContentItemDto(
+        int ContentItemId,
+        ContentType Type,
+        ContentSourceType SourceType,
+        string Title,
+        string? Description,
+        string ResourceUrl,
+        long? FileSizeBytes,
+        DateTime CreatedAt,
+        bool IsActive,
+        int? LessonId = null,
+        string? LessonTitle = null);
+
+    public record UploadContentUrlRequest(
+        int TeachingAssignmentId,
+        int? SessionId,
+        int? LessonId,
+        ContentType Type,
+        ContentSourceType SourceType,
+        string Title,
+        string? Description,
+        string Url);
+
+    public record DeleteContentItemRequest(
+        int ContentItemId);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 4 â€” Chat DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record ChatRoomDto(
+        int ChatRoomId,
+        string Name,
+        ChatRoomType RoomType,
+        int? GradeId,
+        int MessageCount);
+
+    public record ChatMessageDto(
+        int MessageId,
+        int ChatRoomId,
+        int SenderUserId,
+        string SenderName,
+        string Content,
+        DateTime SentAt,
+        bool IsDeleted);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 4 â€” Attendance Override Request
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record OverrideAttendanceRequest(
+        AttendanceStatus NewStatus,
+        string? Note);
+}
+
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” AI Recommendation DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record WeaknessAnalysisDto(
+        int SubjectId,
+        string SubjectName,
+        IEnumerable<WeakTopicDto> WeakTopics,
+        string NarrativeSummary,
+        DateTime GeneratedAt);
+
+    public record WeakTopicDto(
+        string TopicName,
+        decimal ErrorRate,
+        IEnumerable<string> RecommendedActions);
+
+    public record ContentRecommendationDto(
+        int ContentItemId,
+        string Title,
+        string ContentType,
+        string Reason,
+        decimal RelevanceScore);
+
+    public record ParentReportDto(
+        string StudentName,
+        string ReportMonth,
+        decimal OverallScore,
+        decimal AttendancePercentage,
+        IEnumerable<SubjectSummaryDto> Subjects,
+        string AiNarrative,
+        DateTime GeneratedAt);
+
+    public record SubjectSummaryDto(
+        string SubjectName,
+        decimal AverageScore,
+        decimal AttendancePercentage,
+        string PerformanceLevel,
+        string AiSubjectNarrative,
+        IEnumerable<LessonMasteryDto> WeakLessons,
+        IEnumerable<LessonMasteryDto> StrongLessons,
+        IEnumerable<string> Recommendations);
+
+    public record LessonMasteryDto(
+        string LessonTitle,
+        decimal MasteryPercentage,
+        IEnumerable<string> WeakTopics);
+
+    public record TeachingSuggestionDto(
+        string StudentName,
+        string SubjectName,
+        string Suggestion,
+        IEnumerable<string> ActionItems,
+        DateTime GeneratedAt);
+
+    public record StudentInsightDto(
+        string StudentName,
+        string SubjectName,
+        IEnumerable<WeakTopicDto> WeakTopics,
+        IEnumerable<PerformanceAlertDto> ActiveAlerts,
+        TeachingSuggestionDto? LatestSuggestion);
+
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” Dashboard DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record LearningInsightsDashboardDto(
+        IEnumerable<WeaknessAnalysisDto> SubjectAnalyses,
+        IEnumerable<ContentRecommendationDto> Recommendations,
+        IEnumerable<PerformanceAlertDto> ActiveAlerts,
+        IEnumerable<PerformanceTrendDto> PerformanceTrends);
+
+    public record PerformanceTrendDto(
+        string SubjectName,
+        IEnumerable<ScorePointDto> ExamScores);
+
+    public record ScorePointDto(
+        DateTime Date,
+        decimal Score);
+
+    public record ClassAnalyticsDashboardDto(
+        string ClassName,
+        string SubjectName,
+        decimal ClassAverage,
+        IEnumerable<ScoreDistributionBucketDto> Distribution,
+        IEnumerable<AnalyticsStudentScoreDto> TopFive,
+        IEnumerable<AnalyticsStudentScoreDto> BottomFive,
+        int SessionsScheduled,
+        int SessionsCompleted);
+
+    public record ScoreDistributionBucketDto(
+        string Label,
+        int Count);
+
+    public record AnalyticsStudentScoreDto(
+        int StudentUserId,
+        string StudentName,
+        decimal AverageScore);
+
+    public record PlatformAnalyticsDto(
+        int TotalActiveStudents,
+        int TotalTeachers,
+        int TotalActiveSubscriptions,
+        decimal TotalRevenueThisMonth,
+        decimal SessionCompletionRate,
+        IEnumerable<GradeEnrollmentDto> EnrollmentByGrade);
+
+    public record GradeEnrollmentDto(
+        string GradeName,
+        int StudentCount);
+
+    public record GradeHeatmapDto(
+        string GradeName,
+        IEnumerable<ClassHeatmapRowDto> Classes);
+
+    public record ClassHeatmapRowDto(
+        string ClassName,
+        IEnumerable<SubjectScoreCellDto> SubjectScores);
+
+    public record SubjectScoreCellDto(
+        string SubjectName,
+        decimal AverageScore,
+        string HeatmapColor);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” Alert DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record PerformanceAlertDto(
+        int PerformanceAlertId,
+        int StudentUserId,
+        string StudentName,
+        int? SubjectId,
+        string? SubjectName,
+        AlertType AlertType,
+        string Message,
+        decimal TriggerValue,
+        decimal Threshold,
+        bool IsResolved,
+        DateTime CreatedAt,
+        DateTime? ResolvedAt);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” Prompt Template DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record AiPromptTemplateDto(
+        int AiPromptTemplateId,
+        string Key,
+        string SystemPrompt,
+        string UserPromptTemplate,
+        int MaxTokens,
+        decimal Temperature,
+        DateTime UpdatedAt,
+        string UpdatedBy);
+
+    public record UpdatePromptTemplateRequest(
+        string SystemPrompt,
+        string UserPromptTemplate,
+        int MaxTokens,
+        decimal Temperature);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” AI Provider DTOs
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record AiPromptRequest(
+        string SystemPrompt,
+        string UserPrompt,
+        int MaxTokens,
+        decimal Temperature);
+
+    public record AiCompletionResult(
+        string Content,
+        int PromptTokens,
+        int CompletionTokens,
+        string ProviderUsed);
+
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+    // Phase 5 â€” Generate Report Request
+    // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+    public record GenerateParentReportRequest(
+        string ReportMonth);
+
+    public record GenerateTeachingSuggestionRequest(
+        int SubjectId);
+}
+
+namespace Masarak.Application.DTOs
+{
+    // â”€â”€ Notification DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>
+    /// Phase 6: Notification DTO for API responses and SignalR push.
+    /// </summary>
+    public record NotificationDto(
+        int NotificationId,
+        string Type,
+        string Title,
+        string Body,
+        string? ActionUrl,
+        bool IsRead,
+        DateTime CreatedAt);
+
+    // â”€â”€ Admin User Management DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>
+    /// Phase 6: Admin user list item DTO.
+    /// </summary>
+    public record AdminUserDto(
+        int UserId,
+        string FullName,
+        string Email,
+        string Role,
+        bool IsActive,
+        DateTime CreatedAt,
+        bool HasActiveSubscription,
+        int? GradeId = null,
+        string? Specialization = null,
+        List<int>? StudentIds = null);
+
+    /// <summary>
+    /// Phase 6: Detailed admin user view DTO with activity metrics.
+    /// </summary>
+    public record AdminUserDetailDto(
+        int UserId,
+        string FullName,
+        string Email,
+        string Role,
+        bool IsActive,
+        DateTime CreatedAt,
+        bool HasActiveSubscription,
+        int ExamsTaken,
+        int AssignmentsSubmitted,
+        decimal AttendancePercentage);
+
+    // â”€â”€ System Health DTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>
+    /// Phase 6: System health metrics for admin dashboard.
+    /// </summary>
+    public record SystemHealthDto(
+        int TotalUsers,
+        int ActiveUsers,
+        int TotalNotifications,
+        int ActiveSubscriptions,
+        int TotalContentItems,
+        int TotalSessions,
+        IEnumerable<string> RecentErrors);
+}
+
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.DTOs
+{
+    // â”€â”€â”€ Subscription DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record SubscriptionDto(
+        int SubscriptionId,
+        int UserId,
+        string UserFullName,
+        string PlanName,
+        PlanType PlanType,
+        SubscriptionStatus Status,
+        DateTime StartDate,
+        DateTime EndDate,
+        ActivationMethod ActivationMethod,
+        string? AdminNote,
+        bool IsStripeManaged
+    );
+
+    public record PlanDto(
+        int PlanId,
+        string Name,
+        string? Description,
+        PlanType Type,
+        decimal Price,
+        string Currency,
+        int DurationDays,
+        int MaxSubjects,
+        bool HasAi,
+        bool HasLiveClass
+    );
+
+    public record ParentStudentLinkDto(
+        int LinkId,
+        int ParentUserId,
+        int StudentUserId,
+        string StudentFullName,
+        DateTime LinkedAt
+    );
+
+    public record LinkedStudentDto(
+        int StudentUserId,
+        string FullName,
+        string Email,
+        bool HasActiveSubscription
+    );
+
+    // â”€â”€â”€ Paged result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record PagedResult<T>(
+        IEnumerable<T> Items,
+        int TotalCount,
+        int PageNumber,
+        int PageSize
+    )
+    {
+        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+        public bool HasPrevious => PageNumber > 1;
+        public bool HasNext => PageNumber < TotalPages;
+    }
+
+    // â”€â”€â”€ Checkout DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record InitiateCheckoutRequest
+    {
+        public int PlanId { get; init; }
+        public string SuccessUrl { get; init; } = null!;
+        public string CancelUrl { get; init; } = null!;
+        public List<int>? SubjectIds { get; init; }
+    }
+
+    public record CheckoutResult(string CheckoutUrl, string SessionId);
+
+    // â”€â”€â”€ Admin Activation DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record AdminActivateRequest
+    {
+        public int StudentUserId { get; init; }
+        public int PlanId { get; init; }
+        public string? Note { get; init; }
+        public List<int>? SubjectIds { get; init; }
+    }
+
+    public record AdminCancelRequest
+    {
+        public string Reason { get; init; } = null!;
+    }
+
+    // â”€â”€â”€ Parent Link DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record LinkStudentRequest
+    {
+        public string StudentLinkageCode { get; init; } = null!;
+    }
+
+    // â”€â”€â”€ Subscription Status â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    public record SubscriptionStatusResponse(
+        bool HasActiveSubscription,
+        SubscriptionDto? ActiveSubscription
+    );
+}
+
+namespace Masarak.Application.DTOs
+{
+    public class TeacherDashboardStatsDto
+    {
+        public int TotalStudents { get; set; }
+        public int ActiveCourses { get; set; }
+        public int AssignmentsToGrade { get; set; }
+        public decimal AveragePerformance { get; set; }
+    }
+
+    public class TeacherActivityDto
+    {
+        public string Title { get; set; } = null!;
+        public string Time { get; set; } = null!;
+        public string Icon { get; set; } = null!;
+        public string Color { get; set; } = null!;
+    }
+
+    public class TeacherChartDataDto
+    {
+        public string[] Labels { get; set; } = Array.Empty<string>();
+        public ChartDatasetDto[] Datasets { get; set; } = Array.Empty<ChartDatasetDto>();
+    }
+
+    public class ChartDatasetDto
+    {
+        public string Label { get; set; } = null!;
+        public decimal[] Data { get; set; } = Array.Empty<decimal>();
+        public string BorderColor { get; set; } = null!;
+        public string BackgroundColor { get; set; } = null!;
+        public decimal Tension { get; set; } = 0.4m;
+        public bool Fill { get; set; } = false;
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Admin-level academic operations: grades, subjects, classes,
+    /// teaching assignments, and student enrollment.
+    /// </summary>
+    public interface IAcademicService
+    {
+        // â”€â”€ Grades â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<GradeDto>> GetAllGradesAsync(CancellationToken ct = default);
+        Task<GradeDetailDto> GetGradeWithDetailsAsync(int gradeId, int? academicYear = null, CancellationToken ct = default);
+
+        // â”€â”€ Subjects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<SubjectCategoryDto>> GetAllSubjectCategoriesAsync(CancellationToken ct = default);
+        Task<IEnumerable<SubjectDto>> GetSubjectsByGradeAsync(int gradeId, CancellationToken ct = default);
+        Task<IEnumerable<SubjectDto>> GetAllSubjectsAsync(CancellationToken ct = default);
+        Task<SubjectDto> CreateSubjectAsync(CreateSubjectRequest request, CancellationToken ct = default);
+        Task<SubjectDto> UpdateSubjectAsync(int subjectId, UpdateSubjectRequest request, CancellationToken ct = default);
+
+        // â”€â”€ Classes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<ClassDto>> GetClassesByGradeAsync(int gradeId, int academicYear, CancellationToken ct = default);
+        Task<ClassDto> CreateClassAsync(CreateClassRequest request, CancellationToken ct = default);
+        Task<ClassDto> UpdateClassAsync(int classId, UpdateClassRequest request, CancellationToken ct = default);
+
+        // â”€â”€ Teaching Assignments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<SubjectCategoryDto>> GetTeacherSpecializationsAsync(int teacherId, CancellationToken ct = default);
+        Task UpdateTeacherSpecializationAsync(int teacherId, UpdateTeacherSpecializationRequest request, CancellationToken ct = default);
+        Task<IEnumerable<TeachingAssignmentDto>> GetAssignmentsForClassAsync(int classId, int academicYear, CancellationToken ct = default);
+        Task<TeachingAssignmentDto> AssignTeacherAsync(AssignTeacherRequest request, CancellationToken ct = default);
+        Task UnassignTeacherAsync(int assignmentId, CancellationToken ct = default);
+
+        // â”€â”€ Student Enrollment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<StudentInClassDto>> GetClassRosterAsync(int classId, CancellationToken ct = default);
+        Task<IEnumerable<StudentInClassDto>> GetStudentsByTeachingAssignmentAsync(int userId, int taId, CancellationToken ct = default);
+        Task<StudentClassDto> EnrollStudentAsync(EnrollStudentRequest request, CancellationToken ct = default);
+        Task UnenrollStudentAsync(int studentClassId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 6: Admin user management repository.
+    /// Provides paginated user lists with filters and account management operations.
+    /// </summary>
+    public interface IAdminUserRepository
+    {
+        /// <summary>Get paginated list of all users with optional role filter and search.</summary>
+        Task<(IEnumerable<AdminUserDto> Items, int TotalCount)> GetAllAsync(
+            string? roleFilter, string? searchTerm, int page, int pageSize, CancellationToken ct);
+
+        /// <summary>Get a user with full details for admin view.</summary>
+        Task<User?> GetByIdWithDetailsAsync(int userId, CancellationToken ct);
+
+        /// <summary>Activate a user account.</summary>
+        Task ActivateAsync(int userId, CancellationToken ct);
+
+        /// <summary>Deactivate a user account.</summary>
+        Task DeactivateAsync(int userId, CancellationToken ct);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IAdminUserService
+    {
+        Task<PagedResult<AdminUserDto>> GetUsersAsync(int pageNumber, int pageSize, string? role, CancellationToken ct = default);
+        Task<IEnumerable<TeacherDto>> GetAllTeachersAsync(CancellationToken ct = default);
+        Task<AdminUserDto> CreateUserAsync(AdminCreateUserRequest request, CancellationToken ct = default);
+        Task DeleteUserAsync(int userId, CancellationToken ct = default);
+    }
+}
+namespace Masarak.Application.Interfaces
+{
+    public interface IAgoraTokenService
+    {
+        string GenerateRtcToken(string channelName, string uid, string role = "publisher", int expireTimeInSeconds = 3600);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Service layer for AI recommendations, analytics, and rule-based alerts.
+    /// Orchestrates AI provider calls, caching, and data aggregation.
+    /// </summary>
+    public interface IAiAnalyticsService
+    {
+        // â”€â”€ Student-Facing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<LearningInsightsDashboardDto> GetLearningInsightsAsync(int studentUserId, int academicYear, CancellationToken ct);
+        Task<IEnumerable<ContentRecommendationDto>> GetRecommendedContentAsync(int studentUserId, int subjectId, CancellationToken ct);
+
+        // â”€â”€ Parent-Facing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<ParentReportDto?> GetParentReportAsync(int parentUserId, int studentUserId, string reportMonth, CancellationToken ct);
+        Task<ParentReportDto> GenerateParentReportAsync(int parentUserId, int studentUserId, string reportMonth, CancellationToken ct);
+        Task<IEnumerable<PerformanceAlertDto>> GetStudentAlertsForParentAsync(int parentUserId, int studentUserId, CancellationToken ct);
+
+        // â”€â”€ Teacher-Facing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<ClassAnalyticsDashboardDto> GetClassAnalyticsAsync(int teacherUserId, int classId, int subjectId, int academicYear, CancellationToken ct);
+        Task<TeachingSuggestionDto> GenerateTeachingSuggestionAsync(int teacherUserId, int studentUserId, int subjectId, CancellationToken ct);
+        Task<StudentInsightDto> GetStudentInsightAsync(int teacherUserId, int studentUserId, int subjectId, CancellationToken ct);
+
+
+        // â”€â”€ Admin-Facing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<PlatformAnalyticsDto> GetPlatformAnalyticsAsync(int academicYear, CancellationToken ct);
+        Task<GradeHeatmapDto> GetGradeHeatmapAsync(int gradeId, int academicYear, CancellationToken ct);
+        Task<IEnumerable<AiPromptTemplateDto>> GetAllPromptTemplatesAsync(CancellationToken ct);
+        Task UpdatePromptTemplateAsync(string key, UpdatePromptTemplateRequest request, string updatedBy, CancellationToken ct);
+
+        // â”€â”€ Rule-Based Alerts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<PerformanceAlertDto>> EvaluatePerformanceAlertsAsync(int studentUserId, int subjectId, int classId, int academicYear, CancellationToken ct);
+
+        // â”€â”€ AI Generation (triggered by consumers) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task GenerateWeaknessAnalysisAsync(int studentUserId, int subjectId, int classId, CancellationToken ct);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Abstraction over an AI completion provider (OpenAI, Claude, Gemini).
+    /// </summary>
+    public interface IAiProvider
+    {
+        string ProviderName { get; }
+        Task<AiCompletionResult> CompleteAsync(AiPromptRequest request, CancellationToken ct);
+    }
+
+    /// <summary>
+    /// Factory that returns the configured primary AI provider and falls back on failure.
+    /// </summary>
+    public interface IAiProviderFactory
+    {
+        IAiProvider GetProvider(AiProvider preferred);
+        IAiProvider GetFallbackProvider(AiProvider failed);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Core application service for Phase 3: Assessment & Grading.
+    /// Manages assignments, exams, submissions, taking exams, and manual/auto grading.
+    /// </summary>
+    public interface IAssessmentService
+    {
+        // â”€â”€ Teacher: Assignments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<AssignmentDto> CreateAssignmentAsync(int teacherUserId, CreateAssignmentRequest request, CancellationToken ct = default);
+        Task PublishAssignmentAsync(int teacherUserId, int assignmentId, CancellationToken ct = default);
+        Task CloseAssignmentAsync(int teacherUserId, int assignmentId, CancellationToken ct = default);
+        Task<IEnumerable<AssignmentDto>> GetTeacherAssignmentsAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);
+        Task<IEnumerable<SubmissionDetailDto>> GetSubmissionsForAssignmentAsync(int teacherUserId, int assignmentId, CancellationToken ct = default);
+        Task<SubmissionDto> GradeSubmissionAsync(int teacherUserId, int submissionId, GradeSubmissionRequest request, CancellationToken ct = default);
+        Task<string> GetSubmissionFileDownloadUrlAsync(int teacherUserId, int submissionId, CancellationToken ct = default);
+
+        // â”€â”€ Teacher: Exams â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<ExamDto> CreateExamAsync(int teacherUserId, CreateExamRequest request, CancellationToken ct = default);
+        Task<QuestionDto> AddQuestionToExamAsync(int teacherUserId, int examId, AddQuestionRequest request, CancellationToken ct = default);
+        Task<QuestionDto> UpdateQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default);
+        Task RemoveQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default);
+        
+        // Question Bank Support
+        Task<IEnumerable<QuestionDto>> GetQuestionBankAsync(int teacherUserId, int subjectId, CancellationToken ct = default);
+        Task<QuestionDto> AddQuestionToBankAsync(int teacherUserId, int subjectId, AddQuestionRequest request, CancellationToken ct = default);
+        Task<QuestionDto> UpdateBankQuestionAsync(int teacherUserId, int questionId, UpdateQuestionRequest request, CancellationToken ct = default);
+        Task RemoveBankQuestionAsync(int teacherUserId, int questionId, CancellationToken ct = default);
+        Task<IEnumerable<QuestionDto>> AddQuestionsFromBankToExamAsync(int teacherUserId, int examId, AddQuestionsFromBankRequest request, CancellationToken ct = default);
+        Task PublishExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
+        Task CloseExamAsync(int teacherUserId, int examId, CancellationToken ct = default);
+        Task<IEnumerable<ExamDto>> GetTeacherExamsAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);
+
+        // â”€â”€ Teacher: Grading Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<PendingGradingDashboardDto> GetPendingGradingDashboardAsync(int teacherUserId, CancellationToken ct = default);
+        Task<ExamGradingReviewDto> GetStudentAnswersForReviewAsync(int teacherUserId, int studentExamId, CancellationToken ct = default);
+        Task GradeStudentAnswerAsync(int teacherUserId, int answerId, GradeStudentAnswerRequest request, CancellationToken ct = default);
+
+        // â”€â”€ Student: Assignments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<AssignmentDto>> GetStudentAssignmentsAsync(int studentUserId, int subjectId, CancellationToken ct = default);
+        Task<SubmissionDto> SubmitAssignmentAsync(int studentUserId, int assignmentId, string? textContent, Stream? fileStream, string? fileName, string? contentType, CancellationToken ct = default);
+
+        // â”€â”€ Student: Exams â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<ExamDto>> GetOpenExamsForStudentAsync(int studentUserId, int subjectId, CancellationToken ct = default);
+        Task<ExamAttemptDto> StartExamAttemptAsync(int studentUserId, int examId, CancellationToken ct = default);
+        Task SaveAnswerAsync(int studentUserId, int studentExamId, SaveAnswerRequest request, Stream? fileStream, string? fileName, string? contentType, CancellationToken ct = default);
+        Task<ExamResultDto> SubmitExamAsync(int studentUserId, int studentExamId, CancellationToken ct = default);
+        Task<ExamResultDto> GetStudentExamResultAsync(int studentUserId, int studentExamId, CancellationToken ct = default);
+        Task<IEnumerable<StudentExamGradeDto>> GetStudentExamGradesAsync(int studentUserId, CancellationToken ct = default);
+
+        // â”€â”€ Performance & Reports â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceAsync(int studentUserId, string academicYear, CancellationToken ct = default);
+        Task<IEnumerable<SubjectPerformanceDto>> GetStudentPerformanceForParentAsync(int parentUserId, int studentUserId, string academicYear, CancellationToken ct = default);
+        Task<ClassPerformanceReportDto> GetClassPerformanceReportAsync(int classId, int subjectId, string academicYear, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for Assignment CRUD operations.
+    /// </summary>
+    public interface IAssignmentRepository
+    {
+        Task<Assignment?> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<IEnumerable<Assignment>> GetByTeachingAssignmentIdAsync(int taId, CancellationToken ct = default);
+        Task<IEnumerable<Assignment>> GetPublishedForClassAsync(int classId, int subjectId, CancellationToken ct = default);
+        Task AddAsync(Assignment assignment, CancellationToken ct = default);
+        Task UpdateAsync(Assignment assignment, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Repository interface for Attendance entity.
+    /// </summary>
+    public interface IAttendanceRepository
+    {
+        Task<Attendance?> GetBySessionAndStudentAsync(int sessionId, int studentUserId, CancellationToken ct = default);
+        Task<IEnumerable<Attendance>> GetBySessionIdAsync(int sessionId, CancellationToken ct = default);
+        Task<IEnumerable<Attendance>> GetByStudentAndSubjectAsync(int studentUserId, int subjectId, int academicYear, CancellationToken ct = default);
+        Task<IEnumerable<int>> GetStudentsWithoutAttendanceAsync(int sessionId, IEnumerable<int> enrolledStudentUserIds, CancellationToken ct = default);
+        Task AddAsync(Attendance attendance, CancellationToken ct = default);
+        Task UpdateAsync(Attendance attendance, CancellationToken ct = default);
+        Task BulkAddAbsentAsync(IEnumerable<Attendance> absences, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Service interface for Attendance operations.
+    /// </summary>
+    public interface IAttendanceService
+    {
+        /// <summary>Records student presence when joining a live session.</summary>
+        Task<AttendanceDto> RecordAttendanceAsync(int studentUserId, int sessionId, CancellationToken ct = default);
+
+        /// <summary>Teacher overrides an attendance record.</summary>
+        Task<AttendanceDto> OverrideAttendanceAsync(int teacherUserId, int attendanceId, AttendanceStatus newStatus, string? note, CancellationToken ct = default);
+
+        /// <summary>Gets attendance roster for a specific session (teacher view).</summary>
+        Task<SessionAttendanceDto> GetSessionAttendanceAsync(int teacherUserId, int sessionId, CancellationToken ct = default);
+
+        /// <summary>Gets student's attendance summary per subject (student view).</summary>
+        Task<IEnumerable<SubjectAttendanceDto>> GetStudentAttendanceAsync(int studentUserId, int academicYear, CancellationToken ct = default);
+
+        /// <summary>Gets attendance summary for a linked student (parent view).</summary>
+        Task<IEnumerable<SubjectAttendanceDto>> GetStudentAttendanceForParentAsync(int parentUserId, int studentUserId, int academicYear, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IAuthService
+    {
+        Task<AuthResponse> RegisterAsync(RegisterRequest request);
+        Task<AuthResponse> LoginAsync(LoginRequest request);
+        Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request);
+        Task<MessageResponse> LogoutAsync(string refreshToken);
+        Task<MessageResponse> RevokeTokenAsync(string refreshToken, int requestingUserId, string requestingUserRole);
+        Task<MessageResponse> ChangePasswordAsync(int userId, ChangePasswordRequest request);
+        Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
+        Task<MessageResponse> ResetPasswordAsync(ResetPasswordRequest request);
+        Task<UserInfoDto?> GetCurrentUserAsync(int userId);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Repository interface for ChatMessage entity.
+    /// </summary>
+    public interface IChatMessageRepository
+    {
+        Task<ChatMessage?> GetByIdAsync(int messageId, CancellationToken ct = default);
+        Task<IEnumerable<ChatMessage>> GetRecentAsync(int chatRoomId, int count, int skip, CancellationToken ct = default);
+        Task<int> GetCountAsync(int chatRoomId, CancellationToken ct = default);
+        Task AddAsync(ChatMessage message, CancellationToken ct = default);
+        Task UpdateAsync(ChatMessage message, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Repository interface for ChatRoom entity.
+    /// </summary>
+    public interface IChatRoomRepository
+    {
+        Task<ChatRoom?> GetByIdAsync(int roomId, CancellationToken ct = default);
+        Task<ChatRoom?> GetGradeRoomAsync(int gradeId, CancellationToken ct = default);
+        Task<ChatRoom?> GetTeachersRoomAsync(CancellationToken ct = default);
+        Task<IEnumerable<ChatRoom>> GetRoomsForUserAsync(int userId, string role, IEnumerable<int> userGradeIds, CancellationToken ct = default);
+        Task AddAsync(ChatRoom room, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Service interface for Chat operations (REST-based).
+    /// Real-time messaging is handled via SignalR ChatHub.
+    /// </summary>
+    public interface IChatService
+    {
+        /// <summary>Gets accessible chat rooms for the user.</summary>
+        Task<IEnumerable<ChatRoomDto>> GetMyRoomsAsync(int userId, string role, CancellationToken ct = default);
+
+        /// <summary>Gets paginated message history for a room.</summary>
+        Task<(IEnumerable<ChatMessageDto> Messages, int TotalCount)> GetRoomMessagesAsync(
+            int userId, string role, int chatRoomId, int page, int pageSize, CancellationToken ct = default);
+
+        /// <summary>Sends a message (called from ChatHub or REST).</summary>
+        Task<ChatMessageDto> SendMessageAsync(int senderUserId, string senderRole, int chatRoomId, string content, CancellationToken ct = default);
+
+        /// <summary>Deletes (soft-deletes) a message. Sender or Admin only.</summary>
+        Task DeleteMessageAsync(int actorUserId, string actorRole, int messageId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IClassRepository
+    {
+        Task<Class?> GetByIdAsync(int classId, CancellationToken ct = default);
+        Task<Class?> GetByIdWithGradeAsync(int classId, CancellationToken ct = default);
+        Task<IEnumerable<Class>> GetByGradeIdAsync(int gradeId, int academicYear, CancellationToken ct = default);
+        Task<int> GetEnrollmentCountAsync(int classId, CancellationToken ct = default);
+        Task AddAsync(Class cls, CancellationToken ct = default);
+        Task UpdateAsync(Class cls, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Repository interface for ContentItem entity.
+    /// </summary>
+    public interface IContentItemRepository
+    {
+        Task<ContentItem?> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<IEnumerable<ContentItem>> GetByTeachingAssignmentIdAsync(int taId, CancellationToken ct = default);
+        Task<IEnumerable<ContentItem>> GetBySubjectAndClassAsync(int subjectId, int classId, CancellationToken ct = default);
+        Task AddAsync(ContentItem item, CancellationToken ct = default);
+        Task UpdateAsync(ContentItem item, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 4: Service interface for Content Library operations.
+    /// </summary>
+    public interface IContentService
+    {
+        /// <summary>Teacher uploads a URL-based content item (YouTube/Vimeo).</summary>
+        Task<ContentItemDto> UploadContentUrlAsync(int teacherUserId, UploadContentUrlRequest request, CancellationToken ct = default);
+
+        /// <summary>Teacher uploads a file-based content item to blob storage.</summary>
+        Task<ContentItemDto> UploadContentFileAsync(int teacherUserId, int teachingAssignmentId, int? sessionId, int? lessonId,
+            ContentType type, string title, string? description,
+            Stream fileStream, string fileName, CancellationToken ct = default);
+
+        /// <summary>Deletes (deactivates) a content item. Teacher can delete own, admin can delete any.</summary>
+        Task DeleteContentItemAsync(int actorUserId, string actorRole, int contentItemId, CancellationToken ct = default);
+
+        /// <summary>Gets all content for a teaching assignment (teacher view).</summary>
+        Task<IEnumerable<ContentItemDto>> GetTeacherContentAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);
+
+        /// <summary>Gets content for a subject the student is enrolled in (student view).</summary>
+        Task<IEnumerable<ContentItemDto>> GetContentForSubjectAsync(int studentUserId, int subjectId, CancellationToken ct = default);
+
+        /// <summary>Generates a signed download URL for a content item.</summary>
+        Task<string> GetContentDownloadUrlAsync(int userId, int contentItemId, CancellationToken ct = default);
+    }
+}
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IEmailService
+    {
+        /// <summary>
+        /// Sends a password-reset email containing the one-time token.
+        /// </summary>
+        Task SendPasswordResetEmailAsync(string toEmail, string toName, string resetToken);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for Exam CRUD operations.
+    /// </summary>
+    public interface IExamRepository
+    {
+        Task<Exam?> GetByIdWithQuestionsAsync(int examId, CancellationToken ct = default);
+        Task<IEnumerable<Exam>> GetByTeachingAssignmentIdAsync(int taId, CancellationToken ct = default);
+        Task<IEnumerable<Exam>> GetOpenExamsForClassAsync(int classId, int subjectId, DateTime now, CancellationToken ct = default);
+        Task AddAsync(Exam exam, CancellationToken ct = default);
+        Task UpdateAsync(Exam exam, CancellationToken ct = default);
+    }
+}
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Abstraction over file storage (Azure Blob in prod, local filesystem in dev).
+    /// </summary>
+    public interface IFileStorageService
+    {
+        /// <summary>
+        /// Uploads a file and returns the blob name and public URL.
+        /// </summary>
+        Task<(string BlobName, string PublicUrl)> UploadAsync(Stream content, string fileName, string containerName, CancellationToken ct = default);
+
+        /// <summary>
+        /// Generates a time-limited signed download URL for a blob.
+        /// </summary>
+        Task<string> GenerateSignedDownloadUrlAsync(string blobName, string containerName, TimeSpan expiry, CancellationToken ct = default);
+
+        /// <summary>
+        /// Deletes a blob from storage.
+        /// </summary>
+        Task DeleteAsync(string blobName, string containerName, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IGradeRepository
+    {
+        Task<Grade?> GetByIdAsync(int gradeId, CancellationToken ct = default);
+        Task<IEnumerable<Grade>> GetAllActiveAsync(CancellationToken ct = default);
+        Task<IEnumerable<Grade>> GetAllAsync(CancellationToken ct = default);
+        Task AddAsync(Grade grade, CancellationToken ct = default);
+        Task UpdateAsync(Grade grade, CancellationToken ct = default);
+    }
+}
+
+using System.Security.Claims;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IJwtService
+    {
+        (string token, DateTime expiry, string jwtId) GenerateAccessToken(int userId, string email, string fullName, string role);
+        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+        string GenerateRefreshToken();
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 6: Pushes real-time notifications via SignalR.
+    /// Implemented by SignalRNotificationPushService.
+    /// </summary>
+    public interface INotificationPushService
+    {
+        /// <summary>Sends a real-time notification to a specific user via SignalR.</summary>
+        Task PushToUserAsync(int userId, NotificationDto notification, CancellationToken ct);
+
+        /// <summary>Sends a real-time notification to all users with a specific role.</summary>
+        Task PushToRoleAsync(string role, NotificationDto notification, CancellationToken ct);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 6: Repository for notification persistence.
+    /// Handles paginated inbox queries, unread counts, and mark-read operations.
+    /// </summary>
+    public interface INotificationRepository
+    {
+        /// <summary>Get paginated notifications for a user, optionally filtering to unread only.</summary>
+        Task<IEnumerable<Notification>> GetByUserIdAsync(int userId, int page, int pageSize, bool unreadOnly, CancellationToken ct);
+
+        /// <summary>Get the total count of notifications for a user (for pagination).</summary>
+        Task<int> GetTotalCountAsync(int userId, bool unreadOnly, CancellationToken ct);
+
+        /// <summary>Get the count of unread notifications for the navbar badge.</summary>
+        Task<int> GetUnreadCountAsync(int userId, CancellationToken ct);
+
+        /// <summary>Persist a new notification to the database.</summary>
+        Task AddAsync(Notification notification, CancellationToken ct);
+
+        /// <summary>Mark a single notification as read (only if owned by userId).</summary>
+        Task MarkReadAsync(int notificationId, int userId, CancellationToken ct);
+
+        /// <summary>Mark all notifications for a user as read.</summary>
+        Task MarkAllReadAsync(int userId, CancellationToken ct);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Phase 6: Notification orchestration service.
+    /// Creates notifications, persists them, and pushes via SignalR in a single operation.
+    /// Called by RabbitMQ consumers â€” not directly exposed via API.
+    /// </summary>
+    public interface INotificationService
+    {
+        /// <summary>
+        /// Creates a notification entity, persists to DB, and pushes via SignalR to the target user.
+        /// </summary>
+        Task CreateAndPushAsync(int userId, NotificationType type, string title, string body, string? actionUrl, CancellationToken ct);
+
+        /// <summary>
+        /// Creates and pushes a notification to all users with a specific role (e.g. Admin).
+        /// </summary>
+        Task CreateAndPushToRoleAsync(string role, NotificationType type, string title, string body, string? actionUrl, CancellationToken ct);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IParentStudentLinkRepository
+    {
+        Task<bool> LinkExistsAsync(int parentUserId, int studentUserId, CancellationToken ct = default);
+        Task AddAsync(ParentStudentLink link, CancellationToken ct = default);
+        Task<IEnumerable<ParentStudentLink>> GetByParentUserIdAsync(int parentUserId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IPaymentRepository
+    {
+        Task AddAsync(Payment payment, CancellationToken ct = default);
+        Task UpdateAsync(Payment payment, CancellationToken ct = default);
+        Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for AI-generated recommendations with TTL-based lifecycle.
+    /// </summary>
+    public interface IAiRecommendationRepository
+    {
+        Task<AiRecommendation?> GetActiveByStudentAndTypeAsync(int studentUserId, int? subjectId,
+            RecommendationType type, CancellationToken ct);
+
+        Task<IEnumerable<AiRecommendation>> GetActiveByStudentAsync(int studentUserId, CancellationToken ct);
+
+        Task AddAsync(AiRecommendation rec, CancellationToken ct);
+
+        Task DeactivateAsync(int studentUserId, int? subjectId, RecommendationType type, CancellationToken ct);
+    }
+
+    /// <summary>
+    /// Repository for rule-based performance alerts.
+    /// </summary>
+    public interface IPerformanceAlertRepository
+    {
+        Task<PerformanceAlert?> GetUnresolvedAsync(int studentUserId, int? subjectId,
+            AlertType type, CancellationToken ct);
+
+        Task AddAsync(PerformanceAlert alert, CancellationToken ct);
+
+        Task UpdateAsync(PerformanceAlert alert, CancellationToken ct);
+
+        Task<IEnumerable<PerformanceAlert>> GetUnresolvedByStudentAsync(int studentUserId, CancellationToken ct);
+    }
+
+    /// <summary>
+    /// Repository for admin-editable AI prompt templates.
+    /// </summary>
+    public interface IAiPromptTemplateRepository
+    {
+        Task<AiPromptTemplate?> GetByKeyAsync(string key, CancellationToken ct);
+
+        Task<IEnumerable<AiPromptTemplate>> GetAllAsync(CancellationToken ct);
+
+        Task UpdateAsync(AiPromptTemplate template, CancellationToken ct);
+    }
+
+    /// <summary>
+    /// Repository for pre-computed analytics snapshots.
+    /// </summary>
+    public interface IAnalyticsSnapshotRepository
+    {
+        Task<AnalyticsDashboardSnapshot?> GetAsync(SnapshotScope scope, int? entityId, CancellationToken ct);
+
+        Task UpsertAsync(AnalyticsDashboardSnapshot snapshot, CancellationToken ct);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IPlanRepository
+    {
+        Task<Plan?> GetByIdAsync(int planId, CancellationToken ct = default);
+        Task<IEnumerable<Plan>> GetAllActiveAsync(CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ISessionAdminService
+    {
+        Task<IEnumerable<SessionDto>> ScheduleSessionSeriesAsync(AdminScheduleSessionRequest request, CancellationToken ct = default);
+        Task CancelSessionSeriesAsync(Guid seriesId, CancellationToken ct = default);
+        Task<IEnumerable<SessionDto>> GetClassScheduleAsync(int classId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task<IEnumerable<SessionDto>> GetAllScheduleAsync(DateTime from, DateTime to, CancellationToken ct = default);
+        Task<IEnumerable<SessionDto>> GetTeacherScheduleAsync(int teacherId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task CancelSingleSessionAsync(int sessionId, CancellationToken ct = default);
+        Task ReactivateSessionAsync(int sessionId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ISessionRepository
+    {
+        Task<Session?> GetByIdAsync(int sessionId, CancellationToken ct = default);
+        Task<Session?> GetByIdWithDetailsAsync(int sessionId, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetByClassIdAsync(int classId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetAllAsync(DateTime from, DateTime to, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetByTeachingAssignmentIdAsync(int assignmentId, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetUpcomingByClassIdAsync(int classId, DateTime after, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetByTeacherIdAsync(int teacherId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task AddAsync(Session session, CancellationToken ct = default);
+        Task AddRangeAsync(IEnumerable<Session> sessions, CancellationToken ct = default);
+        Task UpdateAsync(Session session, CancellationToken ct = default);
+        Task UpdateRangeAsync(IEnumerable<Session> sessions, CancellationToken ct = default);
+        Task<bool> HasConflictAsync(int classId, int teacherId, DateTime start, DateTime end, Guid? excludeSeriesId = null, CancellationToken ct = default);
+        Task<IEnumerable<Session>> GetBySeriesIdAsync(Guid seriesId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Session management for teachers and schedule queries for students.
+    /// </summary>
+    public interface ISessionService
+    {
+        // â”€â”€ Teacher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<TeachingAssignmentDto>> GetTeacherAssignmentsAsync(int userId, int academicYear, CancellationToken ct = default);
+        Task<SessionDto> ScheduleSessionAsync(int userId, ScheduleSessionRequest request, CancellationToken ct = default);
+        Task<SessionDto> UpdateSessionAsync(int userId, int sessionId, UpdateSessionRequest request, CancellationToken ct = default);
+        Task StartSessionAsync(int userId, int sessionId, CancellationToken ct = default);
+        Task CompleteSessionAsync(int userId, int sessionId, CancellationToken ct = default);
+        Task CancelSessionAsync(int userId, int sessionId, CancellationToken ct = default);
+        Task<IEnumerable<SessionDto>> GetTeacherSessionsAsync(int userId, DateTime from, DateTime to, CancellationToken ct = default);
+        Task<SessionDto> GetTeacherSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default);
+
+        // â”€â”€ Student â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<StudentEnrollmentDto?> GetStudentEnrollmentAsync(int userId, int academicYear, CancellationToken ct = default);
+        Task<WeeklyScheduleDto> GetStudentScheduleAsync(int userId, int academicYear, DateTime weekStart, CancellationToken ct = default);
+        Task<SessionDto> GetStudentSessionByIdAsync(int userId, int sessionId, CancellationToken ct = default);
+    }
+}
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Creates Stripe Checkout Sessions and handles webhook validation.
+    /// </summary>
+    public interface IStripeService
+    {
+        /// <summary>
+        /// Creates a Stripe Checkout Session and returns the checkout URL + session ID.
+        /// </summary>
+        Task<(string CheckoutUrl, string SessionId)> CreateCheckoutSessionAsync(
+            int userId, int planId, string planName, decimal price, string currency,
+            string successUrl, string cancelUrl, CancellationToken ct = default);
+
+        /// <summary>
+        /// Changes an existing Stripe Subscription (Upgrade or Downgrade).
+        /// Returns a new CheckoutUrl if payment is needed immediately, or null if successful instantly.
+        /// </summary>
+        Task<string?> ChangeSubscriptionAsync(
+            string stripeSubscriptionId, int newPlanId, string newPlanName, decimal newPrice, string currency, 
+            bool isUpgrade, string successUrl, string cancelUrl, CancellationToken ct = default);
+
+        /// <summary>Validates the webhook signature. Returns false if invalid.</summary>
+        bool ValidateWebhookSignature(string payload, string signature);
+
+        /// <summary>Parses a webhook event payload and returns the Stripe Event object.</summary>
+        Stripe.Event ParseWebhookEvent(string payload, string signature);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IStudentClassRepository
+    {
+        Task<StudentClass?> GetByIdAsync(int studentClassId, CancellationToken ct = default);
+        Task<bool> IsEnrolledAsync(int studentId, int classId, CancellationToken ct = default);
+        Task<StudentClass?> GetByStudentAndYearAsync(int studentId, int academicYear, CancellationToken ct = default);
+        Task<IEnumerable<StudentClass>> GetByStudentIdAsync(int studentId, int academicYear, CancellationToken ct = default);
+        Task<IEnumerable<StudentClass>> GetByClassIdAsync(int classId, CancellationToken ct = default);
+        Task AddAsync(StudentClass studentClass, CancellationToken ct = default);
+        Task UpdateAsync(StudentClass studentClass, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for StudentExam (exam attempt) operations.
+    /// </summary>
+    public interface IStudentExamRepository
+    {
+        Task<StudentExam?> GetByStudentAndExamAsync(int studentId, int examId, CancellationToken ct = default);
+        Task<StudentExam?> GetByIdWithAnswersAsync(int studentExamId, CancellationToken ct = default);
+        Task<IEnumerable<StudentExam>> GetPendingManualGradingForTeacherAsync(int teacherUserId, CancellationToken ct = default);
+        Task<IEnumerable<StudentExam>> GetExpiredInProgressAsync(DateTime now, CancellationToken ct = default);
+        Task<IEnumerable<StudentExam>> GetGradedByStudentAndSubjectAsync(int studentId, int subjectId, CancellationToken ct = default);
+        Task AddAsync(StudentExam attempt, CancellationToken ct = default);
+        Task UpdateAsync(StudentExam attempt, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface IStudentLessonService
+    {
+        // â”€â”€ Student: Lesson Viewing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<LessonDto>> GetStudentLessonsAsync(int studentUserId, int subjectId, CancellationToken ct = default);
+        Task<LessonDetailDto> GetStudentLessonDetailAsync(int studentUserId, int lessonId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for aggregated StudentPerformance records.
+    /// </summary>
+    public interface IStudentPerformanceRepository
+    {
+        Task<StudentPerformance?> GetByStudentSubjectClassAsync(int studentId, int subjectId, string academicYear, CancellationToken ct = default);
+        Task<IEnumerable<StudentPerformance>> GetByStudentAndYearAsync(int studentId, string academicYear, CancellationToken ct = default);
+        Task<IEnumerable<StudentPerformance>> GetByClassAndSubjectAsync(int classId, int subjectId, string academicYear, CancellationToken ct = default);
+        Task UpsertAsync(StudentPerformance performance, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ISubjectRepository
+    {
+        Task<Subject?> GetByIdAsync(int subjectId, CancellationToken ct = default);
+        Task<IEnumerable<Subject>> GetByGradeIdAsync(int gradeId, CancellationToken ct = default);
+        Task AddAsync(Subject subject, CancellationToken ct = default);
+        Task UpdateAsync(Subject subject, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Repository for assignment Submission operations.
+    /// </summary>
+    public interface ISubmissionRepository
+    {
+        Task<Submission?> GetByIdAsync(int submissionId, CancellationToken ct = default);
+        Task<Submission?> GetByStudentAndAssignmentAsync(int studentId, int assignmentId, CancellationToken ct = default);
+        Task<IEnumerable<Submission>> GetByAssignmentIdAsync(int assignmentId, CancellationToken ct = default);
+        Task<IEnumerable<Submission>> GetGradedByStudentAndSubjectAsync(int studentId, int subjectId, CancellationToken ct = default);
+        Task AddAsync(Submission submission, CancellationToken ct = default);
+        Task UpdateAsync(Submission submission, CancellationToken ct = default);
+    }
+}
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Checks whether a user has an active subscription.
+    /// Used by the SubscriptionAccessMiddleware and guards.
+    /// </summary>
+    public interface ISubscriptionAccessService
+    {
+        Task<bool> HasActiveSubscriptionAsync(int userId, CancellationToken ct = default);
+
+        /// <summary>Invalidates the cached subscription status for a user.</summary>
+        Task InvalidateCacheAsync(int userId);
+    }
+}
+
+using Masarak.Domain.Entities;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ISubscriptionRepository
+    {
+        Task<Subscription?> GetByIdAsync(int subscriptionId, CancellationToken ct = default);
+        Task<Subscription?> GetActiveByUserIdAsync(int userId, CancellationToken ct = default);
+        Task<Subscription?> GetByStripeSessionIdAsync(string sessionId, CancellationToken ct = default);
+        Task<Subscription?> GetByStripeSubscriptionIdAsync(string stripeSubscriptionId, CancellationToken ct = default);
+        Task<IEnumerable<Subscription>> GetByUserIdAsync(int userId, CancellationToken ct = default);
+        Task<IEnumerable<Subscription>> GetExpiredActiveSubscriptionsAsync(CancellationToken ct = default);
+        Task<(IEnumerable<Subscription> Items, int TotalCount)> GetAllPagedAsync(
+            int pageNumber, int pageSize, SubscriptionStatus? status = null, CancellationToken ct = default);
+        Task AddAsync(Subscription subscription, CancellationToken ct = default);
+        Task UpdateAsync(Subscription subscription, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+using Masarak.Domain.Enums;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Application service handling all subscription-related operations.
+    /// Follows the same service pattern as IAuthService.
+    /// </summary>
+    public interface ISubscriptionService
+    {
+        // â”€â”€ Checkout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<CheckoutResult> InitiateCheckoutAsync(int userId, InitiateCheckoutRequest request, CancellationToken ct = default);
+        Task<bool> VerifyCheckoutSessionAsync(string sessionId, CancellationToken ct = default);
+        Task HandleStripeWebhookAsync(string payload, string signature, CancellationToken ct = default);
+
+        // â”€â”€ Admin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<SubscriptionDto> AdminActivateAsync(int adminId, AdminActivateRequest request, CancellationToken ct = default);
+        Task AdminCancelAsync(int adminId, int subscriptionId, string reason, CancellationToken ct = default);
+        Task<PagedResult<SubscriptionDto>> GetAllSubscriptionsAsync(int pageNumber, int pageSize, SubscriptionStatus? status, CancellationToken ct = default);
+
+        // â”€â”€ User â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<SubscriptionDto?> GetActiveSubscriptionAsync(int userId, CancellationToken ct = default);
+        Task<IEnumerable<SubscriptionDto>> GetSubscriptionHistoryAsync(int userId, CancellationToken ct = default);
+        Task<string?> ChangeSubscriptionAsync(int parentId, int childId, int newPlanId, CancellationToken ct = default);
+
+        // â”€â”€ Plans â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<IEnumerable<PlanDto>> GetAllPlansAsync(CancellationToken ct = default);
+
+        // â”€â”€ Parent-Student Linking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<ParentStudentLinkDto> LinkParentToStudentAsync(int parentUserId, string studentLinkageCode, CancellationToken ct = default);
+        Task<IEnumerable<LinkedStudentDto>> GetLinkedStudentsAsync(int parentUserId, CancellationToken ct = default);
+
+        // â”€â”€ Student Linkage Code â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<string?> GetStudentLinkageCodeAsync(int userId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Application.DTOs;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ITeacherLessonService
+    {
+        // â”€â”€ Teacher: Lesson Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task<LessonDto> CreateLessonAsync(int teacherUserId, CreateLessonRequest request, CancellationToken ct = default);
+        Task<LessonDto> UpdateLessonAsync(int teacherUserId, int lessonId, UpdateLessonRequest request, CancellationToken ct = default);
+        Task DeleteLessonAsync(int teacherUserId, int lessonId, CancellationToken ct = default);
+        Task<IEnumerable<LessonDto>> GetTeacherLessonsAsync(int teacherUserId, int teachingAssignmentId, CancellationToken ct = default);
+        Task<LessonDetailDto> GetTeacherLessonDetailAsync(int teacherUserId, int lessonId, CancellationToken ct = default);
+        Task PublishLessonAsync(int teacherUserId, int lessonId, CancellationToken ct = default);
+        Task ReorderLessonsAsync(int teacherUserId, int teachingAssignmentId, ReorderLessonsRequest request, CancellationToken ct = default);
+        
+        // â”€â”€ Teacher: Clone Lesson â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task CloneLessonAsync(int teacherUserId, int lessonId, CloneLessonRequest request, CancellationToken ct = default);
+
+        // â”€â”€ Teacher: Attach/Detach â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        Task AttachContentToLessonAsync(int teacherUserId, int lessonId, int contentItemId, CancellationToken ct = default);
+        Task DetachContentFromLessonAsync(int teacherUserId, int contentItemId, CancellationToken ct = default);
+        Task AttachExamToLessonAsync(int teacherUserId, int lessonId, int examId, CancellationToken ct = default);
+        Task DetachExamFromLessonAsync(int teacherUserId, int examId, CancellationToken ct = default);
+        Task AttachAssignmentToLessonAsync(int teacherUserId, int lessonId, int assignmentId, CancellationToken ct = default);
+        Task DetachAssignmentFromLessonAsync(int teacherUserId, int assignmentId, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    public interface ITeachingAssignmentRepository
+    {
+        Task<TeachingAssignment?> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<TeachingAssignment?> GetByIdWithDetailsAsync(int id, CancellationToken ct = default);
+        Task<bool> AssignmentExistsAsync(int teacherId, int classId, int subjectId, int academicYear, CancellationToken ct = default);
+        Task<TeachingAssignment?> GetAssignmentBySubjectClassYearAsync(int classId, int subjectId, int academicYear, CancellationToken ct = default);
+        Task<IEnumerable<TeachingAssignment>> GetByTeacherIdAsync(int teacherId, int academicYear, CancellationToken ct = default);
+        Task<IEnumerable<TeachingAssignment>> GetByClassIdAsync(int classId, int academicYear, CancellationToken ct = default);
+        Task AddAsync(TeachingAssignment assignment, CancellationToken ct = default);
+        Task UpdateAsync(TeachingAssignment assignment, CancellationToken ct = default);
+    }
+}
+
+using Masarak.Domain.Entities;
+
+namespace Masarak.Application.Interfaces
+{
+    /// <summary>
+    /// Extended user repository for Phase 1 subscription features.
+    /// The existing IAuthService handles authentication; this adds
+    /// user lookup methods needed by subscription/linkage handlers.
+    /// </summary>
+    public interface IUserRepository
+    {
+        Task<User?> GetByIdAsync(int userId, CancellationToken ct = default);
+        Task<User?> GetByStudentLinkageCodeAsync(string code, CancellationToken ct = default);
+        Task UpdateAsync(User user, CancellationToken ct = default);
+    }
+}
+
+// <autogenerated />
+using System;
+using System.Reflection;
+[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v9.0", FrameworkDisplayName = ".NET 9.0")]
+
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Masarak.Application")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67fe0d002141cb2df84975bf1234398583ccb0cf")]
+[assembly: System.Reflection.AssemblyProductAttribute("Masarak.Application")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Masarak.Application")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+
+// Generated by the MSBuild WriteCodeFragment class.
+
+
+// <auto-generated/>
+global using System;
+global using System.Collections.Generic;
+global using System.IO;
+global using System.Linq;
+global using System.Net.Http;
+global using System.Threading;
+global using System.Threading.Tasks;
+
