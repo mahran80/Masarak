@@ -22,7 +22,7 @@ import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
     <ng-container *ngSwitchCase="'settings'"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l1.9-1.5-2-3.4-2.3.6a7.7 7.7 0 0 0-1.7-1L15 3h-4l-.3 2.7a7.7 7.7 0 0 0-1.7 1l-2.3-.6-2 3.4L6.6 11a7.6 7.6 0 0 0 0 2l-1.9 1.5 2 3.4 2.3-.6c.5.4 1.1.8 1.7 1L11 21h4l.3-2.7c.6-.2 1.2-.6 1.7-1l2.3.6 2-3.4z"/></ng-container>
     <ng-container *ngSwitchCase="'bell'"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5 1.5 6H4.5C4.5 14 6 13 6 9Z"/><path d="M10 19a2 2 0 0 0 4 0"/></ng-container>
     <ng-container *ngSwitchCase="'search'"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.5-4.5"/></ng-container>
-    <ng-container *ngSwitchCase="'chat'"><path d="M21 11.5a8.5 8.5 0 1 1-3.6-7"/><path d="M21 3v6h-6"/></ng-container>
+    <ng-container *ngSwitchCase="'chat'"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" /></ng-container>
     <ng-container *ngSwitchCase="'message'"><path d="M4 4h16v12H8l-4 4V4Z"/></ng-container>
     <ng-container *ngSwitchCase="'logout'"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></ng-container>
     <ng-container *ngSwitchCase="'folder'"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></ng-container>
@@ -101,6 +101,7 @@ import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
     <ng-container *ngSwitchCase="'notes'"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/><path d="M19.5 7.125 16.862 4.487"/><path d="M3 20.25V17.6c0-.597.237-1.17.659-1.591L17.25 2.418"/></ng-container>
     <ng-container *ngSwitchCase="'clipboard-document'"><path d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-1.674c.11.208.1.444-.025.654M15.75 18H4.875c-.621 0-1.125-.504-1.125-1.125V4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125h1.5c.621 0 1.125.504 1.125 1.125V18Z"/></ng-container>
     <ng-container *ngSwitchCase="'chevron-up'"><path d="M4.5 15.75l7.5-7.5 7.5 7.5"/></ng-container>
+    <ng-container *ngSwitchCase="'arrow-right-on-rectangle'"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H5.25" /></ng-container>
 
     <ng-container *ngSwitchDefault><circle cx="12" cy="12" r="9"/></ng-container>
   </svg>
