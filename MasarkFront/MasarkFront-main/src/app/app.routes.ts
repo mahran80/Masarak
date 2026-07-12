@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Chat } from './features/signalR/Component/chat/chat';
-import { Landing } from './features/landing/landing';
+import { LandingPageComponent } from './features/landing/landing';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout';
 import { AdminComponent } from './features/admin/adminComponent/admin';
 import { TeacherComponent } from './features/teacher/teacherComponent/teacher';
@@ -27,7 +27,7 @@ import { parentGuard } from './core/guards/parent-guard-guard';
 export const routes: Routes = [
   {
     path: '',
-    component: Landing,
+    component: LandingPageComponent,
     pathMatch: 'full',
   },
 

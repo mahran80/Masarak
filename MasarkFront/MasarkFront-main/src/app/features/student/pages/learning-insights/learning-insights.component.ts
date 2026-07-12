@@ -1,7 +1,6 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import {
   LearningInsightsDashboardDto,
@@ -14,7 +13,7 @@ import {
 @Component({
   selector: 'app-learning-insights',
   standalone: true,
-  imports: [IconComponent, CommonModule, RouterLink],
+  imports: [IconComponent, CommonModule],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <!-- Header -->

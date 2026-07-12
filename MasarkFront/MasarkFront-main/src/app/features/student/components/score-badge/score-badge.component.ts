@@ -1,11 +1,10 @@
-import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-score-badge',
   standalone: true,
-  imports: [IconComponent, CommonModule],
+  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [class]="badgeClass()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border">
