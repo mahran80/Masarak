@@ -1,10 +1,7 @@
-<div
-  class="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8"
-  dir="rtl"
->
-  <div
-    class="max-w-2xl w-full space-y-6 bg-white p-8 rounded-2xl shadow-xl border border-slate-100"
-  >
+<div class="min-h-screen flex bg-white" dir="rtl">
+  <!-- Form Section (Right side in RTL) -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-12 relative z-10">
+    <div class="max-w-2xl w-full space-y-8">
     <div class="text-center">
       <h2 class="text-3xl font-bold tracking-tight text-slate-900">
         @if (mode === 'Parent') { إنشاء حساب ولي أمر } @else { تسجيل بيانات الطالب }
@@ -220,5 +217,12 @@
         </p>
       </div>
     }
+    </div>
+  </div>
+
+  <!-- Illustration Section (Left side in RTL) -->
+  <div class="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden px-10">
+    <!-- Illustration Image -->
+    <img src="/assets/images/learning-illustration.png" alt="Learning" class="w-full max-w-2xl object-contain relative z-10 transition-transform duration-700 ease-in-out" />
   </div>
 </div>
