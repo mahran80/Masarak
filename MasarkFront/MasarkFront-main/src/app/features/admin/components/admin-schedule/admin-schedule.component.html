@@ -19,73 +19,76 @@
     </div>
   </div>
 
-  <div class="flex flex-col md:flex-row gap-6 relative">
-    <!-- Left Sidebar: Grade & Class Selection -->
-    <div class="bg-white rounded-[24px] shadow-xs border border-slate-100 flex flex-col gap-4 overflow-hidden transition-all duration-500 ease-in-out shrink-0"
-         [ngClass]="isSidebarOpen() ? 'w-full md:w-[280px] p-6 opacity-100' : 'w-0 h-0 md:h-auto p-0 opacity-0 md:border-0 md:shadow-none pointer-events-none'">
-      <div class="w-[230px]"> <!-- Fixed inner width to prevent content reflow during animation -->
-        <h2 class="text-lg font-black text-slate-800 mb-4 whitespace-nowrap">الصفوف الدراسية</h2>
-        <div class="flex flex-col gap-2">
-          @for (g of grades(); track g.gradeId) {
-            <div class="border border-slate-100 rounded-xl overflow-hidden">
-              <button (click)="onGradeSelect(g.gradeId)" 
-                      class="w-full text-right px-4 py-3 font-bold transition-colors flex justify-between items-center"
-                      [ngClass]="selectedGradeId() === g.gradeId ? 'bg-[#4F8CD4] text-white' : 'hover:bg-slate-50 text-slate-700'">
-                <span class="whitespace-nowrap">{{ g.name }}</span>
-              </button>
-              @if (selectedGradeId() === g.gradeId) {
-                <div class="bg-slate-50 p-2 flex flex-col gap-1">
-                  @for (c of classes(); track c.classId) {
-                    <button (click)="onClassSelect(c.classId)"
-                            class="w-full text-right px-3 py-2 text-sm font-bold rounded-lg transition-colors whitespace-nowrap overflow-hidden text-ellipsis"
-                            [ngClass]="selectedClassId() === c.classId ? 'bg-[#4F8CD4]/10 text-[#4F8CD4]' : 'hover:bg-slate-200 text-slate-600'">
-                      {{ c.name }}
-                    </button>
-                  } @empty {
-                    <div class="text-xs text-slate-400 text-center py-2">لا توجد فصول</div>
-                  }
-                </div>
-              }
-            </div>
+  <div class="flex flex-col gap-6 relative">
+    
+    <!-- Top Horizontal Grade & Class Selection -->
+    <div class="flex flex-col gap-4 transition-all duration-500 ease-in-out" 
+         [ngClass]="isSidebarOpen() ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden m-0'">
+      
+      <!-- Grades Row -->
+      <div class="flex flex-wrap items-center gap-3 bg-white p-3 rounded-[20px] shadow-sm border border-slate-200">
+        <span class="text-sm font-black text-slate-800 ml-2 px-2 whitespace-nowrap">الصفوف الدراسية:</span>
+        @for (g of grades(); track g.gradeId) {
+          <button (click)="onGradeSelect(g.gradeId)"
+                  class="px-5 py-2 rounded-xl text-sm font-bold transition-all border whitespace-nowrap active:scale-95"
+                  [ngClass]="selectedGradeId() === g.gradeId ? 'bg-[#4F8CD4] border-[#4F8CD4] text-white shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'">
+            {{ g.name }}
+          </button>
+        }
+      </div>
+
+      <!-- Sub-row for Classes -->
+      @if (selectedGradeId()) {
+        <div class="flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-[20px] shadow-inner border border-slate-200/60 transition-all duration-300">
+          <span class="text-[13px] font-black text-slate-500 ml-2 px-2 whitespace-nowrap">الفصول:</span>
+          @for (c of classes(); track c.classId) {
+            <button (click)="onClassSelect(c.classId)"
+                    class="px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all border active:scale-95"
+                    [ngClass]="selectedClassId() === c.classId ? 'bg-white border-[#4F8CD4] text-[#4F8CD4] shadow-sm' : 'bg-transparent border-slate-200 hover:bg-white hover:shadow-sm text-slate-600'">
+              {{ c.name }}
+            </button>
+          } @empty {
+            <span class="text-[13px] font-semibold text-slate-400 px-2">لا توجد فصول مسجلة لهذا الصف</span>
           }
         </div>
-      </div>
+      }
     </div>
 
     <!-- Main Content: Schedule View -->
-    <div class="flex-1 space-y-6 transition-all duration-500 min-w-0">
+    <div class="flex-1 space-y-6 transition-all duration-500 min-w-0 w-full">
       @if (selectedClassId() || viewMode() === 'list') {
         <!-- Toolbar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 bg-white rounded-[24px] p-4 shadow-xs border border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-white rounded-[20px] p-4 shadow-sm border border-slate-200">
           
-          <div class="flex items-center gap-4 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+          <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200/60">
             <button (click)="viewMode.set('week'); loadSessions()"
-                    class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
-                    [ngClass]="viewMode() === 'week' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700'">
+                    class="px-5 py-2 rounded-lg text-[13px] font-bold transition-all h-[36px] flex items-center justify-center"
+                    [ngClass]="viewMode() === 'week' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'">
               عرض أسبوعي
             </button>
             <button (click)="viewMode.set('list'); loadSessions()"
-                    class="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
-                    [ngClass]="viewMode() === 'list' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700'">
+                    class="px-5 py-2 rounded-lg text-[13px] font-bold transition-all h-[36px] flex items-center justify-center"
+                    [ngClass]="viewMode() === 'list' ? 'bg-white shadow-sm text-[#4F8CD4]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'">
               عرض القائمة
             </button>
           </div>
 
           @if (viewMode() === 'list') {
-            <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-              <label class="text-xs font-bold text-slate-500">من:</label>
-              <input type="date" class="bg-transparent text-sm font-bold text-slate-700 focus:outline-none" 
+            <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-200 h-[40px] shadow-sm">
+              <label class="text-[13px] font-bold text-slate-400">من:</label>
+              <input type="date" class="bg-transparent text-[13px] font-bold text-slate-700 focus:outline-none" 
                      [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event); loadSessions()">
-              <label class="text-xs font-bold text-slate-500 mr-2">إلى:</label>
-              <input type="date" class="bg-transparent text-sm font-bold text-slate-700 focus:outline-none" 
+              <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
+              <label class="text-[13px] font-bold text-slate-400">إلى:</label>
+              <input type="date" class="bg-transparent text-[13px] font-bold text-slate-700 focus:outline-none" 
                      [ngModel]="toDate()" (ngModelChange)="toDate.set($event); loadSessions()">
             </div>
           } @else {
-            <div class="flex items-center gap-4 bg-slate-50 rounded-xl border border-slate-200 p-1.5">
+            <div class="flex items-center gap-4 bg-white rounded-xl border border-slate-200 px-3 py-2 h-[40px] shadow-sm">
               <select
                 [ngModel]="selectedWeek()"
                 (change)="onWeekChange($event)"
-                class="bg-transparent text-sm font-bold text-slate-700 min-w-[140px] text-center focus:outline-none cursor-pointer px-2 py-1"
+                class="bg-transparent text-[13px] font-bold text-slate-700 min-w-[140px] focus:outline-none cursor-pointer w-full"
                 dir="rtl"
               >
                 @for (week of academicWeeks(); track week.value) {
@@ -96,7 +99,7 @@
           }
 
           @if (selectedClassId()) {
-            <button (click)="openModal()" class="flex items-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md active:scale-95">
+            <button (click)="openModal()" class="flex items-center justify-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-6 h-[40px] rounded-xl text-[13px] transition-all shadow-sm hover:shadow-md active:scale-95">
               + جدولة حصة جديدة
             </button>
           }

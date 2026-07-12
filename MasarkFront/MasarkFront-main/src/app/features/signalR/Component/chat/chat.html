@@ -1,30 +1,40 @@
-<div class="flex h-[calc(100vh-8rem)] w-full bg-[#f4f5f7] rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-4 text-slate-800" dir="rtl">
+<div class="flex h-[calc(100vh-8rem)] w-full bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-4 text-slate-800 font-sans" dir="rtl">
   
   <!-- Channels Sidebar -->
-  <div class="w-72 bg-white border-s border-slate-200 flex flex-col shrink-0">
-    <div class="h-16 flex items-center px-6 border-b border-slate-100 shrink-0">
-      <h2 class="font-bold text-lg text-slate-800 flex items-center gap-2">
-        <app-icon name="chat" [size]="20" class="text-blue-500"></app-icon>
+  <div class="w-80 bg-slate-50/50 border-l border-slate-200 flex flex-col shrink-0 min-h-0">
+    <div class="h-[76px] flex items-center px-8 border-b border-slate-200 bg-white shrink-0 z-10">
+      <h2 class="font-black text-[17px] text-slate-800 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#4F8CD4]">
+          <app-icon name="chat" [size]="18"></app-icon>
+        </div>
         المحادثات
       </h2>
     </div>
     
-    <div class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+    <div class="flex-1 overflow-y-auto py-5 px-4 space-y-6 custom-scrollbar min-h-0">
       @for (group of store.groupedRooms(); track group.groupName) {
         <div>
-          <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3 flex items-center gap-2">
+          <h3 class="text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-3 flex items-center gap-2">
             {{ group.groupName }}
           </h3>
-          <div class="space-y-0.5">
+          <div class="space-y-1.5">
             @for (room of group.rooms; track room.chatRoomId) {
               <button 
                 (click)="selectRoom(room.chatRoomId)"
-                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group relative text-start"
-                [ngClass]="store.selectedRoomId() === room.chatRoomId ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-50 text-slate-600 font-medium'">
-                <app-icon name="hashtag" [size]="18" [class]="store.selectedRoomId() === room.chatRoomId ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-600'"></app-icon>
-                <span class="truncate text-[15px] flex-1">{{ room.name }}</span>
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ease-in-out group relative text-start overflow-hidden"
+                [ngClass]="store.selectedRoomId() === room.chatRoomId ? 'bg-blue-50 border-r-4 border-r-[#4F8CD4] text-blue-900 shadow-[0_2px_8px_-2px_rgba(79,140,212,0.15)] ring-1 ring-[#4F8CD4]/10 font-black' : 'bg-transparent hover:bg-slate-50 text-slate-600 hover:shadow-sm border-r-4 border-transparent font-bold'">
+                
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200"
+                     [ngClass]="store.selectedRoomId() === room.chatRoomId ? 'bg-blue-100 text-[#4F8CD4]' : 'bg-slate-200 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#4F8CD4]'">
+                  <app-icon name="hashtag" [size]="16"></app-icon>
+                </div>
+                
+                <span class="truncate text-[14px] flex-1">
+                  {{ room.name }}
+                </span>
+                
                 @if (room.messageCount > 0) {
-                  <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md leading-none flex items-center justify-center min-w-[1.25rem]">
+                  <span class="bg-[#4F8CD4] text-white text-[11px] font-black px-2 py-0.5 rounded-full shadow-sm">
                     {{ room.messageCount > 99 ? '99+' : room.messageCount }}
                   </span>
                 }
@@ -37,46 +47,56 @@
   </div>
 
   <!-- Main Chat Area -->
-  <div class="flex-1 flex flex-col bg-[#f4f5f7]">
+  <div class="flex-1 flex flex-col bg-[#F9FAFB] min-w-0 min-h-0">
     @if (store.selectedRoomId()) {
       <!-- Chat Header -->
-      <div class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
-        <div class="flex items-center gap-3">
-          <app-icon name="hashtag" [size]="24" class="text-slate-400"></app-icon>
-          <div>
-            <h2 class="font-bold text-slate-800 text-lg leading-tight">{{ selectedRoom()?.name }}</h2>
-            <p class="text-[13px] text-slate-500 font-medium">{{ selectedRoom()?.roomType === 'GradeCommunity' ? 'مجتمع المرحلة الدراسية' : 'مجتمع المعلمين' }}</p>
+      <div class="h-[76px] bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0 z-10">
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[#4F8CD4] shrink-0">
+            <app-icon name="hashtag" [size]="20"></app-icon>
+          </div>
+          <div class="flex flex-col justify-center">
+            <h2 class="font-black text-slate-800 text-[17px] leading-tight mb-0.5">{{ selectedRoom()?.name }}</h2>
+            <p class="text-[13px] text-slate-500 font-semibold">{{ selectedRoom()?.roomType === 'GradeCommunity' ? 'مجتمع المرحلة الدراسية' : 'مجتمع المعلمين' }}</p>
           </div>
         </div>
       </div>
 
       <!-- Messages Area -->
-      <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar" id="messages-container">
+      <div class="flex-1 overflow-y-auto p-6 custom-scrollbar min-h-0" id="messages-container">
         @if (store.messages().length === 0) {
           <div class="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
-            <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center">
-              <app-icon name="chat" [size]="40" class="text-slate-300"></app-icon>
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shadow-inner">
+              <app-icon name="chat" [size]="28" class="text-slate-400"></app-icon>
             </div>
-            <p class="text-[15px] font-medium text-slate-500">لا توجد رسائل سابقة. كن أول من يشارك!</p>
+            <p class="text-[14px] font-bold text-slate-500">لا توجد رسائل سابقة. كن أول من يشارك!</p>
           </div>
         } @else {
           @for (msg of store.messages(); track msg.messageId) {
-            <div class="flex flex-col max-w-[80%]" 
-                 [ngClass]="msg.senderUserId === currentUserId ? 'ms-auto items-end' : 'me-auto items-start'">
+            <!-- 
+              RTL Logic:
+              mr-auto: margin-right auto -> pushes to left (Sent Messages)
+              ml-auto: margin-left auto -> pushes to right (Received Messages)
+            -->
+            <div class="flex flex-col w-fit max-w-[75%] mb-5" 
+                 [ngClass]="msg.senderUserId === currentUserId ? 'mr-auto items-start' : 'ml-auto items-start'">
               
-              <div class="flex items-center gap-2 mb-1.5 px-1">
-                <span class="text-[13px] font-bold text-slate-700">
+              <!-- Metadata Header -->
+              <div class="flex items-baseline gap-2 mb-1.5 px-1">
+                <span class="text-[13px] font-black"
+                      [ngClass]="msg.senderUserId === currentUserId ? 'text-slate-800' : 'text-slate-700'">
                   {{ msg.senderUserId === currentUserId ? 'أنت' : msg.senderName }}
                 </span>
-                <span class="text-[11px] font-medium text-slate-400">
+                <span class="text-[11px] font-semibold text-slate-400">
                   {{ msg.sentAt | date:'shortTime' }}
                 </span>
               </div>
 
-              <div class="px-4 py-3 text-[15px] shadow-sm leading-relaxed"
+              <!-- Message Bubble -->
+              <div class="px-4 py-2.5 text-[14.5px] leading-[1.6] shadow-sm min-w-[60px]"
                    [ngClass]="msg.senderUserId === currentUserId 
-                     ? 'bg-blue-600 text-white rounded-2xl rounded-te-sm border border-blue-700' 
-                     : 'bg-white text-slate-800 rounded-2xl rounded-ts-sm border border-slate-200'">
+                     ? 'bg-blue-50 text-blue-950 rounded-2xl rounded-tl-sm border border-blue-200 font-medium' 
+                     : 'bg-white text-slate-800 rounded-2xl rounded-tr-sm border border-slate-200 font-medium'">
                 {{ msg.content }}
               </div>
             </div>
@@ -85,35 +105,53 @@
       </div>
 
       <!-- Message Input -->
-      <div class="bg-white p-4 shrink-0">
-        <div class="max-w-4xl mx-auto flex items-end gap-3 bg-slate-50 border border-slate-200 rounded-2xl p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all shadow-sm">
-          <textarea
-            [(ngModel)]="message"
-            (keydown.enter)="handleEnter($event)"
-            placeholder="اكتب رسالة في #{{ selectedRoom()?.name }}..."
-            rows="1"
-            class="flex-1 bg-transparent border-none px-3 py-2 text-[15px] outline-none resize-none max-h-32 custom-scrollbar"
-            style="min-height: 44px;"></textarea>
+      <div class="bg-white p-5 shrink-0 border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-10 relative">
+        <div class="max-w-4xl mx-auto flex flex-col gap-2.5">
+          <div class="flex items-end gap-3 bg-white border border-slate-300 rounded-xl p-2.5 focus-within:ring-4 focus-within:ring-blue-50 focus-within:border-[#4F8CD4] transition-all duration-200 ease-in-out shadow-sm">
             
-          <button
-            (click)="send()"
-            [disabled]="!message.trim()"
-            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-            [ngClass]="message.trim() ? 'bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5' : 'bg-slate-200 text-slate-400'">
-            <app-icon name="paper-airplane" [size]="20" class="transform -rotate-90 ms-1"></app-icon>
-          </button>
-        </div>
-        <div class="text-center mt-2">
-          <span class="text-[11px] text-slate-400 font-medium">اضغط <kbd class="font-sans bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm">Enter</kbd> للإرسال، و <kbd class="font-sans bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 shadow-sm">Shift + Enter</kbd> لسطر جديد</span>
+            <!-- Functional Web Icon: Attachment -->
+            <button class="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200 ease-in-out shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.536 4.536 0 01-6.42-6.421l10.899-10.899m-7.81 8.122l-4.72-4.72c-.996-.996-.996-2.612 0-3.608.995-.995 2.61-.995 3.607 0l8.9 8.9c1.99 1.99 5.215 1.99 7.205 0 1.99-1.99 1.99-5.215 0-7.205l-7.7-7.7" />
+              </svg>
+            </button>
+
+            <textarea
+              [(ngModel)]="message"
+              (keydown.enter)="handleEnter($event)"
+              placeholder="اكتب رسالة في #{{ selectedRoom()?.name }}..."
+              rows="1"
+              class="flex-1 bg-transparent border-none px-2 py-2 text-[14.5px] font-medium text-slate-800 placeholder:text-slate-400 outline-none resize-none max-h-32 custom-scrollbar transition-all duration-200"
+              style="min-height: 40px;"></textarea>
+              
+            <!-- Functional Web Icon: Send -->
+            <button
+              (click)="send()"
+              [disabled]="!message.trim()"
+              class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ease-in-out shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              [ngClass]="message.trim() ? 'bg-[#4F8CD4] text-white shadow-md shadow-blue-200 hover:bg-blue-600 hover:-translate-y-0.5' : 'bg-slate-100 text-slate-400'">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 transform -rotate-90 rtl:rotate-90">
+                <path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex justify-center mt-1">
+            <span class="text-[11px] text-slate-400 font-bold tracking-wide">
+              اضغط <kbd class="font-sans bg-slate-50 border border-slate-200 rounded-md px-1.5 py-0.5 shadow-sm text-slate-500">Enter</kbd> للإرسال، و <kbd class="font-sans bg-slate-50 border border-slate-200 rounded-md px-1.5 py-0.5 shadow-sm text-slate-500">Shift + Enter</kbd> لسطر جديد
+            </span>
+          </div>
         </div>
       </div>
     } @else {
       <!-- No Room Selected State -->
-      <div class="flex-1 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center">
-          <app-icon name="chat-bubble-start-right" [size]="48" class="text-slate-300"></app-icon>
+      <div class="flex-1 flex flex-col items-center justify-center text-slate-400 space-y-5 bg-white m-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="w-20 h-20 rounded-3xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-inner">
+          <app-icon name="chat-bubble-start-right" [size]="40" class="text-[#4F8CD4]"></app-icon>
         </div>
-        <p class="text-lg font-medium text-slate-500">اختر قناة للبدء في المحادثة</p>
+        <div class="text-center space-y-1">
+          <h3 class="text-[18px] font-black text-slate-700">المحادثات</h3>
+          <p class="text-[14px] font-semibold text-slate-500">اختر قناة من القائمة الجانبية للبدء في المحادثة</p>
+        </div>
       </div>
     }
   </div>

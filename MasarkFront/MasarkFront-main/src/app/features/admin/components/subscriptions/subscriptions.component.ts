@@ -21,6 +21,7 @@ export class AdminSubscriptionsComponent implements OnInit {
   readonly searchTerm = signal('');
   readonly currentPage = signal(1);
   readonly totalPages = 1;
+  readonly openMenuId = signal<string | number | null>(null);
 
   private readonly records = signal<any[]>([]);
 
@@ -33,6 +34,14 @@ export class AdminSubscriptionsComponent implements OnInit {
       record.studentName.toLowerCase().includes(term)
     );
   });
+
+  toggleMenu(id: string | number) {
+    this.openMenuId.set(this.openMenuId() === id ? null : id);
+  }
+
+  closeMenus() {
+    this.openMenuId.set(null);
+  }
 
   ngOnInit() {
     this.adminApi.getSubscriptionsDashboard().subscribe(data => {
