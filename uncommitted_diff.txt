@@ -1,0 +1,95 @@
+Created At: 2026-07-13T17:09:55Z
+Completed At: 2026-07-13T17:09:56Z
+
+				The command completed successfully.
+				Output:
+				<truncated 666 lines>
++    { icon: 'contact_page', title: 'Online Exams', description: 'A continuous assessment system simulating embassy exams to train students for real test conditions.' },
++    { icon: 'groups', title: 'Parent Tracking', description: 'A dedicated app for parents to track attendance and their children\u2019s academic level in real time.' }
+   ],
+   stagesHead: { eyebrow: 'Educational Stages', title: 'A path designed for every age group', sub: 'Different content and tools that match every student\u2019s abilities and needs.' },
+   stages: [
+@@ -193,7 +204,7 @@ const EN: Dictionary = {
+   ],
+   teamHead: { eyebrow: 'Behind the Platform', title: 'Engineering & Academic Excellence', sub: 'Masarak was built by an elite team of developers and academic experts.' },
+   team: [
+-    { name: 'Alaa Walid Gad', role: 'Project Lead & Full-Stack Dev', description: 'Architecting and building the core LMS infrastructure.' },
++    { name: 'Alaa Walid Gad', role: 'Full-Stack Dev', description: 'Architecting and building the core LMS infrastructure.' },
+     { name: 'Reham Mohamed', role: 'Curriculum Advisor', description: 'Ensuring total alignment of content and assessments with official standards.' },
+     { name: 'Habiba Mohamed', role: 'UI/UX Designer', description: 'Creating seamless interfaces that support all ages.' },
+     { name: 'Ahmed Mehran', role: 'Full-Stack Dev', description: 'Developing and securing backend operations for platform stability.' },
+@@ -225,7 +236,7 @@ const DICTS: Record<Lang, Dictionary> = { ar: AR, en: EN };
+   templateUrl: './landing.html',
+   styleUrls: ['./landing.css']
+ })
+-export class LandingPageComponent implements OnInit, OnDestroy {
++export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
+ 
+   media = MEDIA;
+ 
+@@ -246,12 +257,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
+   /* ============ HERO SLIDER 
+<truncated 4154 bytes>
+eroImageTimer) clearInterval(this.heroImageTimer);
++    this.heroImageTimer = null;
++  }
++
++  resumeHeroImageAutoplay(): void {
++    this.startHeroImageAutoplay();
++  }
++
++  onHeroImagePointerDown(event: PointerEvent): void {
++    if (event.pointerType !== 'touch') return;
++    this.heroImagePointerStartX = event.clientX;
++    this.pauseHeroImageAutoplay();
++  }
++
++  onHeroImagePointerUp(event: PointerEvent): void {
++    if (this.heroImagePointerStartX === null) return;
++    const distance = event.clientX - this.heroImagePointerStartX;
++    this.heroImagePointerStartX = null;
++
++    if (Math.abs(distance) >= 48) {
++      if (distance < 0) this.nextHeroImage();
++      else this.previousHeroImage();
++    }
++
++    this.resumeHeroImageAutoplay();
++  }
++
++  private startHeroImageAutoplay(): void {
++    this.pauseHeroImageAutoplay();
++    if (this.reduceMotion) return;
++    this.heroImageTimer = setInterval(() => this.nextHeroImage(), 5000);
+   }
+ 
+   /* ============ STAT COUNTERS ============ */
+@@ -407,12 +451,24 @@ export class LandingPageComponent implements OnInit, OnDestroy {
+           this.scrollObserver?.unobserve(entry.target);
+         });
+       },
+-      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
++      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' }
+     );
+     document.querySelectorAll('.reveal, .js-stats-trigger').forEach(el => this.scrollObserver?.observe(el));
++
++    // Safety net: if an element is already inside the viewport at load time
++    // (e.g. on a fast connection or a short page), the observer's first
++    // callback can occasionally be missed. Force-check once after paint.
++    requestAnimationFrame(() => {
++      document.querySelectorAll('.reveal:not(.is-visible)').forEach(el => {
++        const rect = el.getBoundingClientRect();
++        if (rect.top < window.innerHeight && rect.bottom > 0) {
++          el.classList.add('is-visible');
++        }
++      });
++    });
+   }
+ 
+   trackByIndex(index: number): number {
+     return index;
+   }
+-}
+\ No newline at end of file
++}
+
