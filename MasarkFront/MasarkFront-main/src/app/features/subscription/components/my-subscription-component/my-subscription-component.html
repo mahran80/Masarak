@@ -1,12 +1,12 @@
 <div class="mx-auto max-w-5xl px-4 py-8">
 
-  <div class="mb-8">
+  <div class="mb-8" dir="rtl">
     <h1 class="text-3xl font-bold text-slate-900">
-      My Subscription
+      اشتراكاتي
     </h1>
 
     <p class="mt-2 text-slate-500">
-      Manage your subscription and account access
+      إدارة اشتراكاتك الحالية وصلاحيات الوصول
     </p>
   </div>
 
@@ -31,7 +31,7 @@
           (click)="loadStatus()"
           class="text-sm font-medium underline"
         >
-          Retry
+          إعادة المحاولة
         </button>
       </div>
     </div>
@@ -62,7 +62,7 @@
                 <span
                   class="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700"
                 >
-                  Active
+                  نشط
                 </span>
 
                 <span
@@ -80,7 +80,7 @@
               </h2>
 
               <p class="mt-2 text-slate-500">
-                Activated via
+                تم التفعيل عبر
                 {{ formatMethod(sub.activationMethod) }}
               </p>
 
@@ -91,7 +91,7 @@
               <p
                 class="text-sm uppercase tracking-wider text-slate-400"
               >
-                Expires
+                تاريخ الانتهاء
               </p>
 
               <p
@@ -102,7 +102,7 @@
 
               <p [class]="daysLeftClass(sub.endDate)">
                 {{ daysLeft(sub.endDate) }}
-                days remaining
+                أيام متبقية
               </p>
 
             </div>
@@ -117,7 +117,7 @@
               class="rounded-2xl bg-slate-50 p-4"
             >
               <p class="text-sm text-slate-500">
-                Start Date
+                تاريخ البدء
               </p>
 
               <p class="mt-1 font-semibold">
@@ -129,7 +129,7 @@
               class="rounded-2xl bg-slate-50 p-4"
             >
               <p class="text-sm text-slate-500">
-                End Date
+                تاريخ الانتهاء
               </p>
 
               <p class="mt-1 font-semibold">
@@ -151,11 +151,11 @@
           <h3
             class="text-lg font-semibold text-slate-900"
           >
-            Parent Linkage Code
+            رمز ربط ولي الأمر
           </h3>
 
           <p class="mt-2 text-slate-500">
-            Share this code with your parent.
+            شارك هذا الرمز مع ولي أمرك.
           </p>
 
           @if (codeLoading()) {
@@ -183,9 +183,9 @@
                 class="rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
               >
                 @if (copied()) {
-                  Copied <app-icon name="check" size="1.2em"></app-icon>
+                  تم النسخ <app-icon name="check" size="1.2em"></app-icon>
                 } @else {
-                  Copy
+                  نسخ
                 }
               </button>
 
@@ -212,18 +212,18 @@
         <h2
           class="mt-4 text-2xl font-bold text-slate-900"
         >
-          No Active Subscription
+          لا توجد اشتراكات نشطة
         </h2>
 
         <p class="mt-2 text-slate-500">
-          Subscribe to unlock all platform features.
+          اشترك الآن للوصول إلى جميع مزايا المنصة.
         </p>
 
         <a
           routerLink="/plans"
-          class="mt-6 inline-flex rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
+          class="mt-6 inline-flex rounded-2xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 transition-all duration-300 hover:shadow-md"
         >
-          View Plans
+          عرض الخطط
         </a>
 
       </div>

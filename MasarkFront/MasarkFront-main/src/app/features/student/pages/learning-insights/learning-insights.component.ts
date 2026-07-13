@@ -22,7 +22,7 @@ import {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-violet-600"><app-icon name="sparkles" size="1.2em"></app-icon></span>
+              <span class="text-blue-600"><app-icon name="sparkles" size="1.2em"></app-icon></span>
               رؤى التعلم الذكية
             </h1>
             <p class="text-sm text-slate-500 mt-1">تحليل نقاط الضعف والقوة لديك مع توصيات مخصصة بالذكاء الاصطناعي</p>
@@ -60,9 +60,9 @@ import {
       @else if (data()) {
         <!-- Active Alerts -->
         @if (data()!.activeAlerts.length > 0) {
-          <div class="space-y-3">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span><app-icon name="bell" size="1.2em"></app-icon></span> تنبيهات الأداء
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-3">
+              <span class="text-blue-600"><app-icon name="bell" size="1.2em"></app-icon></span> تنبيهات الأداء
               <span class="text-xs bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">{{ data()!.activeAlerts.length }}</span>
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -94,14 +94,14 @@ import {
         }
 
         <!-- Weakness Analyses -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span><app-icon name="chart" size="1.2em"></app-icon></span> تحليل نقاط الضعف
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-3">
+            <span class="text-blue-600"><app-icon name="chart" size="1.2em"></app-icon></span> تحليل نقاط الضعف
           </h2>
           @if (data()!.subjectAnalyses.length === 0) {
-            <div class="bg-emerald-50 text-emerald-700 p-6 rounded-2xl border border-emerald-200 text-center">
-              <span class="text-4xl mb-2 block"><app-icon name="sparkles" size="1.2em"></app-icon></span>
-              <p class="font-bold">لم نرصد أي نقاط ضعف حتى الآن. أداء رائع!</p>
+            <div class="bg-white text-slate-700 p-6 rounded-2xl border border-blue-100 shadow-sm flex flex-col items-center justify-center text-center">
+              <span class="text-4xl mb-3 flex justify-center text-blue-600"><app-icon name="check-circle" size="1.2em"></app-icon></span>
+              <p class="font-bold text-slate-700">لم نرصد أي نقاط ضعف حتى الآن. أداء رائع!</p>
             </div>
           } @else {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -158,13 +158,13 @@ import {
         </div>
 
         <!-- Content Recommendations -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span><app-icon name="sparkles" size="1.2em"></app-icon></span> محتوى موصى به
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-3">
+            <span class="text-blue-600"><app-icon name="sparkles" size="1.2em"></app-icon></span> محتوى موصى به
           </h2>
           @if (data()!.recommendations.length === 0) {
-            <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <span class="text-4xl mb-2 block opacity-50"><app-icon name="book-open" size="1.2em"></app-icon></span>
+            <div class="flex flex-col items-center justify-center text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-4xl mb-3 text-slate-400"><app-icon name="book-open" size="1.2em"></app-icon></span>
               <p class="text-slate-500 font-medium">لا توجد توصيات حالياً</p>
             </div>
           } @else {
@@ -197,13 +197,13 @@ import {
         </div>
 
         <!-- Performance Trends -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <span><app-icon name="chart" size="1.2em"></app-icon></span> اتجاهات الأداء
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-3">
+            <span class="text-blue-600"><app-icon name="chart" size="1.2em"></app-icon></span> اتجاهات الأداء
           </h2>
           @if (data()!.performanceTrends.length === 0) {
-            <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <span class="text-4xl mb-2 block opacity-50"><app-icon name="chart" size="1.2em"></app-icon></span>
+            <div class="flex flex-col items-center justify-center text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <span class="text-4xl mb-3 text-slate-400"><app-icon name="chart" size="1.2em"></app-icon></span>
               <p class="text-slate-500 font-medium">لا توجد بيانات أداء كافية لعرض الاتجاهات</p>
             </div>
           } @else {

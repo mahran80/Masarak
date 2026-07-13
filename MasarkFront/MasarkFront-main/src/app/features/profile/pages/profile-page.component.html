@@ -1,13 +1,13 @@
 <div class="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12" dir="rtl">
   <!-- Header -->
-  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+  <div class="bg-white p-4 lg:px-6 lg:py-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border border-blue-100 shadow-sm">
         <app-icon name="user" size="1.2em"></app-icon>
       </div>
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">حسابي</h1>
-        <p class="text-sm text-slate-500 mt-1">
+        <h1 class="text-xl font-bold text-slate-800">حسابي</h1>
+        <p class="text-xs text-slate-500 mt-1">
           @if (isReadOnly()) {
             عرض المعلومات الشخصية
           } @else {
@@ -24,11 +24,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Profile Picture and Status -->
-      <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center text-center">
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center justify-center text-center h-full min-h-[300px]">
           <!-- Avatar -->
           <div class="relative group">
-            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-slate-100">
+            <div class="w-28 h-28 rounded-full overflow-hidden border-[3px] border-white shadow-md bg-slate-100">
               @if (profile()?.avatarUrl) {
                 <img [src]="profile()?.avatarUrl" (error)="onAvatarError($event)" class="w-full h-full object-cover" alt="Profile avatar">
               } @else {
@@ -44,21 +44,21 @@
                   @if (isUploading()) {
                     <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                   } @else {
-                    <app-icon name="camera" size="1.5em"></app-icon>
-                    <span class="text-xs mt-1 font-semibold">تغيير الصورة</span>
+                    <app-icon name="camera" size="1.3em"></app-icon>
+                    <span class="text-[10px] mt-1 font-bold">تغيير الصورة</span>
                   }
                 </div>
               </label>
             }
           </div>
           
-          <h2 class="mt-4 text-xl font-bold text-slate-800">{{ profile()?.fullName }}</h2>
-          <span class="inline-block mt-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-100">
+          <h2 class="mt-4 text-xl font-black text-slate-800">{{ profile()?.fullName }}</h2>
+          <span class="inline-flex mt-2 px-4 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-100">
             {{ profile()?.role === 'Admin' ? 'مدير النظام' : profile()?.role === 'Teacher' ? 'معلم' : profile()?.role === 'Parent' ? 'ولي أمر' : 'طالب' }}
           </span>
 
           @if (!isReadOnly() && profile()?.avatarUrl) {
-            <button (click)="removeAvatar()" [disabled]="isUploading()" class="mt-4 text-sm font-semibold text-rose-500 hover:text-rose-600 transition-colors bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-lg w-full text-center">
+            <button (click)="removeAvatar()" [disabled]="isUploading()" class="mt-5 text-sm font-bold text-rose-500 hover:text-rose-600 transition-colors bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-xl w-full text-center">
               إزالة الصورة
             </button>
           }
@@ -85,25 +85,30 @@
           <div class="p-6">
             @if (isReadOnly()) {
               <!-- Read-only View for Student -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الاسم الكامل</label>
-                  <p class="text-slate-800 font-medium">{{ profile()?.fullName }}</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <label class="block text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-widest">الاسم الكامل</label>
+                  <p class="text-slate-800 font-bold text-[15px] mt-0.5">{{ profile()?.fullName }}</p>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">البريد الإلكتروني</label>
-                  <p class="text-slate-800 font-medium" dir="ltr">{{ profile()?.email }}</p>
+                
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100 flex flex-col justify-center text-start">
+                  <label class="block text-[11px] font-bold text-slate-400 mb-1 uppercase tracking-widest text-start">البريد الإلكتروني</label>
+                  <p class="text-slate-800 font-bold text-[15px] text-right mt-0.5" dir="ltr"><span class="inline-block">{{ profile()?.email }}</span></p>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">نبذة مختصرة</label>
-                  <p class="text-slate-800 font-medium">{{ profile()?.bio || 'لا يوجد' }}</p>
-                </div>
-                <div class="md:col-span-2">
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الحالة الأكاديمية</label>
-                  <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
-                    {{ profile()?.studentDetails?.academicStatus }}
+
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100 md:col-span-2 flex flex-col justify-center items-start">
+                  <label class="block text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-widest">الحالة الأكاديمية</label>
+                  <span class="inline-flex items-center px-4 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-100 tracking-wide">
+                    {{ profile()?.studentDetails?.academicStatus === 'Active' ? 'نشط' : (profile()?.studentDetails?.academicStatus || 'نشط') }}
                   </span>
                 </div>
+
+                <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100 md:col-span-2 flex flex-col justify-center">
+                  <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest">نبذة مختصرة</label>
+                  <p class="text-slate-700 font-medium text-[14px] leading-relaxed">{{ profile()?.bio || 'لا يوجد' }}</p>
+                </div>
+                
               </div>
             } @else {
               <!-- Edit Form for Teacher/Parent -->

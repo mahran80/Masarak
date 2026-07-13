@@ -1,20 +1,19 @@
 <section class="space-y-6 text-slate-900" dir="rtl">
   <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div class="text-right">
-      <p class="text-sm font-semibold text-sky-700">Masarak Education System</p>
-      <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Student Dashboard</h1>
+      <h1 class="text-2xl font-bold text-slate-950 sm:text-3xl">لوحة تحكم الطالب</h1>
     </div>
 
     <button
       type="button"
-      class="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+      class="inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
       [disabled]="isLoading()"
       (click)="loadDashboard()"
     >
       @if (isLoading()) {
-        Loading...
+        جارٍ التحميل...
       } @else {
-        Refresh
+        تحديث
       }
     </button>
   </header>
@@ -31,14 +30,14 @@
     </div>
   } @else if (errorMessage()) {
     <article class="rounded-lg border border-rose-200 bg-white p-6 text-right shadow-sm">
-      <p class="text-sm font-semibold text-rose-700">Dashboard could not be loaded</p>
+      <p class="text-sm font-semibold text-rose-700">تعذّر تحميل لوحة التحكم</p>
       <p class="mt-2 text-sm leading-6 text-slate-600">{{ errorMessage() }}</p>
       <button
         type="button"
         class="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
         (click)="loadDashboard()"
       >
-        Try again
+        إعادة المحاولة
       </button>
     </article>
   } @else if (data(); as dashboard) {
@@ -51,52 +50,60 @@
       [schedule]="dashboard.schedule"
     />
 
-    <div class="grid gap-6 xl:grid-cols-3">
-      <div class="space-y-6 xl:col-span-2">
-        <app-student-attendance-summary [summary]="dashboard.attendance" />
+    <div class="grid gap-6 xl:grid-cols-3 items-stretch">
+      <div class="xl:col-span-2 flex flex-col">
+        <app-student-attendance-summary [summary]="dashboard.attendance" class="flex-1" />
+      </div>
 
-        <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
+      <div class="xl:col-span-1 flex flex-col">
+        <article class="flex flex-col flex-1 rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
           <div class="flex items-center justify-between gap-4">
-            <h2 class="text-lg font-bold text-slate-950">Recent Courses</h2>
-            <a routerLink="courses" class="text-sm font-semibold text-sky-700 hover:text-sky-800">View all</a>
+            <h2 class="text-lg font-bold text-slate-950">الجدول القادم</h2>
+            <a routerLink="schedule" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors">عرض الكل</a>
           </div>
 
-          @if (recentCourses().length > 0) {
-            <div class="mt-5 grid gap-4 md:grid-cols-2">
-              @for (course of recentCourses(); track course.subjectId) {
-                <app-student-course-card [course]="course" />
+          @if (actionMessage()) {
+            <p class="mt-4 rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
+          }
+
+          @if (upcomingSchedule().length > 0) {
+            <div class="mt-5 grid gap-4">
+              @for (session of upcomingSchedule(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
+                <app-student-schedule-card [session]="session" (joinSession)="joinSession($event)" />
               }
             </div>
           } @else {
-            <div class="mt-5 rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-              No courses are assigned yet.
+            <div class="mt-5 flex flex-col items-center justify-center rounded-xl border border-blue-100 bg-blue-50/50 p-8 text-center text-sm text-slate-500" dir="ltr">
+              <svg class="mx-auto mb-3 h-10 w-10 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+              </svg>
+              لا توجد جلسات قادمة مجدولة.
             </div>
           }
         </article>
       </div>
-
-      <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-        <div class="flex items-center justify-between gap-4">
-          <h2 class="text-lg font-bold text-slate-950">Upcoming Schedule</h2>
-          <a routerLink="schedule" class="text-sm font-semibold text-sky-700 hover:text-sky-800">View all</a>
-        </div>
-
-        @if (actionMessage()) {
-          <p class="mt-4 rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
-        }
-
-        @if (upcomingSchedule().length > 0) {
-          <div class="mt-5 grid gap-4">
-            @for (session of upcomingSchedule(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
-              <app-student-schedule-card [session]="session" (joinSession)="joinSession($event)" />
-            }
-          </div>
-        } @else {
-          <div class="mt-5 rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-            No upcoming sessions are scheduled.
-          </div>
-        }
-      </article>
     </div>
+
+    <article class="mt-6 rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="text-lg font-bold text-slate-950">أحدث المقررات</h2>
+        <a routerLink="courses" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors">عرض الكل</a>
+      </div>
+
+      @if (recentCourses().length > 0) {
+        <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          @for (course of recentCourses(); track course.subjectId) {
+            <app-student-course-card [course]="course" />
+          }
+        </div>
+      } @else {
+        <div class="mt-5 flex flex-col items-center justify-center rounded-xl border border-blue-100 bg-blue-50/50 p-8 text-center text-sm text-slate-500" dir="ltr">
+          <svg class="mx-auto mb-3 h-10 w-10 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+          </svg>
+          لا توجد مقررات مُسنَدة بعد.
+        </div>
+      }
+    </article>
   }
 </section>
