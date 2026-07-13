@@ -1,182 +1,378 @@
-<div class="masarak-film" dir="rtl" (mousemove)="onMouseMove($event)">
+<!-- Skip link -->
+<a #skipLink href="#home" class="ml-btn ml-btn-primary" style="position:fixed; top:-100px; left:50%; translate:-50% 0; z-index:1000;" (focus)="skipLink.style.top='16px'" (blur)="skipLink.style.top='-100px'">
+  تخطي إلى المحتوى الرئيسي
+</a>
 
-  <!-- ============ مؤشر مخصص ============ -->
-  <div class="custom-cursor"
-       [class.cursor-active]="cursorActive()"
-       [class.cursor-hover]="cursorHover()"
-       [style.transform]="'translate(' + cursorX() + 'px,' + cursorY() + 'px)'">
-  </div>
+<div class="ml-root">
 
   <!-- ============ NAVBAR ============ -->
-  <nav class="film-nav" [class.nav-condensed]="isScrolled()">
-    <div class="nav-row">
-      <a routerLink="/" class="nav-brand">
-        <svg viewBox="0 0 48 48" fill="none" class="nav-brand-icon">
-          <path d="M8 38V12L24 6L40 12V38" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M8 12L24 18L40 12" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-          <line x1="24" y1="18" x2="24" y2="42" stroke="currentColor" stroke-width="1.6"/>
-        </svg>
-        <span>مسارك</span>
+  <header class="ml-navbar" [class.is-scrolled]="isScrolled()">
+    <div class="ml-navbar-inner">
+      <a href="#home" class="ml-brand" [attr.aria-label]="t().nav.home">
+        <span class="ml-brand-mark">M</span>
+        <span class="ml-brand-text">Masarak</span>
       </a>
 
-      <button routerLink="/auth/login"
-              class="nav-cta"
-              (mouseenter)="setCursorHover(true)"
-              (mouseleave)="setCursorHover(false)">
-        دخول
-      </button>
-    </div>
+      <nav class="ml-nav-links" aria-label="Main">
+        <a href="#home" class="ml-nav-link" [class.is-active]="activeSection() === 'home'">{{ t().nav.home }}</a>
+        <a href="#features" class="ml-nav-link" [class.is-active]="activeSection() === 'features'">{{ t().nav.features }}</a>
+        <a href="#stages" class="ml-nav-link" [class.is-active]="activeSection() === 'stages'">{{ t().nav.stages }}</a>
+        <a href="#journey" class="ml-nav-link" [class.is-active]="activeSection() === 'journey'">{{ t().nav.journey }}</a>
+        <a href="#team" class="ml-nav-link" [class.is-active]="activeSection() === 'team'">{{ t().nav.team }}</a>
+        <a href="#faq" class="ml-nav-link" [class.is-active]="activeSection() === 'faq'">{{ t().nav.faq }}</a>
+      </nav>
 
-    <!-- نقاط التنقل الجانبية -->
-    <div class="side-nav">
-      <a href="#hero" class="side-dot" aria-label="البداية"></a>
-      <a href="#live" class="side-dot" aria-label="الحصص الحية"></a>
-      <a href="#scale" class="side-dot" aria-label="الانتشار"></a>
-      <a href="#journey" class="side-dot" aria-label="رحلة الطالب"></a>
-      <a href="#pricing" class="side-dot" aria-label="الاشتراكات"></a>
-    </div>
-  </nav>
+      <div class="ml-nav-actions">
+        <a routerLink="/auth/login" class="ml-btn ml-btn-outline ml-nav-cta" style="padding: 10px 22px; font-size: 13.5px;">{{ t().nav.login }}</a>
 
-  <!-- ============ HERO — اللقطة الافتتاحية ============ -->
-  <section id="hero" class="hero-shot">
-    <div class="hero-media">
-      <img
-        class="hero-image"
-        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=2400&q=85"
-        alt="طالب يذاكر المنهج المصري عبر مسارك">
-      <div class="hero-scrim"></div>
-    </div>
+        <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple ml-nav-cta">{{ t().hero.ctaPrimary }}</a>
 
-    <div class="hero-copy">
-      <h1 class="hero-line">
-        <span class="line-mask"><span class="line-inner">منهج مصر الأصيل،</span></span>
-        <span class="line-mask"><span class="line-inner">من أي مكان في العالم</span></span>
-      </h1>
-      <p class="hero-sub reveal fade-in-delayed">فصول حية، مساعد تعلّم شخصي، ومتابعة لا تنقطع.</p>
-      <a href="#live"
-         class="hero-link"
-         (mouseenter)="setCursorHover(true)"
-         (mouseleave)="setCursorHover(false)">
-        ابدأ رحلتك
-      </a>
-    </div>
-
-    <div class="scroll-hint" aria-hidden="true"><span></span></div>
-  </section>
-
-  <!-- ============ STATEMENT — الجملة ============ -->
-  <section class="statement-shot">
-    <p class="statement-text reveal fade-up">
-      منهج مصر، <span class="statement-accent">من غير ما تسيب هويتك</span>.
-    </p>
-  </section>
-
-  <!-- ============ LIVE CLASS — pinned scrollytelling ============ -->
-  <section id="live" class="live-shot">
-    <div class="live-sticky">
-      <img
-        class="live-image"
-        src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=2000&q=85"
-        alt="معلم يشرح في حصة حية عبر مسارك">
-      <div class="live-scrim"></div>
-      <div class="live-copy">
-        <span class="live-eyebrow">حصة حية</span>
-        <h2 class="live-title">كأنك قاعد في الفصل</h2>
-        <p class="live-caption">صوت وصورة نقية، بدون تقطيع، من أي دولة في العالم.</p>
+        <button type="button" class="ml-icon-btn ml-burger" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen()" aria-label="menu">
+          <span class="material-symbols-outlined">{{ isMobileMenuOpen() ? 'close' : 'menu' }}</span>
+        </button>
       </div>
     </div>
-  </section>
 
-  <!-- ============ SCALE — الأرقام كبطلة ============ -->
-  <section id="scale" class="scale-shot">
-    <div class="scale-inner">
-      <div class="scale-number">
-        <span class="scale-value">{{ displayedStat().toLocaleString('ar-EG') }}{{ stats[statIndex()].suffix }}</span>
-        <span class="scale-label">{{ stats[statIndex()].label }}</span>
-      </div>
+    <div class="ml-mobile-panel" *ngIf="isMobileMenuOpen()">
+      <a href="#home" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.home }}</a>
+      <a href="#features" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.features }}</a>
+      <a href="#stages" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.stages }}</a>
+      <a href="#journey" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.journey }}</a>
+      <a href="#team" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.team }}</a>
+      <a href="#faq" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.faq }}</a>
+      <div class="ml-mobile-divider"></div>
+      <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple" (click)="closeMobileMenu()">{{ t().hero.ctaPrimary }}</a>
     </div>
-    <div class="scale-grid" aria-hidden="true"></div>
-  </section>
+  </header>
 
-  <!-- ============ JOURNEY — تمرير أفقي مثبت ============ -->
-  <section id="journey" class="journey-shot" #journeySection>
-    <div class="journey-sticky">
-      <div class="journey-progress-bar">
-        <span class="journey-progress-fill" [style.width.%]="journeyProgress() * 100"></span>
+  <!-- ============ HERO ============ -->
+  <section id="home" class="ml-hero">
+    <div class="ml-hero-decor"></div>
+    <div class="ml-hero-grid">
+      <div class="ml-hero-text reveal">
+        <span class="ml-hero-eyebrow-pill glass-card">
+          <span class="material-symbols-outlined ml-btn-icon">auto_awesome</span>
+          {{ t().hero.slides[activeSlide()].tag }}
+        </span>
+
+        <h1 class="ml-hero-title">
+          {{ t().hero.slides[activeSlide()].title }}<br>
+          <span class="ml-hero-highlight">{{ t().hero.slides[activeSlide()].highlight }}</span>
+        </h1>
+
+        <p class="ml-hero-subtitle">{{ t().hero.slides[activeSlide()].subtitle }}</p>
+
+        <div class="ml-hero-actions">
+          <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple">{{ t().hero.ctaPrimary }}</a>
+          <a href="#features" class="ml-btn ml-btn-outline">{{ t().hero.ctaGhost }}</a>
+        </div>
+
+        <div class="ml-hero-dots" role="tablist" [attr.aria-label]="t().nav.home">
+          <button
+            type="button"
+            class="ml-hero-dot"
+            role="tab"
+            *ngFor="let slide of t().hero.slides; let i = index; trackBy: trackByIndex"
+            [class.is-active]="i === activeSlide()"
+            (click)="activeSlide.set(i)"
+            [attr.aria-label]="'slide ' + (i + 1)">
+          </button>
+        </div>
       </div>
 
-      <span class="journey-eyebrow">رحلة الطالب</span>
-
-      <div class="journey-track" [style.transform]="'translateX(' + journeyTrackOffset + '%)'">
-        <div class="journey-frame" *ngFor="let step of journeySteps; let i = index">
-          <div class="journey-frame-media">
-            <img [src]="step.image" [alt]="step.title">
+      <div class="ml-hero-visual reveal reveal-delay-1">
+        <div class="ml-hero-photo-frame">
+          <img [src]="media.hero" [alt]="t().hero.slides[0].title" loading="eager">
+          <div class="ml-hero-photo-scrim"></div>
+          <div class="ml-hero-progress-card">
+            <span class="ml-hero-progress-label">التقدم الأكاديمي</span>
+            <span class="ml-hero-progress-value" dir="ltr">98%</span>
           </div>
-          <div class="journey-frame-copy">
-            <span class="journey-frame-index">{{ step.index }}</span>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.desc }}</p>
+        </div>
+
+        <div class="ml-ai-widget">
+          <div class="ml-ai-widget-head">
+            <span class="ml-ai-dot"></span>
+            <span class="ml-ai-widget-label">{{ t().aiCardLabel }}</span>
+          </div>
+          <p class="ml-ai-widget-text">{{ typedTip() }}<span class="ml-ai-caret"></span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="ml-stats js-stats-trigger">
+    <div class="ml-shell ml-stats-grid">
+      <div class="ml-stat" *ngFor="let stat of t().stats; let i = index; trackBy: trackByIndex">
+        <span class="ml-stat-value">{{ displayedStats()[i] }}{{ stat.suffix }}</span>
+        <span class="ml-stat-label">{{ stat.label }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="ml-features" id="features">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().featuresHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().featuresHead.title }}</h2>
+        <p class="ml-sub">{{ t().featuresHead.sub }}</p>
+      </div>
+
+      <div class="ml-features-grid">
+        <div
+          class="ml-feature-card corporate-shadow hover-lift reveal"
+          *ngFor="let feature of t().features; let i = index; trackBy: trackByIndex"
+          [class.is-alt]="i % 2 === 1"
+          [class.reveal-delay-1]="i === 1"
+          [class.reveal-delay-2]="i === 2">
+          <div class="ml-feature-icon">
+            <span class="material-symbols-outlined">{{ feature.icon }}</span>
+          </div>
+          <h3 class="ml-feature-title">{{ feature.title }}</h3>
+          <p class="ml-feature-desc">{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STAGES ============ -->
+  <section class="ml-stages" id="stages">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().stagesHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().stagesHead.title }}</h2>
+        <p class="ml-sub">{{ t().stagesHead.sub }}</p>
+      </div>
+
+      <div class="ml-stages-grid">
+        <article class="ml-stage-card corporate-shadow hover-lift reveal" *ngFor="let stage of t().stages; let i = index; trackBy: trackByIndex" [class.reveal-delay-1]="i === 1" [class.reveal-delay-2]="i === 2">
+          <div class="ml-stage-photo">
+            <img [src]="media.stages[i]" [alt]="stage.title" loading="lazy">
+          </div>
+          <div class="ml-stage-body">
+            <span class="ml-stage-range">{{ stage.range }}</span>
+            <h3 class="ml-stage-title">{{ stage.title }}</h3>
+            <p class="ml-stage-desc">{{ stage.description }}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AI SECTION ============ -->
+  <section class="ml-ai-section">
+    <div class="ml-shell">
+      <div class="ml-ai-section-head reveal">
+        <div class="ml-ai-section-head-text">
+          <span class="ml-eyebrow">{{ t().aiSectionHead.eyebrow }}</span>
+          <h2 class="ml-title">{{ t().aiSectionHead.title }}</h2>
+          <p class="ml-sub">{{ t().aiSectionHead.sub }}</p>
+        </div>
+        <div class="ml-ai-badge-pill glass-card">
+          <span class="material-symbols-outlined">auto_awesome</span>
+          <span>{{ t().aiPanel.badge }}</span>
+        </div>
+      </div>
+
+      <div class="ml-ai-bento reveal reveal-delay-1">
+        <div class="ml-ai-bento-primary">
+          <span class="material-symbols-outlined ml-ai-bento-icon">insights</span>
+          <h3 class="ml-ai-bento-title">{{ t().aiSection[0].title }}</h3>
+          <p class="ml-ai-bento-desc">{{ t().aiSection[0].desc }}</p>
+        </div>
+
+        <div class="ml-ai-bento-secondary">
+          <div class="ml-ai-bento-icon-badge">
+            <span class="material-symbols-outlined">psychology</span>
+          </div>
+          <h3 class="ml-ai-bento-subtitle">{{ t().aiPanel.title }}</h3>
+          <p class="ml-ai-bento-desc">{{ t().aiSection[1].desc }}</p>
+
+          <div class="ml-ai-bento-metric">
+            <div class="ml-ai-bento-metric-row">
+              <span>{{ t().aiPanel.accuracyLabel }}</span>
+              <span class="ml-ai-bento-metric-value">98%</span>
+            </div>
+            <div class="ml-ai-bar-track"><div class="ml-ai-bar-fill" style="width:98%"></div></div>
+            <p class="ml-ai-bento-metric-desc">{{ t().aiPanel.accuracyDesc }}</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ PRICING — تقسيم رأسي بدون كروت ============ -->
-  <section id="pricing" class="pricing-shot">
-    <span class="pricing-eyebrow reveal fade-up">الاشتراكات</span>
+  <!-- ============ JOURNEY / PROCESS ============ -->
+  <section class="ml-journey" id="journey">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().processHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().processHead.title }}</h2>
+        <p class="ml-sub">{{ t().processHead.sub }}</p>
+      </div>
 
-    <div class="pricing-split">
-      <a routerLink="/auth/login"
-         class="pricing-half"
-         [class.pricing-dim]="hoveredPricing() === 1"
-         (mouseenter)="setHoveredPricing(0); setCursorHover(true)"
-         (mouseleave)="setHoveredPricing(null); setCursorHover(false)">
-        <span class="pricing-name">الترم الكامل</span>
-        <span class="pricing-rule"></span>
-        <span class="pricing-desc">شرح كامل لجميع المواد، وبنك أسئلة ذكي محدّث.</span>
-        <span class="pricing-action">اشترك الآن</span>
-      </a>
-
-      <a routerLink="/auth/login"
-         class="pricing-half pricing-featured"
-         [class.pricing-dim]="hoveredPricing() === 0"
-         (mouseenter)="setHoveredPricing(1); setCursorHover(true)"
-         (mouseleave)="setHoveredPricing(null); setCursorHover(false)">
-        <span class="pricing-tag">الأكثر طلبًا</span>
-        <span class="pricing-name">العام الدراسي الشامل</span>
-        <span class="pricing-rule"></span>
-        <span class="pricing-desc">الترمين كاملين، مراجعات ليلية، ومساعد تعلم على مدار الساعة.</span>
-        <span class="pricing-action">اشترك ووفر ٣٠٪</span>
-      </a>
+      <div class="ml-journey-track">
+        <div class="ml-journey-line"></div>
+        <div class="ml-journey-grid">
+          <div
+            class="ml-journey-step reveal"
+            *ngFor="let step of t().process; let i = index; trackBy: trackByIndex"
+            [class.reveal-delay-1]="i % 2 === 1"
+            [class.is-last-step]="i === t().process.length - 1">
+            <div class="ml-journey-index">{{ step.index }}</div>
+            <h3 class="ml-journey-title">{{ step.title }}</h3>
+            <p class="ml-journey-desc">{{ step.description }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ============ FINAL CTA — الحلقة البصرية المغلقة ============ -->
-  <section class="final-shot">
-    <div class="final-media">
-      <img
-        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=2400&q=85"
-        alt="طالب يبدأ رحلته التعليمية مع مسارك">
-      <div class="final-scrim"></div>
+  <!-- ============ TEAM ============ -->
+  <section class="ml-team" id="team">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().teamHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().teamHead.title }}</h2>
+        <p class="ml-sub">{{ t().teamHead.sub }}</p>
+      </div>
+
+      <div class="ml-team-grid">
+        <div class="ml-team-card glass-card corporate-shadow reveal" *ngFor="let member of t().team; let i = index; trackBy: trackByIndex" [class.reveal-delay-1]="i % 3 === 1" [class.reveal-delay-2]="i % 3 === 2">
+          <div class="ml-team-avatar">{{ member.name.charAt(0) }}</div>
+          <h3 class="ml-team-name">{{ member.name }}</h3>
+          <p class="ml-team-role">{{ member.role }}</p>
+          <p class="ml-team-desc">{{ member.description }}</p>
+        </div>
+      </div>
     </div>
-    <div class="final-copy">
-      <h2 class="final-title">
-        <span class="line-mask"><span class="line-inner">جاهز تبدأ؟</span></span>
-      </h2>
-      <a routerLink="/auth/login"
-         class="final-cta-btn"
-         (mouseenter)="setCursorHover(true)"
-         (mouseleave)="setCursorHover(false)">
-        انضم إلى مسارك
-      </a>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="ml-testimonials">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().testimonialsHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().testimonialsHead.title }}</h2>
+      </div>
+
+      <div class="ml-testimonials-grid">
+        <div
+          class="ml-testimonial-card glass-card corporate-shadow hover-lift reveal"
+          *ngFor="let review of t().testimonials; let i = index; trackBy: trackByIndex"
+          [class.is-featured]="i === 1">
+          <div class="ml-testimonial-featured-bar" *ngIf="i === 1"></div>
+          <div>
+            <div class="ml-testimonial-stars">
+              <span class="material-symbols-outlined" *ngFor="let star of [1,2,3,4,5]">star</span>
+            </div>
+            <p class="ml-testimonial-quote">"{{ review.quote }}"</p>
+          </div>
+          <div class="ml-testimonial-footer">
+            <div class="ml-testimonial-avatar">{{ review.name.charAt(0) }}</div>
+            <div>
+              <p class="ml-testimonial-name">{{ review.name }}</p>
+              <p class="ml-testimonial-role">{{ review.role }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="ml-faq" id="faq">
+    <div class="ml-shell">
+      <div class="ml-section-head centered reveal">
+        <span class="ml-eyebrow">{{ t().faqHead.eyebrow }}</span>
+        <h2 class="ml-title">{{ t().faqHead.title }}</h2>
+      </div>
+
+      <div class="ml-faq-list reveal">
+        <div class="ml-faq-item glass-card corporate-shadow" *ngFor="let faq of t().faqs; let i = index; trackBy: trackByIndex" [class.is-open]="openFaqIndex() === i">
+          <button type="button" class="ml-faq-question" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaqIndex() === i">
+            <span>{{ faq.question }}</span>
+            <span class="material-symbols-outlined ml-faq-icon">expand_more</span>
+          </button>
+          <div class="ml-faq-answer">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="ml-cta reveal">
+    <div class="ml-cta-panel">
+      <div class="ml-cta-glow-a"></div>
+      <div class="ml-cta-glow-b"></div>
+      <div class="ml-cta-inner">
+        <h2 class="ml-cta-title">{{ t().finalCta.title }}</h2>
+        <p class="ml-cta-sub">{{ t().finalCta.sub }}</p>
+        <div class="ml-cta-actions">
+          <a routerLink="/auth/register" class="ml-btn ml-btn-white ripple">{{ t().finalCta.primary }}</a>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ============ FOOTER ============ -->
-  <footer class="film-footer">
-    <span class="footer-brand">مسارك</span>
-    <span class="footer-rights">© ٢٠٢٦ منصة مسارك التعليمية. جميع الحقوق محفوظة.</span>
+  <footer class="ml-footer">
+    <div class="ml-shell ml-footer-grid">
+      <div>
+        <span class="ml-footer-brand">Masarak</span>
+        <p class="ml-footer-desc">{{ t().footer.desc }}</p>
+        <div class="ml-footer-social">
+          <a href="#" class="ml-footer-social-btn" aria-label="Facebook">
+            <span class="material-symbols-outlined">public</span>
+          </a>
+          <a href="#" class="ml-footer-social-btn" aria-label="Share">
+            <span class="material-symbols-outlined">share</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="ml-footer-heading">{{ t().footer.quickLinks }}</h4>
+        <div class="ml-footer-links">
+          <a href="#home">{{ t().nav.home }}</a>
+          <a href="#features">{{ t().nav.features }}</a>
+          <a href="#team">{{ t().nav.team }}</a>
+          <a href="#faq">{{ t().nav.faq }}</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="ml-footer-heading">{{ t().footer.stagesTitle }}</h4>
+        <div class="ml-footer-links">
+          <span *ngFor="let stage of t().stages; trackBy: trackByIndex">{{ stage.title }}</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="ml-footer-heading">{{ t().footer.contact }}</h4>
+        <div class="ml-footer-links">
+          <span class="ml-footer-contact-item">
+            <span class="material-symbols-outlined">mail</span>
+            support&#64;masarak.com
+          </span>
+          <span class="ml-footer-contact-item">
+            <span class="material-symbols-outlined">headset_mic</span>
+            الدعم الفني المباشر
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ml-shell ml-footer-bottom">
+      <p>{{ t().footer.rights }}</p>
+      <span class="ml-footer-badge">
+        <span class="material-symbols-outlined">verified</span>
+        {{ t().footer.accredited }}
+      </span>
+    </div>
   </footer>
 
 </div>
