@@ -28,6 +28,7 @@ export const routes: Routes = [
   {
     path: '',
     component: LandingPageComponent,
+    canActivate: [guestGuard],
     pathMatch: 'full',
   },
 

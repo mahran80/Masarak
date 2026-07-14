@@ -1,4 +1,14 @@
-<div class="min-h-screen flex bg-white" dir="rtl">
+<div class="min-h-screen flex bg-white relative" dir="rtl">
+  <!-- Simple Navbar -->
+  <header class="absolute top-0 w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-12 z-50">
+    <a routerLink="/" class="flex items-center">
+      <span class="text-2xl font-black text-blue-600 tracking-tight">Masarak</span>
+    </a>
+    <a routerLink="/auth/login" class="text-sm font-semibold text-blue-600 hover:text-blue-500 transition-colors bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg">
+      تسجيل الدخول
+    </a>
+  </header>
+
   <!-- Form Section (Right side in RTL) -->
   <div class="w-full lg:w-1/2 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-12 relative z-10">
     <div class="max-w-2xl w-full space-y-8">
