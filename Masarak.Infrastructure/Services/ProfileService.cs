@@ -104,11 +104,7 @@ namespace Masarak.Infrastructure.Services
 
         public async Task<UserProfileDto?> GetStudentProfileForParentAsync(int parentUserId, int childUserId)
         {
-            var parent = await _db.Parents.FirstOrDefaultAsync(p => p.UserId == parentUserId);
-            if (parent == null) return null;
-
-            var linkExists = await _db.ParentStudents
-                .AnyAsync(ps => ps.ParentId == parent.ParentId && ps.Student.UserId == childUserId);
+            var linkExists = await IsParentLinkedToStudent(parentUserId, childUserId);
                 
             if (!linkExists) return null; // Parent is not linked to this student
 

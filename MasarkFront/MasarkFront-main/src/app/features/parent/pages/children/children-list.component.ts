@@ -1,8 +1,9 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ParentService } from '../../services/parent.service';
+import { ProfileService, LinkedChildDto } from '../../../profile/services/profile.service';
 
 @Component({
   selector: 'app-children-list',
@@ -25,14 +26,18 @@ import { ParentService } from '../../services/parent.service';
         </a>
       </div>
 
-      @if (parentService.hasStudents()) {
+      @if (combinedStudents().length > 0) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (student of parentService.linkedStudents(); track student.studentUserId) {
+          @for (student of combinedStudents(); track student.studentUserId) {
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
               <div class="p-6 flex-1">
                 <div class="flex justify-between items-start mb-4">
-                  <div class="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center text-2xl border-2 border-white shadow-sm">
-                    
+                  <div class="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center text-2xl border-2 border-white shadow-sm overflow-hidden text-slate-400 font-bold uppercase">
+                    @if (student.avatarUrl) {
+                      <img [src]="student.avatarUrl" [alt]="student.fullName" class="w-full h-full object-cover">
+                    } @else {
+                      {{ student.fullName.charAt(0) }}
+                    }
                   </div>
                   @if (student.hasActiveSubscription) {
                     <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-emerald-200">
@@ -93,8 +98,31 @@ import { ParentService } from '../../services/parent.service';
 })
 export class ChildrenListComponent implements OnInit {
   public parentService = inject(ParentService);
+  private profileService = inject(ProfileService);
+
+  private profileChildren = signal<LinkedChildDto[]>([]);
+
+  public combinedStudents = computed(() => {
+    const subs = this.parentService.linkedStudents();
+    const profs = this.profileChildren();
+    
+    return subs.map(sub => {
+      const prof = profs.find(p => p.userId === sub.studentUserId);
+      return {
+        ...sub,
+        avatarUrl: prof?.avatarUrl
+      };
+    });
+  });
 
   ngOnInit() {
     this.parentService.fetchLinkedStudents().subscribe();
+    this.profileService.getProfile().subscribe({
+      next: (res) => {
+        if (res.linkedChildren) {
+          this.profileChildren.set(res.linkedChildren);
+        }
+      }
+    });
   }
 }
