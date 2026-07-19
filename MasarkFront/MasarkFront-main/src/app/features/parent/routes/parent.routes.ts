@@ -9,11 +9,7 @@ export const PARENT_ROUTES: Routes = [
     path: 'children',
     loadComponent: () => import('../pages/children/children-list.component').then(m => m.ChildrenListComponent)
   },
-  {
-    path: 'onboarding/add-student',
-    loadComponent: () => import('../../auth/signup/signup').then(m => m.Signup),
-    data: { mode: 'Student' }
-  },
+
   {
     path: 'reports/:studentId',
     loadComponent: () => import('../pages/smart-report/smart-report.component').then(m => m.SmartReportComponent)

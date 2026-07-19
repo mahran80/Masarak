@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 export class ChatSignalRService {
 
   private hubConnection?: signalR.HubConnection;
+  private connectionPromise?: Promise<void>;
 
   messages$ = new BehaviorSubject<any | null>(null);
 
@@ -16,7 +17,15 @@ export class ChatSignalRService {
 
   userLeft$ = new BehaviorSubject<string | null>(null);
 
-  startConnection(token: string) {
+  startConnection(token: string): Promise<void> {
+
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      return Promise.resolve();
+    }
+
+    if (this.connectionPromise) {
+      return this.connectionPromise;
+    }
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(
@@ -25,12 +34,17 @@ export class ChatSignalRService {
           accessTokenFactory: () => token
         }
       )
-      .withAutomaticReconnect()
+      .withAutomaticReconnect([0, 2000, 5000, 10000])
       .build();
 
     this.registerEvents();
 
-    return this.hubConnection.start();
+    this.connectionPromise = this.hubConnection.start()
+      .finally(() => {
+        this.connectionPromise = undefined;
+      });
+
+    return this.connectionPromise;
   }
 
   private registerEvents() {
@@ -57,15 +71,21 @@ export class ChatSignalRService {
     );
   }
 
-  joinRoom(roomId: number) {
-    return this.hubConnection?.invoke(
+  joinRoom(roomId: number): Promise<void> {
+    if (this.hubConnection?.state !== signalR.HubConnectionState.Connected) {
+      return Promise.reject(new Error('Chat connection is not ready.'));
+    }
+    return this.hubConnection.invoke(
       'JoinRoom',
       roomId
     );
   }
 
-  leaveRoom(roomId: number) {
-    return this.hubConnection?.invoke(
+  leaveRoom(roomId: number): Promise<void> {
+    if (this.hubConnection?.state !== signalR.HubConnectionState.Connected) {
+      return Promise.resolve();
+    }
+    return this.hubConnection.invoke(
       'LeaveRoom',
       roomId
     );
@@ -74,8 +94,11 @@ export class ChatSignalRService {
   sendMessage(
     roomId: number,
     content: string
-  ) {
-    return this.hubConnection?.invoke(
+  ): Promise<void> {
+    if (this.hubConnection?.state !== signalR.HubConnectionState.Connected) {
+      return Promise.reject(new Error('Chat connection is not ready.'));
+    }
+    return this.hubConnection.invoke(
       'SendMessage',
       roomId,
       content

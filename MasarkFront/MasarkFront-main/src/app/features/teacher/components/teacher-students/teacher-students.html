@@ -1,103 +1,127 @@
-<div class="space-y-6 font-sans text-slate-800" dir="rtl">
-
-  <div class="flex items-center justify-between">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-black text-slate-900">قائمة الطلاب</h1>
-      <p class="text-xs font-bold text-slate-400">متابعة طلاب الفصل المحدد</p>
+<div class="teacher-students-page" dir="rtl">
+  <section class="students-hero">
+    <div class="students-hero-copy">
+      <span class="students-hero-badge">لوحة المدرس</span>
+      <h1>الطلاب</h1>
+      <p>تابع طلاب الفصل المحدد واطّلع على بيانات التسجيل والمواد المرتبطة بهم.</p>
     </div>
-    <div class="flex items-center gap-3 text-xs font-bold text-slate-400">
-      <!-- Context Selector -->
-      @if (!isLoadingContext()) {
-        <select class="border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 focus:outline-none focus:border-[#4F8CD4]"
-                [ngModel]="selectedTaId()"
-                (ngModelChange)="selectAssignment($event)">
-          <option [ngValue]="null" disabled>اختر الفصل الدراسي</option>
-          @for (ta of teachingAssignments(); track ta.id) {
-            <option [ngValue]="ta.id">{{ ta.className }} - {{ ta.subjectName }}</option>
-          }
-        </select>
+    <div class="students-hero-side">
+      @if (selectedTaId() !== null) {
+        <div class="students-hero-stat"><strong>{{ students().length }}</strong><span>طالب في الفصل</span></div>
       }
-      <span class="text-slate-600 px-2 py-1 bg-slate-100 rounded-lg">{{ filteredStudents().length }} طالب</span>
+      <span class="students-hero-icon"><app-icon name="users" size="30"></app-icon></span>
     </div>
-  </div>
+  </section>
 
-  <div class="bg-white rounded-[24px] p-6 shadow-xs border border-slate-100 space-y-6 relative">
-    
+  <section class="class-selector-card">
+    <div class="class-selector-heading">
+      <span class="class-selector-icon"><app-icon name="book" size="20"></app-icon></span>
+      <div><small>الفصل الحالي</small><h2>اختر الفصل والمقرر</h2><p>حدّد الفصل الذي تريد متابعة بيانات طلابه.</p></div>
+    </div>
+
+    <div class="class-selector-control">
+      <label for="students-class-select">الفصل والمقرر</label>
+      @if (isLoadingContext()) {
+        <div class="class-selector-skeleton"></div>
+      } @else {
+        <div class="class-select-wrap">
+          <span class="class-select-icon"><app-icon name="graduation" size="17"></app-icon></span>
+          <select id="students-class-select" [ngModel]="selectedTaId()" (ngModelChange)="selectAssignment($event)">
+            <option [ngValue]="null" disabled>اختر الفصل الدراسي</option>
+            @for (ta of teachingAssignments(); track ta.id) { <option [ngValue]="ta.id">{{ ta.subjectName }} — {{ ta.className }}</option> }
+          </select>
+          <span class="class-select-chevron"><app-icon name="chevron-down" size="15"></app-icon></span>
+        </div>
+      }
+    </div>
+
+    @if (selectedContext(); as context) {
+      <div class="selected-class-summary">
+        <span><app-icon name="check-circle" size="17"></app-icon></span>
+        <div><small>الفصل المحدد</small><strong>{{ context.subjectName }}</strong></div>
+        <em>{{ context.className }}</em>
+        <b>{{ students().length }} طالب</b>
+      </div>
+    }
+  </section>
+
+  <section class="students-table-card">
+    <header class="students-table-card-header">
+      <div class="students-table-title">
+        <span><app-icon name="users" size="21"></app-icon></span>
+        <div><h2>طلاب الفصل</h2><p>عرض بيانات الطلاب المسجلين في الفصل المحدد.</p></div>
+      </div>
+      <b>{{ filteredStudents().length }} طالب</b>
+    </header>
+
+    <div class="students-toolbar">
+      <div class="student-search-wrap">
+        <span><app-icon name="search" size="17"></app-icon></span>
+        <input type="search" aria-label="البحث باسم الطالب" placeholder="ابحث باسم الطالب..." [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" />
+      </div>
+      <label class="students-page-size"><span>عرض</span><select [ngModel]="studentsPageSize()" (ngModelChange)="changeStudentsPageSize($event)"><option [ngValue]="10">10</option><option [ngValue]="20">20</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option></select><span>طالب</span></label>
+    </div>
+
     @if (isLoading()) {
-      <div class="space-y-3">
-        @for (i of [1,2,3]; track i) {
-          <div class="h-14 bg-slate-100 rounded-xl animate-pulse"></div>
-        }
+      <div class="students-loading" aria-label="جاري تحميل الطلاب">
+        @for (i of [1,2,3,4,5,6]; track i) { <div class="student-row-skeleton"><span></span><span></span><span></span></div> }
       </div>
     } @else if (errorMessage()) {
-      <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100 flex items-center justify-between">
-        <span>{{ errorMessage() }}</span>
-        @if (selectedTaId() !== null) {
-          <button (click)="loadStudents(selectedTaId()!)" class="underline text-rose-700">إعادة المحاولة</button>
+      <div class="students-error-state" role="alert">
+        <span><app-icon name="exclamation-triangle" size="25"></app-icon></span>
+        <div><h3>تعذّر تحميل الطلاب</h3><p>{{ errorMessage() }}</p></div>
+        @if (selectedTaId() !== null) { <button type="button" (click)="loadStudents(selectedTaId()!)">إعادة المحاولة</button> }
+      </div>
+    } @else if (filteredStudents().length === 0) {
+      <div class="students-empty-state">
+        <span class="students-empty-icon"><app-icon [name]="searchQuery() ? 'search' : 'users'" size="34"></app-icon></span>
+        @if (searchQuery()) {
+          <h3>لا يوجد طلاب مطابقون</h3><p>جرّب البحث باسم آخر للوصول إلى الطالب المطلوب.</p>
+        } @else {
+          <h3>لا يوجد طلاب في هذا الفصل</h3><p>لم يتم تسجيل طلاب في الفصل المحدد حتى الآن.</p>
         }
       </div>
     } @else {
-
-      <div class="flex flex-col lg:flex-row justify-between items-center gap-4 border-b border-slate-50 pb-4">
-        <div class="relative w-full lg:max-w-md">
-          <span class="absolute right-3.5 top-3 text-slate-400 text-sm"><app-icon name="search" size="1.2em"></app-icon></span>
-          <input
-            type="text"
-            placeholder="بحث عن طالب..."
-            [value]="searchQuery()"
-            (input)="searchQuery.set($any($event.target).value)"
-            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl py-2.5 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-400"
-          >
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-right border-collapse text-sm">
-          <thead>
-            <tr class="text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50">
-              <th class="py-3 pr-4 font-black">اسم الطالب</th>
-              <th class="py-3 font-black">البريد الإلكتروني</th>
-              <th class="py-3 font-black">نوع التسجيل</th>
-              <th class="py-3 font-black">المواد المسجلة (للجزئي)</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-            @for (s of filteredStudents(); track s.studentId) {
-              <tr class="hover:bg-slate-50/50 transition-colors">
-                <td class="py-4 pr-4 font-bold text-slate-900">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm"><app-icon name="academic-cap" size="1.2em"></app-icon></div>
-                    <span>{{ s.fullName }}</span>
-                  </div>
-                </td>
-                <td class="py-4 text-xs font-bold text-slate-500">{{ s.email }}</td>
-                <td class="py-4 text-xs">
-                  <span class="px-2 py-1 rounded-sm text-[10px] font-bold"
-                    [ngClass]="{
-                      'bg-emerald-50 text-emerald-600': s.enrollmentType === 'Full',
-                      'bg-blue-50 text-blue-600': s.enrollmentType === 'Partial'
-                    }">
-                    {{ s.enrollmentType === 'Full' ? 'كلي' : 'جزئي' }}
-                  </span>
-                </td>
-                <td class="py-4 text-xs text-slate-600">
-                  @if (s.enrollmentType === 'Partial') {
-                    {{ s.enrolledSubjects.join('، ') }}
+      <div class="students-table-scroll">
+        <table class="students-table">
+          <thead><tr><th scope="col">اسم الطالب</th><th scope="col">البريد الإلكتروني</th><th scope="col">نوع التسجيل</th><th scope="col">المواد المسجلة</th></tr></thead>
+          <tbody>
+            @for (s of paginatedStudents(); track s.studentId) {
+              <tr>
+                <td><div class="student-identity"><span class="student-avatar">{{ s.fullName.charAt(0) }}</span><strong [title]="s.fullName">{{ s.fullName }}</strong></div></td>
+                <td><div class="student-email" dir="ltr" [title]="s.email"><app-icon name="mail" size="14"></app-icon><span>{{ s.email }}</span></div></td>
+                <td><span class="enrollment-badge" [class.is-full]="s.enrollmentType === 'Full'" [class.is-partial]="s.enrollmentType === 'Partial'"><i></i>{{ s.enrollmentType === 'Full' ? 'كلي' : 'جزئي' }}</span></td>
+                <td>
+                  @if (s.enrollmentType === 'Partial' && s.enrolledSubjects.length > 0) {
+                    <div class="subject-chips">
+                      @for (subject of s.enrolledSubjects.slice(0, 2); track subject) { <span>{{ subject }}</span> }
+                      @if (s.enrolledSubjects.length > 2) { <b>+{{ s.enrolledSubjects.length - 2 }} أخرى</b> }
+                    </div>
+                  } @else if (s.enrollmentType === 'Full') {
+                    <span class="all-subjects-label"><app-icon name="check-circle" size="14"></app-icon>مسجل في جميع المواد</span>
                   } @else {
-                    <span class="text-slate-400">-</span>
+                    <span class="no-subjects-label"><app-icon name="folder-open" size="14"></app-icon>لا توجد مواد مسجلة</span>
                   }
                 </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="4" class="text-center py-8 text-slate-400 font-bold">لا يوجد طلاب مطابقين.</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
 
+      @if (filteredStudents().length > studentsPageSize()) {
+        <footer class="students-pagination">
+          <p>عرض <strong>{{ studentsRangeStart() }}–{{ studentsRangeEnd() }}</strong> من أصل <strong>{{ filteredStudents().length }}</strong> طالبًا</p>
+          <div class="students-pagination-actions">
+            <button type="button" (click)="setStudentsPage(effectiveStudentsPage() - 1)" [disabled]="effectiveStudentsPage() === 1"><app-icon name="chevron-right" size="14"></app-icon><span>السابق</span></button>
+            @for (page of paginationPages(); track $index) {
+              @if (page === 0) { <span class="pagination-ellipsis">…</span> }
+              @else { <button type="button" (click)="setStudentsPage(page)" [class.is-active]="page === effectiveStudentsPage()" [attr.aria-current]="page === effectiveStudentsPage() ? 'page' : null">{{ page }}</button> }
+            }
+            <button type="button" (click)="setStudentsPage(effectiveStudentsPage() + 1)" [disabled]="effectiveStudentsPage() === studentsTotalPages()"><span>التالي</span><app-icon name="chevron-left" size="14"></app-icon></button>
+          </div>
+        </footer>
+      }
     }
-  </div>
-
+  </section>
 </div>

@@ -1,58 +1,122 @@
 <div class="um-page font-sans" dir="rtl">
 
-  <!-- ── Page header ─────────────────────────────────────────────── -->
-  <div class="um-header">
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- HERO                                                       -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="um-hero">
     <div>
-      <h1 class="um-title">إدارة المستخدمين</h1>
-      <p class="um-subtitle">عرض وإدارة جميع مستخدمي المنصة</p>
+      <div class="um-hero-badge">
+        <app-icon name="users" [size]="12"></app-icon>
+        إدارة المستخدمين
+      </div>
+      <h1 class="um-hero-title">إدارة اشتراكات الطلاب</h1>
+      <p class="um-hero-desc">متابعة خطط الطلاب، حالات الاشتراك، وإضافة أو تجديد الاشتراكات من مكان واحد.</p>
     </div>
-    <nav class="um-breadcrumb">
-      <span>لوحة التحكم</span>
-      <span class="sep">/</span>
-      <span class="active">المستخدمون</span>
-    </nav>
+    <div class="um-hero-icon">
+      <app-icon name="credit-card" [size]="26"></app-icon>
+    </div>
   </div>
 
-  <!-- ── Global feedback ─────────────────────────────────────────── -->
-  <div *ngIf="feedback()"
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- GLOBAL FEEDBACK — only on users tab                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="feedback() && activeTab() === 'users'"
     class="um-feedback"
     [class.is-success]="feedbackType() === 'success'"
     [class.is-error]="feedbackType() === 'error'">
     <span class="icon">
       @if (feedbackType() === 'success') {
-        <app-icon name="check" size="1.2em"></app-icon>
+        <app-icon name="check" [size]="16"></app-icon>
       } @else {
-        <app-icon name="x-mark" size="1.2em"></app-icon>
+        <app-icon name="x-mark" [size]="16"></app-icon>
       }
     </span>
     {{ feedback() }}
   </div>
 
-  <!-- ── Tabs ────────────────────────────────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- STATS                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="!isLoadingUsers()" class="um-stats-grid">
+    <div class="um-stat-card">
+      <div class="um-stat-icon blue">
+        <app-icon name="users" [size]="22"></app-icon>
+      </div>
+      <div>
+        <div class="um-stat-value">{{ users().length }}</div>
+        <div class="um-stat-label">إجمالي المستخدمين</div>
+      </div>
+    </div>
+    <div class="um-stat-card">
+      <div class="um-stat-icon purple">
+        <app-icon name="academic-cap" [size]="22"></app-icon>
+      </div>
+      <div>
+        <div class="um-stat-value">{{ totalStudents() }}</div>
+        <div class="um-stat-label">الطلاب</div>
+      </div>
+    </div>
+    <div class="um-stat-card">
+      <div class="um-stat-icon emerald">
+        <app-icon name="check-badge" [size]="22"></app-icon>
+      </div>
+      <div>
+        <div class="um-stat-value">{{ totalSubscribed() }}</div>
+        <div class="um-stat-label">المشتركون النشطون</div>
+      </div>
+    </div>
+    <div class="um-stat-card">
+      <div class="um-stat-icon amber">
+        <app-icon name="briefcase" [size]="22"></app-icon>
+      </div>
+      <div>
+        <div class="um-stat-value">{{ totalTeachers() }}</div>
+        <div class="um-stat-label">المعلمون</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TABS                                                       -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <div class="um-tabs">
-    <button class="um-tab" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users')">
-      <app-icon name="users" size="1.2em"></app-icon> المستخدمون
+    <button
+      class="um-tab"
+      [class.active]="activeTab() === 'users'"
+      (click)="activeTab.set('users')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'users'">
+      <app-icon name="users" [size]="15"></app-icon>
+      المستخدمون
     </button>
-    <button class="um-tab" [class.active]="activeTab() === 'subscriptions'" (click)="activeTab.set('subscriptions')">
-      <app-icon name="credit-card" size="1.2em"></app-icon> إضافة اشتراك
+    <button
+      class="um-tab"
+      [class.active]="activeTab() === 'subscriptions'"
+      (click)="activeTab.set('subscriptions')"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'subscriptions'">
+      <app-icon name="credit-card" [size]="15"></app-icon>
+      إضافة اشتراك
     </button>
   </div>
 
-  <!-- ══════════════ TAB 1: Users Table ══════════════ -->
-  <div *ngIf="activeTab() === 'users'" class="um-card">
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TAB 1 : USERS TABLE                                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab() === 'users'" class="um-table-card">
 
     <!-- Toolbar -->
     <div class="um-toolbar">
       <div class="um-search-wrap">
-        <span class="search-icon"><app-icon name="search" size="1.2em"></app-icon></span>
+        <span class="search-icon"><app-icon name="search" [size]="16"></app-icon></span>
         <input
           class="um-search"
-          placeholder="بحث بالاسم أو البريد..."
+          placeholder="ابحث باسم الطالب أو البريد الإلكتروني..."
           [(ngModel)]="searchQuery"
-        />
+          id="um-search-input">
       </div>
 
-      <select class="um-select" [(ngModel)]="roleFilter">
+      <select class="um-select" [(ngModel)]="roleFilter" id="um-role-filter">
         <option value="">كل الأدوار</option>
         <option value="Student">طالب</option>
         <option value="Teacher">معلم</option>
@@ -60,296 +124,596 @@
         <option value="Parent">ولي أمر</option>
       </select>
 
-      <button class="um-btn-primary" (click)="openAddModal()">
-        ＋ إضافة مستخدم
+      <select
+        class="um-select"
+        id="um-page-size"
+        [ngModel]="pageSize()"
+        (ngModelChange)="pageSize.set(+$event); currentPage.set(1)">
+        <option [ngValue]="10">10 لكل صفحة</option>
+        <option [ngValue]="20">20 لكل صفحة</option>
+        <option [ngValue]="25">25 لكل صفحة</option>
+        <option [ngValue]="50">50 لكل صفحة</option>
+      </select>
+
+      <button class="um-btn-primary" (click)="openAddModal()" id="um-add-user-btn">
+        <app-icon name="plus" [size]="15"></app-icon>
+        إضافة مستخدم
       </button>
     </div>
 
-    <!-- Loading -->
-    <div *ngIf="isLoadingUsers()" class="um-loading">
-      <div class="spinner"></div>
-      <p>جاري تحميل المستخدمين...</p>
-    </div>
+    <!-- Loading Skeleton -->
+    @if (isLoadingUsers()) {
+      <div class="um-table-scroll">
+        <table class="um-table">
+          <thead>
+            <tr>
+              <th>#</th><th>المستخدم</th><th>الدور</th><th>الحالة</th>
+              <th>الاشتراك</th><th>نوع الخطة</th><th>تاريخ الانضمام</th><th class="center">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of [1,2,3,4,5,6,7,8]; track i) {
+              <tr class="um-row skeleton-row">
+                <td><div class="skeleton-block skeleton-id"></div></td>
+                <td>
+                  <div class="user-cell">
+                    <div class="skeleton-block skeleton-avatar"></div>
+                    <div class="skeleton-user-lines">
+                      <div class="skeleton-block skeleton-name"></div>
+                      <div class="skeleton-block skeleton-email"></div>
+                    </div>
+                  </div>
+                </td>
+                <td><div class="skeleton-block skeleton-role"></div></td>
+                <td><div class="skeleton-block skeleton-phone"></div></td>
+                <td><div class="skeleton-block skeleton-status"></div></td>
+                <td><div class="skeleton-block skeleton-plan"></div></td>
+                <td><div class="skeleton-block skeleton-date"></div></td>
+                <td><div class="skeleton-block skeleton-actions"></div></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
 
     <!-- Table -->
-    <div *ngIf="!isLoadingUsers()" class="um-table-wrap">
-      <table class="um-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>المستخدم</th>
-            <th>الدور</th>
-            <th>الحالة</th>
-            <th>الاشتراك</th>
-            <th>نوع الاشتراك</th>
-            <th>تاريخ الانضمام</th>
-            <th class="center">إجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of paginatedUsers()" class="um-row">
-            <!-- ID -->
-            <td>
-              <span class="text-xs font-mono bg-slate-100 text-slate-500 px-2 py-1 rounded">{{ user.id }}</span>
-            </td>
-            <!-- User -->
-            <td>
-              <div class="user-cell">
-                <div class="avatar">{{ user.name.charAt(0) }}</div>
-                <div>
-                  <p class="user-name">{{ user.name }}</p>
-                  <p class="user-email">{{ user.email }}</p>
-                </div>
-              </div>
-            </td>
-            <!-- Role -->
-            <td>
-              <span class="role-badge" [ngClass]="roleClass(user.role)">{{ roleLabel(user.role) }}</span>
-              <div *ngIf="user.role === 'Teacher' && user.specialization" class="text-xs text-slate-500 font-bold mt-1 max-w-[120px] truncate" title="{{ user.specialization }}">
-                {{ user.specialization }}
-              </div>
-            </td>
-            <!-- Status -->
-            <td>
-              <span class="status-dot" [class.active]="user.status === 'Active'" [class.inactive]="user.status === 'Inactive'">
-                <span class="dot"></span>{{ user.status === 'Active' ? 'نشط' : 'غير نشط' }}
-              </span>
-            </td>
-            <!-- Subscription status -->
-            <td>
-              <span *ngIf="user.subscription && user.subscription.status === 'Active'" class="sub-badge active"><app-icon name="check" size="1.2em"></app-icon> مشترك</span>
-              <span *ngIf="user.subscription && user.subscription.status !== 'Active'" class="sub-badge expired">{{ subStatusLabel(user.subscription.status) }}</span>
-              <span *ngIf="!user.subscription" class="sub-badge none">— لا يوجد</span>
-            </td>
-            <!-- Plan type -->
-            <td>
-              <span *ngIf="user.subscription" class="plan-label">
-                {{ planTypeLabel(user.subscription.planType) }}
-                <br/>
-                <small class="plan-name">{{ user.subscription.planName }}</small>
-              </span>
-              <span *ngIf="!user.subscription" class="text-muted">—</span>
-            </td>
-            <!-- Joined -->
-            <td class="text-muted">{{ user.joinedAt }}</td>
-            <!-- Actions -->
-            <td class="center">
-              <div class="action-btns">
-                <button class="btn-edit" (click)="openEditModal(user)">تعديل</button>
-                <button class="btn-edit" (click)="toggleUserStatus(user)">
-                  {{ user.status === 'Active' ? 'تعطيل' : 'تفعيل' }}
-                </button>
-                <button class="btn-edit" (click)="resetPassword(user)">
-                  إعادة تعيين المرور
-                </button>
-                <button
-                  *ngIf="user.subscription && user.subscription.status === 'Active'"
-                  class="btn-cancel"
-                  (click)="cancelSubscription(user.id, user.subscription.subscriptionId)"
-                  title="إلغاء الاشتراك">
-                  <app-icon name="x-mark" size="1.2em"></app-icon> إلغاء الاشتراك
-                </button>
-              </div>
-            </td>
-          </tr>
-          <!-- Empty state -->
-          <tr *ngIf="filteredUsers().length === 0">
-            <td colspan="9" class="empty-state">لا يوجد مستخدمون يطابقون البحث</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    @if (!isLoadingUsers()) {
+      <div class="um-table-scroll">
+        <table class="um-table">
+          <thead>
+            <tr>
+              <th>#</th><th>المستخدم</th><th>الدور</th><th>الحالة</th>
+              <th>الاشتراك</th><th>نوع الخطة</th><th>تاريخ الانضمام</th><th class="center">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of paginatedUsers(); track user.id) {
+              <tr class="um-row" [class.actions-open-row]="openActionMenuId() === user.id">
+                <td><span class="id-chip">{{ user.id }}</span></td>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar" [title]="user.name">{{ user.name.charAt(0) }}</div>
+                    <div>
+                      <p class="user-name" [title]="user.name">{{ user.name }}</p>
+                      <p class="user-email" [title]="user.email" dir="ltr">{{ user.email }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge" [ngClass]="roleClass(user.role)">{{ roleLabel(user.role) }}</span>
+                  <div *ngIf="user.role === 'Teacher' && user.specialization"
+                    class="specialization-text"
+                    [title]="user.specialization">{{ user.specialization }}</div>
+                </td>
+                <td>
+                  <span class="status-dot" [class.active]="user.status === 'Active'" [class.inactive]="user.status === 'Inactive'">
+                    <span class="dot"></span>{{ user.status === 'Active' ? 'نشط' : 'غير نشط' }}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="user.subscription && user.subscription.status === 'Active'" class="sub-badge active">
+                    <app-icon name="check" [size]="12"></app-icon> مشترك
+                  </span>
+                  <span *ngIf="user.subscription && user.subscription.status !== 'Active'" class="sub-badge" [ngClass]="subStatusClass(user.subscription.status)">
+                    {{ subStatusLabel(user.subscription.status) }}
+                  </span>
+                  <span *ngIf="!user.subscription" class="sub-badge none">— لا يوجد</span>
+                </td>
+                <td>
+                  <span *ngIf="user.subscription">
+                    <span class="plan-type-badge">{{ planTypeLabel(user.subscription.planType) }}</span>
+                    <span class="plan-name-small">{{ user.subscription.planName }}</span>
+                  </span>
+                  <span *ngIf="!user.subscription" class="text-muted">—</span>
+                </td>
+                <td class="text-muted">{{ user.joinedAt }}</td>
+                <td class="center">
+                  <div class="user-actions" [class.menu-open]="openActionMenuId() === user.id" (click)="$event.stopPropagation()">
+                    <button class="user-actions-trigger" type="button"
+                      (click)="toggleActionMenu(user.id, $event)"
+                      [attr.aria-expanded]="openActionMenuId() === user.id"
+                      aria-haspopup="menu"
+                      [attr.aria-label]="'إجراءات المستخدم ' + user.name">
+                      <app-icon name="dots" [size]="17"></app-icon>
+                      <span>الإجراءات</span>
+                    </button>
+                    @if (openActionMenuId() === user.id) {
+                      <div class="user-actions-menu" role="menu" [attr.aria-label]="'إجراءات ' + user.name">
+                        <button type="button" class="action-menu-item edit" role="menuitem" (click)="openEditModal(user); closeActionMenu()">
+                          <span class="action-menu-icon"><app-icon name="pencil" [size]="15"></app-icon></span>
+                          <span><b>تعديل المستخدم</b><small>تحديث بيانات الحساب</small></span>
+                        </button>
+                        <button type="button" class="action-menu-item reset" role="menuitem" (click)="resetPassword(user); closeActionMenu()">
+                          <span class="action-menu-icon"><app-icon name="key" [size]="15"></app-icon></span>
+                          <span><b>إعادة تعيين كلمة المرور</b><small>إنشاء كلمة مرور جديدة</small></span>
+                        </button>
+                        <button type="button" class="action-menu-item" [class.enable]="user.status === 'Inactive'" [class.disable]="user.status === 'Active'" role="menuitem" (click)="toggleUserStatus(user); closeActionMenu()">
+                          <span class="action-menu-icon"><app-icon [name]="user.status === 'Active' ? 'eye-off' : 'check-circle'" [size]="15"></app-icon></span>
+                          <span><b>{{ user.status === 'Active' ? 'تعطيل الحساب' : 'تفعيل الحساب' }}</b><small>{{ user.status === 'Active' ? 'إيقاف وصول المستخدم مؤقتًا' : 'إعادة السماح بالدخول' }}</small></span>
+                        </button>
+                        @if (user.subscription && user.subscription.status === 'Active') {
+                          <div class="action-menu-divider"></div>
+                          <button type="button" class="action-menu-item danger" role="menuitem" (click)="cancelSubscription(user.id, user.subscription.subscriptionId); closeActionMenu()">
+                            <span class="action-menu-icon"><app-icon name="credit-card" [size]="15"></app-icon></span>
+                            <span><b>إلغاء الاشتراك</b><small>إيقاف خطة المستخدم النشطة</small></span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
 
-    <!-- Pagination Controls -->
-    <div class="pagination-controls" *ngIf="filteredUsers().length > 0" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding-bottom: 1rem;">
-      <button class="btn-cancel" [disabled]="currentPage() === 1" (click)="prevPage()" style="padding: 0.4rem 1rem;">السابق</button>
-      <span class="text-sm font-medium text-slate-600">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
-      <button class="btn-primary" [disabled]="currentPage() === totalPages()" (click)="nextPage()" style="padding: 0.4rem 1rem;">التالي</button>
-    </div>
+            @if (filteredUsers().length === 0) {
+              <tr>
+                <td colspan="8">
+                  <div class="um-empty">
+                    <div class="um-empty-icon"><app-icon name="magnifying-glass" [size]="28"></app-icon></div>
+                    <div class="um-empty-title">لا توجد نتائج مطابقة</div>
+                    <p class="um-empty-desc">جرّب تعديل البحث أو الفلاتر للعثور على النتائج.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Stats footer -->
-    <div class="um-stats" *ngIf="!isLoadingUsers()">
-      <span>إجمالي: <b>{{ users().length }}</b></span>
-      <span>طلاب: <b>{{ totalStudents() }}</b></span>
-      <span>معلمون: <b>{{ totalTeachers() }}</b></span>
-      <span>مشتركون: <b>{{ totalSubscribed() }}</b></span>
-    </div>
+      <!-- Pagination -->
+      @if (filteredUsers().length > 0) {
+        <div class="um-pagination">
+          <span class="um-pagination-info">
+            عرض <b>{{ (currentPage() - 1) * pageSize() + 1 }}</b> – <b>{{ currentPage() * pageSize() < filteredUsers().length ? currentPage() * pageSize() : filteredUsers().length }}</b> من أصل <b>{{ filteredUsers().length }}</b> مستخدم
+          </span>
+          <div class="um-pagination-pages">
+            <button class="pg-btn" [disabled]="currentPage() === 1" (click)="prevPage()" aria-label="الصفحة السابقة">
+              <app-icon name="chevron-right" [size]="14"></app-icon> السابق
+            </button>
+            @for (page of getPaginationPages(); track page) {
+              @if (page === -1) {
+                <span class="pg-ellipsis">…</span>
+              } @else {
+                <button class="pg-btn" [class.active]="page === currentPage()" [attr.aria-current]="page === currentPage() ? 'page' : null" (click)="currentPage.set(page)">{{ page }}</button>
+              }
+            }
+            <button class="pg-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()" aria-label="الصفحة التالية">
+              التالي <app-icon name="chevron-left" [size]="14"></app-icon>
+            </button>
+          </div>
+        </div>
+      }
+    }
   </div>
 
-  <!-- ══════════════ TAB 2: Assign Subscription ══════════════ -->
-  <div *ngIf="activeTab() === 'subscriptions'" class="um-card">
-    <div class="sub-header">
-      <div>
-        <h2 class="section-title">إضافة اشتراك للطلاب</h2>
-        <p class="section-desc">تظهر هنا جميع الطلاب المسجلين عبر المنصة والطلاب المضافين يدوياً من هذه الصفحة</p>
-      </div>
-    </div>
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- TAB 2 : ASSIGN SUBSCRIPTION                                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab() === 'subscriptions'" class="sub-wrapper">
 
-    <div class="sub-form">
-      <!-- Student selector -->
-      <div class="form-group">
-        <label class="form-label">اختر الطالب</label>
-        <div class="select-wrap">
-          <select class="um-select full" [ngModel]="selectedStudentId()" (ngModelChange)="onStudentSelected($event ? +$event : null)">
-            <option [ngValue]="null">-- اختر طالب --</option>
-            <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
-              {{ student.name }}
-              <ng-container *ngIf="student.email"> ({{ student.email }})</ng-container>
-              <ng-container *ngIf="student.subscription?.status === 'Active'"> <app-icon name="check" size="1.2em"></app-icon> مشترك بالفعل</ng-container>
-            </option>
-          </select>
+    <!-- ── Subscription Workspace ── -->
+    <div class="sub-workspace">
+
+      <!-- Workspace Header -->
+      <div class="sub-ws-header">
+        <div class="sub-ws-header-text">
+          <h2 class="sub-ws-title">إضافة اشتراك للطالب</h2>
+          <p class="sub-ws-desc">اختر الطالب، حدّد الخطة المناسبة، ثم راجع التفاصيل قبل تأكيد الاشتراك.</p>
         </div>
-        <!-- Preview selected student -->
-        <div *ngIf="selectedStudentId()" class="student-preview">
+        <!-- Step Indicators -->
+        <div class="sub-steps">
+          <div class="sub-step" [class.completed]="selectedStudentId()">
+            <span class="step-num">01</span>
+            <span class="step-label">الطالب</span>
+          </div>
+          <div class="sub-step-line" [class.active]="selectedStudentId()"></div>
+          <div class="sub-step" [class.completed]="selectedPlanId()">
+            <span class="step-num">02</span>
+            <span class="step-label">الخطة</span>
+          </div>
+          <div class="sub-step-line" [class.active]="selectedPlanId()"></div>
+          <div class="sub-step" [class.completed]="selectedStudentId() && selectedPlanId()">
+            <span class="step-num">03</span>
+            <span class="step-label">التأكيد</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Step 1: Student Selection ── -->
+      <div class="sub-section">
+        <div class="sub-section-label">
+          <span class="sub-section-num">01</span>
+          اختيار الطالب
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="sub-student-select">اختر الطالب من القائمة</label>
+          <div class="um-search-wrap">
+            <span class="search-icon"><app-icon name="search" [size]="15"></app-icon></span>
+            <select
+              class="um-search um-select-styled"
+              [ngModel]="selectedStudentId()"
+              (ngModelChange)="onStudentSelected($event ? +$event : null)"
+              id="sub-student-select"
+              aria-label="اختيار الطالب">
+              <option [ngValue]="null">-- ابحث واختر طالبًا --</option>
+              <option *ngFor="let student of studentUsers()" [ngValue]="student.id">
+                {{ student.name }}
+                <ng-container *ngIf="student.email"> — {{ student.email }}</ng-container>
+                <ng-container *ngIf="student.subscription?.status === 'Active'"> ✓ مشترك</ng-container>
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Selected student preview -->
+        <div *ngIf="selectedStudentId()" class="student-preview-card">
           <ng-container *ngFor="let s of studentUsers()">
             <ng-container *ngIf="s.id === selectedStudentId()">
               <div class="preview-avatar">{{ s.name.charAt(0) }}</div>
-              <div>
+              <div class="preview-info">
                 <p class="preview-name">{{ s.name }}</p>
-                <p class="preview-email">{{ s.email }}</p>
-                <span *ngIf="s.subscription?.status === 'Active'" class="sub-badge active small"><app-icon name="check" size="1.2em"></app-icon> لديه اشتراك نشط: {{ s.subscription?.planName }}</span>
+                <p class="preview-email" dir="ltr">{{ s.email }}</p>
+                <span *ngIf="s.subscription?.status === 'Active'" class="sub-badge active">
+                  <app-icon name="check" [size]="11"></app-icon>
+                  اشتراك نشط: {{ s.subscription?.planName }}
+                </span>
               </div>
+              <button class="preview-change-btn" (click)="onStudentSelected(null)" title="تغيير الطالب" aria-label="تغيير الطالب">
+                <app-icon name="x-mark" [size]="14"></app-icon>
+              </button>
             </ng-container>
           </ng-container>
         </div>
       </div>
 
-      <!-- Plan selector -->
-      <div class="form-group">
-        <label class="form-label">اختر خطة الاشتراك</label>
-        <div class="plans-grid">
+      <!-- ── Step 2: Plan Selection ── -->
+      <div class="sub-section">
+        <div class="sub-section-label">
+          <span class="sub-section-num">02</span>
+          اختيار خطة الاشتراك
+        </div>
+
+        <div class="sub-plans-grid">
           <div
             *ngFor="let plan of plans()"
-            class="plan-card"
+            class="sub-plan-card"
             [class.selected]="selectedPlanId() === plan.planId"
             (click)="selectedPlanId.set(plan.planId)"
-          >
+            [attr.aria-selected]="selectedPlanId() === plan.planId"
+            role="option"
+            tabindex="0"
+            (keydown.enter)="selectedPlanId.set(plan.planId)"
+            (keydown.space)="selectedPlanId.set(plan.planId); $event.preventDefault()">
+
+            <!-- Selected indicator -->
+            <div class="plan-selected-check" *ngIf="selectedPlanId() === plan.planId">
+              <app-icon name="check" [size]="14"></app-icon>
+            </div>
+
+            <!-- Top gradient line -->
+            <div class="plan-top-line"></div>
+
+            <!-- Type badge -->
             <div class="plan-card-top">
               <span class="plan-type-chip">{{ planTypeLabel(plan.type) }}</span>
+              <span *ngIf="selectedPlanId() === plan.planId" class="plan-selected-label">الخطة المختارة</span>
             </div>
+
+            <!-- Plan name -->
             <p class="plan-card-name">{{ plan.name }}</p>
-            <p class="plan-card-price">{{ plan.price }} <span>{{ plan.currency }}</span></p>
-            <p class="plan-card-dur">{{ plan.durationDays }} يوم</p>
+
+            <!-- Price (main element) -->
+            <div class="plan-price-block">
+              <span class="plan-price-number">{{ plan.price }}</span>
+              <span class="plan-price-currency">{{ plan.currency }}</span>
+            </div>
+
+            <!-- Duration -->
+            <p class="plan-card-dur">
+              <app-icon name="calendar" [size]="13"></app-icon>
+              لمدة {{ plan.durationDays }} يومًا
+            </p>
+
+            <!-- Features -->
             <div class="plan-features">
-              <span *ngIf="plan.hasAi" class="feat"><app-icon name="robot" size="1.2em"></app-icon> AI</span>
-              <span *ngIf="plan.hasLiveClass" class="feat"><app-icon name="video" size="1.2em"></app-icon> حصص مباشرة</span>
+              <span *ngIf="plan.hasAi" class="feat">
+                <app-icon name="sparkles" [size]="13"></app-icon> ذكاء اصطناعي
+              </span>
+              <span *ngIf="plan.hasLiveClass" class="feat">
+                <app-icon name="video-camera" [size]="13"></app-icon> حصص مباشرة
+              </span>
             </div>
           </div>
-          <div *ngIf="plans().length === 0" class="plans-empty">لا توجد خطط متاحة حالياً</div>
-        </div>
-      </div>
 
-      <!-- Subject selector (Only for PerSubject) -->
-      @for (p of plans(); track p.planId) {
-        @if (selectedPlanId() === p.planId && p.type === 'PerSubject') {
-          <div class="form-group">
-            <label class="form-label">اختر المواد (الاشتراك الجزئي)</label>
-            @if (availableSubjects().length > 0) {
-              <div class="flex flex-col gap-2 p-3 bg-white rounded border border-slate-200">
-                <div class="flex gap-4 flex-wrap">
+          <div *ngIf="plans().length === 0" class="plans-empty-state">
+            <div class="um-empty-icon"><app-icon name="credit-card" [size]="24"></app-icon></div>
+            <p class="um-empty-title">لا توجد خطط اشتراك متاحة</p>
+            <p class="um-empty-desc">يرجى إضافة خطط من لوحة إدارة الاشتراكات.</p>
+          </div>
+        </div>
+
+        <!-- Subject selector for PerSubject plans -->
+        @for (p of plans(); track p.planId) {
+          @if (selectedPlanId() === p.planId && p.type === 'PerSubject') {
+            <section class="subject-selection-section" aria-labelledby="subject-selection-title">
+              <div class="subject-selection-header">
+                <div class="subject-selection-heading">
+                  <span class="subject-selection-icon"><app-icon name="book-open" [size]="20"></app-icon></span>
+                  <div>
+                    <h3 id="subject-selection-title">اختر المواد</h3>
+                    <p>حدّد المواد التي تريد تضمينها في اشتراك الطالب.</p>
+                  </div>
+                </div>
+                <span class="subject-selection-count">
+                  تم اختيار {{ selectedSubjects().length }} {{ selectedSubjects().length === 1 ? 'مادة' : 'مواد' }}
+                </span>
+              </div>
+
+              @if (availableSubjects().length > 0) {
+                <div class="subjects-grid">
                   @for (s of availableSubjects(); track s.subjectId) {
-                    <label class="flex items-center gap-1 cursor-pointer">
-                      <input type="checkbox" (change)="toggleSubject(s.subjectId, $event)" [checked]="selectedSubjects().includes(s.subjectId)" class="rounded text-emerald-600 border-slate-300">
-                      <span class="text-sm">{{ s.name }}</span>
+                    <label class="subject-option" [class.is-selected]="selectedSubjects().includes(s.subjectId)">
+                      <input class="subject-option__input" type="checkbox"
+                        (change)="toggleSubject(s.subjectId, $event)"
+                        [checked]="selectedSubjects().includes(s.subjectId)">
+                      <span class="subject-option__content">
+                        <span class="subject-option__icon" aria-hidden="true">{{ subjectDisplayName(s).charAt(0) }}</span>
+                        <span class="subject-option__text">
+                          <span class="subject-option__name" [title]="subjectDisplayName(s)">{{ subjectDisplayName(s) }}</span>
+                          @if (s.code) { <span class="subject-option__code" dir="ltr">{{ s.code }}</span> }
+                        </span>
+                      </span>
+                      <span class="subject-option__check" aria-hidden="true"><app-icon name="check" [size]="14"></app-icon></span>
                     </label>
                   }
                 </div>
-              </div>
-              <p class="text-xs text-emerald-600 mt-2 font-medium">
-                التكلفة الإجمالية: {{ p.price * selectedSubjects().length }} {{ p.currency }}
-              </p>
-            } @else {
-              <p class="text-xs text-red-500">لا توجد مواد مسجلة لمرحلة هذا الطالب. يرجى إضافة مواد للمرحلة أولاً.</p>
-            }
-          </div>
+
+                <div class="subjects-summary" aria-live="polite">
+                  <div class="subjects-summary__selection">
+                    <app-icon name="book-open" [size]="18"></app-icon>
+                    <span>
+                      @if (selectedSubjects().length > 0) {
+                        <b>{{ selectedSubjects().length }} {{ selectedSubjects().length === 1 ? 'مادة مختارة' : 'مواد مختارة' }}</b>
+                      } @else {
+                        <b>لم يتم اختيار أي مادة بعد</b>
+                      }
+                      <small>سعر المادة الواحدة: {{ p.price }} {{ p.currency }}</small>
+                    </span>
+                  </div>
+                  <div class="subjects-summary__total">
+                    <span>التكلفة الإجمالية</span>
+                    <b dir="ltr">{{ p.price * selectedSubjects().length }} {{ p.currency }}</b>
+                  </div>
+                </div>
+              } @else {
+                <p class="sub-subjects-empty">
+                  <app-icon name="x-mark" [size]="14"></app-icon>
+                  لا توجد مواد مسجلة لمرحلة هذا الطالب. يرجى إضافة مواد للمرحلة أولًا.
+                </p>
+              }
+            </section>
+          }
         }
+      </div>
+
+      <!-- ── Step 3: Summary ── -->
+      @if (selectedStudentId() && selectedPlanId()) {
+        <div class="sub-section">
+          <div class="sub-section-label">
+            <span class="sub-section-num">03</span>
+            ملخص الاشتراك
+          </div>
+
+          <div class="sub-summary-card">
+            <div class="sub-summary-grid">
+              <!-- Student -->
+              <ng-container *ngFor="let s of studentUsers()">
+                <ng-container *ngIf="s.id === selectedStudentId()">
+                  <div class="sub-summary-item">
+                    <span class="sub-summary-label">الطالب</span>
+                    <span class="sub-summary-value">{{ s.name }}</span>
+                  </div>
+                  <div class="sub-summary-item" *ngIf="s.email">
+                    <span class="sub-summary-label">البريد الإلكتروني</span>
+                    <span class="sub-summary-value text-start" dir="ltr">{{ s.email }}</span>
+                  </div>
+                </ng-container>
+              </ng-container>
+              <!-- Plan -->
+              <ng-container *ngFor="let p of plans()">
+                <ng-container *ngIf="p.planId === selectedPlanId()">
+                  <div class="sub-summary-item">
+                    <span class="sub-summary-label">الخطة</span>
+                    <span class="sub-summary-value">{{ p.name }}</span>
+                  </div>
+                  <div class="sub-summary-item">
+                    <span class="sub-summary-label">السعر</span>
+                    <span class="sub-summary-value sub-summary-price">{{ p.price }} {{ p.currency }}</span>
+                  </div>
+                  <div class="sub-summary-item">
+                    <span class="sub-summary-label">المدة</span>
+                    <span class="sub-summary-value">{{ p.durationDays }} يومًا</span>
+                  </div>
+                  <div class="sub-summary-item">
+                    <span class="sub-summary-label">النوع</span>
+                    <span class="sub-summary-value">{{ planTypeLabel(p.type) }}</span>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+        </div>
       }
 
-      <button
-        class="um-btn-success"
-        (click)="assignSubscription()"
-        [disabled]="assigning() || !selectedStudentId() || !selectedPlanId()"
-      >
-        <span *ngIf="!assigning()"><app-icon name="credit-card" size="1.2em"></app-icon> إضافة الاشتراك</span>
-        <span *ngIf="assigning()"><app-icon name="clock" size="1.2em"></app-icon> جاري الإضافة...</span>
-      </button>
-
-      <!-- Subscription feedback (visible inside subscription tab) -->
-      <div *ngIf="feedback()" class="um-feedback sm"
+      <!-- ── Feedback (single, inside form only) ── -->
+      <div *ngIf="feedback() && activeTab() === 'subscriptions'" class="um-feedback sub-feedback"
         [class.is-success]="feedbackType() === 'success'"
-        [class.is-error]="feedbackType() === 'error'"
-        style="margin-top: 12px;">
+        [class.is-error]="feedbackType() === 'error'">
         <span class="icon">
           @if (feedbackType() === 'success') {
-            <app-icon name="check" size="1.2em"></app-icon>
+            <app-icon name="check" [size]="16"></app-icon>
           } @else {
-            <app-icon name="x-mark" size="1.2em"></app-icon>
+            <app-icon name="x-mark" [size]="16"></app-icon>
           }
         </span>
         {{ feedback() }}
       </div>
+
+      <!-- ── Submit ── -->
+      <button
+        class="sub-submit-btn"
+        (click)="assignSubscription()"
+        [disabled]="assigning() || !selectedStudentId() || !selectedPlanId()"
+        id="um-assign-sub-btn">
+        @if (!assigning()) {
+          <app-icon name="credit-card" [size]="18"></app-icon>
+          تأكيد وإضافة الاشتراك
+        } @else {
+          <div class="spinner spinner-sm"></div>
+          جاري الإضافة...
+        }
+      </button>
+
     </div>
 
-    <!-- Students subscription table -->
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- Student Subscription Status Table                 -->
+    <!-- ══════════════════════════════════════════════════ -->
     <div class="sub-table-section">
-      <h3 class="section-title sm">حالة اشتراكات الطلاب</h3>
-      <div class="um-table-wrap">
-        <table class="um-table">
-          <thead>
-            <tr>
-              <th>الطالب</th>
-              <th>البريد</th>
-              <th>حالة الاشتراك</th>
-              <th>نوع الخطة</th>
-              <th>اسم الخطة</th>
-              <th>تاريخ الانتهاء</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let s of studentUsers()" class="um-row">
-              <td>
-                <div class="user-cell">
-                  <div class="avatar sm">{{ s.name.charAt(0) }}</div>
-                  <span class="user-name">{{ s.name }}</span>
-                </div>
-              </td>
-              <td class="text-muted">{{ s.email || '—' }}</td>
-              <td>
-                <span *ngIf="s.subscription" class="sub-badge" [ngClass]="subStatusClass(s.subscription.status)">{{ subStatusLabel(s.subscription.status) }}</span>
-                <span *ngIf="!s.subscription" class="sub-badge none">لا يوجد</span>
-              </td>
-              <td>
-                <span *ngIf="s.subscription">{{ planTypeLabel(s.subscription.planType) }}</span>
-                <span *ngIf="!s.subscription" class="text-muted">—</span>
-              </td>
-              <td>
-                <span *ngIf="s.subscription" class="plan-name">{{ s.subscription.planName }}</span>
-                <span *ngIf="!s.subscription" class="text-muted">—</span>
-              </td>
-              <td class="text-muted">
-                {{ s.subscription ? (s.subscription.endDate | date:'dd/MM/yyyy') : '—' }}
-              </td>
-            </tr>
-            <tr *ngIf="studentUsers().length === 0">
-              <td colspan="6" class="empty-state">لا يوجد طلاب مسجلون</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sub-table-header">
+        <div>
+          <h3 class="section-title sm">حالة اشتراكات الطلاب</h3>
+          <p class="section-desc">عرض {{ studentUsers().length }} طالب مسجل</p>
+        </div>
+      </div>
+
+      <div class="um-table-card">
+        <div class="um-table-scroll sub-table-scroll">
+          <table class="um-table">
+            <thead>
+              <tr>
+                <th>الطالب</th>
+                <th>البريد الإلكتروني</th>
+                <th>حالة الاشتراك</th>
+                <th>نوع الخطة</th>
+                <th>اسم الخطة</th>
+                <th>تاريخ الانتهاء</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of paginatedStudentSubs()" class="um-row">
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar sm">{{ s.name.charAt(0) }}</div>
+                    <span class="user-name">{{ s.name }}</span>
+                  </div>
+                </td>
+                <td class="text-muted text-left" dir="ltr" [title]="s.email">{{ s.email || '—' }}</td>
+                <td>
+                  <span *ngIf="s.subscription" class="sub-badge" [ngClass]="subStatusClass(s.subscription.status)">
+                    <span class="dot sub-status-dot" [ngClass]="subStatusClass(s.subscription.status)"></span>
+                    {{ subStatusLabel(s.subscription.status) }}
+                  </span>
+                  <span *ngIf="!s.subscription" class="sub-badge none">
+                    <span class="dot sub-status-dot none"></span>
+                    لا يوجد
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="s.subscription" class="plan-type-badge">{{ planTypeLabel(s.subscription.planType) }}</span>
+                  <span *ngIf="!s.subscription" class="text-muted">—</span>
+                </td>
+                <td>
+                  <span *ngIf="s.subscription" class="plan-name-cell">{{ s.subscription.planName }}</span>
+                  <span *ngIf="!s.subscription" class="text-muted">—</span>
+                </td>
+                <td class="text-muted">
+                  {{ s.subscription ? (s.subscription.endDate | date:'dd/MM/yyyy') : '—' }}
+                </td>
+              </tr>
+              <tr *ngIf="studentUsers().length === 0">
+                <td colspan="6">
+                  <div class="um-empty">
+                    <div class="um-empty-icon"><app-icon name="users" [size]="24"></app-icon></div>
+                    <div class="um-empty-title">لا يوجد طلاب مسجلون</div>
+                    <p class="um-empty-desc">ابدأ بإضافة طلاب من تبويب المستخدمين، ثم أضف لهم اشتراكات.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Subscription Table Pagination -->
+        @if (studentUsers().length > 0) {
+          <div class="um-pagination">
+            <span class="um-pagination-info">
+              عرض
+              <b>{{ (subCurrentPage() - 1) * subPageSize() + 1 }}</b> –
+              <b>{{ subCurrentPage() * subPageSize() < studentUsers().length ? subCurrentPage() * subPageSize() : studentUsers().length }}</b>
+              من أصل <b>{{ studentUsers().length }}</b> طالب
+            </span>
+            <div class="um-pagination-pages">
+              <button class="pg-btn" [disabled]="subCurrentPage() === 1" (click)="subPrevPage()" aria-label="الصفحة السابقة">
+                <app-icon name="chevron-right" [size]="14"></app-icon> السابق
+              </button>
+              @for (page of getSubPaginationPages(); track page) {
+                @if (page === -1) {
+                  <span class="pg-ellipsis">…</span>
+                } @else {
+                  <button class="pg-btn" [class.active]="page === subCurrentPage()" [attr.aria-current]="page === subCurrentPage() ? 'page' : null"
+                    (click)="subCurrentPage.set(page)">{{ page }}</button>
+                }
+              }
+              <button class="pg-btn" [disabled]="subCurrentPage() === subTotalPages()" (click)="subNextPage()" aria-label="الصفحة التالية">
+                التالي <app-icon name="chevron-left" [size]="14"></app-icon>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     </div>
+
   </div>
 
 </div>
 
-<!-- ══ Add / Edit Modal ══ -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADD / EDIT USER MODAL                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <div *ngIf="showAddModal()" class="um-overlay" (click)="closeModal()">
-  <div class="um-modal" (click)="$event.stopPropagation()">
+  <div class="um-modal" (click)="$event.stopPropagation()" dir="rtl">
+
     <div class="modal-header">
       <h2>{{ isEditing() ? 'تعديل المستخدم' : 'إضافة مستخدم جديد' }}</h2>
-      <button class="modal-close" (click)="closeModal()"><app-icon name="x-mark" size="1.2em"></app-icon></button>
+      <button class="modal-close" (click)="closeModal()" aria-label="إغلاق">
+        <app-icon name="x-mark" [size]="16"></app-icon>
+      </button>
     </div>
 
-    <div *ngIf="feedback()" class="um-feedback sm"
+    <div *ngIf="feedback()" class="um-feedback modal-feedback"
       [class.is-success]="feedbackType() === 'success'"
       [class.is-error]="feedbackType() === 'error'">
       {{ feedback() }}
@@ -357,23 +721,23 @@
 
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">الاسم الكامل *</label>
-        <input class="um-input" [(ngModel)]="form.name" placeholder="أدخل الاسم الكامل" />
+        <label class="form-label">الاسم الكامل <span class="required-mark">*</span></label>
+        <input class="um-input" [(ngModel)]="form.name" placeholder="أدخل الاسم الكامل">
       </div>
 
       <div class="form-group">
         <label class="form-label">البريد الإلكتروني</label>
-        <input class="um-input" [(ngModel)]="form.email" placeholder="example@email.com" type="email" />
+        <input class="um-input" [(ngModel)]="form.email" placeholder="example@email.com" type="email" dir="ltr">
       </div>
 
       <div class="form-group" *ngIf="!isEditing()">
-        <label class="form-label">كلمة المرور <span style="color:red">*</span></label>
-        <input class="um-input" [(ngModel)]="form.password" placeholder="8 أحرف على الأقل" type="password" />
+        <label class="form-label">كلمة المرور <span class="required-mark">*</span></label>
+        <input class="um-input" [(ngModel)]="form.password" placeholder="8 أحرف على الأقل" type="password">
       </div>
 
       <div class="form-group">
         <label class="form-label">رقم الهاتف (اختياري)</label>
-        <input class="um-input" [(ngModel)]="form.phone" placeholder="مثال: 0501234567" type="tel" />
+        <input class="um-input" [(ngModel)]="form.phone" placeholder="مثال: 0501234567" type="tel" dir="ltr">
       </div>
 
       <div class="form-row">
@@ -386,7 +750,6 @@
             <option value="Admin">مدير</option>
           </select>
         </div>
-
         <div class="form-group">
           <label class="form-label">الحالة</label>
           <select class="um-select full" [(ngModel)]="form.status">
@@ -396,46 +759,55 @@
         </div>
       </div>
 
-      <!-- Dynamic Role Requirements -->
+      <!-- Student: Grade -->
       <div class="form-group dynamic-field" *ngIf="form.role === 'Student'">
-        <label class="form-label">المرحلة الدراسية <span style="color:red">*</span></label>
+        <label class="form-label">المرحلة الدراسية <span class="required-mark">*</span></label>
         <select class="um-select full" [(ngModel)]="form.gradeId">
           <option [ngValue]="null">-- اختر المرحلة الدراسية --</option>
           <option *ngFor="let grade of grades()" [value]="grade.gradeId">{{ grade.name }}</option>
         </select>
       </div>
 
+      <!-- Teacher: Specialization -->
       <div class="form-group dynamic-field" *ngIf="form.role === 'Teacher'">
-        <label class="form-label">التخصص (Specialization) <span style="color:red">*</span></label>
-        <input class="um-input" [(ngModel)]="form.specialization" placeholder="مثال: رياضيات، علوم" type="text" />
+        <label class="form-label">التخصص <span class="required-mark">*</span></label>
+        <input class="um-input" [(ngModel)]="form.specialization" placeholder="مثال: رياضيات، علوم" type="text">
       </div>
 
+      <!-- Parent: Students -->
       <div class="form-group dynamic-field" *ngIf="form.role === 'Parent'">
-        <label class="form-label">أبناء ولي الأمر <span style="color:red">*</span></label>
-        
-        <!-- Selected Students Chips -->
-        <div class="selected-students" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;" *ngIf="form.studentIds.length > 0">
-          <span *ngFor="let id of form.studentIds" style="background: #e2e8f0; color: #1e293b; padding: 4px 10px; border-radius: 16px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+        <label class="form-label">أبناء ولي الأمر <span class="required-mark">*</span></label>
+
+        <div *ngIf="form.studentIds.length > 0" class="parent-chips">
+          <span *ngFor="let id of form.studentIds" class="parent-chip">
             {{ getStudentName(id) }}
-            <button (click)="toggleStudentSelection(id)" style="color: #ef4444; border: none; background: transparent; cursor: pointer; font-weight: bold;"><app-icon name="x-mark" size="1.2em"></app-icon></button>
+            <button (click)="toggleStudentSelection(id)" class="parent-chip-remove" aria-label="إزالة">
+              <app-icon name="x-mark" [size]="12"></app-icon>
+            </button>
           </span>
         </div>
 
-        <input type="text" class="um-input mb-2" [ngModel]="parentStudentSearch()" (ngModelChange)="parentStudentSearch.set($event)" placeholder="البحث عن طالب بالاسم أو البريد..." style="margin-bottom: 8px;" />
+        <input type="text" class="um-input parent-search-input"
+          [ngModel]="parentStudentSearch()" (ngModelChange)="parentStudentSearch.set($event)"
+          placeholder="البحث عن طالب بالاسم أو البريد...">
 
-        <div class="students-list-container" style="max-height: 150px; overflow-y: auto; border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); background: #f8fafc;">
-          <div *ngFor="let s of filteredStudentsForParent()" 
-               style="padding: 8px; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;"
-               [style.background]="form.studentIds.includes(s.id) ? '#dbeafe' : 'transparent'"
-               (click)="toggleStudentSelection(s.id)">
+        <div class="parent-students-list">
+          <div *ngFor="let s of filteredStudentsForParent()"
+            class="parent-student-item"
+            [class.selected]="form.studentIds.includes(s.id)"
+            (click)="toggleStudentSelection(s.id)">
             <div>
-              <div style="font-weight: 500; font-size: 14px;">{{ s.name }}</div>
-              <div style="font-size: 12px; color: #64748b;" *ngIf="s.email">{{ s.email }}</div>
+              <div class="parent-student-name">{{ s.name }}</div>
+              <div class="parent-student-email" *ngIf="s.email" dir="ltr">{{ s.email }}</div>
             </div>
-            <span *ngIf="form.studentIds.includes(s.id)" style="color: #2563eb; font-weight: bold;"><app-icon name="check" size="1.2em"></app-icon> مضاف</span>
-            <span *ngIf="!form.studentIds.includes(s.id)" style="color: #64748b; font-size: 12px;">+ إضافة</span>
+            <span *ngIf="form.studentIds.includes(s.id)" class="parent-student-check">
+              <app-icon name="check" [size]="12"></app-icon> مضاف
+            </span>
+            <span *ngIf="!form.studentIds.includes(s.id)" class="parent-student-add">+ إضافة</span>
           </div>
-          <div *ngIf="filteredStudentsForParent().length === 0" class="text-muted" style="font-size: 0.9em; text-align: center; padding: 10px;">لا توجد نتائج بحث مطابقة.</div>
+          <div *ngIf="filteredStudentsForParent().length === 0" class="parent-students-empty">
+            لا توجد نتائج مطابقة.
+          </div>
         </div>
       </div>
     </div>

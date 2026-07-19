@@ -12,8 +12,9 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 @Component({
   selector: 'app-teacher-sessions',
   standalone: true,
-  imports: [NgClass, FormsModule, RouterModule, WeeklyCalendarComponent, IconComponent],
+  imports: [DatePipe, NgClass, FormsModule, RouterModule, WeeklyCalendarComponent, IconComponent],
   templateUrl: './teacher-sessions.component.html',
+  styleUrl: './teacher-sessions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherSessionsComponent implements OnInit {

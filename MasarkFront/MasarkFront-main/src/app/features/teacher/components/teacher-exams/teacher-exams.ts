@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect, computed } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { TeacherExam } from '../../models/teacher-assessment.model';
   standalone: true,
   imports: [IconComponent, DatePipe, NgClass, RouterLink, FormsModule],
   templateUrl: './teacher-exams.html',
+  styleUrl: './teacher-exams.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeacherExamsComponent implements OnInit {
@@ -23,6 +24,8 @@ export class TeacherExamsComponent implements OnInit {
   readonly exams = signal<TeacherExam[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly examsPage = signal(1);
+  readonly examsPageSize = signal(10);
 
   readonly teachingAssignments = this.contextService.assignments;
   readonly isLoadingContext = this.contextService.isLoading;
@@ -45,6 +48,7 @@ export class TeacherExamsComponent implements OnInit {
   }
 
   selectAssignment(taId: number): void {
+    this.examsPage.set(1);
     this.contextService.selectAssignment(taId);
   }
 
@@ -92,5 +96,50 @@ export class TeacherExamsComponent implements OnInit {
       Closed: 'مغلق',
     };
     return labels[status] ?? status;
+  }
+
+  readonly examsTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.exams().length / this.examsPageSize()))
+  );
+
+  readonly effectiveExamsPage = computed(() =>
+    Math.min(this.examsPage(), this.examsTotalPages())
+  );
+
+  readonly paginatedExams = computed(() => {
+    const start = (this.effectiveExamsPage() - 1) * this.examsPageSize();
+    return this.exams().slice(start, start + this.examsPageSize());
+  });
+
+  readonly examsRangeStart = computed(() =>
+    this.exams().length ? (this.effectiveExamsPage() - 1) * this.examsPageSize() + 1 : 0
+  );
+
+  readonly examsRangeEnd = computed(() =>
+    Math.min(this.effectiveExamsPage() * this.examsPageSize(), this.exams().length)
+  );
+
+  setExamsPage(page: number): void {
+    this.examsPage.set(Math.min(Math.max(page, 1), this.examsTotalPages()));
+  }
+
+  changeExamsPageSize(size: number | string): void {
+    this.examsPageSize.set(Number(size));
+    this.examsPage.set(1);
+  }
+
+  paginationPages(): number[] {
+    const total = this.examsTotalPages();
+    const current = this.effectiveExamsPage();
+    if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+
+    const pages = new Set([1, total, current - 1, current, current + 1]);
+    const sorted = [...pages].filter(page => page > 0 && page <= total).sort((a, b) => a - b);
+    const result: number[] = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) result.push(0);
+      result.push(page);
+    });
+    return result;
   }
 }

@@ -10,164 +10,190 @@ import { ParentService } from '../../services/parent.service';
   standalone: true,
   imports: [IconComponent, CommonModule, RouterLink],
   template: `
-    <div class="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
-      <!-- Header -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+    <div class="space-y-10 animate-fade-in relative z-10 pt-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6">
+      
+      <!-- 1. Page Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-2xl border-2 border-white shadow-sm">
-            <app-icon name="settings" size="1.2em"></app-icon>️
+          <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-xl shadow-sm">
+            <app-icon name="settings" size="1.2em"></app-icon>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-slate-800">إعدادات الحساب</h1>
-            <p class="text-sm text-slate-500 mt-1">إدارة بياناتك الشخصية وحسابات أبنائك</p>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">حسابي والإعدادات</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">تعديل وعرض بياناتك الشخصية وحسابات الأبناء التابعين لك</p>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Personal Info Card -->
-        <div class="lg:col-span-2 space-y-6">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-              <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <span><app-icon name="user" size="1.2em"></app-icon></span> المعلومات الشخصية
-              </h2>
-            </div>
-            
-            <div class="p-6 space-y-6">
-              <!-- Avatar section -->
-              <div class="flex items-center gap-6 pb-6 border-b border-slate-100">
-                <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-md">
-                  {{ userInitials }}
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-slate-800">{{ user?.fullName }}</h3>
-                  <span class="inline-block mt-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                    ولي أمر
-                  </span>
-                </div>
-              </div>
-
-              <!-- Details grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الاسم الكامل</label>
-                  <p class="text-slate-800 font-medium">{{ user?.fullName }}</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">البريد الإلكتروني</label>
-                  <p class="text-slate-800 font-medium" dir="ltr">{{ user?.email }}</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">رقم الهاتف</label>
-                  <p class="text-slate-800 font-medium" dir="ltr">{{ user?.phone || 'غير مسجل' }}</p>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">الدولة</label>
-                  <p class="text-slate-800 font-medium">{{ user?.country || 'غير مسجل' }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Linked Students Overview -->
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-              <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <span><app-icon name="family" size="1.2em"></app-icon></span> الأبناء المرتبطين
-              </h2>
-              <a routerLink="/dashboard/parent/children" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                إدارة الأبناء
-              </a>
-            </div>
-            
-            <div class="p-6">
-              @if (parentService.hasStudents()) {
-                <div class="flex flex-wrap gap-3">
-                  @for (student of parentService.linkedStudents(); track student.studentUserId) {
-                    <div class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl bg-slate-50">
-                      <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-lg border border-slate-100 shadow-sm">
-                        
-                      </div>
-                      <div>
-                        <p class="text-sm font-bold text-slate-800">{{ student.fullName }}</p>
-                        <p class="text-xs text-slate-500 flex items-center gap-1">
-                          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="student.hasActiveSubscription ? 'bg-emerald-500' : 'bg-orange-500'"></span>
-                          {{ student.hasActiveSubscription ? 'نشط' : 'غير نشط' }}
-                        </p>
-                      </div>
-                    </div>
+      <!-- 2. Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Column 1: Profile Summary Card (Smaller space, left side visually) -->
+        <div class="lg:col-span-1 space-y-6">
+          
+          <!-- Summary card -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-6 text-center shadow-sm relative overflow-hidden">
+            <div class="relative z-10 flex flex-col items-center justify-center space-y-4">
+              <!-- Avatar Container -->
+              <div class="relative inline-block mb-2">
+                <div class="w-28 h-28 bg-gradient-to-tr from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black text-4xl shadow-sm rounded-full overflow-hidden border-4 border-white dark:border-slate-800">
+                  @if (user?.avatarUrl) {
+                    <img [src]="user?.avatarUrl" class="w-full h-full object-cover" alt="Profile Picture" />
+                  } @else {
+                    {{ userInitials }}
                   }
                 </div>
-              } @else {
-                <p class="text-sm text-slate-500">لا يوجد أبناء مرتبطين حالياً.</p>
-              }
+                
+                <!-- Upload/Change Picture Button -->
+                <button class="absolute bottom-1 left-1 w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-105 border-2 border-white dark:border-slate-900" title="تغيير الصورة الشخصية">
+                  <app-icon name="camera" size="14"></app-icon>
+                </button>
+              </div>
               
-              <a routerLink="/dashboard/parent/onboarding/add-student" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                <span><app-icon name="plus" size="1.2em"></app-icon></span> إضافة طالب جديد
-              </a>
+              <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-lg">{{ user?.fullName }}</h3>
+                <span class="inline-flex mt-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-xl tracking-wider">ولي أمر</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Sidebar Options -->
-        <div class="lg:col-span-1 space-y-6">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-2">
-            <a routerLink="/dashboard/change-password" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
-                <app-icon name="lock" size="1.2em"></app-icon>
+          <!-- Account Options Menu -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-3 shadow-sm">
+            <a routerLink="/dashboard/change-password" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+              <div class="w-10 h-10 rounded-[14px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors"><app-icon name="lock" size="18"></app-icon></div>
+              <div class="flex-1 text-right min-w-0">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">تغيير كلمة المرور</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">تحديث كلمة مرور الحساب</p>
               </div>
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-800 text-sm">تغيير كلمة المرور</h3>
-                <p class="text-xs text-slate-500">تحديث كلمة مرور حسابك</p>
-              </div>
-              <svg class="w-5 h-5 text-slate-400 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
             </a>
-            
-            <div class="h-px bg-slate-100 mx-4"></div>
 
-            <a routerLink="/plans" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
-                <app-icon name="credit-card" size="1.2em"></app-icon>
+            <div class="h-px bg-slate-50 dark:bg-slate-800/60 mx-4 my-1"></div>
+
+            <a routerLink="/dashboard/parent/subscriptions" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+              <div class="w-10 h-10 rounded-[14px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors"><app-icon name="credit-card" size="18"></app-icon></div>
+              <div class="flex-1 text-right min-w-0">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">الاشتراكات والباقات</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">إدارة وتجديد اشتراك الأبناء</p>
               </div>
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-800 text-sm">الاشتراكات والباقات</h3>
-                <p class="text-xs text-slate-500">تجديد أو ترقية اشتراك الأبناء</p>
-              </div>
-              <svg class="w-5 h-5 text-slate-400 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
             </a>
-            
-            <div class="h-px bg-slate-100 mx-4"></div>
 
-            <a routerLink="/dashboard/chat" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                <app-icon name="chat" size="1.2em"></app-icon>
+            <div class="h-px bg-slate-50 dark:bg-slate-800/60 mx-4 my-1"></div>
+
+            <a routerLink="/dashboard/chat" class="flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+              <div class="w-10 h-10 rounded-[14px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors"><app-icon name="chat" size="18"></app-icon></div>
+              <div class="flex-1 text-right min-w-0">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">التواصل والدعم</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">الرسائل ومحادثات المعلمين</p>
               </div>
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-800 text-sm">التواصل والدعم</h3>
-                <p class="text-xs text-slate-500">الرسائل ومحادثات المعلمين</p>
-              </div>
-              <svg class="w-5 h-5 text-slate-400 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
             </a>
           </div>
 
-          <!-- Danger Zone -->
-          <div class="bg-rose-50 rounded-2xl border border-rose-200 shadow-sm p-6 text-center">
-            <h3 class="font-bold text-rose-800 mb-2">تسجيل الخروج</h3>
-            <p class="text-sm text-rose-600 mb-4">إنهاء الجلسة الحالية وتأمين حسابك</p>
-            <button (click)="logout()" class="w-full bg-white hover:bg-rose-100 text-rose-700 font-bold py-2.5 px-4 rounded-xl border border-rose-200 transition-colors shadow-sm">
+          <!-- Danger Area -->
+          <div class="bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/50 p-6 rounded-[24px] text-center shadow-sm">
+            <h4 class="font-bold text-rose-700 dark:text-rose-400 text-sm mb-1">تسجيل الخروج من الحساب</h4>
+            <p class="text-xs text-slate-500 mb-5">إنهاء جلسة المتابعة الحالية لتأمين حسابك</p>
+            <button 
+              (click)="logout()" 
+              class="w-full bg-white dark:bg-slate-900 hover:bg-rose-50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 py-3 rounded-xl text-sm font-bold transition-all shadow-sm">
               تسجيل الخروج
             </button>
           </div>
+
         </div>
+
+        <!-- Column 2: Basic Info Form Card (Takes larger space) -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-8 shadow-sm">
+            <div class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
+              <h2 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-3">
+                <span class="text-blue-600 bg-blue-50 dark:bg-blue-900/30 p-2 rounded-xl"><app-icon name="user" size="18"></app-icon></span>
+                المعلومات الأساسية
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <!-- Full Name Field -->
+              <div class="space-y-2 text-right">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">الاسم الكامل</label>
+                <input 
+                  type="text" 
+                  [value]="user?.fullName" 
+                  readonly 
+                  class="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm font-medium focus:outline-none cursor-default"
+                />
+              </div>
+
+              <!-- Email Field -->
+              <div class="space-y-2 text-right">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">البريد الإلكتروني</label>
+                <input 
+                  type="email" 
+                  [value]="user?.email" 
+                  readonly 
+                  dir="ltr"
+                  class="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm font-medium focus:outline-none cursor-default text-right"
+                />
+              </div>
+
+              <!-- Phone Field -->
+              <div class="space-y-2 text-right">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">رقم الهاتف</label>
+                <div class="flex items-center gap-3" dir="ltr">
+                  <div class="px-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-bold rounded-xl flex items-center gap-2 shrink-0 cursor-default">
+                    <span>🇪🇬</span>
+                    <span class="text-slate-600 dark:text-slate-300">+20</span>
+                  </div>
+                  <input 
+                    type="text" 
+                    [value]="user?.phone || 'غير مسجل'" 
+                    readonly 
+                    class="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm font-medium focus:outline-none cursor-default text-left"
+                  />
+                </div>
+              </div>
+
+              <!-- Country Field -->
+              <div class="space-y-2 text-right">
+                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300">الدولة</label>
+                <input 
+                  type="text" 
+                  [value]="user?.country || 'مصر'" 
+                  readonly 
+                  class="w-full px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-sm font-medium focus:outline-none cursor-default"
+                />
+              </div>
+            </div>
+
+            <!-- Accent Help note & Contact Support -->
+            <div class="mt-8 bg-gradient-to-l from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-900/50 rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-6 shadow-sm">
+              <div class="flex items-start gap-4 flex-1">
+                <div class="w-12 h-12 rounded-full bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-sm border border-blue-50 dark:border-blue-900/30">
+                  <app-icon name="information-circle" size="24"></app-icon>
+                </div>
+                <div class="text-right">
+                  <h4 class="font-black text-slate-900 dark:text-white mb-2 text-base">تحديث البيانات الأساسية</h4>
+                  <p class="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                    لتحديث الاسم، البريد الإلكتروني، أو بيانات أبنائك الأكاديمية، يُرجى التواصل مع فريق الدعم. نحن هنا لمساعدتك على مدار الساعة لتحديث الحساب بشكل رسمي وآمن.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0 w-full md:w-auto mt-2 md:mt-0">
+                <a href="https://wa.me/201000000000" target="_blank" class="flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl text-sm font-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                  <app-icon name="chat-bubble-left-ellipsis" size="18"></app-icon>
+                  تواصل عبر واتساب
+                </a>
+                <a href="mailto:support@masarak.com" class="flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-black transition-all shadow-sm hover:shadow">
+                  <app-icon name="envelope" size="18"></app-icon>
+                  راسلنا بالبريد
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
+
+      </div>
   `
 })
 export class ParentProfileComponent {
@@ -185,7 +211,7 @@ export class ParentProfileComponent {
     if (parts.length >= 2) {
       return parts[0][0] + parts[1][0];
     }
-    return parts[0][0] + parts[0][1];
+    return parts[0][0] + (parts[0][1] || '');
   }
 
   logout() {

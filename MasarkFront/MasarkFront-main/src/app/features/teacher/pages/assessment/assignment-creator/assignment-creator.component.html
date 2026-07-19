@@ -1,90 +1,34 @@
-<div class="space-y-6 font-sans text-slate-800" dir="rtl">
-  <div class="flex items-center justify-between">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-black text-slate-900">إنشاء واجب جديد</h1>
-      <p class="text-xs font-bold text-slate-400">إضافة واجب دراسي جديد للطلاب مع تحديد موعد التسليم والدرجة.</p>
-    </div>
-  </div>
+<div class="assignment-builder-page" dir="rtl">
+  <header class="assignment-builder-header"><div class="builder-heading"><span class="builder-badge">الواجبات</span><h1>إنشاء واجب جديد</h1><p>أضف واجبًا دراسيًا وحدّد موعد التسليم والدرجة ليصبح متاحًا للطلاب.</p></div><span class="builder-header-icon"><app-icon name="clipboard-document-list" size="30"></app-icon></span></header>
 
-  <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()" class="bg-white rounded-[24px] p-8 shadow-xs border border-slate-100 space-y-6 max-w-3xl">
-    
-    @if (errorMessage()) {
-      <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100">
-        {{ errorMessage() }}
-      </div>
-    }
+  <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()" class="assignment-builder-layout">
+    <div class="assignment-form-card">
+      @if (errorMessage()) { <div class="form-alert" role="alert"><app-icon name="exclamation-triangle" size="20"></app-icon><span>{{ errorMessage() }}</span></div> }
 
-    <div class="space-y-2">
-      <label class="block text-sm font-bold text-slate-700">المقرر الدراسي <span class="text-rose-500">*</span></label>
-      <select formControlName="teachingAssignmentId"
-        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-        @for (ta of teachingAssignments(); track ta.id) {
-          <option [value]="ta.id">{{ ta.subjectName }} - {{ ta.className }}</option>
-        }
-      </select>
-      @if (assignmentForm.get('teachingAssignmentId')?.touched && assignmentForm.get('teachingAssignmentId')?.invalid) {
-        <p class="text-xs text-rose-500 font-bold mt-1">المقرر الدراسي مطلوب.</p>
-      }
+      <section class="form-section"><header class="section-heading"><span>01</span><div><h2>المقرر والدرس</h2><p>حدّد الفصل والمقرر والدرس المرتبط بالواجب.</p></div></header><div class="form-grid">
+        <div class="form-field"><label for="assignment-course" class="field-label"><app-icon name="book" size="15"></app-icon><span>المقرر الدراسي</span><b>*</b></label><div class="field-control select-control"><app-icon name="book-open" size="17"></app-icon><select id="assignment-course" formControlName="teachingAssignmentId" [class.is-invalid]="assignmentForm.get('teachingAssignmentId')?.touched && assignmentForm.get('teachingAssignmentId')?.invalid" aria-describedby="course-error">@for (ta of teachingAssignments(); track ta.id) { <option [value]="ta.id">{{ ta.subjectName }} — {{ ta.className }}</option> }</select><i><app-icon name="chevron-down" size="14"></app-icon></i></div>@if (assignmentForm.get('teachingAssignmentId')?.touched && assignmentForm.get('teachingAssignmentId')?.invalid) { <p id="course-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>المقرر الدراسي مطلوب.</p> }</div>
+        <div class="form-field"><label for="assignment-lesson" class="field-label"><app-icon name="book-open" size="15"></app-icon><span>الدرس المرتبط</span><em>اختياري</em></label><div class="field-control select-control"><app-icon name="book-open" size="17"></app-icon><select id="assignment-lesson" formControlName="lessonId"><option value="">بدون درس — واجب عام للمادة</option>@for (lesson of lessons(); track lesson.lessonId) { <option [value]="lesson.lessonId">{{ lesson.title }}</option> }</select><i><app-icon name="chevron-down" size="14"></app-icon></i></div></div>
+      </div></section>
+
+      <section class="form-section"><header class="section-heading"><span>02</span><div><h2>تفاصيل الواجب</h2><p>اكتب عنوانًا واضحًا وتعليمات تساعد الطلاب على تنفيذ المطلوب.</p></div></header><div class="form-grid">
+        <div class="form-field full-width"><label for="assignment-title" class="field-label"><app-icon name="clipboard" size="15"></app-icon><span>عنوان الواجب</span><b>*</b></label><div class="field-control"><app-icon name="pencil" size="17"></app-icon><input id="assignment-title" type="text" formControlName="title" placeholder="مثال: واجب المعادلات الخطية" [class.is-invalid]="assignmentForm.get('title')?.touched && assignmentForm.get('title')?.invalid" aria-describedby="title-help title-error"></div><p id="title-help" class="field-help">استخدم عنوانًا قصيرًا وواضحًا للطلاب.</p>@if (assignmentForm.get('title')?.touched && assignmentForm.get('title')?.invalid) { <p id="title-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>عنوان الواجب مطلوب.</p> }</div>
+        <div class="form-field full-width"><label for="assignment-instructions" class="field-label"><app-icon name="document-text" size="15"></app-icon><span>التعليمات والوصف</span><em>اختياري</em></label><textarea id="assignment-instructions" formControlName="instructions" rows="4" placeholder="اكتب المطلوب من الطلاب، خطوات الحل، والملاحظات المهمة..."></textarea></div>
+      </div></section>
+
+      <section class="form-section"><header class="section-heading"><span>03</span><div><h2>التسليم والتقييم</h2><p>حدّد آخر موعد للتسليم والدرجة القصوى للواجب.</p></div></header><div class="form-grid">
+        <div class="form-field"><label for="assignment-due-date" class="field-label"><app-icon name="calendar" size="15"></app-icon><span>آخر موعد للتسليم</span><b>*</b></label><div class="field-control"><app-icon name="calendar" size="17"></app-icon><input id="assignment-due-date" type="datetime-local" formControlName="dueDate" [class.is-invalid]="assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid" aria-describedby="date-error"></div>@if (assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid) { <p id="date-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>موعد التسليم مطلوب.</p> }</div>
+        <div class="form-field"><label for="assignment-score" class="field-label"><app-icon name="trophy" size="15"></app-icon><span>الدرجة القصوى</span><b>*</b></label><div class="score-control"><div class="field-control"><app-icon name="trophy" size="17"></app-icon><input id="assignment-score" type="number" step="0.01" formControlName="maxScore" placeholder="100" min="0" max="1000" [class.is-invalid]="assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid" aria-describedby="score-error"></div><span>درجة</span></div>@if (assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid) { <p id="score-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>درجة الواجب غير صالحة.</p> }</div>
+      </div></section>
+
+      <footer class="form-actions"><button type="submit" class="submit-button" [disabled]="isSubmitting()" [attr.aria-busy]="isSubmitting()"><app-icon [name]="isSubmitting() ? 'clock' : 'send'" size="17"></app-icon><span>{{ isSubmitting() ? 'جاري النشر...' : 'حفظ ونشر الواجب' }}</span></button><button type="button" class="cancel-button" routerLink="/dashboard/teacher/assignments">إلغاء</button><p><app-icon name="check-circle" size="14"></app-icon>راجع البيانات قبل النشر للطلاب.</p></footer>
     </div>
 
-    <div class="space-y-2">
-      <label class="block text-sm font-bold text-slate-700">الدرس (اختياري)</label>
-      <select formControlName="lessonId"
-        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-        <option value="">-- بدون درس / مادة عامة --</option>
-        @for (lesson of lessons(); track lesson.lessonId) {
-          <option [value]="lesson.lessonId">{{ lesson.title }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="space-y-2">
-      <label class="block text-sm font-bold text-slate-700">عنوان الواجب <span class="text-rose-500">*</span></label>
-      <input type="text" formControlName="title" placeholder="مثال: واجب الرياضيات - المعادلات الخطية"
-        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-      @if (assignmentForm.get('title')?.touched && assignmentForm.get('title')?.invalid) {
-        <p class="text-xs text-rose-500 font-bold mt-1">عنوان الواجب مطلوب.</p>
-      }
-    </div>
-
-    <div class="space-y-2">
-      <label class="block text-sm font-bold text-slate-700">التعليمات / الوصف</label>
-      <textarea formControlName="instructions" rows="4" placeholder="اكتب تعليمات الواجب هنا..."
-        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"></textarea>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="space-y-2">
-        <label class="block text-sm font-bold text-slate-700">آخر موعد للتسليم <span class="text-rose-500">*</span></label>
-        <input type="datetime-local" formControlName="dueDate"
-          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-        @if (assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid) {
-          <p class="text-xs text-rose-500 font-bold mt-1">موعد التسليم مطلوب.</p>
-        }
-      </div>
-
-      <div class="space-y-2">
-        <label class="block text-sm font-bold text-slate-700">الدرجة القصوى <span class="text-rose-500">*</span></label>
-        <input type="number" step="0.01" formControlName="maxScore" placeholder="100" min="0" max="1000"
-          class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-        @if (assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid) {
-          <p class="text-xs text-rose-500 font-bold mt-1">درجة الواجب غير صالحة.</p>
-        }
-      </div>
-    </div>
-
-    <div class="pt-4 flex items-center gap-3">
-      <button type="submit" [disabled]="isSubmitting()"
-        class="bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md shadow-blue-100">
-        @if (isSubmitting()) {
-          جاري الحفظ...
-        } @else {
-          حفظ ونشر الواجب
-        }
-      </button>
-      <button type="button" routerLink="/dashboard/teacher/assignments" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl text-sm transition-all">
-        إلغاء
-      </button>
-    </div>
+    <aside class="assignment-summary-panel"><header><span><app-icon name="clipboard-document-list" size="21"></app-icon></span><div><h2>ملخص الواجب</h2><p>معاينة البيانات الحالية.</p></div></header><div class="summary-list">
+      <div><small>المقرر والفصل</small><strong>@for (ta of teachingAssignments(); track ta.id) { @if (ta.id == assignmentForm.get('teachingAssignmentId')?.value) { {{ ta.subjectName }} · {{ ta.className }} } } @if (!assignmentForm.get('teachingAssignmentId')?.value) { لم يُحدد بعد }</strong></div>
+      <div><small>الدرس</small><strong>@if (assignmentForm.get('lessonId')?.value) { @for (lesson of lessons(); track lesson.lessonId) { @if (lesson.lessonId == assignmentForm.get('lessonId')?.value) { {{ lesson.title }} } } } @else { بدون درس محدد }</strong></div>
+      <div><small>عنوان الواجب</small><strong>{{ assignmentForm.get('title')?.value || 'لم يُحدد بعد' }}</strong></div>
+      <div><small>موعد التسليم</small><strong dir="ltr">{{ assignmentForm.get('dueDate')?.value || 'لم يُحدد بعد' }}</strong></div>
+      <div><small>الدرجة القصوى</small><strong>{{ assignmentForm.get('maxScore')?.value ?? 'لم تُحدد بعد' }} درجة</strong></div>
+    </div><div class="summary-note"><app-icon name="check-badge" size="17"></app-icon><p>سيتم حفظ الواجب ثم نشره مباشرة باستخدام الإعدادات الحالية.</p></div></aside>
   </form>
 </div>

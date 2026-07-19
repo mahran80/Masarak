@@ -1,238 +1,362 @@
-<div class="min-h-screen flex bg-white relative" dir="rtl">
-  <!-- Simple Navbar -->
-  <header class="absolute top-0 w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-12 z-50">
-    <a routerLink="/" class="flex items-center">
-      <span class="text-2xl font-black text-blue-600 tracking-tight">Masarak</span>
-    </a>
-    <a routerLink="/auth/login" class="text-sm font-semibold text-blue-600 hover:text-blue-500 transition-colors bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg">
-      تسجيل الدخول
-    </a>
-  </header>
+<div class="ml-auth-bg" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
+  
+  <!-- Subtle Grid Overlay -->
+  <div class="ml-auth-grid-overlay"></div>
 
-  <!-- Form Section (Right side in RTL) -->
-  <div class="w-full lg:w-1/2 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-12 relative z-10">
-    <div class="max-w-2xl w-full space-y-8">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900">
-        @if (mode === 'Parent') { إنشاء حساب ولي أمر } @else { تسجيل بيانات الطالب }
-      </h2>
-      <p class="mt-2 text-sm text-slate-500">
-        @if (mode === 'Parent') { انضم إلينا وابدأ رحلتك التعليمية الآن } @else { أضف بيانات الطالب الجديد لربطه بحسابك }
-      </p>
+  <!-- Ambient Blurred Blobs -->
+  <div class="ml-auth-blob ml-auth-blob-1"></div>
+  <div class="ml-auth-blob ml-auth-blob-2"></div>
+
+  <!-- Top Corner Toggles (COMPACT) -->
+  <div class="ml-auth-toggles-corner">
+    <!-- Globe Language Dropdown -->
+    <div class="ml-lang-dropdown-wrapper">
+      <button type="button" class="ml-globe-btn" (click)="showLangDropdown.set(!showLangDropdown())" aria-label="Language selection">
+        <span class="material-symbols-outlined">language</span>
+      </button>
+      <div class="ml-lang-dropdown-menu" *ngIf="showLangDropdown()">
+        <button type="button" class="ml-dropdown-item" [class.is-active]="lang() === 'ar'" (click)="setLang('ar'); showLangDropdown.set(false)">العربية</button>
+        <button type="button" class="ml-dropdown-item" [class.is-active]="lang() === 'en'" (click)="setLang('en'); showLangDropdown.set(false)">English</button>
+      </div>
     </div>
 
-    @if (authState.error()) {
-      <div
-        class="flex items-center gap-2 bg-red-50 border-r-4 border-red-500 p-4 rounded-xl text-sm text-red-700 animate-fade-in"
-      >
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span>{{ authState.error() }}</span>
+    <!-- Adaptive Dark Mode Icon Button -->
+    <button type="button" class="ml-theme-icon-btn" (click)="toggleTheme()" aria-label="Toggle theme">
+      <span class="material-symbols-outlined">
+        {{ theme() === 'light' ? 'dark_mode' : 'light_mode' }}
+      </span>
+    </button>
+  </div>
+
+  <div class="ml-auth-wrapper">
+    <div class="ml-auth-card-container">
+      
+      <!-- LEFT SIDE: Hero Image -->
+      <div class="ml-auth-hero-pane" [ngStyle]="{'background-image': 'url(/assets/images/' + (mode === 'Parent' ? 'parent_register.jpg' : 'student_register.jpg') + ')'}">
+        <div class="ml-hero-overlay"></div>
+        <div class="ml-hero-text-overlay" style="top: auto; bottom: 0; padding: 40px 24px; text-align: start;">
+          <h1 class="ml-hero-title" style="font-size: 24px; margin-bottom: 12px; font-weight: 800; line-height: 1.4;">{{ mode === 'Parent' ? t().heroHeadlineParent : t().heroHeadlineStudent }}</h1>
+          <p class="ml-hero-desc" style="font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.85); line-height: 1.6; max-width: none; margin: 0;">{{ mode === 'Parent' ? t().heroSubheadlineParent : t().heroSubheadlineStudent }}</p>
+        </div>
       </div>
-    }
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">الاسم الكامل</label>
-          <input
-            type="text"
-            formControlName="fullName"
-            placeholder="أدخل اسمك الثلاثي"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-            [class.border-red-400]="
-              registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid
-            "
-          />
-          @if (
-            registerForm.controls.fullName.touched &&
-            registerForm.controls.fullName.hasError('required')
-          ) {
-            <small class="text-red-500 text-xs mt-1 block font-medium">الاسم الكامل مطلوب</small>
-          }
+      <!-- RIGHT SIDE: Form Pane / Success Pane -->
+      <!-- Register Form Side -->
+      <div class="ml-auth-form-pane" *ngIf="!isSuccess">
+        <!-- Top Brand Logo & Toggle Route link -->
+        <div class="ml-auth-brand-row" style="margin-bottom: 24px;">
+          <a routerLink="/" class="ml-auth-brand-logo">
+            <div class="ml-auth-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+            <span class="ml-auth-logo-text">{{ lang() === 'ar' ? 'مسارك' : 'Masarak' }}</span>
+          </a>
+          
+          <a routerLink="/auth/login" class="ml-auth-top-action" *ngIf="mode === 'Parent'">
+            {{ t().loginLink }}
+          </a>
         </div>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">البريد الإلكتروني</label>
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="name@example.com"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-            [class.border-red-400]="
-              registerForm.controls.email.touched && registerForm.controls.email.invalid
-            "
-          />
-          @if (registerForm.controls.email.touched) {
-            @if (registerForm.controls.email.hasError('required')) {
-              <small class="text-red-500 text-xs mt-1 block font-medium"
-                >البريد الإلكتروني مطلوب</small
-              >
-            }
-            @if (registerForm.controls.email.hasError('email')) {
-              <small class="text-red-500 text-xs mt-1 block font-medium"
-                >صيغة البريد غير صحيحة</small
-              >
-            }
-          }
+        <!-- Header Text -->
+        <div class="ml-auth-header" style="margin-bottom: 20px;">
+          <h2 class="ml-auth-title" style="font-size: 20px; font-weight: 800;">
+            {{ mode === 'Parent' ? t().titleParent : t().titleStudent }}
+          </h2>
+          <p class="ml-auth-subtitle" style="font-size: 12px; color: var(--text-variant);">
+            {{ mode === 'Parent' ? t().subParent : t().subStudent }}
+          </p>
         </div>
 
-        @if (mode === 'Parent') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5"
-              >رقم الهاتف</label
-            >
-            <div class="flex gap-3">
-              <select
-                formControlName="countryCode"
-                class="w-1/3 sm:w-32 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-                dir="ltr"
-              >
-                @for (country of countryCodes; track country.code) {
-                  <option [value]="country.code">{{ country.name }}</option>
-                }
-              </select>
+        <!-- Global Error Alert -->
+        <div class="ml-auth-global-alert" *ngIf="authState.error()" style="margin-bottom: 12px;">
+          <span class="material-symbols-outlined">error</span>
+          <span>{{ authState.error() }}</span>
+        </div>
+
+        <!-- Registration Form -->
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="ml-auth-form">
+          
+          <!-- Full Name Field -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
               <input
                 type="text"
-                formControlName="phone"
-                placeholder="رقم الهاتف"
-                class="flex-1 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-                [class.border-red-400]="
-                  registerForm.controls.phone.touched && registerForm.controls.phone.invalid
-                "
+                id="fullName"
+                formControlName="fullName"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid"
+                [class.is-valid]="registerForm.controls.fullName.touched && registerForm.controls.fullName.valid"
               />
+              <label for="fullName" class="ml-floating-label">
+                <span>{{ t().fullNameLabel }}</span>
+              </label>
+              <span class="material-symbols-outlined ml-floating-input-icon">person</span>
             </div>
-            @if (registerForm.controls.phone.touched && registerForm.controls.phone.invalid) {
-              <small class="text-red-500 text-xs mt-1 block font-medium">رقم الهاتف مطلوب وصيغته يجب أن تكون صحيحة</small>
-            }
+            <div class="ml-auth-error-msg" *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().fullNameRequired }}</span>
+            </div>
           </div>
 
-          <!-- إخفاء حقل الدولة، سيتم استخدامه كقيمة افتراضية أو يمكن إضافته إذا لزم الأمر -->
-        }
+          <!-- Email Field -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="registerForm.controls.email.touched && registerForm.controls.email.invalid"
+                [class.is-valid]="registerForm.controls.email.touched && registerForm.controls.email.valid"
+              />
+              <label for="email" class="ml-floating-label">
+                <span>{{ t().emailLabel }}</span>
+              </label>
+              <span class="material-symbols-outlined ml-floating-input-icon">mail</span>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="registerForm.controls.email.touched && registerForm.controls.email.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().emailInvalid }}</span>
+            </div>
+          </div>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">كلمة المرور</label>
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="******"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-            [class.border-red-400]="
-              registerForm.controls.password.touched && registerForm.controls.password.invalid
-            "
-          />
-          @if (registerForm.controls.password.touched) {
-            @if (registerForm.controls.password.hasError('required')) {
-              <small class="text-red-500 text-xs mt-1 block font-medium">كلمة المرور مطلوبة</small>
-            }
-            @if (registerForm.controls.password.hasError('minlength')) {
-              <small class="text-red-500 text-xs mt-1 block font-medium"
-                >يجب ألا تقل عن 6 أحرف</small
+          <!-- Phone Number (Parent only) -->
+          <div class="ml-auth-field" *ngIf="mode === 'Parent'">
+            <div class="ml-phone-flex-row">
+              <div class="ml-country-select-wrapper">
+                <select
+                  formControlName="countryCode"
+                  dir="ltr"
+                >
+                  <option *ngFor="let country of countryCodes; trackBy: trackByIndex" [value]="country.code">
+                    {{ country.name }}
+                  </option>
+                </select>
+                <span class="material-symbols-outlined ml-select-caret">expand_more</span>
+              </div>
+
+              <div class="ml-form-group-floating flex-1">
+                <input
+                  type="text"
+                  id="phone"
+                  formControlName="phone"
+                  placeholder=" "
+                  (keypress)="($event.charCode >= 48 && $event.charCode <= 57) || $event.preventDefault()"
+                  (input)="registerForm.controls.phone.setValue(registerForm.controls.phone.value.slice(0, 11).replace(/[^0-9]/g, ''))"
+                  class="ml-floating-input"
+                  [class.is-invalid]="registerForm.controls.phone.touched && registerForm.controls.phone.invalid"
+                  [class.is-valid]="registerForm.controls.phone.touched && registerForm.controls.phone.valid"
+                />
+                <label for="phone" class="ml-floating-label">
+                  <span>{{ t().phoneLabel }}</span>
+                </label>
+                <span class="material-symbols-outlined ml-floating-input-icon">call</span>
+              </div>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="registerForm.controls.phone.touched && registerForm.controls.phone.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().phoneInvalid }}</span>
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                autocomplete="new-password"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="registerForm.controls.password.touched && registerForm.controls.password.invalid"
+                [class.is-valid]="registerForm.controls.password.touched && registerForm.controls.password.valid"
+              />
+              <label for="password" class="ml-floating-label">
+                <span>{{ t().passwordLabel }}</span>
+              </label>
+              <svg class="ml-floating-input-icon ml-field-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5" stroke-width="1.8"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <button
+                type="button"
+                (click)="showPassword = !showPassword"
+                class="ml-auth-input-toggle"
+                [attr.aria-label]="'Toggle password visibility'"
               >
-            }
-          }
-        </div>
+                @if (showPassword) {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.2A10.8 10.8 0 0 1 12 4c5.4 0 9 5.2 9 8a8.8 8.8 0 0 1-2.1 3.7M6.6 6.6C4.3 8.1 3 10.4 3 12c0 2.8 3.6 8 9 8 1.3 0 2.5-.3 3.5-.7"/></svg>
+                } @else {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.8 12S6.2 5.5 12 5.5 21.2 12 21.2 12 17.8 18.5 12 18.5 2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="2.8" stroke-width="1.8"/></svg>
+                }
+              </button>
+            </div>
+            
+            <!-- Password Strength Bar & Checklist (Compact) -->
+            <div class="ml-strength-container" *ngIf="passwordValue" style="margin-top: 4px;">
+              <div class="ml-strength-track" style="height: 3px;">
+                <div class="ml-strength-bar"
+                     [class.weak]="strengthScore <= 2"
+                     [class.medium]="strengthScore > 2 && strengthScore <= 4"
+                     [class.strong]="strengthScore > 4"
+                     [style.width]="(strengthScore * 20) + '%'"></div>
+              </div>
+              
+              <p class="ml-strength-text" style="font-size: 8.5px; margin-top: 2px;">
+                {{ t().pwStrength }}
+                <span [class.weak]="strengthScore <= 2"
+                      [class.medium]="strengthScore > 2 && strengthScore <= 4"
+                      [class.strong]="strengthScore > 4">
+                  {{ strengthScore <= 2 ? t().pwWeak : (strengthScore <= 4 ? t().pwMedium : t().pwStrong) }}
+                </span>
+              </p>
 
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">تأكيد كلمة المرور</label>
-          <input
-            type="password"
-            formControlName="confirmPassword"
-            placeholder="******"
-            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-            [class.border-red-400]="
-              registerForm.controls.confirmPassword.touched &&
-              registerForm.controls.confirmPassword.invalid
-            "
-          />
-          @if (
-            registerForm.controls.confirmPassword.touched &&
-            registerForm.controls.confirmPassword.hasError('required')
-          ) {
-            <small class="text-red-500 text-xs mt-1 block font-medium"
-              >تأكيد كلمة المرور مطلوب</small
-            >
-          }
-        </div>
-
-        @if (mode === 'Student') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">المرحلة الدراسية</label>
-            <select
-              formControlName="gradeId"
-              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition"
-              [class.border-red-400]="
-                registerForm.controls.gradeId.touched && registerForm.controls.gradeId.invalid
-              "
-            >
-              <option value="" disabled selected>اختر المرحلة الدراسية</option>
-              @for (grade of grades; track grade.gradeId) {
-                <option [ngValue]="grade.gradeId">{{ grade.nameAr }}</option>
-              }
-            </select>
-            @if (
-              registerForm.controls.gradeId.touched &&
-              registerForm.controls.gradeId.hasError('required')
-            ) {
-              <small class="text-red-500 text-xs mt-1 block font-medium">المرحلة الدراسية مطلوبة</small>
-            }
+              <!-- Interactive Requirements checklist -->
+              <div class="ml-strength-checklist" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px;">
+                <div class="ml-checklist-item" [class.is-valid]="hasMinLength" style="font-size: 8px;">
+                  <span class="bullet">{{ hasMinLength ? '✓' : '·' }}</span>
+                  <span>{{ t().reqLength }}</span>
+                </div>
+                <div class="ml-checklist-item" [class.is-valid]="hasUppercase" style="font-size: 8px;">
+                  <span class="bullet">{{ hasUppercase ? '✓' : '·' }}</span>
+                  <span>{{ t().reqUpper }}</span>
+                </div>
+                <div class="ml-checklist-item" [class.is-valid]="hasLowercase" style="font-size: 8px;">
+                  <span class="bullet">{{ hasLowercase ? '✓' : '·' }}</span>
+                  <span>{{ t().reqLower }}</span>
+                </div>
+                <div class="ml-checklist-item" [class.is-valid]="hasNumber" style="font-size: 8px;">
+                  <span class="bullet">{{ hasNumber ? '✓' : '·' }}</span>
+                  <span>{{ t().reqNumber }}</span>
+                </div>
+                <div class="ml-checklist-item" [class.is-valid]="hasSpecialChar" style="font-size: 8px;">
+                  <span class="bullet">{{ hasSpecialChar ? '✓' : '·' }}</span>
+                  <span>{{ t().reqSpecial }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        }
-      </div>
 
-      <button
-        type="submit"
-        [disabled]="authState.isLoading()"
-        class="w-full flex justify-center items-center py-3 px-4 text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-blue-200 mt-4"
-      >
-        @if (authState.isLoading()) {
-          <svg class="animate-spin ml-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          جاري إنشاء الحساب...
-        } @else {
-          إنشاء الحساب
-        }
-      </button>
-    </form>
+          <!-- Confirm Password Field -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                autocomplete="new-password"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid"
+                [class.is-valid]="registerForm.controls.confirmPassword.value && registerForm.controls.confirmPassword.value === registerForm.controls.password.value"
+              />
+              <label for="confirmPassword" class="ml-floating-label">
+                <span>{{ t().confirmPasswordLabel }}</span>
+              </label>
+              <svg class="ml-floating-input-icon ml-field-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5" stroke-width="1.8"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <button
+                type="button"
+                (click)="showConfirmPassword = !showConfirmPassword"
+                class="ml-auth-input-toggle"
+                [attr.aria-label]="'Toggle password visibility'"
+              >
+                @if (showConfirmPassword) {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.2A10.8 10.8 0 0 1 12 4c5.4 0 9 5.2 9 8a8.8 8.8 0 0 1-2.1 3.7M6.6 6.6C4.3 8.1 3 10.4 3 12c0 2.8 3.6 8 9 8 1.3 0 2.5-.3 3.5-.7"/></svg>
+                } @else {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.8 12S6.2 5.5 12 5.5 21.2 12 21.2 12 17.8 18.5 12 18.5 2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="2.8" stroke-width="1.8"/></svg>
+                }
+              </button>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.value !== registerForm.controls.password.value">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().passwordMismatch }}</span>
+            </div>
+          </div>
 
-    @if (mode === 'Parent') {
-      <div class="text-center pt-2">
-        <p class="text-sm text-slate-600">
-          لديك حساب بالفعل؟
-          <a
-            routerLink="/auth/login"
-            class="font-semibold text-blue-600 hover:text-blue-500 transition underline decoration-2 underline-offset-4"
+          <!-- Grade Selector (Student mode only) -->
+          <div class="ml-auth-field" *ngIf="mode === 'Student'">
+            <div class="ml-form-group-floating">
+              <select
+                formControlName="gradeId"
+                class="ml-floating-input"
+                style="padding-inline-start: 44px; padding-inline-end: 28px;"
+              >
+                <option value="" disabled selected></option>
+                <option *ngFor="let grade of grades; trackBy: trackByIndex" [value]="grade.gradeId">
+                  {{ grade.nameAr }}
+                </option>
+              </select>
+              <label class="ml-floating-label" style="top: 14px; font-size: 9.5px; color: var(--primary);">
+                <span>{{ t().gradeLabel }}</span>
+              </label>
+              <span class="material-symbols-outlined ml-floating-input-icon">layers</span>
+              <span class="material-symbols-outlined ml-select-caret">expand_more</span>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="registerForm.controls.gradeId.touched && registerForm.controls.gradeId.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().gradeRequired }}</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="authState.isLoading() || isSuccess"
+            class="ml-btn ml-btn-primary w-full shadow-md ripple"
+            style="margin-top: 12px; height: 50px; border-radius: 14px; font-size: 14px;"
           >
-            تسجيل الدخول
+            {{ mode === 'Parent' ? t().submitButton : (lang() === 'ar' ? 'ربط حساب طفلك الآن' : 'Link Child Account Now') }}
+          </button>
+        </form>
+
+        <!-- Footer Link (Parent only) -->
+        <div class="ml-auth-footer" *ngIf="mode === 'Parent'" style="margin-top: 20px; font-size: 11.5px; display: flex; justify-content: center; align-items: center; gap: 6px; text-align: center; width: 100%;">
+          <span style="color: var(--text-variant);">{{ t().haveAccount }}</span>
+          <a routerLink="/auth/login" class="ml-auth-helper-link" style="color: #2563EB; font-weight: 800; text-decoration: none;">
+            {{ t().loginLink }}
           </a>
-        </p>
+        </div>
       </div>
-    }
+
+      <!-- Success Pane -->
+      <div class="ml-auth-form-pane animate-fade-in" *ngIf="isSuccess" style="align-items: center; text-align: center;">
+        <div class="ml-success-icon-ring" style="width: 72px; height: 72px; border-radius: 50%; background: color-mix(in srgb, var(--success) 12%, transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+          <span class="material-symbols-outlined" style="font-size: 36px; color: var(--success);">check_circle</span>
+        </div>
+        
+        <h2 class="ml-auth-title" style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">
+          {{ t().successTitle }}
+        </h2>
+        <p class="ml-auth-subtitle" style="font-size: 13px; color: var(--text-variant); max-width: 300px; margin: 0 auto 32px;">
+          {{ t().successSub }}
+        </p>
+
+        <!-- Primary CTA link button -->
+        <a [routerLink]="mode === 'Parent' ? '/add-student' : '/dashboard/student'" class="ml-btn ml-btn-primary" style="width: 100%; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 700;">
+          {{ lang() === 'ar' ? 'الانتقال إلى لوحة التحكم' : 'Go to Dashboard' }}
+        </a>
+      </div>
+
     </div>
   </div>
 
-  <!-- Illustration Section (Left side in RTL) -->
-  <div class="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden px-10">
-    <!-- Illustration Image -->
-    <img src="/assets/images/learning-illustration.png" alt="Learning" class="w-full max-w-2xl object-contain relative z-10 transition-transform duration-700 ease-in-out" />
+  <!-- LOADING OVERLAY -->
+  <div class="ml-loading-overlay-screen" *ngIf="authState.isLoading()">
+    <div class="ml-loading-spinner-card glass-card corporate-shadow">
+      <div class="ml-progress-ring">
+        <div class="spinner-border"></div>
+        <div class="spinner-center-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="ml-loading-text-pulsing">{{ t().loadingText }}</p>
+    </div>
   </div>
+
 </div>

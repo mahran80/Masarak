@@ -11,9 +11,9 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
   standalone: true,
   imports: [IconComponent, CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="space-y-8 pb-16 font-sans text-slate-800" dir="rtl">
+    <div class="prompt-workspace space-y-8 pb-16 font-sans text-slate-800" dir="rtl">
       <!-- Header -->
-      <div class="flex flex-col gap-2">
+      <div class="prompt-page-header flex flex-col gap-2">
         <div class="flex items-center gap-2 text-[13px] font-semibold text-slate-400">
           <span>الرئيسية</span>
           <app-icon name="chevron-left" [size]="12"></app-icon>
@@ -66,13 +66,13 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
           </div>
         }
 
-        <div class="grid grid-cols-1 gap-6">
+        <div class="templates-grid grid grid-cols-1 gap-6">
           <!-- Template Cards -->
           @for (template of templates(); track template.key) {
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+            <div class="template-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
               
               <!-- Template Header (White/Blue Theme, No Purple) -->
-              <div class="bg-slate-50/50 border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="template-card-header bg-slate-50/50 border-b border-slate-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm shrink-0">
                     <app-icon [name]="getTemplateIcon(template.key)" [size]="20"></app-icon>
@@ -94,9 +94,9 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
               </div>
 
               <!-- Template Body -->
-              <div class="p-6 space-y-6">
+              <div class="template-card-body p-6 space-y-6">
                 <!-- System Prompt -->
-                <div class="space-y-2">
+                <div class="prompt-field system-prompt-field space-y-2">
                   <label class="text-[13px] font-black text-slate-700 flex items-center gap-2">
                     <div class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-slate-500">
                       <app-icon name="settings" [size]="14"></app-icon>
@@ -110,7 +110,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
                 </div>
 
                 <!-- User Prompt Template -->
-                <div class="space-y-2">
+                <div class="prompt-field user-prompt-field space-y-2">
                   <label class="text-[13px] font-black text-slate-700 flex items-center gap-2">
                     <div class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-slate-500">
                       <app-icon name="chat" [size]="14"></app-icon>
@@ -124,7 +124,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
                 </div>
 
                 <!-- Parameters Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-slate-50/50 border border-slate-100 rounded-xl">
+                <div class="params-panel grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-slate-50/50 border border-slate-100 rounded-xl">
                   <div class="space-y-2">
                     <label class="text-[12px] font-bold text-slate-600 uppercase tracking-wide">Max Tokens</label>
                     <input type="number" [(ngModel)]="editData[template.key].maxTokens"
@@ -141,7 +141,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
                 </div>
 
                 <!-- Save Button (Blue Theme) -->
-                <div class="flex justify-end pt-2">
+                <div class="save-row flex justify-end pt-2">
                   <button (click)="saveTemplate(template.key)"
                           [disabled]="savingKey() === template.key"
                           class="bg-[#4F8CD4] hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl text-[13px] font-bold transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm hover:shadow-md">
@@ -172,6 +172,7 @@ import { AiPromptTemplateDto, UpdatePromptTemplateRequest } from '../../../../mo
       }
     </div>
   `,
+  styleUrl: './prompt-editor.component.css',
 })
 export class PromptEditorComponent implements OnInit {
   private readonly aiService = inject(AiAnalyticsService);

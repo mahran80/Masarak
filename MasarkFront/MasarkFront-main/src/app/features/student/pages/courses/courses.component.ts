@@ -19,6 +19,7 @@ import { StudentService } from '../../services/student.service';
   standalone: true,
   imports: [RouterLink, StudentCourseCardComponent],
   templateUrl: './courses.component.html',
+  styleUrl: './courses.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentCoursesPageComponent implements OnInit {

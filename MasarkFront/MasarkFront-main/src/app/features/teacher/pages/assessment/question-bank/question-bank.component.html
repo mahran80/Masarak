@@ -101,8 +101,8 @@
   </div>
 
   @if (showQuestionEditor()) {
-    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div class="question-editor-overlay" role="dialog" aria-modal="true" aria-label="إضافة أو تعديل سؤال">
+      <div class="question-editor-dialog">
         <app-question-editor 
           mode="bank"
           [subjectId]="selectedSubjectId()!" 

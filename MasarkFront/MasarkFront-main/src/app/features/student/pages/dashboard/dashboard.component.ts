@@ -28,6 +28,7 @@ import { StudentService } from '../../services/student.service';
     StudentScheduleCardComponent,
   ],
   templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentDashboardPageComponent implements OnInit {
@@ -42,6 +43,11 @@ export class StudentDashboardPageComponent implements OnInit {
 
   readonly recentCourses = computed(() => this.data()?.courses.slice(0, 4) ?? []);
   readonly upcomingSchedule = computed(() => this.data()?.schedule.slice(0, 3) ?? []);
+  readonly isEnrollmentError = computed(() =>
+    (this.errorMessage() ?? '').toLowerCase().includes('not enrolled') ||
+    (this.errorMessage() ?? '').includes('غير مسجل') ||
+    (this.errorMessage() ?? '').includes('غير مُسجل')
+  );
 
   ngOnInit(): void {
     this.loadDashboard();

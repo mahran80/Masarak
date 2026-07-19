@@ -13,6 +13,7 @@ import { QuestionEditorComponent } from '../question-editor/question-editor.comp
   standalone: true,
   imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
   templateUrl: './question-bank.component.html',
+  styleUrl: './question-bank.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionBankComponent implements OnInit {

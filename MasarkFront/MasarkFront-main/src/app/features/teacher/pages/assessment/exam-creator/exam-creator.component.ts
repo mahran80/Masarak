@@ -15,6 +15,7 @@ import { QuestionEditorComponent } from '../question-editor/question-editor.comp
   standalone: true,
   imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
   templateUrl: './exam-creator.component.html',
+  styleUrl: './exam-creator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExamCreatorComponent implements OnInit {

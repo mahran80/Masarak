@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal, effect, computed } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +24,8 @@ export class TeacherAssignments implements OnInit {
   readonly assignments = signal<TeacherAssignment[]>([]);
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly assignmentsPage = signal(1);
+  readonly assignmentsPageSize = signal(10);
 
   readonly teachingAssignments = this.contextService.assignments;
   readonly isLoadingContext = this.contextService.isLoading;
@@ -46,6 +48,7 @@ export class TeacherAssignments implements OnInit {
   }
 
   selectAssignment(taId: number): void {
+    this.assignmentsPage.set(1);
     this.contextService.selectAssignment(taId);
   }
 
@@ -93,5 +96,52 @@ export class TeacherAssignments implements OnInit {
       Closed: 'مغلق',
     };
     return labels[status] ?? status;
+  }
+
+  readonly assignmentsTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.assignments().length / this.assignmentsPageSize()))
+  );
+
+  readonly effectiveAssignmentsPage = computed(() =>
+    Math.min(this.assignmentsPage(), this.assignmentsTotalPages())
+  );
+
+  readonly paginatedAssignments = computed(() => {
+    const start = (this.effectiveAssignmentsPage() - 1) * this.assignmentsPageSize();
+    return this.assignments().slice(start, start + this.assignmentsPageSize());
+  });
+
+  readonly assignmentsRangeStart = computed(() =>
+    this.assignments().length
+      ? (this.effectiveAssignmentsPage() - 1) * this.assignmentsPageSize() + 1
+      : 0
+  );
+
+  readonly assignmentsRangeEnd = computed(() =>
+    Math.min(this.effectiveAssignmentsPage() * this.assignmentsPageSize(), this.assignments().length)
+  );
+
+  setAssignmentsPage(page: number): void {
+    this.assignmentsPage.set(Math.min(Math.max(page, 1), this.assignmentsTotalPages()));
+  }
+
+  changeAssignmentsPageSize(size: number | string): void {
+    this.assignmentsPageSize.set(Number(size));
+    this.assignmentsPage.set(1);
+  }
+
+  paginationPages(): number[] {
+    const total = this.assignmentsTotalPages();
+    const current = this.effectiveAssignmentsPage();
+    if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+
+    const pages = new Set([1, total, current - 1, current, current + 1]);
+    const sorted = [...pages].filter(page => page > 0 && page <= total).sort((a, b) => a - b);
+    const result: number[] = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) result.push(0);
+      result.push(page);
+    });
+    return result;
   }
 }

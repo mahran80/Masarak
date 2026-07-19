@@ -63,6 +63,13 @@ export const routes: Routes = [
   },
 
   {
+    path: 'add-student',
+    canActivate: [authGuard, parentGuard],
+    loadComponent: () => import('./features/auth/signup/signup').then((m) => m.Signup),
+    data: { mode: 'Student' }
+  },
+
+  {
     path: 'dashboard',
     component: DashboardLayoutComponent, // الشاسيه الثابت
     canActivate: [authGuard],

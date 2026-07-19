@@ -1,141 +1,206 @@
-<div class="min-h-screen flex bg-white relative" dir="rtl">
-  <!-- Simple Navbar -->
-  <header class="absolute top-0 w-full h-16 flex items-center justify-between px-4 sm:px-6 lg:px-12 z-50">
-    <a routerLink="/" class="flex items-center">
-      <span class="text-2xl font-black text-blue-600 tracking-tight">Masarak</span>
-    </a>
-    <a routerLink="/auth/register" class="text-sm font-semibold text-blue-600 hover:text-blue-500 transition-colors bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg">
-      إنشاء حساب
-    </a>
-  </header>
+<div class="ml-auth-bg" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
+  
+  <!-- Subtle Grid Overlay -->
+  <div class="ml-auth-grid-overlay"></div>
 
-  <!-- Form Section (Right side in RTL) -->
-  <div class="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 lg:px-12 relative z-10">
-    <div class="max-w-md w-full space-y-8">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900">تسجيل الدخول</h2>
-      <p class="mt-2 text-sm text-slate-500">أهلاً بك مجدداً! يرجى إدخال بياناتك للمتابعة.</p>
+  <!-- Ambient Blurred Blobs -->
+  <div class="ml-auth-blob ml-auth-blob-1"></div>
+  <div class="ml-auth-blob ml-auth-blob-2"></div>
+
+  <!-- Top Corner Toggles (COMPACT) -->
+  <div class="ml-auth-toggles-corner">
+    <!-- Globe Language Dropdown -->
+    <div class="ml-lang-dropdown-wrapper">
+      <button type="button" class="ml-globe-btn" (click)="showLangDropdown.set(!showLangDropdown())" aria-label="Language selection">
+        <span class="material-symbols-outlined">language</span>
+      </button>
+      <div class="ml-lang-dropdown-menu" *ngIf="showLangDropdown()">
+        <button type="button" class="ml-dropdown-item" [class.is-active]="lang() === 'ar'" (click)="setLang('ar'); showLangDropdown.set(false)">العربية</button>
+        <button type="button" class="ml-dropdown-item" [class.is-active]="lang() === 'en'" (click)="setLang('en'); showLangDropdown.set(false)">English</button>
+      </div>
     </div>
 
-    @if (authState.error()) {
-      <div
-        class="flex items-center gap-2 bg-red-50 border-r-4 border-red-500 p-4 rounded-xl text-sm text-red-700 animate-fade-in"
-      >
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span>{{ authState.error() }}</span>
-      </div>
-    }
+    <!-- Adaptive Dark Mode Icon Button -->
+    <button type="button" class="ml-theme-icon-btn" (click)="toggleTheme()" aria-label="Toggle theme">
+      <span class="material-symbols-outlined">
+        {{ theme() === 'light' ? 'dark_mode' : 'light_mode' }}
+      </span>
+    </button>
+  </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-      <div class="form-group">
-        <label class="block text-sm font-semibold text-slate-700 mb-1.5">البريد الإلكتروني</label>
-        <div class="relative">
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="example@mail.com"
-            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition duration-200"
-            [class.border-red-400]="
-              loginForm.controls.email.touched && loginForm.controls.email.invalid
-            "
-          />
+  <div class="ml-auth-wrapper">
+    <div class="ml-auth-card-container">
+      
+      <!-- LEFT SIDE: Hero Image -->
+      <div class="ml-auth-hero-pane" style="background-image: url('/assets/images/login.jpg');">
+        <div class="ml-hero-overlay"></div>
+        <div class="ml-hero-text-overlay" style="top: auto; bottom: 0; padding: 40px 24px; text-align: start;">
+          <h1 class="ml-hero-title" style="font-size: 24px; margin-bottom: 12px; font-weight: 800; line-height: 1.4;">{{ t().heroHeadline }}</h1>
+          <p class="ml-hero-desc" style="font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.85); line-height: 1.6; max-width: none; margin: 0;">{{ t().heroDescription }}</p>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: Form Pane / Success Pane -->
+      <!-- Login Form Side -->
+      <div class="ml-auth-form-pane" *ngIf="!isSuccess">
+        <!-- Top Brand Logo & Toggle Route link -->
+        <div class="ml-auth-brand-row" style="margin-bottom: 24px;">
+          <a routerLink="/" class="ml-auth-brand-logo">
+            <div class="ml-auth-logo-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+            <span class="ml-auth-logo-text">{{ lang() === 'ar' ? 'مسارك' : 'Masarak' }}</span>
+          </a>
+          
+          <a routerLink="/auth/register" class="ml-auth-top-action">
+            {{ t().registerLink }}
+          </a>
         </div>
 
-        @if (loginForm.controls.email.touched) {
-          @if (loginForm.controls.email.hasError('required')) {
-            <small class="text-red-500 text-xs mt-1 block font-medium"
-              >البريد الإلكتروني مطلوب</small
-            >
-          }
-          @if (loginForm.controls.email.hasError('email')) {
-            <small class="text-red-500 text-xs mt-1 block font-medium"
-              >صيغة البريد الإلكتروني غير صحيحة</small
-            >
-          }
-        }
+        <!-- Header Text -->
+        <div class="ml-auth-header" style="margin-bottom: 20px;">
+          <h2 class="ml-auth-title" style="font-size: 20px; font-weight: 800;">{{ t().title }}</h2>
+          <p class="ml-auth-subtitle" style="font-size: 12px; color: var(--text-variant);">{{ t().subtitle }}</p>
+        </div>
+
+        <!-- Global Error Alert -->
+        <div class="ml-auth-global-alert" *ngIf="authState.error()" style="margin-bottom: 12px;">
+          <span class="material-symbols-outlined">error</span>
+          <span>{{ authState.error() }}</span>
+        </div>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="ml-auth-form">
+          <!-- Email Input -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid"
+                [class.is-valid]="loginForm.controls.email.touched && loginForm.controls.email.valid"
+              />
+              <label for="email" class="ml-floating-label">
+                <span>{{ t().emailLabel }}</span>
+              </label>
+              <span class="material-symbols-outlined ml-floating-input-icon">mail</span>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="loginForm.controls.email.touched && loginForm.controls.email.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().emailInvalid }}</span>
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="ml-auth-field">
+            <div class="ml-form-group-floating">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                autocomplete="current-password"
+                autocomplete="current-password"
+                placeholder=" "
+                class="ml-floating-input"
+                [class.is-invalid]="loginForm.controls.password.touched && loginForm.controls.password.invalid"
+                [class.is-valid]="loginForm.controls.password.touched && loginForm.controls.password.valid"
+              />
+              <label for="password" class="ml-floating-label">
+                <span>{{ t().passwordLabel }}</span>
+              </label>
+              <svg class="ml-floating-input-icon ml-field-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5" stroke-width="1.8"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <button
+                type="button"
+                (click)="showPassword = !showPassword"
+                class="ml-auth-input-toggle"
+                [attr.aria-label]="'Toggle password visibility'"
+              >
+                @if (showPassword) {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 4.2A10.8 10.8 0 0 1 12 4c5.4 0 9 5.2 9 8a8.8 8.8 0 0 1-2.1 3.7M6.6 6.6C4.3 8.1 3 10.4 3 12c0 2.8 3.6 8 9 8 1.3 0 2.5-.3 3.5-.7"/></svg>
+                } @else {
+                  <svg class="ml-password-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.8 12S6.2 5.5 12 5.5 21.2 12 21.2 12 17.8 18.5 12 18.5 2.8 12 2.8 12Z"/><circle cx="12" cy="12" r="2.8" stroke-width="1.8"/></svg>
+                }
+              </button>
+            </div>
+            <div class="ml-auth-error-msg" *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid">
+              <span class="material-symbols-outlined">info</span>
+              <span>{{ t().passwordRequired }}</span>
+            </div>
+          </div>
+
+          <!-- Remember Me & Forgot Password -->
+          <div class="ml-auth-actions-row" style="font-size: 11.5px; margin-top: 4px;">
+            <label class="ml-auth-checkbox-label">
+              <input type="checkbox" formControlName="rememberMe" class="ml-auth-checkbox" />
+              <span>{{ lang() === 'ar' ? 'تذكرني' : 'Remember me' }}</span>
+            </label>
+            <a routerLink="/auth/ForgotPassword" class="ml-auth-helper-link">
+              {{ t().forgotPassword }}
+            </a>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="authState.isLoading() || isSuccess"
+            class="ml-btn ml-btn-primary w-full shadow-md ripple"
+            style="margin-top: 12px; height: 50px; border-radius: 14px; font-size: 14px;"
+          >
+            {{ t().submitButton }}
+          </button>
+        </form>
+
+        <!-- Footer Link -->
+        <div class="ml-auth-footer" style="margin-top: 20px; font-size: 11.5px; display: flex; justify-content: center; align-items: center; gap: 6px; text-align: center; width: 100%;">
+          <span style="color: var(--text-variant);">{{ t().noAccount }}</span>
+          <a routerLink="/auth/register" class="ml-auth-helper-link" style="color: #2563EB; font-weight: 800; text-decoration: none;">
+            {{ t().registerLink }}
+          </a>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label class="block text-sm font-semibold text-slate-700 mb-1.5">كلمة المرور</label>
-        <input
-          type="password"
-          formControlName="password"
-          placeholder="******"
-          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:bg-white transition duration-200"
-          [class.border-red-400]="
-            loginForm.controls.password.touched && loginForm.controls.password.invalid
-          "
-        />
+      <!-- Success Pane -->
+      <div class="ml-auth-form-pane animate-fade-in" *ngIf="isSuccess" style="align-items: center; text-align: center;">
+        <div class="ml-success-icon-ring" style="width: 72px; height: 72px; border-radius: 50%; background: color-mix(in srgb, var(--success) 12%, transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+          <span class="material-symbols-outlined" style="font-size: 36px; color: var(--success);">check_circle</span>
+        </div>
+        
+        <h2 class="ml-auth-title" style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">
+          {{ t().successTitle }}
+        </h2>
+        <p class="ml-auth-subtitle" style="font-size: 13px; color: var(--text-variant); max-width: 300px; margin: 0 auto 32px;">
+          {{ t().successSub }}
+        </p>
 
-        @if (
-          loginForm.controls.password.touched && loginForm.controls.password.hasError('required')
-        ) {
-          <small class="text-red-500 text-xs mt-1 block font-medium">كلمة المرور مطلوبة</small>
-        }
+        <!-- Primary CTA link button -->
+        <a routerLink="/dashboard/parent" class="ml-btn ml-btn-primary" style="width: 100%; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 700;">
+          {{ lang() === 'ar' ? 'الانتقال إلى لوحة التحكم' : 'Go to Dashboard' }}
+        </a>
       </div>
 
-      <button
-        type="submit"
-        [disabled]="authState.isLoading()"
-        class="w-full flex justify-center items-center py-3 px-4 text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-blue-200"
-      >
-        @if (authState.isLoading()) {
-          <svg class="animate-spin ml-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div class="ml-loading-overlay-screen" *ngIf="authState.isLoading()">
+    <div class="ml-loading-spinner-card glass-card corporate-shadow">
+      <div class="ml-progress-ring">
+        <div class="spinner-border"></div>
+        <div class="spinner-center-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
           </svg>
-          جاري التحميل...
-        } @else {
-          دخول
-        }
-      </button>
-    </form>
-
-    <div class="text-center pt-2">
-      <p class="text-sm text-slate-600">
-        ليس لديك حساب؟
-        <a
-          routerLink="/auth/register"
-          class="font-semibold text-blue-600 hover:text-blue-500 transition duration-150 underline decoration-2 underline-offset-4"
-        >
-          سجل الآن
-        </a>
-      </p>
-
-      <p class="text-sm text-slate-600">
-        نسيت كلمه السر ؟؟
-        <a
-          routerLink="/auth/ForgotPassword"
-          class="font-semibold text-blue-600 hover:text-blue-500 transition duration-150 underline decoration-2 underline-offset-4"
-        >
-          اضغط هنا
-        </a>
-      </p>
-    </div>
+        </div>
+      </div>
+      <p class="ml-loading-text-pulsing">{{ t().loadingText }}</p>
     </div>
   </div>
 
-  <!-- Illustration Section (Left side in RTL) -->
-  <div class="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden px-10">
-    <!-- Illustration Image -->
-    <img src="/assets/images/learning-illustration.png" alt="Learning" class="w-full max-w-2xl object-contain relative z-10 transition-transform duration-700 ease-in-out" />
-  </div>
 </div>

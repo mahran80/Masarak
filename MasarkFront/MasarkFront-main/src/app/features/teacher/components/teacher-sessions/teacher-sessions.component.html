@@ -1,126 +1,32 @@
-<div class="p-6 bg-slate-50 min-h-screen text-slate-900" dir="rtl">
-  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-center gap-3">
-      <button (click)="isSidebarOpen.set(!isSidebarOpen())" 
-              class="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-[#4F8CD4] hover:bg-[#4F8CD4]/5 transition-all shadow-sm active:scale-95"
-              title="إظهار / إخفاء القائمة الجانبية">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300" 
-             [ngClass]="{'rotate-180': !isSidebarOpen()}" 
-             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-      <div>
-        <h1 class="text-3xl font-black text-slate-900">جدول الحصص</h1>
-        <p class="text-sm font-bold text-slate-500 mt-1">إدارة وبدء حصصك الدراسية</p>
+<div class="live-schedule-page" dir="rtl">
+  <section class="schedule-hero">
+    <div class="hero-copy"><span class="hero-badge">لوحة المدرس</span><h1>جدول الحصص</h1><p>تابع حصصك الأسبوعية، مواعيدها، والفصول المرتبطة بها من مكان واحد.</p></div>
+    <div class="hero-side">@if (selectedClassId()) { <div class="hero-stat"><strong>{{ calendarSessions().length }}</strong><span>حصة هذا الأسبوع</span></div> }<span class="hero-icon"><app-icon name="calendar" [size]="30"></app-icon></span></div>
+  </section>
+
+  <section class="schedule-controls">
+    <div class="week-control"><label for="teacher-week-select">الأسبوع الدراسي</label><div class="week-select-wrap"><span><app-icon name="calendar" [size]="17"></app-icon></span><select id="teacher-week-select" [ngModel]="selectedWeek()" (change)="onWeekChange($event)" dir="rtl">@for (week of academicWeeks(); track week.value) { <option [value]="week.value">{{ week.label }}</option> }</select><i><app-icon name="chevron-down" [size]="15"></app-icon></i></div></div>
+    <div class="controls-summary"><span><app-icon name="clock" [size]="17"></app-icon></span><div><small>الأسبوع المحدد</small><strong>{{ weekStart() | date:'dd MMM yyyy' }}</strong></div><b>{{ calendarSessions().length }} حصة</b></div>
+    <button type="button" class="sidebar-toggle" (click)="isSidebarOpen.set(!isSidebarOpen())" [attr.aria-expanded]="isSidebarOpen()" aria-label="إظهار أو إخفاء قائمة الفصول"><app-icon name="menu" [size]="18"></app-icon><span>{{ isSidebarOpen() ? 'إخفاء الفصول' : 'اختيار الفصل' }}</span></button>
+  </section>
+
+  <div class="schedule-layout" [class.sidebar-closed]="!isSidebarOpen()">
+    <aside class="classes-sidebar" [class.is-closed]="!isSidebarOpen()">
+      <div class="classes-panel"><header><span><app-icon name="academic-cap" [size]="20"></app-icon></span><div><h2>الفصول الدراسية</h2><p>اختر الصف ثم الفصل.</p></div></header>
+        <div class="grades-list">@for (g of grades(); track g.gradeId) { <div class="grade-group"><button type="button" class="grade-button" [class.is-active]="selectedGradeId() === g.gradeId" (click)="onGradeSelect(g.gradeId)"><span>{{ g.name }}</span><app-icon name="chevron-down" [size]="14"></app-icon></button>@if (selectedGradeId() === g.gradeId) { <div class="classes-list">@for (c of classes(); track c.classId) { <button type="button" [class.is-active]="selectedClassId() === c.classId" (click)="onClassSelect(c.classId)"><i></i><span>{{ c.name }}</span>@if (selectedClassId() === c.classId) { <app-icon name="check-circle" [size]="15"></app-icon> }</button> }</div> }</div> }</div>
       </div>
-    </div>
-    
-    <div class="flex items-center gap-4 bg-white rounded-xl shadow-sm border border-slate-100 p-1.5">
-        <select
-          [ngModel]="selectedWeek()"
-          (change)="onWeekChange($event)"
-          class="bg-transparent text-sm font-bold text-slate-700 min-w-[140px] text-center focus:outline-none cursor-pointer px-2 py-1"
-          dir="rtl"
-        >
-          @for (week of academicWeeks(); track week.value) {
-            <option [value]="week.value">{{ week.label }}</option>
-          }
-        </select>
-      </div>
-  </div>
+    </aside>
 
-  <div class="flex gap-6 relative">
-    <!-- Sidebar -->
-    <div class="shrink-0 transition-all duration-500 ease-in-out overflow-hidden"
-         [ngClass]="isSidebarOpen() ? 'w-72 opacity-100' : 'w-0 opacity-0 pointer-events-none'">
-      <div class="w-72 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
-        
-
-        <h3 class="text-sm font-black text-slate-900 mb-4">الصفوف الدراسية</h3>
-        
-        <div class="space-y-3">
-          @for (g of grades(); track g.gradeId) {
-            <div>
-              <button 
-                class="w-full flex items-center justify-between p-3 rounded-xl transition-all"
-                [ngClass]="selectedGradeId() === g.gradeId ? 'bg-sky-50 border-2 border-sky-100' : 'bg-slate-50 border-2 border-transparent hover:bg-slate-100'"
-                (click)="onGradeSelect(g.gradeId)">
-                <span class="font-bold text-sm" [ngClass]="selectedGradeId() === g.gradeId ? 'text-sky-700' : 'text-slate-700'">{{ g.name }}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform" 
-                     [ngClass]="selectedGradeId() === g.gradeId ? 'text-sky-500 rotate-180' : 'text-slate-400'"
-                     viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </button>
-              
-              @if (selectedGradeId() === g.gradeId) {
-                <div class="mt-2 pr-4 space-y-1">
-                  @for (c of classes(); track c.classId) {
-                    <button 
-                      class="w-full text-right p-2.5 rounded-lg text-sm transition-all flex items-center gap-2"
-                      [ngClass]="selectedClassId() === c.classId ? 'bg-sky-500 text-white font-bold shadow-sm' : 'text-slate-600 font-semibold hover:bg-slate-50'"
-                      (click)="onClassSelect(c.classId)">
-                      <div class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedClassId() === c.classId ? 'bg-white' : 'bg-slate-300'"></div>
-                      {{ c.name }}
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 transition-all duration-500 min-w-0">
+    <main class="schedule-main">
       @if (selectedClassId()) {
-        <div class="mb-6">
-           <h2 class="text-xl font-bold text-slate-900">حصص الأسبوع</h2>
-        </div>
-
-        @if (isLoading()) {
-          <div class="grid grid-cols-7 gap-4">
-            @for (item of [1,2,3,4,5,6,7]; track item) {
-              <div class="h-96 bg-white rounded-2xl animate-pulse shadow-sm"></div>
-            }
-          </div>
-        } @else if (errorMessage()) {
-          <div class="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
-             <div class="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
-               <p class="text-sm font-bold text-rose-700">عذرًا، لم نتمكن من تحميل الجدول</p>
-               <p class="mt-2 text-sm text-slate-600">{{ errorMessage() }}</p>
-               <button type="button" class="mt-4 rounded-lg bg-rose-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm" (click)="loadSessions()">
-                 إعادة المحاولة
-               </button>
-             </div>
-           </div>
-        } @else {
-          <app-weekly-calendar 
-            [weekStart]="weekStart()" 
-            [sessions]="calendarSessions()" 
-            role="teacher"
-            (start)="onCalendarStart($event)"
-            (join)="onCalendarJoin($event)"
-            (complete)="onCalendarComplete($event)"
-            (attendance)="onCalendarAttendance($event)"
-          ></app-weekly-calendar>
-        }
+        <section class="schedule-workspace"><header class="workspace-header"><div class="workspace-title"><span><app-icon name="calendar" [size]="21"></app-icon></span><div><h2>حصص الأسبوع</h2><p>الجدول الأسبوعي للحصص والمواعيد.</p></div></div><div class="workspace-meta"><span>{{ weekStart() | date:'dd MMM yyyy' }}</span><b>{{ calendarSessions().length }} حصة</b></div></header>
+          @if (isLoading()) { <div class="schedule-loading" aria-label="جاري تحميل جدول الحصص">@for (item of [1,2,3,4,5,6,7]; track item) { <div><span></span><span></span><span></span></div> }</div> }
+          @else if (errorMessage()) { <div class="schedule-error" role="alert"><span><app-icon name="exclamation-triangle" [size]="25"></app-icon></span><div><h3>تعذّر تحميل جدول الحصص</h3><p>{{ errorMessage() }}</p></div><button type="button" (click)="loadSessions()">إعادة المحاولة</button></div> }
+          @else { <app-weekly-calendar [weekStart]="weekStart()" [sessions]="calendarSessions()" role="teacher" (start)="onCalendarStart($event)" (join)="onCalendarJoin($event)" (complete)="onCalendarComplete($event)" (attendance)="onCalendarAttendance($event)"></app-weekly-calendar> }
+        </section>
       } @else {
-        <!-- Empty State -->
-        <div class="bg-white rounded-[24px] p-12 shadow-xs border border-slate-100 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
-          <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
-            <app-icon name="calendar" [size]="40"></app-icon>
-          </div>
-          <h3 class="text-lg font-black text-slate-900 mb-2">اختر فصلاً دراسياً</h3>
-          <p class="text-sm font-bold text-slate-500 max-w-sm">
-            قم باختيار الصف الدراسي ثم الفصل من القائمة الجانبية لعرض جدول الحصص الخاص بك.
-          </p>
-        </div>
+        <section class="select-class-empty"><span><app-icon name="calendar" [size]="38"></app-icon></span><h2>اختر فصلًا دراسيًا</h2><p>اختر الصف ثم الفصل من القائمة لعرض جدول الحصص الأسبوعي الخاص بك.</p><button type="button" (click)="isSidebarOpen.set(true)"><app-icon name="academic-cap" [size]="16"></app-icon><span>اختيار الفصل</span></button></section>
       }
-    </div>
+    </main>
   </div>
 </div>
-

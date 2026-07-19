@@ -1,34 +1,57 @@
-<div class="p-4 sm:p-6 max-w-full" dir="rtl">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">إدارة الدروس</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">قم بتنظيم المحتوى والاختبارات في دروس ووحدات</p>
-  </div>
-
-  <!-- Select Class/Subject -->
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
-    <label for="ta-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اختر الفصل والمادة</label>
-    <select id="ta-select"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors"
-            (change)="onSelectTa($event)">
-      <option value="">-- اختر --</option>
-      <option *ngFor="let ta of teachingAssignments" [value]="ta.id">
-        {{ ta.className }} - {{ ta.subjectName }}
-      </option>
-    </select>
-  </div>
-
-  <div *ngIf="selectedTaId">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
-      <h2 class="text-lg font-semibold text-gray-800 dark:text-white">الدروس</h2>
-      <button (click)="openCreateForm()"
-              class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-        <app-icon name="plus" [size]="16"></app-icon>
-        إضافة درس جديد
-      </button>
+<div class="lessons-page-container" dir="rtl">
+  <section class="lessons-hero">
+    <div class="lessons-hero-copy">
+      <span class="lessons-hero-badge">لوحة المدرس</span>
+      <h1>إدارة الدروس</h1>
+      <p>نظّم دروسك ووحداتك التعليمية واربطها بالمقرر والفصل المناسب.</p>
     </div>
+    <div class="lessons-hero-side">
+      <span class="lessons-hero-icon"><app-icon name="graduation" [size]="30"></app-icon></span>
+      <div *ngIf="selectedTaId" class="lessons-hero-stat"><strong>{{ lessons.length }}</strong><span>درس في المقرر</span></div>
+    </div>
+  </section>
 
+  <section class="course-selector-card">
+    <div class="course-selector-content">
+      <div class="course-selector-heading">
+        <span class="selector-step">01</span>
+        <span class="selector-icon"><app-icon name="book" [size]="20"></app-icon></span>
+        <div><h2>اختر المقرر والفصل</h2><p>اختر المقرر الذي تريد عرض دروسه أو إضافة درس جديد إليه.</p></div>
+      </div>
+      <div class="course-select-area">
+        <label for="ta-select">المقرر والفصل</label>
+        <div class="course-select-wrap">
+          <span class="select-book-icon"><app-icon name="book" [size]="16"></app-icon></span>
+          <select id="ta-select" (change)="onSelectTa($event)">
+            <option value="">اختر المقرر والفصل</option>
+            <option *ngFor="let ta of teachingAssignments" [value]="ta.id">{{ ta.subjectName }} — {{ ta.className }}</option>
+          </select>
+          <span class="select-arrow"><app-icon name="chevron-down" [size]="15"></app-icon></span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="selectedAssignment as course" class="lesson-selected-course-summary">
+      <span><app-icon name="check-circle" [size]="17"></app-icon></span>
+      <div><small>المقرر المختار</small><strong>{{ course.subjectName }}</strong></div>
+      <em>{{ course.className }}</em>
+      <b>{{ lessons.length }} درس</b>
+    </div>
+  </section>
+
+  <section class="lessons-section" *ngIf="selectedTaId">
+    <header class="lessons-section-header">
+      <div class="lessons-section-title">
+        <span><app-icon name="book-open" [size]="22"></app-icon></span>
+        <div><h2>الدروس</h2><p>إدارة دروس المقرر المختار وترتيب محتواها.</p></div>
+        <b>{{ lessons.length }}</b>
+      </div>
+      <div class="lessons-header-actions">
+        <label class="lessons-page-size"><span>عرض</span><select [value]="lessonsPageSize" (change)="changeLessonsPageSize($event)"><option value="6">6</option><option value="9">9</option><option value="12">12</option><option value="18">18</option></select><span>دروس</span></label>
+        <button type="button" class="add-lesson-button" (click)="openCreateForm()" aria-label="إضافة درس جديد"><app-icon name="plus" [size]="17"></app-icon><span>إضافة درس جديد</span></button>
+      </div>
+    </header>
     <!-- Form -->
-    <div *ngIf="showForm" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+    <div *ngIf="showForm" class="lesson-form-panel">
       <h3 class="text-base font-semibold mb-4 text-gray-900 dark:text-white">
         {{ isEditMode ? 'تعديل الدرس' : 'درس جديد' }}
       </h3>
@@ -56,36 +79,40 @@
       </form>
     </div>
 
-    <!-- Empty State -->
-    <div *ngIf="lessons.length === 0 && !showForm" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-      <div class="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-        <app-icon name="book-open" [size]="24"></app-icon>
-      </div>
-      <h3 class="text-base font-medium text-gray-900 dark:text-white mb-1">لا توجد دروس بعد</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400">قم بإنشاء الدرس الأول للبدء في تنظيم المحتوى الخاص بك.</p>
+    <div *ngIf="isLoadingLessons" class="lessons-grid lessons-skeleton-grid" aria-label="جاري تحميل الدروس">
+      <div *ngFor="let item of [1,2,3,4,5,6]" class="lesson-card lesson-card-skeleton"></div>
+    </div>
+    <div *ngIf="!isLoadingLessons && lessonsError" class="lessons-error-state" role="alert">
+      <span><app-icon name="exclamation-triangle" [size]="25"></app-icon></span><div><h3>تعذّر تحميل الدروس</h3><p>{{ lessonsError }}</p></div><button type="button" (click)="loadLessons()">إعادة المحاولة</button>
     </div>
 
+    <!-- Empty State -->
+    <div *ngIf="!isLoadingLessons && !lessonsError && lessons.length === 0 && !showForm" class="lessons-empty-state">
+      <div class="lessons-empty-visual"><span class="empty-decoration decoration-one"><app-icon name="doc" [size]="14"></app-icon></span><span class="lessons-empty-icon"><app-icon name="book-open" [size]="36"></app-icon></span><span class="empty-decoration decoration-two"><app-icon name="plus" [size]="13"></app-icon></span></div>
+      <h3>لا توجد دروس حتى الآن</h3><p>أنشئ أول درس لتنظيم محتوى المقرر والبدء في إضافة الموارد التعليمية.</p>
+      <span *ngIf="selectedAssignment as course" class="empty-course-badge">{{ course.subjectName }} · {{ course.className }}</span>
+      <button type="button" class="add-lesson-button empty-add-button" (click)="openCreateForm()"><app-icon name="plus" [size]="16"></app-icon><span>إضافة أول درس</span></button>
+    </div>
     <!-- List -->
-    <div *ngIf="lessons.length > 0" class="space-y-3">
-      <div *ngFor="let lesson of lessons; let i = index"
-           class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div *ngIf="!isLoadingLessons && !lessonsError && lessons.length > 0" class="lessons-grid">
+      <article *ngFor="let lesson of paginatedLessons; let pageIndex = index" class="lesson-card" [class.is-expanded]="expandedLessonId === lesson.lessonId">
         
         <!-- Handle & Summary -->
-        <div class="px-4 py-3.5 sm:px-5 sm:py-4 flex items-center gap-3">
-          <div class="flex flex-col gap-0.5">
-            <button *ngIf="i > 0" (click)="moveUp(i)"
+        <div class="lesson-card-summary">
+          <div class="lesson-order-controls"><span class="lesson-order-number">{{ lesson.orderNum || ((lessonsPage - 1) * lessonsPageSize + pageIndex + 1) }}</span>
+            <button *ngIf="((lessonsPage - 1) * lessonsPageSize + pageIndex) > 0" (click)="moveUp((lessonsPage - 1) * lessonsPageSize + pageIndex)"
                     class="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     title="تحريك لأعلى" aria-label="تحريك لأعلى">
               <app-icon name="chevron-up" [size]="14"></app-icon>
             </button>
-            <button *ngIf="i < lessons.length - 1" (click)="moveDown(i)"
+            <button *ngIf="((lessonsPage - 1) * lessonsPageSize + pageIndex) < lessons.length - 1" (click)="moveDown((lessonsPage - 1) * lessonsPageSize + pageIndex)"
                     class="text-gray-400 hover:text-indigo-600 transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     title="تحريك لأسفل" aria-label="تحريك لأسفل">
               <app-icon name="chevron-down" [size]="14"></app-icon>
             </button>
           </div>
           
-          <div class="flex-1 min-w-0 cursor-pointer" (click)="toggleDetails(lesson.lessonId)"
+          <div class="lesson-card-main" (click)="toggleDetails(lesson.lessonId)"
                role="button" tabindex="0" (keydown.enter)="toggleDetails(lesson.lessonId)"
                [attr.aria-expanded]="expandedLessonId === lesson.lessonId">
             <div class="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -116,7 +143,7 @@
             <app-icon [name]="expandedLessonId === lesson.lessonId ? 'chevron-up' : 'chevron-down'" [size]="18"></app-icon>
           </div>
 
-          <div class="flex gap-1 shrink-0 flex-wrap">
+          <div class="lesson-card-actions">
             <button *ngIf="!lesson.isPublished" (click)="publishLesson(lesson.lessonId)" title="نشر" aria-label="نشر الدرس"
                     class="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-400">
               <app-icon name="check-badge" [size]="18"></app-icon>
@@ -137,7 +164,7 @@
         </div>
 
         <!-- Expanded Details (Children) -->
-        <div *ngIf="expandedLessonId === lesson.lessonId" class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-4 sm:px-5 sm:py-5">
+        <div *ngIf="expandedLessonId === lesson.lessonId" class="lesson-expanded-details">
           <div *ngIf="!lessonDetails[lesson.lessonId]" class="flex items-center justify-center gap-2 py-6 text-gray-500">
             <span class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
             <span class="text-sm">جاري التحميل...</span>
@@ -204,13 +231,19 @@
             <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500">
               لإضافة عناصر جديدة، قم بإنشائها من الشاشات الخاصة بها واختر هذا الدرس.
             </div>
-          </div>
-        </div>
-      </div>
+          </div>        </div>
+      </article>
     </div>
-  </div>
+    <nav *ngIf="!isLoadingLessons && !lessonsError && lessons.length > 0" class="lessons-pagination" aria-label="صفحات الدروس">
+      <p>عرض <strong>{{ lessonsRangeStart }}–{{ lessonsRangeEnd }}</strong> من أصل <strong>{{ lessons.length }}</strong> درسًا</p>
+      <div class="lessons-pagination-actions">
+        <button type="button" (click)="setLessonsPage(lessonsPage - 1)" [disabled]="lessonsPage === 1"><app-icon name="chevron-right" [size]="14"></app-icon><span>السابق</span></button>
+        <ng-container *ngFor="let page of paginationPages()"><span *ngIf="page === 0" class="page-ellipsis">…</span><button *ngIf="page !== 0" type="button" (click)="setLessonsPage(page)" [class.is-active]="page === lessonsPage">{{ page }}</button></ng-container>
+        <button type="button" (click)="setLessonsPage(lessonsPage + 1)" [disabled]="lessonsPage === lessonsTotalPages"><span>التالي</span><app-icon name="chevron-left" [size]="14"></app-icon></button>
+      </div>
+    </nav>
+  </section>
 </div>
-
 <!-- Clone Modal -->
 <div *ngIf="showCloneModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
      role="dialog" aria-modal="true" aria-labelledby="clone-modal-title">

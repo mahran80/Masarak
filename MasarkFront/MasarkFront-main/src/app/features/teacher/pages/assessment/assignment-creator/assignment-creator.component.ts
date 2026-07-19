@@ -9,12 +9,14 @@ import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateAssignmentRequest } from '../../../models/teacher-assessment.model';
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-assignment-creator',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './assignment-creator.component.html',
+  styleUrl: './assignment-creator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignmentCreatorComponent implements OnInit {

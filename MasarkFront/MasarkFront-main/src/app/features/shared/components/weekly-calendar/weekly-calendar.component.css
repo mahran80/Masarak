@@ -1,0 +1,595 @@
+/* ═══════════════════════════════════════════════════════════════
+   MASARAK — WEEKLY CALENDAR COMPONENT
+   Premium educational scheduler design
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Root Container ────────────────────────────────────────── */
+.wc-root {
+  width: 100%;
+  direction: rtl;
+}
+
+/* ─── Horizontal Scroll Wrapper ─────────────────────────────── */
+.wc-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.35) transparent;
+}
+
+.wc-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+
+.wc-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wc-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #2563EB, #7C3AED);
+  border-radius: 999px;
+}
+
+/* ─── Week Grid ─────────────────────────────────────────────── */
+.wc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(190px, 1fr));
+  min-width: 1190px;
+  width: 100%;
+}
+
+/* ─── Day Header Row ────────────────────────────────────────── */
+.wc-header-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(190px, 1fr));
+  min-width: 1190px;
+  width: 100%;
+  background: #F8FAFC;
+  border-bottom: 1.5px solid #E2E8F0;
+}
+
+:root[data-theme='dark'] .wc-header-row {
+  background: #15243B;
+  border-bottom-color: rgba(148, 163, 184, 0.14);
+}
+
+.wc-day-header {
+  padding: 14px 14px 12px;
+  text-align: center;
+  border-inline-start: 1px solid #E2E8F0;
+  transition: background 200ms ease;
+}
+
+.wc-day-header:last-child {
+  border-inline-end: 1px solid #E2E8F0;
+}
+
+:root[data-theme='dark'] .wc-day-header {
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+.wc-day-header.is-today {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07), rgba(124, 58, 237, 0.05));
+}
+
+:root[data-theme='dark'] .wc-day-header.is-today {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(124, 58, 237, 0.12));
+}
+
+.wc-day-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.2;
+}
+
+:root[data-theme='dark'] .wc-day-name {
+  color: #E2E8F0;
+}
+
+.wc-day-name.is-today {
+  color: #2563EB;
+}
+
+:root[data-theme='dark'] .wc-day-name.is-today {
+  color: #60A5FA;
+}
+
+.wc-day-date {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+  margin-top: 3px;
+}
+
+:root[data-theme='dark'] .wc-day-date {
+  color: #94A3B8;
+}
+
+.wc-day-date.is-today {
+  color: #2563EB;
+}
+
+:root[data-theme='dark'] .wc-day-date.is-today {
+  color: #60A5FA;
+}
+
+/* Today badge pill */
+.wc-today-badge {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Day Body Cells ────────────────────────────────────────── */
+.wc-body-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(190px, 1fr));
+  min-width: 1190px;
+  width: 100%;
+  align-items: start;
+}
+
+.wc-day-cell {
+  padding: 12px;
+  border-inline-start: 1px solid #E2E8F0;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background 200ms ease;
+}
+
+.wc-day-cell:last-child {
+  border-inline-end: 1px solid #E2E8F0;
+}
+
+:root[data-theme='dark'] .wc-day-cell {
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+.wc-day-cell.is-today {
+  background: rgba(37, 99, 235, 0.025);
+}
+
+:root[data-theme='dark'] .wc-day-cell.is-today {
+  background: rgba(37, 99, 235, 0.07);
+}
+
+/* ─── Lesson Card ───────────────────────────────────────────── */
+.wc-lesson-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.07) 0%, rgba(124, 58, 237, 0.05) 100%);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+  transition: all 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+}
+
+:root[data-theme='dark'] .wc-lesson-card {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(124, 58, 237, 0.10) 100%);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
+}
+
+.wc-lesson-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.28);
+}
+
+:root[data-theme='dark'] .wc-lesson-card:hover {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.30);
+  border-color: rgba(37, 99, 235, 0.40);
+}
+
+/* Status strip on the right (RTL) */
+.wc-status-strip {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 0 16px 16px 0;
+  transition: width 200ms ease;
+}
+
+.wc-lesson-card:hover .wc-status-strip {
+  width: 5px;
+}
+
+.strip-scheduled  { background: #38BDF8; }
+.strip-live       { background: #10B981; animation: stripPulse 2s infinite; }
+.strip-completed  { background: #CBD5E1; }
+.strip-cancelled  { background: #F87171; }
+
+@keyframes stripPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* Card inner padding */
+.wc-card-inner {
+  padding: 13px 14px 13px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* ─── Card Rows ─────────────────────────────────────────────── */
+.wc-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.3;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+:root[data-theme='dark'] .wc-card-title {
+  color: #F1F5F9;
+}
+
+.wc-card-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.wc-card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-subject  { background: #818CF8; }
+.dot-teacher  { background: #38BDF8; }
+.dot-class    { background: #34D399; }
+
+.wc-card-text-subject {
+  color: #4F46E5;
+  word-break: break-word;
+}
+
+:root[data-theme='dark'] .wc-card-text-subject {
+  color: #A5B4FC;
+}
+
+.wc-card-text-teacher {
+  color: #475569;
+  word-break: break-word;
+}
+
+:root[data-theme='dark'] .wc-card-text-teacher {
+  color: #94A3B8;
+}
+
+.wc-card-text-class {
+  color: #059669;
+  word-break: break-word;
+}
+
+:root[data-theme='dark'] .wc-card-text-class {
+  color: #34D399;
+}
+
+/* Time Badge */
+.wc-card-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.80);
+  border: 1px solid rgba(226, 232, 240, 0.80);
+  margin-top: 2px;
+}
+
+:root[data-theme='dark'] .wc-card-time-row {
+  background: rgba(15, 24, 41, 0.60);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.wc-card-time-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+:root[data-theme='dark'] .wc-card-time-text {
+  color: #CBD5E1;
+}
+
+.wc-card-duration-text {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+:root[data-theme='dark'] .wc-card-duration-text {
+  color: #94A3B8;
+}
+
+/* Live ping indicator */
+.wc-live-ping {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.wc-live-dot-outer {
+  position: relative;
+  width: 8px;
+  height: 8px;
+}
+
+.wc-live-dot-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.50);
+  animation: livePing 1.5s ease-out infinite;
+}
+
+@keyframes livePing {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.wc-live-dot-core {
+  position: absolute;
+  inset: 1.5px;
+  border-radius: 50%;
+  background: #10B981;
+}
+
+.wc-live-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #059669;
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme='dark'] .wc-live-label {
+  color: #34D399;
+}
+
+/* ─── Card Actions ──────────────────────────────────────────── */
+.wc-card-actions {
+  padding: 9px 14px 12px;
+  border-top: 1px solid rgba(226, 232, 240, 0.70);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+:root[data-theme='dark'] .wc-card-actions {
+  border-top-color: rgba(148, 163, 184, 0.10);
+}
+
+/* Action buttons base */
+.wc-btn {
+  width: 100%;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+
+.wc-btn-cancel {
+  background: rgba(239, 68, 68, 0.08);
+  color: #DC2626;
+  border-color: rgba(239, 68, 68, 0.16);
+}
+
+:root[data-theme='dark'] .wc-btn-cancel {
+  background: rgba(239, 68, 68, 0.12);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
+.wc-btn-cancel:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+  border-color: #EF4444;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.22);
+}
+
+.wc-btn-reactivate {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.16);
+}
+
+:root[data-theme='dark'] .wc-btn-reactivate {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
+.wc-btn-reactivate:hover {
+  background: #10B981;
+  color: #FFFFFF;
+  border-color: #10B981;
+  transform: translateY(-1px);
+}
+
+.wc-btn-start {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.16);
+}
+
+.wc-btn-start:hover {
+  background: #10B981;
+  color: #FFFFFF;
+  border-color: #10B981;
+}
+
+.wc-btn-start:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.wc-btn-join {
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.20);
+}
+
+.wc-btn-join:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  filter: brightness(1.05);
+}
+
+.wc-btn-complete {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563EB;
+  border-color: rgba(37, 99, 235, 0.16);
+}
+
+:root[data-theme='dark'] .wc-btn-complete {
+  color: #60A5FA;
+  background: rgba(37, 99, 235, 0.14);
+}
+
+.wc-btn-complete:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+  border-color: #2563EB;
+}
+
+.wc-btn-attendance {
+  background: rgba(100, 116, 139, 0.08);
+  color: #475569;
+  border-color: rgba(100, 116, 139, 0.16);
+}
+
+:root[data-theme='dark'] .wc-btn-attendance {
+  color: #94A3B8;
+}
+
+.wc-btn-attendance:hover {
+  background: #475569;
+  color: #FFFFFF;
+}
+
+.wc-btn-waiting {
+  background: rgba(100, 116, 139, 0.06);
+  color: #94A3B8;
+  border-color: rgba(100, 116, 139, 0.12);
+  cursor: not-allowed;
+}
+
+.wc-btn-group {
+  display: flex;
+  gap: 7px;
+  width: 100%;
+}
+
+.wc-btn-group .wc-btn {
+  flex: 1;
+}
+
+/* ─── Empty Day State ───────────────────────────────────────── */
+.wc-empty-day {
+  min-height: 200px;
+  max-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px dashed #E2E8F0;
+  border-radius: 14px;
+  text-align: center;
+  padding: 16px 10px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.025), rgba(124, 58, 237, 0.025));
+  transition: all 200ms ease;
+}
+
+:root[data-theme='dark'] .wc-empty-day {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(124, 58, 237, 0.04));
+}
+
+.wc-empty-day:hover {
+  border-color: rgba(37, 99, 235, 0.22);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(124, 58, 237, 0.04));
+}
+
+.wc-empty-icon {
+  color: #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:root[data-theme='dark'] .wc-empty-icon {
+  color: rgba(148, 163, 184, 0.40);
+}
+
+.wc-empty-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #94A3B8;
+}
+
+:root[data-theme='dark'] .wc-empty-title {
+  color: #64748B;
+}
+
+.wc-empty-desc {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #CBD5E1;
+}
+
+:root[data-theme='dark'] .wc-empty-desc {
+  color: rgba(100, 116, 139, 0.70);
+}
+
+/* ─── Bottom border row ─────────────────────────────────────── */
+.wc-bottom-border {
+  border-top: 1.5px solid #E2E8F0;
+  height: 8px;
+  background: #F8FAFC;
+  border-radius: 0 0 22px 22px;
+}
+
+:root[data-theme='dark'] .wc-bottom-border {
+  background: #111E33;
+  border-top-color: rgba(148, 163, 184, 0.12);
+}

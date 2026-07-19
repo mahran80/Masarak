@@ -1,46 +1,72 @@
 <!-- Skip link -->
 <a #skipLink href="#home" class="ml-btn ml-btn-primary" style="position:fixed; top:-100px; left:50%; translate:-50% 0; z-index:1000;" (focus)="skipLink.style.top='16px'" (blur)="skipLink.style.top='-100px'">
-  تخطي إلى المحتوى الرئيسي
+  {{ lang() === 'ar' ? 'تخطي إلى المحتوى الرئيسي' : 'Skip to main content' }}
 </a>
 
 <div class="ml-root">
 
   <!-- ============ NAVBAR ============ -->
-  <header class="ml-navbar" [class.is-scrolled]="isScrolled()">
-    <div class="ml-navbar-inner">
-      <a href="#home" class="flex items-center" [attr.aria-label]="t().nav.home">
-        <span class="text-2xl font-black text-blue-600 tracking-tight" style="font-family: system-ui, sans-serif;">Masarak</span>
+  <div class="ml-navbar-container" [class.is-scrolled]="isScrolled()">
+    <header class="ml-navbar">
+      
+      <!-- Brand Logo -->
+      <a href="#home" class="ml-navbar-brand" [attr.aria-label]="t().nav.home">
+        <div class="w-[38px] h-[38px] bg-[#EEF5FF] dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-400 rounded-xl flex items-center justify-center font-bold">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <span class="ml-navbar-brand-name">{{ t().nav.brand }}</span>
       </a>
 
+      <!-- Navigation Links -->
       <nav class="ml-nav-links" aria-label="Main">
         <a href="#home" class="ml-nav-link" [class.is-active]="activeSection() === 'home'">{{ t().nav.home }}</a>
         <a href="#features" class="ml-nav-link" [class.is-active]="activeSection() === 'features'">{{ t().nav.features }}</a>
         <a href="#stages" class="ml-nav-link" [class.is-active]="activeSection() === 'stages'">{{ t().nav.stages }}</a>
-        <a href="#journey" class="ml-nav-link" [class.is-active]="activeSection() === 'journey'">{{ t().nav.journey }}</a>
+        <a href="#journey" class="ml-nav-link" [class.is-active]="activeSection() === 'journey'">{{ lang() === 'ar' ? 'لماذا مسارك؟' : 'Why Masarak?' }}</a>
         <a href="#faq" class="ml-nav-link" [class.is-active]="activeSection() === 'faq'">{{ t().nav.faq }}</a>
       </nav>
 
-      <div class="ml-nav-actions">
-        <a routerLink="/auth/login" class="ml-btn ml-btn-outline ml-nav-cta" style="padding: 10px 22px; font-size: 13.5px;">{{ t().nav.login }}</a>
+      <!-- Action Buttons -->
+      <div class="ml-navbar-actions">
+        <!-- Language Switcher Button -->
+        <button type="button" class="ml-action-icon-btn ml-lang-toggle" (click)="toggleLanguage()" aria-label="Toggle Language">
+          <span class="material-symbols-outlined text-[20px]">language</span>
+          <span class="ml-navbar-control-text">{{ lang() === 'ar' ? 'EN' : 'عربي' }}</span>
+        </button>
 
-        <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple ml-nav-cta">{{ t().nav.register }}</a>
+        <!-- Dark/Light Mode Button -->
+        <button type="button" class="ml-action-icon-btn" (click)="toggleTheme()" aria-label="Toggle Theme">
+          <span class="material-symbols-outlined text-[20px]">
+            {{ theme() === 'light' ? 'dark_mode' : 'light_mode' }}
+          </span>
+        </button>
 
-        <button type="button" class="ml-icon-btn ml-burger" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen()" aria-label="menu">
+        <!-- Register CTA (Login link is hidden visually from desktop navbar as per reference screenshot) -->
+        <a routerLink="/auth/register" class="ml-navbar-register-btn">{{ t().nav.register }}</a>
+
+        <!-- Burger Menu (visible on mobile under 1024px) -->
+        <button type="button" class="ml-burger-btn" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen()" aria-label="menu">
           <span class="material-symbols-outlined">{{ isMobileMenuOpen() ? 'close' : 'menu' }}</span>
         </button>
       </div>
-    </div>
 
-    <div class="ml-mobile-panel" *ngIf="isMobileMenuOpen()">
-      <a href="#home" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.home }}</a>
-      <a href="#features" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.features }}</a>
-      <a href="#stages" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.stages }}</a>
-      <a href="#journey" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.journey }}</a>
-      <a href="#faq" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.faq }}</a>
-      <div class="ml-mobile-divider"></div>
-      <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple" (click)="closeMobileMenu()">{{ t().nav.register }}</a>
-    </div>
-  </header>
+    </header>
+  </div>
+
+  <div class="ml-mobile-panel" *ngIf="isMobileMenuOpen()">
+    <a href="#home" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.home }}</a>
+    <a href="#features" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.features }}</a>
+    <a href="#stages" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.stages }}</a>
+    <a href="#journey" class="ml-nav-link" (click)="closeMobileMenu()">{{ lang() === 'ar' ? 'لماذا مسارك؟' : 'Why Masarak?' }}</a>
+    <a href="#faq" class="ml-nav-link" (click)="closeMobileMenu()">{{ t().nav.faq }}</a>
+    <div class="ml-mobile-divider"></div>
+    <a routerLink="/auth/login" class="ml-btn ml-btn-outline" style="margin-bottom: 8px;" (click)="closeMobileMenu()">{{ t().nav.login }}</a>
+    <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple" (click)="closeMobileMenu()">{{ t().nav.register }}</a>
+  </div>
+  
 
   <!-- ============ HERO ============ -->
   <section id="home" class="ml-hero">
@@ -105,56 +131,81 @@
       </div>
     </div>
 
-    <div class="ml-hero-grid">
-      <div class="ml-hero-text reveal">
-        <span class="ml-hero-eyebrow-pill glass-card">
-          <span class="material-symbols-outlined ml-btn-icon">auto_awesome</span>
-          {{ t().hero.slides[activeSlide()].tag }}
-        </span>
+    <div class="ml-hero-container">
+      <div class="ml-hero-grid">
+        <!-- Text Column -->
+        <div class="ml-hero-text reveal" style="min-width: 0;">
+          <span class="ml-hero-eyebrow-pill glass-card">
+            <span class="material-symbols-outlined ml-btn-icon">auto_awesome</span>
+            {{ t().hero.slides[activeSlide()].tag }}
+          </span>
 
-        <h1 class="ml-hero-title">
-          {{ t().hero.slides[activeSlide()].title }}<br>
-          <span class="ml-hero-highlight">{{ t().hero.slides[activeSlide()].highlight }}</span>
-        </h1>
+          <h1 class="ml-hero-title">
+            {{ t().hero.slides[activeSlide()].title }}<br>
+            <span class="ml-hero-highlight">{{ t().hero.slides[activeSlide()].highlight }}</span>
+          </h1>
 
-        <p class="ml-hero-subtitle">{{ t().hero.slides[activeSlide()].subtitle }}</p>
+          <p class="ml-hero-subtitle">{{ t().hero.slides[activeSlide()].subtitle }}</p>
 
-        <div class="ml-hero-actions">
-          <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple">{{ t().hero.ctaPrimary }}</a>
-          <a href="#features" class="ml-btn ml-btn-outline">{{ t().hero.ctaGhost }}</a>
+          <div class="ml-hero-actions">
+            <a routerLink="/auth/register" class="ml-btn ml-btn-primary ripple">{{ t().hero.ctaPrimary }}</a>
+            <a href="#features" class="ml-btn ml-btn-outline">{{ t().hero.ctaGhost }}</a>
+          </div>
+
+          <div class="ml-hero-dots" role="tablist" [attr.aria-label]="t().nav.home">
+            <button
+              type="button"
+              class="ml-hero-dot"
+              role="tab"
+              *ngFor="let slide of t().hero.slides; let i = index; trackBy: trackByIndex"
+              [class.is-active]="i === activeSlide()"
+              (click)="activeSlide.set(i)"
+              [attr.aria-label]="'slide ' + (i + 1)">
+            </button>
+          </div>
         </div>
 
-        <div class="ml-hero-dots" role="tablist" [attr.aria-label]="t().nav.home">
-          <button
-            type="button"
-            class="ml-hero-dot"
-            role="tab"
-            *ngFor="let slide of t().hero.slides; let i = index; trackBy: trackByIndex"
-            [class.is-active]="i === activeSlide()"
-            (click)="activeSlide.set(i)"
-            [attr.aria-label]="'slide ' + (i + 1)">
-          </button>
-        </div>
-      </div>
+        <!-- Visual/Photo Column -->
+        <div class="ml-hero-visual reveal reveal-delay-1" style="min-width: 0;">
+          <div class="ml-hero-photo-frame"
+               (pointerdown)="onHeroImagePointerDown($event)"
+               (pointerup)="onHeroImagePointerUp($event)"
+               (pointerleave)="resetHeroParallax()"
+               (pointermove)="onHeroPointerMove($event)"
+               [style.transform]="'perspective(1000px) rotateX(' + -heroParallaxY() + 'deg) rotateY(' + heroParallaxX() + 'deg)'">
+            
+            <div class="ml-hero-photo-inner">
+              <img *ngFor="let img of media.heroImages; let idx = index; trackBy: trackByIndex"
+                   [src]="img"
+                   [class.is-active]="idx === activeHeroImage()"
+                   [alt]="lang() === 'ar' ? 'صورة البطل' : 'Hero Image'"
+                   loading="eager"
+                   class="ml-hero-slide-image">
+              
+              <div class="ml-hero-photo-scrim"></div>
+            </div>
+            
+            <!-- Navigation buttons (Hidden via CSS, kept for logic) -->
+            <button type="button" class="ml-hero-image-nav ml-hero-image-prev" (click)="previousHeroImage(); $event.stopPropagation()" aria-label="Previous image">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button type="button" class="ml-hero-image-nav ml-hero-image-next" (click)="nextHeroImage(); $event.stopPropagation()" aria-label="Next image">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
 
-      <div class="ml-hero-visual reveal reveal-delay-1">
-        <div class="ml-hero-photo-frame"
-             (pointerdown)="onHeroImagePointerDown($event)"
-             (pointerup)="onHeroImagePointerUp($event)"
-             (pointerleave)="resetHeroParallax()"
-             (pointermove)="onHeroPointerMove($event)"
-             [style.transform]="'perspective(1000px) rotateX(' + -heroParallaxY() + 'deg) rotateY(' + heroParallaxX() + 'deg)'">
-          
-          <img *ngFor="let img of media.heroImages; let idx = index; trackBy: trackByIndex"
-               [src]="img"
-               [class.is-active]="idx === activeHeroImage()"
-               [alt]="'صورة البطل'"
-               loading="eager"
-               class="ml-hero-slide-image">
-          
-          <div class="ml-hero-photo-scrim"></div>
-          
-          <!-- Image slider dots -->
+            <!-- Floating tiny info widgets (Graduation cap + Active students as per reference screenshot) -->
+            <div class="ml-hero-floating-glass-card glass-card shadow-premium reveal">
+              <div class="ml-floating-card-icon">
+                <span class="material-symbols-outlined">school</span>
+              </div>
+              <div class="ml-floating-card-text">
+                <h4>{{ lang() === 'ar' ? 'طلاب نشطون' : 'Active Students' }}</h4>
+                <p>{{ lang() === 'ar' ? '+15,000 طالب مسجل' : '+15,000 Registered Students' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image slider dots (Outside the frame container to be positioned below it) -->
           <div class="ml-hero-image-dots">
             <button *ngFor="let img of media.heroImages; let idx = index; trackBy: trackByIndex"
                     type="button"
@@ -164,14 +215,6 @@
                     [attr.aria-label]="'Image ' + (idx + 1)">
             </button>
           </div>
-
-          <!-- Navigation buttons -->
-          <button type="button" class="ml-hero-image-nav ml-hero-image-prev" (click)="previousHeroImage(); $event.stopPropagation()" aria-label="Previous image">
-            <span class="material-symbols-outlined">chevron_left</span>
-          </button>
-          <button type="button" class="ml-hero-image-nav ml-hero-image-next" (click)="nextHeroImage(); $event.stopPropagation()" aria-label="Next image">
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
         </div>
       </div>
     </div>
@@ -180,15 +223,22 @@
   <!-- ============ STATS ============ -->
   <section class="ml-stats js-stats-trigger">
     <div class="ml-shell ml-stats-grid">
-      <div class="ml-stat" *ngFor="let stat of t().stats; let i = index; trackBy: trackByIndex">
-        <span class="ml-stat-value">{{ displayedStats()[i] }}{{ stat.suffix }}</span>
-        <span class="ml-stat-label">{{ stat.label }}</span>
+      <div class="ml-stat-card" *ngFor="let stat of t().stats; let i = index; trackBy: trackByIndex">
+        <div class="ml-stat-icon-wrapper" [ngClass]="'color-' + (i + 1)">
+          <span class="material-symbols-outlined">
+            {{ i === 0 ? 'school' : i === 1 ? 'insights' : i === 2 ? 'schedule' : 'sentiment_very_satisfied' }}
+          </span>
+        </div>
+        <div class="ml-stat-info">
+          <span class="ml-stat-card-value">{{ displayedStats()[i] }}{{ stat.suffix }}</span>
+          <span class="ml-stat-card-label">{{ stat.label }}</span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ============ FEATURES ============ -->
-  <section class="ml-features" id="features">
+  <section class="ml-features-section" id="features">
     <div class="ml-shell">
       <div class="ml-section-head centered reveal">
         <span class="ml-eyebrow">{{ t().featuresHead.eyebrow }}</span>
@@ -196,18 +246,24 @@
         <p class="ml-sub">{{ t().featuresHead.sub }}</p>
       </div>
 
-      <div class="ml-features-grid">
+      <div class="ml-bento-grid">
         <div
-          class="ml-feature-card corporate-shadow hover-lift reveal"
+          class="ml-bento-item corporate-shadow hover-lift reveal"
           *ngFor="let feature of t().features; let i = index; trackBy: trackByIndex"
           [class.is-alt]="i % 2 === 1"
           [class.reveal-delay-1]="i === 1"
           [class.reveal-delay-2]="i === 2">
-          <div class="ml-feature-icon">
+          <div class="ml-bento-icon" [ngClass]="
+            i === 0 ? 'color-blue' :
+            i === 1 ? 'color-teal' :
+            i === 2 ? 'color-indigo' :
+            i === 3 ? 'color-amber' :
+            i === 4 ? 'color-rose' : 'color-purple'
+          ">
             <span class="material-symbols-outlined">{{ feature.icon }}</span>
           </div>
-          <h3 class="ml-feature-title">{{ feature.title }}</h3>
-          <p class="ml-feature-desc">{{ feature.description }}</p>
+          <h3 class="ml-bento-title">{{ feature.title }}</h3>
+          <p class="ml-bento-desc">{{ feature.description }}</p>
         </div>
       </div>
     </div>
@@ -223,14 +279,14 @@
       </div>
 
       <div class="ml-stages-grid">
-        <article class="ml-stage-card corporate-shadow hover-lift reveal" *ngFor="let stage of t().stages; let i = index; trackBy: trackByIndex" [class.reveal-delay-1]="i === 1" [class.reveal-delay-2]="i === 2">
-          <div class="ml-stage-photo">
-            <img [src]="media.stages[i]" [alt]="stage.title" loading="lazy">
-            <span class="ml-stage-badge">{{ stage.range }}</span>
+        <article class="ml-stage-card-premium corporate-shadow hover-lift reveal" *ngFor="let stage of t().stages; let i = index; trackBy: trackByIndex" [class.reveal-delay-1]="i === 1" [class.reveal-delay-2]="i === 2">
+          <div class="ml-stage-card-photo-box">
+            <img class="ml-stage-card-img" [src]="media.stages[i]" [alt]="stage.title" loading="lazy">
+            <span class="ml-stage-card-badge-pill">{{ stage.range }}</span>
           </div>
-          <div class="ml-stage-body">
-            <h3 class="ml-stage-title">{{ stage.title }}</h3>
-            <p class="ml-stage-desc">{{ stage.description }}</p>
+          <div class="ml-stage-card-content">
+            <h3 class="ml-stage-card-title">{{ stage.title }}</h3>
+            <p class="ml-stage-card-desc">{{ stage.description }}</p>
           </div>
         </article>
       </div>
@@ -289,7 +345,7 @@
   </section>
 
   <!-- ============ JOURNEY / PROCESS ============ -->
-  <section class="ml-journey" id="journey">
+  <section class="ml-journey-section" id="journey">
     <div class="ml-shell">
       <div class="ml-section-head centered reveal">
         <span class="ml-eyebrow">{{ t().processHead.eyebrow }}</span>
@@ -297,22 +353,24 @@
         <p class="ml-sub">{{ t().processHead.sub }}</p>
       </div>
 
-      <div class="ml-journey-track">
-        <div class="ml-journey-line"></div>
-        <div class="ml-journey-grid">
+      <div class="ml-journey-timeline-track">
+        <div class="ml-timeline-line-indicator"></div>
+        <div class="ml-timeline-grid">
           <div
-            class="ml-journey-step reveal"
+            class="ml-timeline-step-card reveal"
             *ngFor="let step of t().process; let i = index; trackBy: trackByIndex"
             [class.reveal-delay-1]="i % 2 === 1"
             [class.is-last-step]="i === t().process.length - 1">
-            <div class="ml-journey-index-wrapper">
-              <div class="ml-journey-index">
-                <span class="material-symbols-outlined">{{ step.icon }}</span>
-                <span class="ml-journey-number">{{ step.index }}</span>
+            <div class="ml-timeline-marker-wrapper">
+              <div class="ml-timeline-number-badge">
+                <span class="material-symbols-outlined marker-icon">{{ step.icon }}</span>
+                <span class="marker-index">{{ step.index }}</span>
               </div>
             </div>
-            <h3 class="ml-journey-title">{{ step.title }}</h3>
-            <p class="ml-journey-desc">{{ step.description }}</p>
+            <div class="ml-timeline-step-body">
+              <h3 class="step-title">{{ step.title }}</h3>
+              <p class="step-desc">{{ step.description }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -330,21 +388,21 @@
 
       <div class="ml-testimonials-grid">
         <div
-          class="ml-testimonial-card glass-card corporate-shadow hover-lift reveal"
+          class="ml-testimonial-card-premium glass-card corporate-shadow hover-lift reveal"
           *ngFor="let review of t().testimonials; let i = index; trackBy: trackByIndex"
-          [class.is-featured]="i === 1">
-          <div class="ml-testimonial-featured-bar" *ngIf="i === 1"></div>
+          [class.is-featured-review]="i === 1">
+          <div class="featured-top-accent-bar" *ngIf="i === 1"></div>
           <div>
-            <div class="ml-testimonial-stars">
+            <div class="review-stars-row">
               <span class="material-symbols-outlined" *ngFor="let star of [1,2,3,4,5]">star</span>
             </div>
-            <p class="ml-testimonial-quote">"{{ review.quote }}"</p>
+            <p class="review-quote">"{{ review.quote }}"</p>
           </div>
-          <div class="ml-testimonial-footer">
-            <div class="ml-testimonial-avatar">{{ review.name.charAt(0) }}</div>
-            <div>
-              <p class="ml-testimonial-name">{{ review.name }}</p>
-              <p class="ml-testimonial-role">{{ review.role }}</p>
+          <div class="review-user-footer">
+            <div class="review-avatar-badge">{{ review.name.charAt(0) }}</div>
+            <div class="review-user-info">
+              <p class="name">{{ review.name }}</p>
+              <p class="role">{{ review.role }}</p>
             </div>
           </div>
         </div>
@@ -366,8 +424,10 @@
             <span>{{ faq.question }}</span>
             <span class="material-symbols-outlined ml-faq-icon">expand_more</span>
           </button>
-          <div class="ml-faq-answer">
-            <p>{{ faq.answer }}</p>
+          <div class="ml-faq-answer" [style.max-height]="openFaqIndex() === i ? '300px' : '0'">
+            <div class="ml-faq-answer-inner">
+              <p>{{ faq.answer }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -375,15 +435,17 @@
   </section>
 
   <!-- ============ FINAL CTA ============ -->
-  <section class="ml-cta reveal">
-    <div class="ml-cta-panel">
-      <div class="ml-cta-glow-a"></div>
-      <div class="ml-cta-glow-b"></div>
-      <div class="ml-cta-inner">
-        <h2 class="ml-cta-title">{{ t().finalCta.title }}</h2>
-        <p class="ml-cta-sub">{{ t().finalCta.sub }}</p>
-        <div class="ml-cta-actions">
-          <a routerLink="/auth/register" class="ml-btn ml-btn-white ripple">{{ t().finalCta.primary }}</a>
+  <section class="ml-final-cta-section reveal">
+    <div class="ml-shell">
+      <div class="ml-final-cta-panel">
+        <div class="ml-cta-panel-glow-1"></div>
+        <div class="ml-cta-panel-glow-2"></div>
+        <div class="ml-final-cta-content">
+          <h2 class="ml-cta-title-bold">{{ t().finalCta.title }}</h2>
+          <p class="ml-cta-subtitle-text">{{ t().finalCta.sub }}</p>
+          <div class="ml-cta-action-box">
+            <a routerLink="/auth/register" class="ml-btn ml-btn-white ripple">{{ t().finalCta.primary }}</a>
+          </div>
         </div>
       </div>
     </div>
@@ -430,7 +492,7 @@
           </span>
           <span class="ml-footer-contact-item">
             <span class="material-symbols-outlined">headset_mic</span>
-            الدعم الفني المباشر
+            {{ lang() === 'ar' ? 'الدعم الفني المباشر' : 'Live Technical Support' }}
           </span>
         </div>
       </div>

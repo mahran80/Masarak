@@ -1,109 +1,91 @@
-<section class="space-y-6 text-slate-900" dir="rtl">
-  <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div class="text-right">
-      <h1 class="text-2xl font-bold text-slate-950 sm:text-3xl">لوحة تحكم الطالب</h1>
+<section class="student-dashboard" dir="rtl">
+  <header class="dashboard-hero">
+    <div class="hero-copy">
+      <span class="hero-badge">لوحة الطالب</span>
+      <h1>مرحبًا بك في مسارك التعليمي</h1>
+      <p>تابع دروسك ومواعيدك ومستواك الدراسي من مكان واحد وبخطوات بسيطة.</p>
     </div>
-
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
-      [disabled]="isLoading()"
-      (click)="loadDashboard()"
-    >
-      @if (isLoading()) {
-        جارٍ التحميل...
-      } @else {
-        تحديث
-      }
-    </button>
+    <div class="hero-actions">
+      <a routerLink="courses" class="hero-link hero-link-primary">
+        <span>استكشف مقرراتي</span>
+        <span aria-hidden="true">←</span>
+      </a>
+      <button type="button" class="refresh-button" [disabled]="isLoading()" (click)="loadDashboard()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7h-5V2M4 17h5v5m10.5-9A8 8 0 0 0 6 6.5L4 9m16 6-2 2.5A8 8 0 0 1 4.5 11"/>
+        </svg>
+        {{ isLoading() ? 'جارٍ التحديث...' : 'تحديث البيانات' }}
+      </button>
+    </div>
   </header>
 
+  <nav class="student-quick-links" aria-label="الوصول السريع">
+    <a routerLink="courses"><span class="quick-icon quick-icon-blue">▣</span><span><b>مقرراتي</b><small>واصل التعلّم</small></span></a>
+    <a routerLink="assignments"><span class="quick-icon quick-icon-orange">✓</span><span><b>الواجبات</b><small>تابع المطلوب</small></span></a>
+    <a routerLink="exams"><span class="quick-icon quick-icon-purple">✎</span><span><b>الاختبارات</b><small>استعد واختبر نفسك</small></span></a>
+    <a routerLink="schedule"><span class="quick-icon quick-icon-green">◷</span><span><b>جدولي</b><small>مواعيدك القادمة</small></span></a>
+  </nav>
+
   @if (isLoading()) {
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="dashboard-skeleton" aria-label="جارٍ تحميل لوحة الطالب">
       @for (item of [1, 2, 3, 4]; track item) {
-        <div class="h-40 animate-pulse rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <div class="h-4 w-24 rounded bg-slate-200"></div>
-          <div class="mt-8 h-7 w-40 rounded bg-slate-200"></div>
-          <div class="mt-4 h-4 w-full rounded bg-slate-100"></div>
-        </div>
+        <div class="skeleton-card"><i></i><span></span><strong></strong></div>
       }
     </div>
   } @else if (errorMessage()) {
-    <article class="rounded-lg border border-rose-200 bg-white p-6 text-right shadow-sm">
-      <p class="text-sm font-semibold text-rose-700">تعذّر تحميل لوحة التحكم</p>
-      <p class="mt-2 text-sm leading-6 text-slate-600">{{ errorMessage() }}</p>
-      <button
-        type="button"
-        class="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
-        (click)="loadDashboard()"
-      >
-        إعادة المحاولة
-      </button>
+    <article class="dashboard-state" [class.enrollment-state]="isEnrollmentError()">
+      <div class="state-illustration">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 14 3 9l9-5 9 5-9 5Zm0 0 6.2-3.45V16M6 11.2V16c2.8 2.3 9.2 2.3 12 0"/>
+        </svg>
+      </div>
+      @if (isEnrollmentError()) {
+        <span class="state-label">حسابك جاهز</span>
+        <h2>بانتظار إسنادك إلى الفصل الدراسي</h2>
+        <p>لم يتم ربط حسابك بفصل للعام الدراسي الحالي بعد. تواصل مع إدارة المدرسة، وستظهر مقرراتك وجدولك هنا تلقائيًا فور إتمام الإسناد.</p>
+        <div class="state-steps">
+          <span><b>1</b> تواصل مع الإدارة</span><i></i><span><b>2</b> يتم إسناد الفصل</span><i></i><span><b>3</b> تبدأ رحلتك</span>
+        </div>
+      } @else {
+        <span class="state-label state-label-error">تعذر الاتصال</span>
+        <h2>لم نتمكن من تحميل لوحة الطالب</h2>
+        <p>حدثت مشكلة مؤقتة أثناء جلب بياناتك. جرّب مرة أخرى، وإن استمرت المشكلة تواصل مع الدعم الفني.</p>
+      }
+      <div class="state-actions">
+        <button type="button" (click)="loadDashboard()">إعادة المحاولة</button>
+        <a routerLink="profile">عرض ملفي الشخصي</a>
+      </div>
     </article>
   } @else if (data(); as dashboard) {
     <app-student-dashboard-cards
-      [profile]="dashboard.profile"
-      [classInfo]="dashboard.classInfo"
-      [courses]="dashboard.courses"
-      [attendance]="dashboard.attendance"
-      [performance]="dashboard.performance"
-      [schedule]="dashboard.schedule"
-    />
+      [profile]="dashboard.profile" [classInfo]="dashboard.classInfo" [courses]="dashboard.courses"
+      [attendance]="dashboard.attendance" [performance]="dashboard.performance" [schedule]="dashboard.schedule" />
 
-    <div class="grid gap-6 xl:grid-cols-3 items-stretch">
-      <div class="xl:col-span-2 flex flex-col">
-        <app-student-attendance-summary [summary]="dashboard.attendance" class="flex-1" />
-      </div>
-
-      <div class="xl:col-span-1 flex flex-col">
-        <article class="flex flex-col flex-1 rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-          <div class="flex items-center justify-between gap-4">
-            <h2 class="text-lg font-bold text-slate-950">الجدول القادم</h2>
-            <a routerLink="schedule" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors">عرض الكل</a>
+    <div class="dashboard-content-grid">
+      <section class="dashboard-panel schedule-panel">
+        <div class="panel-heading"><div><span>خطتك اليومية</span><h2>المواعيد القادمة</h2></div><a routerLink="schedule">عرض الجدول بالكامل ←</a></div>
+        @if (upcomingSchedule().length > 0) {
+          <div class="schedule-list">
+            @for (session of upcomingSchedule(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
+              <app-student-schedule-card [session]="session" (joinSession)="joinSession($event)" />
+            }
           </div>
-
-          @if (actionMessage()) {
-            <p class="mt-4 rounded-lg bg-slate-50 p-3 text-sm font-semibold text-slate-700">{{ actionMessage() }}</p>
-          }
-
-          @if (upcomingSchedule().length > 0) {
-            <div class="mt-5 grid gap-4">
-              @for (session of upcomingSchedule(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
-                <app-student-schedule-card [session]="session" (joinSession)="joinSession($event)" />
-              }
-            </div>
-          } @else {
-            <div class="mt-5 flex flex-col items-center justify-center rounded-xl border border-blue-100 bg-blue-50/50 p-8 text-center text-sm text-slate-500" dir="ltr">
-              <svg class="mx-auto mb-3 h-10 w-10 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-              </svg>
-              لا توجد جلسات قادمة مجدولة.
-            </div>
-          }
-        </article>
-      </div>
+        } @else {
+          <div class="compact-empty"><span>◷</span><div><b>لا توجد حصص قادمة</b><p>استمتع بوقتك، سنعرض مواعيدك الجديدة هنا.</p></div></div>
+        }
+      </section>
+      <app-student-attendance-summary [summary]="dashboard.attendance" />
     </div>
 
-    <article class="mt-6 rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
-      <div class="flex items-center justify-between gap-4">
-        <h2 class="text-lg font-bold text-slate-950">أحدث المقررات</h2>
-        <a routerLink="courses" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors">عرض الكل</a>
-      </div>
-
+    <section class="dashboard-panel courses-panel">
+      <div class="panel-heading"><div><span>واصل من حيث توقفت</span><h2>مقرراتي الدراسية</h2></div><a routerLink="courses">عرض كل المقررات ←</a></div>
       @if (recentCourses().length > 0) {
-        <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          @for (course of recentCourses(); track course.subjectId) {
-            <app-student-course-card [course]="course" />
-          }
+        <div class="courses-grid">
+          @for (course of recentCourses(); track course.subjectId) { <app-student-course-card [course]="course" /> }
         </div>
       } @else {
-        <div class="mt-5 flex flex-col items-center justify-center rounded-xl border border-blue-100 bg-blue-50/50 p-8 text-center text-sm text-slate-500" dir="ltr">
-          <svg class="mx-auto mb-3 h-10 w-10 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-          لا توجد مقررات مُسنَدة بعد.
-        </div>
+        <div class="compact-empty"><span>▣</span><div><b>لا توجد مقررات مسندة بعد</b><p>ستظهر مقررات فصلك هنا بمجرد إضافتها.</p></div></div>
       }
-    </article>
+    </section>
   }
 </section>

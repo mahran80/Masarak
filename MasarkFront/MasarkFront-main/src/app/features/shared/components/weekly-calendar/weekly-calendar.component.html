@@ -1,133 +1,178 @@
-<div class="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-x-auto" dir="rtl">
-  <div class="min-w-[1120px] w-full">
-    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 bg-slate-50 border-b border-slate-100">
+<div class="wc-root">
+  <div class="wc-scroll">
+
+    <!-- ═══════════════════════════════ Day Headers ════════════════════════════════ -->
+    <div class="wc-header-row">
       @for (day of days; track day.date) {
-        <div class="px-4 py-5 text-center min-w-[160px]" [ngClass]="{'bg-sky-50/50': day.isToday}">
-          <p class="text-sm font-bold" [ngClass]="day.isToday ? 'text-sky-700' : 'text-slate-900'">{{ day.dayName }}</p>
-          <p class="text-[13px] font-semibold mt-1" [ngClass]="day.isToday ? 'text-sky-600' : 'text-slate-500'">{{ day.date | date:'MMMM d' }}</p>
+        <div
+          class="wc-day-header"
+          [class.is-today]="day.isToday">
+          <p class="wc-day-name" [class.is-today]="day.isToday">{{ day.dayName }}</p>
+          <p class="wc-day-date" [class.is-today]="day.isToday">
+            {{ day.date | date:'d MMM' }}
+          </p>
+          @if (day.isToday) {
+            <span class="wc-today-badge">اليوم</span>
+          }
         </div>
       }
     </div>
 
-    <div class="grid grid-cols-7 divide-x divide-x-reverse divide-slate-100 min-h-[500px]">
-    @for (day of days; track day.date) {
-      <div class="p-2 transition-colors duration-500 relative" [ngClass]="{'bg-sky-50/20': day.isToday, 'hover:bg-white/60': !day.isToday}">
-        @if (day.sessions.length > 0) {
-          <div class="flex flex-col gap-3 relative z-10">
+    <!-- ═══════════════════════════════ Day Body ═══════════════════════════════════ -->
+    <div class="wc-body-row">
+      @for (day of days; track day.date) {
+
+        <div
+          class="wc-day-cell"
+          [class.is-today]="day.isToday">
+
+          @if (day.sessions.length > 0) {
+
+            <!-- ── Lesson Cards ── -->
             @for (s of day.sessions; track s.id) {
-              <div class="rounded-2xl border border-slate-200/60 bg-white p-5 min-h-[160px] flex flex-col shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#4F8CD4]/40 transition-all duration-300 group relative overflow-hidden backdrop-blur-xl">
-                <!-- Status Background Glow -->
-                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                     [ngClass]="{
-                       'bg-gradient-to-br from-sky-50/40 to-transparent': s.status === 'Scheduled',
-                       'bg-gradient-to-br from-emerald-50/40 to-transparent': s.status === 'Live',
-                       'bg-gradient-to-br from-slate-50/40 to-transparent': s.status === 'Completed',
-                       'bg-gradient-to-br from-rose-50/40 to-transparent': s.status === 'Cancelled'
-                     }"></div>
-                
-                <!-- Status Bar Indicator -->
-                <div class="absolute right-0 top-0 bottom-0 w-1 transition-all duration-300 group-hover:w-2"
-                     [ngClass]="{
-                       'bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.4)]': s.status === 'Scheduled',
-                       'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)] animate-pulse': s.status === 'Live',
-                       'bg-slate-300': s.status === 'Completed',
-                       'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.4)]': s.status === 'Cancelled'
-                     }"></div>
-                
-                <div class="relative z-10 w-full flex-1 flex flex-col">
-                  <div class="flex justify-between items-start mb-3">
-                    <p class="font-bold text-slate-800 text-[13px] leading-snug break-words group-hover:text-[#4F8CD4] transition-colors duration-300">{{ s.title }}</p>
-                    
+              <div class="wc-lesson-card">
+
+                <!-- Status strip (right side for RTL) -->
+                <div
+                  class="wc-status-strip"
+                  [class.strip-scheduled]="s.status === 'Scheduled'"
+                  [class.strip-live]="s.status === 'Live'"
+                  [class.strip-completed]="s.status === 'Completed'"
+                  [class.strip-cancelled]="s.status === 'Cancelled'">
+                </div>
+
+                <!-- Card Content -->
+                <div class="wc-card-inner">
+
+                  <!-- Row 1: Title + Live indicator -->
+                  <div class="flex items-start justify-between gap-8px">
+                    <p class="wc-card-title">{{ s.title }}</p>
                     @if (s.status === 'Live') {
-                      <span class="flex h-2 w-2 relative flex-shrink-0 mt-1 mr-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                      </span>
-                    }
-                  </div>
-                  
-                  <div class="flex flex-col gap-2.5 flex-1 justify-center">
-                    <div class="flex flex-col gap-1.5 text-[11px] font-semibold">
-                      <div class="flex items-center gap-1.5 text-slate-600 break-words whitespace-normal">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0"></span>
-                        <span>{{ s.subjectName }}</span>
-                      </div>
-                      
-                      @if (role === 'admin' || role === 'teacher') {
-                        <div class="flex items-center gap-1.5 text-sky-600 break-words whitespace-normal">
-                          <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
-                          <span>{{ s.className }}</span>
+                      <div class="wc-live-ping">
+                        <div class="wc-live-dot-outer">
+                          <span class="wc-live-dot-ping"></span>
+                          <span class="wc-live-dot-core"></span>
                         </div>
-                      }
-                    </div>
-
-                    @if (role === 'admin' || role === 'student') {
-                      <div class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 break-words whitespace-normal mt-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0"></span>
-                        <span>أ. {{ s.teacherName }}</span>
+                        <span class="wc-live-label">مباشر</span>
                       </div>
                     }
-
-                    <div class="flex items-center justify-between mt-1 text-[11px] font-bold text-slate-500 bg-slate-50/80 rounded-lg px-2.5 py-2 w-full border border-slate-100">
-                      <div class="flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                        </svg>
-                        <span dir="ltr">{{ s.scheduledAt | date:'h:mm a' }}</span>
-                      </div>
-                      <span class="text-slate-300">|</span>
-                      <span>{{ s.durationMinutes }} دقيقة</span>
-                    </div>
                   </div>
 
-                  <!-- Actions -->
-                  <div class="mt-4 flex flex-col gap-2 pt-2 border-t border-slate-100/50">
+                  <!-- Row 2: Subject -->
+                  <div class="wc-card-row">
+                    <span class="wc-card-dot dot-subject"></span>
+                    <span class="wc-card-text-subject">{{ s.subjectName }}</span>
+                  </div>
+
+                  <!-- Row 3: Teacher (admin / student) -->
+                  @if (role === 'admin' || role === 'student') {
+                    <div class="wc-card-row">
+                      <span class="wc-card-dot dot-teacher"></span>
+                      <span class="wc-card-text-teacher">أ. {{ s.teacherName }}</span>
+                    </div>
+                  }
+
+                  <!-- Row 3b: Class (admin / teacher) -->
+                  @if ((role === 'admin' || role === 'teacher') && s.className) {
+                    <div class="wc-card-row">
+                      <span class="wc-card-dot dot-class"></span>
+                      <span class="wc-card-text-class">{{ s.className }}</span>
+                    </div>
+                  }
+
+                  <!-- Row 4: Time + Duration -->
+                  <div class="wc-card-time-row">
+                    <span class="wc-card-time-text">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="color:#94A3B8;flex-shrink:0">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                      </svg>
+                      <span dir="ltr">{{ s.scheduledAt | date:'h:mm a' }}</span>
+                    </span>
+                    <span class="wc-card-duration-text">{{ s.durationMinutes }} د</span>
+                  </div>
+
+                </div>
+
+                <!-- ── Actions ── -->
+                @if (role === 'teacher' || role === 'student' || role === 'admin') {
+                  <div class="wc-card-actions">
+
+                    <!-- TEACHER actions -->
                     @if (role === 'teacher') {
                       @if (s.status === 'Scheduled') {
-                        <button (click)="start.emit(s)" [disabled]="!canStartSession(s)" [ngClass]="{'opacity-50 cursor-not-allowed grayscale': !canStartSession(s)}" class="w-full bg-emerald-50 border border-emerald-100 hover:bg-emerald-500 hover:text-white text-emerald-700 text-[11px] font-bold px-3 py-2.5 rounded-lg transition-all duration-300 shadow-sm hover:shadow-emerald-200">بدء الحصة</button>
+                        <button
+                          type="button"
+                          class="wc-btn wc-btn-start"
+                          (click)="start.emit(s)"
+                          [disabled]="!canStartSession(s)">
+                          بدء الحصة
+                        </button>
                       }
                       @if (s.status === 'Live') {
-                        <div class="flex gap-2">
-                          <button (click)="join.emit(s)" class="flex-1 bg-indigo-50 border border-indigo-100 hover:bg-indigo-500 hover:text-white text-indigo-700 text-[11px] font-bold px-2 py-2.5 rounded-lg transition-colors">انضمام</button>
-                          <button (click)="complete.emit(s)" class="flex-1 bg-blue-50 border border-blue-100 hover:bg-[#4F8CD4] hover:text-white text-[#4F8CD4] text-[11px] font-bold px-2 py-2.5 rounded-lg transition-colors">إنهاء الحصة</button>
+                        <div class="wc-btn-group">
+                          <button type="button" class="wc-btn wc-btn-join" (click)="join.emit(s)">انضمام</button>
+                          <button type="button" class="wc-btn wc-btn-complete" (click)="complete.emit(s)">إنهاء</button>
                         </div>
                       }
                       @if (s.status === 'Completed') {
-                        <button (click)="attendance.emit(s)" class="w-full bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 text-[11px] font-bold px-3 py-2.5 rounded-lg transition-colors">سجل الحضور</button>
+                        <button type="button" class="wc-btn wc-btn-attendance" (click)="attendance.emit(s)">
+                          سجل الحضور
+                        </button>
                       }
                     }
 
+                    <!-- STUDENT actions -->
                     @if (role === 'student') {
                       @if (s.status === 'Live') {
-                        <button (click)="join.emit(s)" class="w-full bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white text-[11px] font-bold px-3 py-2.5 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md">انضمام الآن</button>
+                        <button type="button" class="wc-btn wc-btn-join" (click)="join.emit(s)">
+                          انضمام الآن
+                        </button>
                       } @else if (s.status === 'Scheduled') {
-                         <button disabled class="w-full bg-slate-50 text-slate-400 text-[11px] font-bold px-3 py-2.5 rounded-lg cursor-not-allowed border border-slate-200">بانتظار البدء</button>
+                        <button type="button" class="wc-btn wc-btn-waiting" disabled>
+                          بانتظار البدء
+                        </button>
                       }
                     }
 
+                    <!-- ADMIN actions -->
                     @if (role === 'admin') {
-                       @if (s.status === 'Scheduled') {
-                          <button (click)="cancel.emit(s)" class="w-full bg-white border border-rose-200 hover:bg-rose-50 hover:border-rose-300 text-rose-600 text-[11px] font-bold px-3 py-2.5 rounded-lg transition-all duration-300">إلغاء الحصة</button>
-                       }
-                       @if (s.status === 'Cancelled' || s.status === 'Completed') {
-                         <button (click)="edit.emit(s)" class="w-full bg-white border border-sky-200 hover:bg-sky-50 text-sky-600 text-[11px] font-bold px-3 py-2.5 rounded-lg transition-all duration-300">إعادة تنشيط</button>
-                       }
+                      @if (s.status === 'Scheduled') {
+                        <button type="button" class="wc-btn wc-btn-cancel" (click)="cancel.emit(s)">
+                          إلغاء الحصة
+                        </button>
+                      }
+                      @if (s.status === 'Cancelled' || s.status === 'Completed') {
+                        <button type="button" class="wc-btn wc-btn-reactivate" (click)="edit.emit(s)">
+                          إعادة تنشيط
+                        </button>
+                      }
                     }
+
                   </div>
-                </div>
+                }
+
               </div>
             }
-          </div>
-        } @else {
-          <!-- Empty Holiday state -->
-          <div class="h-full min-h-[160px] flex flex-col items-center justify-center opacity-75 grayscale hover:grayscale-0 transition-all duration-500 p-4 text-center border border-dashed border-slate-200 rounded-2xl bg-white/50">
-            <app-icon name="sparkles" [size]="18" class="mx-auto mb-2 text-slate-300"></app-icon>
-            <p class="text-[13px] font-semibold text-slate-400">لا توجد حصص</p>
-            <p class="text-[11px] font-medium text-slate-300 mt-0.5">يوم حر</p>
-          </div>
-        }
-      </div>
-    }
-  </div>
+
+          } @else {
+
+            <!-- ── Empty Day ── -->
+            <div class="wc-empty-day">
+              <div class="wc-empty-icon">
+                <app-icon name="calendar" [size]="20"></app-icon>
+              </div>
+              <p class="wc-empty-title">لا توجد حصص</p>
+              <p class="wc-empty-desc">يوم حر</p>
+            </div>
+
+          }
+
+        </div>
+      }
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="wc-bottom-border"></div>
+
   </div>
 </div>

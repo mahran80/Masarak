@@ -117,11 +117,20 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedRolesAsync(db);
     await DatabaseSeeder.SeedAdminUserAsync(db, pwd);
     await DatabaseSeeder.SeedPlansAsync(db);
-    await DatabaseSeeder.SeedChatRoomsAsync(db);
     await DatabaseSeeder.SeedAiPromptTemplatesAsync(db);
     
-    // Enterprise Seeder (will skip automatically if already seeded)
-    // await Masarak.Infrastructure.Persistence.Seeders.EnterpriseSeeder.SeedAllAsync(db, pwd);
+    // Academic & Test Data Seeders
+    await DatabaseSeeder.SeedGradesAsync(db);
+    await DatabaseSeeder.SeedChatRoomsAsync(db);
+    await DatabaseSeeder.SeedSubjectsAsync(db);
+    await DatabaseSeeder.SeedClassesAsync(db);
+    await DatabaseSeeder.SeedTestTeachersAsync(db, pwd);
+    await DatabaseSeeder.SeedTeachingAssignmentsAsync(db);
+    await DatabaseSeeder.SeedTestParentsAsync(db, pwd);
+    await DatabaseSeeder.SeedTestStudentsAsync(db, pwd);
+    await DatabaseSeeder.SeedSubscriptionsAsync(db);
+    await DatabaseSeeder.SeedStudentEnrollmentsAsync(db);
+    await DatabaseSeeder.SeedParentDashboardDataAsync(db);
 }
     
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
@@ -136,7 +145,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<Masarak.API.Extensions.GlobalExceptionMiddleware>();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();

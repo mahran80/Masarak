@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   Validators,
@@ -12,7 +13,7 @@ import { AuthApiService } from '../../../core/services/auth-api-service';
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password-component.html',
 })
 export class ResetPasswordComponent implements OnInit {
@@ -25,6 +26,7 @@ export class ResetPasswordComponent implements OnInit {
   error = signal<string | null>(null);
   successMessage = signal<string | null>(null);
   showNewPassword = signal(false);
+  showConfirmNewPassword = signal(false);
   submitted = signal(false);
 
   // بناء الفورم كـ nonNullable لحماية الـ Types ومنع استخدام الـ ! اليدوية

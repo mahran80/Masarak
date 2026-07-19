@@ -1,114 +1,82 @@
-<div class="space-y-6 font-sans text-slate-800" dir="rtl">
-
-  <div class="flex items-center justify-between">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-black text-slate-900">الواجبات والمهام</h1>
-      <p class="text-xs font-bold text-slate-400">إدارة ومتابعة تسليمات الطلاب للفصل المحدد</p>
+<div class="assignments-page-container" dir="rtl">
+  <section class="assignments-hero">
+    <div class="assignments-hero-copy"><span class="assignments-hero-badge">لوحة المدرس</span><h1>إدارة الواجبات</h1><p>أنشئ الواجبات وتابع تسليمات الطلاب وحالة التصحيح من مكان واحد.</p></div>
+    <div class="assignments-hero-side">
+      @if (selectedTaId() !== null) { <div class="assignments-hero-stat"><strong>{{ assignments().length }}</strong><span>واجب في الفصل</span></div> }
+      <span class="assignments-hero-icon"><app-icon name="clipboard" size="30"></app-icon></span>
     </div>
-    <div class="flex items-center gap-3">
-      <!-- Context Selector -->
-      @if (!isLoadingContext()) {
-        <select class="border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-600 focus:outline-none focus:border-[#4F8CD4]"
-                [ngModel]="selectedTaId()"
-                (ngModelChange)="selectAssignment($event)">
-          <option [ngValue]="null" disabled>اختر الفصل الدراسي</option>
-          @for (ta of teachingAssignments(); track ta.id) {
-            <option [ngValue]="ta.id">{{ ta.className }} - {{ ta.subjectName }}</option>
-          }
-        </select>
+  </section>
+
+  <section class="assignments-controls">
+    <div class="assignment-context-control">
+      <label for="assignment-context-select">الفصل والمقرر</label>
+      @if (isLoadingContext()) { <div class="assignment-select-skeleton"></div> }
+      @else {
+        <div class="assignment-select-wrap"><span><app-icon name="book" size="17"></app-icon></span>
+          <select id="assignment-context-select" [ngModel]="selectedTaId()" (ngModelChange)="selectAssignment($event)">
+            <option [ngValue]="null" disabled>اختر الفصل الدراسي</option>
+            @for (ta of teachingAssignments(); track ta.id) { <option [ngValue]="ta.id">{{ ta.subjectName }} — {{ ta.className }}</option> }
+          </select><i><app-icon name="chevron-down" size="15"></app-icon></i>
+        </div>
       }
-
-      <a routerLink="/dashboard/teacher/assessment/assignments/create"
-         class="flex items-center justify-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-blue-100 active:scale-95">
-        <app-icon name="plus" size="1.2em"></app-icon> إضافة واجب جديد
-      </a>
-      <a routerLink="/dashboard/teacher/assessment/exams/create"
-         class="flex items-center justify-center gap-2 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-95">
-        <app-icon name="pencil" size="1.2em"></app-icon> إنشاء اختبار
-      </a>
     </div>
-  </div>
+    @if (selectedContext(); as context) {
+      <div class="assignment-context-summary"><span><app-icon name="check-circle" size="16"></app-icon></span><div><small>الفصل المحدد</small><strong>{{ context.subjectName }}</strong></div><em>{{ context.className }}</em><b>{{ assignments().length }} واجب</b></div>
+    }
+    <div class="assignment-quick-actions">
+      <a class="create-assignment-button" routerLink="/dashboard/teacher/assessment/assignments/create"><app-icon name="plus" size="17"></app-icon><span>إضافة واجب جديد</span></a>
+      <a class="create-exam-button" routerLink="/dashboard/teacher/assessment/exams/create"><app-icon name="pencil" size="17"></app-icon><span>إنشاء اختبار</span></a>
+    </div>
+  </section>
 
-  <div class="bg-white rounded-[24px] p-6 shadow-xs border border-slate-100 space-y-6 relative">
+  <section class="assignments-section">
+    <header class="assignments-section-header">
+      <div class="assignments-section-title"><span><app-icon name="clipboard" size="21"></app-icon></span><div><h2>الواجبات</h2><p>عرض وإدارة الواجبات الخاصة بالفصل المحدد.</p></div></div>
+      <div class="assignments-header-meta"><b>{{ assignments().length }} واجب</b><label><span>عرض</span><select [ngModel]="assignmentsPageSize()" (ngModelChange)="changeAssignmentsPageSize($event)"><option [ngValue]="10">10</option><option [ngValue]="20">20</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option></select><span>واجب</span></label></div>
+    </header>
 
     @if (isLoading()) {
-      <div class="space-y-3">
-        @for (i of [1,2,3]; track i) {
-          <div class="h-14 bg-slate-100 rounded-xl animate-pulse"></div>
-        }
-      </div>
+      <div class="assignments-loading" aria-label="جاري تحميل الواجبات">@for (i of [1,2,3,4,5,6]; track i) { <div class="assignment-row-skeleton"><span></span><span></span><span></span></div> }</div>
     } @else if (errorMessage()) {
-      <div class="bg-rose-50 text-rose-600 p-4 rounded-xl text-sm font-bold border border-rose-100 flex items-center justify-between">
-        <span>{{ errorMessage() }}</span>
+      <div class="assignments-error-state" role="alert"><span><app-icon name="exclamation-triangle" size="25"></app-icon></span><div><h3>تعذّر تحميل الواجبات</h3><p>{{ errorMessage() }}</p></div>@if (selectedTaId() !== null) { <button type="button" (click)="loadAssignments(selectedTaId()!)">إعادة المحاولة</button> }</div>
+    } @else if (assignments().length === 0) {
+      <div class="assignments-empty-state">
+        <div class="assignments-empty-visual"><span class="empty-decoration empty-doc"><app-icon name="doc" size="14"></app-icon></span><span class="assignments-empty-icon"><app-icon name="clipboard" size="36"></app-icon></span><span class="empty-decoration empty-plus"><app-icon name="plus" size="13"></app-icon></span></div>
         @if (selectedTaId() !== null) {
-          <button (click)="loadAssignments(selectedTaId()!)" class="underline text-rose-700">إعادة المحاولة</button>
-        }
+          <h3>لا توجد واجبات بعد</h3><p>أنشئ أول واجب للفصل المحدد وابدأ في متابعة تسليمات الطلاب.</p>
+          @if (selectedContext(); as context) { <span class="empty-context-badge">{{ context.subjectName }} · {{ context.className }}</span> }
+          <div class="empty-actions"><a class="create-assignment-button" routerLink="/dashboard/teacher/assessment/assignments/create"><app-icon name="plus" size="16"></app-icon><span>إنشاء أول واجب</span></a><a class="create-exam-button" routerLink="/dashboard/teacher/assessment/exams/create"><app-icon name="pencil" size="16"></app-icon><span>إنشاء اختبار</span></a></div>
+        } @else { <h3>اختر فصلًا لعرض الواجبات</h3><p>استخدم القائمة أعلاه لتحديد الفصل والمقرر.</p> }
       </div>
     } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full text-right border-collapse text-sm">
-          <thead>
-            <tr class="text-slate-400 font-bold border-b border-slate-100 bg-slate-50/50">
-              <th class="py-3 pr-4 font-black">عنوان الواجب</th>
-              <th class="py-3 font-black">المادة / الفصل</th>
-              <th class="py-3 font-black">آخر موعد للتسليم</th>
-              <th class="py-3 font-black">الحالة</th>
-              <th class="py-3 font-black">التسليمات</th>
-              <th class="py-3 pl-4 text-center font-black">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-            @for (a of assignments(); track a.assignmentId) {
-              <tr class="hover:bg-slate-50/50 transition-colors">
-                <td class="py-4 pr-4 font-bold text-slate-900">{{ a.title }}</td>
-                <td class="py-4 text-xs text-slate-500 font-bold">{{ a.subjectName }} / {{ a.className }}</td>
-                <td class="py-4 text-xs" [ngClass]="{'text-rose-500 font-bold': a.status === 'Published', 'text-slate-400': a.status !== 'Published'}">
-                  {{ a.dueDate | date:'dd/MM/yyyy' }}
-                </td>
-                <td class="py-4 text-xs">
-                  <span class="px-2 py-1 rounded-sm text-[10px] font-bold"
-                    [ngClass]="{
-                      'bg-yellow-50 text-yellow-600': a.status === 'Draft',
-                      'bg-blue-50 text-[#4F8CD4]': a.status === 'Published',
-                      'bg-slate-100 text-slate-500': a.status === 'Closed'
-                    }">
-                    {{ statusLabel(a.status) }}
-                  </span>
-                </td>
-                <td class="py-4 text-xs font-bold text-slate-600">
-                  {{ a.submissionCount }} تسليم
-                </td>
-                <td class="py-4 pl-4 text-center">
-                  <div class="flex items-center justify-center gap-2">
-                    @if (a.status === 'Draft') {
-                      <button (click)="publishAssignment(a.assignmentId)" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">نشر</button>
-                    }
-                    @if (a.status === 'Published') {
-                      <button (click)="closeAssignment(a.assignmentId)" class="bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">إغلاق</button>
-                    }
-                    <a [routerLink]="['/dashboard/teacher/assessment/assignments', a.assignmentId, 'submissions']"
-                       class="bg-[#4F8CD4] hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
-                      التسليمات
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            } @empty {
+      <div class="assignments-table-scroll">
+        <table class="assignments-table">
+          <thead><tr><th scope="col">عنوان الواجب</th><th scope="col">المادة / الفصل</th><th scope="col">آخر موعد للتسليم</th><th scope="col">الحالة</th><th scope="col">التسليمات</th><th scope="col">الإجراءات</th></tr></thead>
+          <tbody>
+            @for (a of paginatedAssignments(); track a.assignmentId) {
               <tr>
-                <td colspan="6" class="text-center py-12 text-slate-400">
-                  <div class="flex flex-col items-center gap-2">
-                    <span class="text-3xl"><app-icon name="clipboard" size="1.2em"></app-icon></span>
-                    <p class="font-bold">لا يوجد واجبات بعد</p>
-                    <a routerLink="/dashboard/teacher/assessment/assignments/create"
-                       class="text-[#4F8CD4] text-xs font-bold underline">أنشئ واجبك الأول</a>
-                  </div>
-                </td>
+                <td><div class="assignment-identity"><span><app-icon name="clipboard" size="18"></app-icon></span><strong [title]="a.title">{{ a.title }}</strong></div></td>
+                <td><div class="assignment-context-chips"><span>{{ a.subjectName }}</span><b>{{ a.className }}</b></div></td>
+                <td><div class="assignment-deadline" [class.is-published]="a.status === 'Published'"><app-icon name="calendar" size="15"></app-icon><span>{{ a.dueDate | date:'dd/MM/yyyy' }}</span></div></td>
+                <td><span class="assignment-status" [class.is-draft]="a.status === 'Draft'" [class.is-published]="a.status === 'Published'" [class.is-closed]="a.status === 'Closed'"><i></i>{{ statusLabel(a.status) }}</span></td>
+                <td><div class="submission-summary"><strong>{{ a.submissionCount }}</strong><span>{{ a.submissionCount ? 'تسليم' : 'لا توجد تسليمات بعد' }}</span></div></td>
+                <td><div class="assignment-actions">
+                  @if (a.status === 'Draft') { <button type="button" class="publish-action" (click)="publishAssignment(a.assignmentId)" title="نشر الواجب" aria-label="نشر الواجب"><app-icon name="check-badge" size="16"></app-icon><span>نشر</span></button> }
+                  @if (a.status === 'Published') { <button type="button" class="close-action" (click)="closeAssignment(a.assignmentId)" title="إغلاق الواجب" aria-label="إغلاق الواجب"><app-icon name="x-mark" size="16"></app-icon><span>إغلاق</span></button> }
+                  <a class="submissions-action" [routerLink]="['/dashboard/teacher/assessment/assignments', a.assignmentId, 'submissions']" title="عرض التسليمات" aria-label="عرض التسليمات"><app-icon name="clipboard-document-list" size="16"></app-icon><span>التسليمات</span></a>
+                </div></td>
               </tr>
             }
           </tbody>
         </table>
       </div>
+      @if (assignments().length > assignmentsPageSize()) {
+        <footer class="assignments-pagination"><p>عرض <strong>{{ assignmentsRangeStart() }}–{{ assignmentsRangeEnd() }}</strong> من أصل <strong>{{ assignments().length }}</strong> واجبًا</p><div class="assignments-pagination-actions">
+          <button type="button" (click)="setAssignmentsPage(effectiveAssignmentsPage() - 1)" [disabled]="effectiveAssignmentsPage() === 1"><app-icon name="chevron-right" size="14"></app-icon><span>السابق</span></button>
+          @for (page of paginationPages(); track $index) { @if (page === 0) { <span class="pagination-ellipsis">…</span> } @else { <button type="button" (click)="setAssignmentsPage(page)" [class.is-active]="page === effectiveAssignmentsPage()" [attr.aria-current]="page === effectiveAssignmentsPage() ? 'page' : null">{{ page }}</button> } }
+          <button type="button" (click)="setAssignmentsPage(effectiveAssignmentsPage() + 1)" [disabled]="effectiveAssignmentsPage() === assignmentsTotalPages()"><span>التالي</span><app-icon name="chevron-left" size="14"></app-icon></button>
+        </div></footer>
+      }
     }
-
-  </div>
+  </section>
 </div>

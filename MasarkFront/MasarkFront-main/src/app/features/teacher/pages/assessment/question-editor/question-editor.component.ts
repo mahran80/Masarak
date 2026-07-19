@@ -10,6 +10,7 @@ import { AddQuestionRequest, QuestionType, TeacherQuestion, TeacherQuestionOptio
   standalone: true,
   imports: [IconComponent, ReactiveFormsModule],
   templateUrl: './question-editor.component.html',
+  styleUrl: './question-editor.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionEditorComponent implements OnInit {

@@ -17,6 +17,7 @@ import { SubscriptionApiService } from '../../../../core/services/subscription-a
 export class ParentSubscriptionsComponent {
   readonly parentService = inject(ParentService);
   private cdr = inject(ChangeDetectorRef);
+  private subApi = inject(SubscriptionApiService);
 
   activeSubscription = signal<any>(null);
   loadingSubscription = signal(false);
@@ -24,6 +25,12 @@ export class ParentSubscriptionsComponent {
   processingPlanId = signal<number | null>(null);
   errorMsg = signal<string | null>(null);
   successMsg = signal<string | null>(null);
+  plans = signal<PlanDto[]>([]);
+
+  get selectedStudent() {
+    const id = this.parentService.selectedStudentId();
+    return this.parentService.linkedStudents().find(s => s.studentUserId === id);
+  }
 
   constructor() {
     effect(() => {
@@ -37,6 +44,12 @@ export class ParentSubscriptionsComponent {
   }
 
   ngOnInit() {
+    this.subApi.getPlans().subscribe({
+      next: (plans) => {
+        this.plans.set(plans);
+      }
+    });
+
     if (this.parentService.linkedStudents().length === 0) {
       this.parentService.fetchLinkedStudents().subscribe();
     }

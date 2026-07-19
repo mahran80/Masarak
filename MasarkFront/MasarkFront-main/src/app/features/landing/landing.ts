@@ -48,6 +48,8 @@ interface Dictionary {
   faqs: FaqItem[];
   finalCta: { title: string; sub: string; primary: string };
   footer: { desc: string; quickLinks: string; stagesTitle: string; contact: string; rights: string; accredited: string };
+  whyChooseHead: { eyebrow: string; title: string; sub: string };
+  whyChoose: FeatureItem[];
 }
 
 /* ============================================================
@@ -136,10 +138,148 @@ const AR: Dictionary = {
     { question: 'هل المنهج معتمد رسميًا؟', answer: 'نعم، جميع المواد مطابقة بالكامل للمنهج الرسمي المصري المعتمد لكل الصفوف الدراسية.' }
   ],
   finalCta: { title: 'جاهز لتجربة تعليمية مختلفة؟', sub: 'انضم لبيئة تعلم ذكية ومتكاملة مصممة لطلاب مصر بالخارج.', primary: 'سجّل الآن' },
-  footer: { desc: 'نظام إدارة تعلم ذكي لربط المؤسسة، المعلم، الطالب، وولي الأمر.', quickLinks: 'روابط هامة', stagesTitle: 'المراحل', contact: 'تواصل معنا', rights: '© 2026 Masarak. جميع الحقوق محفوظة.', accredited: 'منصة معتمدة تقنياً وأكاديمياً.' }
+  footer: { desc: 'نظام إدارة تعلم ذكي لربط المؤسسة، المعلم، الطالب، وولي الأمر.', quickLinks: 'روابط هامة', stagesTitle: 'المراحل', contact: 'تواصل معنا', rights: '© 2026 Masarak. جميع الحقوق محفوظة.', accredited: 'منصة معتمدة تقنياً وأكاديمياً.' },
+  whyChooseHead: { eyebrow: 'لماذا مسارك؟', title: 'لماذا تختار المدارس وأولياء الأمور مسارك؟', sub: 'نظام شامل ومبتكر صمم خصيصاً لتلبية احتياجات الطلاب وأولياء أمورهم والمنشآت التعليمية.' },
+  whyChoose: [
+    { icon: 'psychology', title: 'التعلم المخصص بالذكاء الاصطناعي', description: 'مسارات تعليمية ذكية تتكيف مع مستوى الطالب وسرعة استيعابه لتنمية قدراته.' },
+    { icon: 'verified', title: 'المنهج المصري الرسمي', description: 'تغطية شاملة لكافة المواد والدروس المقررة رسمياً من وزارة التربية والتعليم.' },
+    { icon: 'dashboard', title: 'لوحة تحكم ولي الأمر', description: 'متابعة لحظية لحضور وغياب الطلاب، وسلوكهم، ودرجاتهم وتفاعلهم الأكاديمي.' },
+    { icon: 'insights', title: 'تحليلات الأداء والتقدم', description: 'تقارير إحصائية دورية ورؤى تنبؤية بالذكاء الاصطناعي لقياس مدى جاهزية الطالب للامتحانات.' },
+    { icon: 'video_camera_front', title: 'الحصص التفاعلية المباشرة', description: 'فصول افتراضية حية تجمع الطالب بأفضل المعلمين المؤهلين تفاعلياً وبجودة عالية.' },
+    { icon: 'verified_user', title: 'الامتحانات الإلكترونية الآمنة', description: 'نظام تقييم إلكتروني متكامل وآمن لتدريب الطلاب وقياس مستواهم بشكل دوري.' },
+    { icon: 'history_edu', title: 'التحضير لامتحانات السفارة', description: 'تدريب مكثف وتطبيقات تحاكي تماماً نظام امتحانات سفارات مصر بالخارج.' },
+    { icon: 'tips_and_updates', title: 'التوصيات الذكية', description: 'اقتراحات آلية بالذكاء الاصطناعي للمراجعة وحل الأسئلة لتقوية نقاط الضعف الأكاديمية.' }
+  ]
 };
 
-
+const EN: Dictionary = {
+  nav: {
+    home: 'Home',
+    features: 'Features',
+    stages: 'Stages',
+    journey: 'Student Journey',
+    faq: 'FAQ',
+    start: 'Start Free',
+    brand: 'Masarak',
+    register: 'Register Now',
+    login: 'Login'
+  },
+  hero: {
+    ctaPrimary: 'Register Now',
+    ctaGhost: 'Explore Platform',
+    slides: [
+      {
+        tag: 'Smart Educational Management',
+        title: 'Your Egyptian School',
+        highlight: 'Wherever You Are',
+        subtitle: 'A comprehensive learning management system combining official curriculum and AI in one experience for Egyptian students abroad.'
+      },
+      {
+        tag: 'Live Classes',
+        title: 'Direct Interaction',
+        highlight: 'Without Interruption',
+        subtitle: 'Continuous communication between student, teacher, and parent to ensure quality and follow-up.'
+      }
+    ]
+  },
+  aiCardLabel: 'Masarak Assistant',
+  aiTips: [
+    { label: 'Performance Analysis', text: 'Excellent progress — time to review upcoming modules.' },
+    { label: 'Recommendation', text: 'Taking the mock exam now increases readiness.' }
+  ],
+  stats: [
+    { value: 12, suffix: '+', label: 'Stages Covered' },
+    { value: 100, suffix: '%', label: 'Performance Tracking' },
+    { value: 24, suffix: '/7', label: 'Content Access' },
+    { value: 98, suffix: '%', label: 'Parent Satisfaction' }
+  ],
+  featuresHead: {
+    eyebrow: 'Features',
+    title: 'Why Choose Masarak?',
+    sub: 'We combine the quality of Egyptian education with the latest technologies to ensure your child\'s academic excellence.'
+  },
+  features: [
+    { icon: 'video_camera_front', title: 'Live Classes', description: 'Direct interaction with elite Egyptian teachers in high-quality interactive virtual classrooms.' },
+    { icon: 'verified', title: 'Accredited Curriculum', description: 'We offer the official Egyptian curriculum approved by the Ministry of Education for all stages.' },
+    { icon: 'public', title: 'Learn Anywhere', description: 'A fully integrated cloud platform that lets you access lessons and assignments from any device, anytime.' },
+    { icon: 'bar_chart', title: 'Smart Reports', description: 'Detailed analysis of strengths and weaknesses for each student using AI algorithms.' },
+    { icon: 'contact_page', title: 'Electronic Exams', description: 'A continuous evaluation system simulating embassy exams to train students on exam atmosphere.' },
+    { icon: 'groups', title: 'Parent Portal', description: 'Dedicated app for parents to track attendance, grades, and academic progress moment by moment.' }
+  ],
+  stagesHead: {
+    eyebrow: 'Educational Stages',
+    title: 'A Path Designed for Every Age',
+    sub: 'Different content and tools suited to the abilities and needs of each student.'
+  },
+  stages: [
+    { title: 'Primary Stage', range: 'Grades 1 to 6', description: 'Strong foundation in reading and math through short, motivating interactive lessons.' },
+    { title: 'Preparatory Stage', range: 'Grades 7 to 9', description: 'Deepening understanding and building problem-solving skills in preparation for high school.' },
+    { title: 'Secondary Stage', range: 'Grades 10 to 12', description: 'Intensive path for academic excellence and full readiness for embassy exams.' }
+  ],
+  aiSectionHead: {
+    eyebrow: 'AI Technologies',
+    title: 'AI-Powered Smart Routing & Allocation',
+    sub: 'A smart system to allocate students to classrooms in a balanced way, with advanced analytical dashboards to predict and improve academic performance.'
+  },
+  aiSection: [
+    { title: 'Smart Classroom Allocation', desc: 'Advanced algorithms integrate students into appropriate classrooms based on assessments to ensure balance and efficacy.' },
+    { title: 'Predictive Dashboards for Admin', desc: 'Comprehensive analytics help administrative and teaching staff optimize learning outcomes and make right decisions.' }
+  ],
+  aiPanel: {
+    title: 'Predictive Performance Analytics',
+    badge: 'AI Powered',
+    accuracyLabel: 'Academic Predictions Accuracy',
+    accuracyDesc: 'Predict student performance and learning behavior based on cumulative learning curves.'
+  },
+  processHead: {
+    eyebrow: 'How it Works',
+    title: 'An Integrated Smart Learning Journey',
+    sub: 'Simple and studied steps accompanying the student and their parent from the beginning to achieving success.'
+  },
+  process: [
+    { index: '01', title: 'Create Account', description: 'Register your account as a student or parent to activate your profile and start immediately.', icon: 'person_add' },
+    { index: '02', title: 'Choose Educational Stage', description: 'Select your academic stage and grade to access your appropriate learning plan.', icon: 'layers' },
+    { index: '03', title: 'Start Learning', description: 'Attend live classes, interact with qualified teachers, and enjoy interactive lessons.', icon: 'menu_book' },
+    { index: '04', title: 'Track Progress', description: 'View your comprehension levels and instant reports to monitor your exam readiness.', icon: 'insights' },
+    { index: '05', title: 'Achieve Success', description: 'Get fully prepared for embassy exams and excel in your studies with academic readiness.', icon: 'emoji_events' }
+  ],
+  testimonialsHead: { eyebrow: 'Impact', title: 'Success Stories from the Platform' },
+  testimonials: [
+    { name: 'Mr. Yasser', role: 'School Principal', quote: 'The platform made managing academic schedules and payments unbelievably simple.' },
+    { name: 'Mona Hussein', role: 'Parent', quote: 'The organized learning journey let me track my daughter\'s progress step-by-step without hassle.' },
+    { name: 'Karim Saeed', role: 'Student', quote: 'The platform unlocks lessons gradually, which helped me focus better and not feel overwhelmed.' }
+  ],
+  faqHead: { eyebrow: 'FAQ', title: 'Everything You Need to Know Before Starting' },
+  faqs: [
+    { question: 'Can administration track user growth and revenue?', answer: 'Yes, the admin dashboard provides a live overview of revenues, active students, and trends.' },
+    { question: 'How is the learning journey system enforced?', answer: 'Advanced weeks are locked until the student successfully completes the requirements of the current week.' },
+    { question: 'Is the curriculum officially accredited?', answer: 'Yes, all materials fully comply with the official accredited Egyptian curriculum for all grades.' }
+  ],
+  finalCta: {
+    title: 'Ready for a different learning experience?',
+    sub: 'Join an integrated smart learning environment designed for Egyptian students abroad.',
+    primary: 'Register Now'
+  },
+  footer: {
+    desc: 'Smart learning management system connecting institution, teacher, student, and parent.',
+    quickLinks: 'Quick Links',
+    stagesTitle: 'Stages',
+    contact: 'Contact Us',
+    rights: '© 2026 Masarak. All rights reserved.',
+    accredited: 'Technically and academically accredited platform.'
+  },
+  whyChooseHead: { eyebrow: 'Why Masarak?', title: 'Why Schools & Parents Choose Masarak?', sub: 'A comprehensive and innovative system designed specifically to meet the needs of students, parents, and educational institutions.' },
+  whyChoose: [
+    { icon: 'psychology', title: 'AI Personalized Learning', description: 'Intelligent learning pathways that adapt to the student\'s level and pace to cultivate their potential.' },
+    { icon: 'verified', title: 'Egyptian Curriculum', description: 'Comprehensive coverage of all subjects officially mandated by the Egyptian Ministry of Education.' },
+    { icon: 'dashboard', title: 'Parent Dashboard', description: 'Real-time tracking of student attendance, behavior, grades, and academic engagement.' },
+    { icon: 'insights', title: 'Progress Analytics', description: 'Regular statistical reports and AI predictive insights to measure student readiness for exams.' },
+    { icon: 'video_camera_front', title: 'Live Interactive Classes', description: 'Live virtual classrooms connecting students with top qualified teachers interactively.' },
+    { icon: 'verified_user', title: 'Secure Online Exams', description: 'Integrated and secure electronic evaluation system to regularly train students.' },
+    { icon: 'history_edu', title: 'Embassy Exam Prep', description: 'Intensive training and mock tests that perfectly simulate the format of Egyptian embassy exams.' },
+    { icon: 'tips_and_updates', title: 'Smart Recommendations', description: 'Automated AI suggestions for revision and practice to reinforce academic weaknesses.' }
+  ]
+};
 
 @Component({
   selector: 'app-landing-page',
@@ -157,11 +297,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   isMobileMenuOpen = signal(false);
   activeSection = signal<string>('home');
 
-  /* ============ LOCALE & THEME (Fixed to AR / Light Mode) ============ */
-  lang = signal<'ar'>('ar');
-  dir = signal<'rtl'>('rtl');
-  t = computed(() => AR);
-  theme = signal<'light'>('light');
+  /* ============ LOCALE & THEME ============ */
+  lang = signal<'ar' | 'en'>('ar');
+  dir = signal<'rtl' | 'ltr'>('rtl');
+  t = computed(() => this.lang() === 'ar' ? AR : EN);
+  theme = signal<'light' | 'dark'>('light');
+  showLangDropdown = signal<boolean>(false);
+  billingCycle = signal<'monthly' | 'yearly'>('monthly');
 
   @HostBinding('attr.data-theme') get themeAttr(): string { return this.theme(); }
   @HostBinding('attr.dir') get dirAttr(): string { return this.dir(); }
@@ -229,6 +371,39 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   /* ============ ACTIONS ============ */
 
+  toggleLanguage(): void {
+    if (this.lang() === 'ar') {
+      this.lang.set('en');
+      this.dir.set('ltr');
+    } else {
+      this.lang.set('ar');
+      this.dir.set('rtl');
+    }
+  }
+
+  setLang(lang: 'ar' | 'en'): void {
+    this.lang.set(lang);
+    this.dir.set(lang === 'ar' ? 'rtl' : 'ltr');
+  }
+
+  toggleTheme(): void {
+    this.theme.update(t => t === 'light' ? 'dark' : 'light');
+    if (isPlatformBrowser(this.platformId)) {
+      const body = document.body;
+      if (this.theme() === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        body.setAttribute('data-theme', 'light');
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    }
+  }
+
+  toggleBillingCycle(): void {
+    this.billingCycle.update(c => c === 'monthly' ? 'yearly' : 'monthly');
+  }
+
   toggleMobileMenu(): void { this.isMobileMenuOpen.update(open => !open); }
   closeMobileMenu(): void { this.isMobileMenuOpen.set(false); }
 
@@ -257,7 +432,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     const currentScroll = window.scrollY;
     this.isScrolled.set(currentScroll > 12);
 
-    const sections = ['home', 'features', 'stages', 'journey', 'team', 'faq'];
+    const sections = ['home', 'features', 'stages', 'why-choose', 'journey', 'faq'];
     let current = 'home';
     const scrollPosition = currentScroll + 200;
 

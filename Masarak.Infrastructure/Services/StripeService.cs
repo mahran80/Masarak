@@ -72,6 +72,12 @@ namespace Masarak.Infrastructure.Services
             var service = new Stripe.SubscriptionService();
             var subscription = await service.GetAsync(stripeSubscriptionId, cancellationToken: ct);
             
+            var productService = new Stripe.ProductService();
+            var newProduct = await productService.CreateAsync(new Stripe.ProductCreateOptions
+            {
+                Name = newPlanName
+            }, cancellationToken: ct);
+            
             var options = new SubscriptionUpdateOptions
             {
                 ProrationBehavior = isUpgrade ? "create_prorations" : "none",
@@ -85,7 +91,7 @@ namespace Masarak.Infrastructure.Services
                             UnitAmountDecimal = newPrice * 100,
                             Currency = currency.ToLowerInvariant(),
                             Recurring = new SubscriptionItemPriceDataRecurringOptions { Interval = "month" },
-                            Product = subscription.Items.Data[0].Price.ProductId
+                            Product = newProduct.Id
                         }
                     }
                 },

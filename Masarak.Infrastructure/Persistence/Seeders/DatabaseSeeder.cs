@@ -63,15 +63,13 @@ namespace Masarak.Infrastructure.Persistence.Seeders
                 Grade.Create("Grade 8", "ثانية إعدادي", GradeStage.Preparatory, 8),
                 Grade.Create("Grade 9", "ثالثة إعدادي", GradeStage.Preparatory, 9),
 
-                // Secondary (ثانوي) — Grades 10-12
+                // Secondary (ثانوي) — Grade 10 only (to meet 10 grades constraint)
                 Grade.Create("Grade 10", "أولى ثانوي",  GradeStage.Secondary, 10),
-                Grade.Create("Grade 11", "ثانية ثانوي", GradeStage.Secondary, 11),
-                Grade.Create("Grade 12", "ثالثة ثانوي", GradeStage.Secondary, 12),
             };
 
             await db.Grades.AddRangeAsync(grades);
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 12 Egyptian school grades seeded (Primary/Preparatory/Secondary).");
+            Console.WriteLine("[Seeder] 10 Egyptian school grades seeded.");
         }
 
         public static async Task SeedPlansAsync(Context db)
@@ -120,21 +118,28 @@ namespace Masarak.Infrastructure.Persistence.Seeders
         /// </summary>
         public static async Task SeedChatRoomsAsync(Context db)
         {
-            if (await db.ChatRooms.AnyAsync()) return;
-
             var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
             var rooms = new List<Domain.Entities.ChatRoom>();
 
             foreach (var grade in grades)
             {
-                rooms.Add(Domain.Entities.ChatRoom.CreateGradeCommunity(grade.GradeId, $"{grade.Name} Community"));
+                if (!await db.ChatRooms.AnyAsync(r =>
+                    r.RoomType == ChatRoomType.GradeCommunity && r.GradeId == grade.GradeId))
+                {
+                    rooms.Add(Domain.Entities.ChatRoom.CreateGradeCommunity(grade.GradeId, $"{grade.Name} Community"));
+                }
             }
 
-            rooms.Add(Domain.Entities.ChatRoom.CreateTeachersCommunity());
+            if (!await db.ChatRooms.AnyAsync(r => r.RoomType == ChatRoomType.TeachersCommunity))
+            {
+                rooms.Add(Domain.Entities.ChatRoom.CreateTeachersCommunity());
+            }
+
+            if (rooms.Count == 0) return;
 
             await db.ChatRooms.AddRangeAsync(rooms);
             await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] {rooms.Count} chat rooms seeded ({grades.Count} grade rooms + 1 teachers room).");
+            Console.WriteLine($"[Seeder] {rooms.Count} missing chat rooms seeded.");
         }
         public static async Task SeedTestTeachersAsync(Context db, IPasswordService pwd)
         {
@@ -178,6 +183,37 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             Console.WriteLine("[Seeder] 10 test teachers seeded with 10 specializations.");
         }
 
+        public static async Task SeedTestParentsAsync(Context db, IPasswordService pwd)
+        {
+            if (await db.Parents.AnyAsync()) return;
+
+            var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == AppRoles.Parent);
+            if (role == null) return;
+
+            var users = new List<User>();
+            var parents = new List<Parent>();
+
+            for (int i = 1; i <= 10; i++)
+            {
+                var user = new User { 
+                    RoleId = role.RoleId, FullName = $"Parent {i}", 
+                    Email = $"parent{i}@masarak.com", PasswordHash = pwd.HashPassword("Parent@123!"), 
+                    Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 
+                };
+                users.Add(user);
+            }
+            db.Users.AddRange(users);
+            await db.SaveChangesAsync();
+
+            foreach (var user in users)
+            {
+                parents.Add(new Parent { UserId = user.UserId, Bio = "Dedicated parent", Headline = "Supporting my children" });
+            }
+            db.Parents.AddRange(parents);
+            await db.SaveChangesAsync();
+            Console.WriteLine("[Seeder] 10 test parents seeded.");
+        }
+
         public static async Task SeedTestStudentsAsync(Context db, IPasswordService pwd)
         {
             if (await db.Students.AnyAsync()) return;
@@ -186,6 +222,8 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             if (role == null) return;
             var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
             if (!grades.Any()) return;
+            
+            var parents = await db.Parents.ToListAsync();
 
             var users = new List<User>();
             var students = new List<Student>();
@@ -193,7 +231,7 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
             foreach (var grade in grades)
             {
-                for (int i = 1; i <= 2; i++)
+                for (int i = 1; i <= 10; i++)
                 {
                     var user = new User { RoleId = role.RoleId, FullName = $"Student {studentCounter} Grade {grade.Order}", Email = $"student{studentCounter}@grade{grade.Order}.com", PasswordHash = pwd.HashPassword("Student@123!"), Country = "EG", CreatedAt = DateTime.UtcNow, IsActive = true, EmailConfirmed = true, FailedLoginCount = 0 };
                     users.Add(user);
@@ -203,18 +241,43 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             db.Users.AddRange(users);
             await db.SaveChangesAsync();
 
+            // Link students to grades, and link 1 student in each grade to each of the 10 parents
             studentCounter = 1;
             foreach (var grade in grades)
             {
                 var gradeUsers = users.Where(u => u.Email.Contains($"@grade{grade.Order}.com")).ToList();
-                foreach (var user in gradeUsers)
+                for (int i = 0; i < gradeUsers.Count; i++)
                 {
-                    students.Add(new Student { UserId = user.UserId, GradeId = grade.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" });
+                    var user = gradeUsers[i];
+                    var student = new Student { UserId = user.UserId, GradeId = grade.GradeId, EnrollmentDate = DateTime.UtcNow, AcademicStatus = "Active" };
+                    students.Add(student);
                 }
             }
             db.Students.AddRange(students);
             await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] {students.Count} test students seeded.");
+            
+            // Generate ParentStudent links
+            var parentStudents = new List<ParentStudent>();
+            foreach (var grade in grades)
+            {
+                var gradeStudents = students.Where(s => s.GradeId == grade.GradeId).ToList();
+                for (int i = 0; i < 10; i++) // 10 parents, 10 students per grade
+                {
+                    if (i < parents.Count && i < gradeStudents.Count)
+                    {
+                        parentStudents.Add(new ParentStudent 
+                        { 
+                            ParentId = parents[i].ParentId, 
+                            StudentId = gradeStudents[i].StudentId,
+                            Relationship = "Guardian"
+                        });
+                    }
+                }
+            }
+            db.ParentStudents.AddRange(parentStudents);
+            await db.SaveChangesAsync();
+
+            Console.WriteLine($"[Seeder] {students.Count} test students seeded and linked to 10 parents.");
         }
 
         public static async Task SeedSubjectsAsync(Context db)
@@ -287,16 +350,31 @@ namespace Masarak.Infrastructure.Persistence.Seeders
         public static async Task SeedTeachingAssignmentsAsync(Context db)
         {
             if (await db.TeachingAssignments.AnyAsync()) return;
-            var teacher1 = await db.Teachers.FirstOrDefaultAsync();
-            var grade1 = await db.Grades.FirstOrDefaultAsync(g => g.Order == 1);
-            if (grade1 == null) return;
-            var class1 = await db.Classes.FirstOrDefaultAsync(c => c.GradeId == grade1.GradeId);
-            var mathSubj = await db.Subjects.FirstOrDefaultAsync(s => s.GradeId == grade1.GradeId && s.Name.StartsWith("Mathematics"));
-            if (teacher1 == null || class1 == null || mathSubj == null) return;
+            var teachers = await db.Teachers.ToListAsync();
+            var classes = await db.Classes.Include(c => c.Grade).ToListAsync();
+            var subjects = await db.Subjects.ToListAsync();
+            
+            if (!teachers.Any() || !classes.Any() || !subjects.Any()) return;
 
-            db.TeachingAssignments.Add(TeachingAssignment.Create(teacher1.TeacherId, class1.ClassId, mathSubj.SubjectId, DateTime.UtcNow.Year));
+            var assignments = new List<TeachingAssignment>();
+
+            foreach (var cls in classes)
+            {
+                var gradeSubjects = subjects.Where(s => s.GradeId == cls.GradeId).ToList();
+                foreach (var subject in gradeSubjects)
+                {
+                    // Find teacher with matching specialization
+                    var teacher = teachers.FirstOrDefault(t => subject.Name.StartsWith(t.Specialization));
+                    if (teacher != null)
+                    {
+                        assignments.Add(TeachingAssignment.Create(teacher.TeacherId, cls.ClassId, subject.SubjectId, DateTime.UtcNow.Year));
+                    }
+                }
+            }
+            
+            db.TeachingAssignments.AddRange(assignments);
             await db.SaveChangesAsync();
-            Console.WriteLine("[Seeder] 1 teaching assignment seeded.");
+            Console.WriteLine($"[Seeder] {assignments.Count} teaching assignments seeded.");
         }
 
         public static async Task SeedSubscriptionsAsync(Context db)
@@ -363,35 +441,29 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             if (await db.StudentClasses.AnyAsync()) return;
             var students = await db.Students.ToListAsync();
             var classes = await db.Classes.ToListAsync();
+            var grades = await db.Grades.ToListAsync();
 
-            int enrollments = 0;
-            foreach (var student in students)
+            var enrollments = new List<StudentClass>();
+
+            foreach (var grade in grades)
             {
-                var studentClass = classes.FirstOrDefault(c => c.GradeId == student.GradeId);
-                if (studentClass != null)
+                var gradeStudents = students.Where(s => s.GradeId == grade.GradeId).ToList();
+                var gradeClasses = classes.Where(c => c.GradeId == grade.GradeId).ToList();
+                
+                if (gradeClasses.Count == 0 || gradeStudents.Count == 0) continue;
+
+                for (int i = 0; i < gradeStudents.Count; i++)
                 {
-                    // Check subscription type
-                    var sub = await db.Subscriptions.Include(s => s.SubscriptionSubjects).FirstOrDefaultAsync(s => s.UserId == student.UserId && s.Status == Masarak.Domain.Enums.SubscriptionStatus.Active);
-                    if (sub != null)
-                    {
-                        var isFull = sub.SubscriptionSubjects.Count == 0;
-                        var type = isFull ? Masarak.Domain.Enums.EnrollmentType.FullClass : Masarak.Domain.Enums.EnrollmentType.PerSubject;
-                        var sc = StudentClass.Enroll(student.StudentId, studentClass.ClassId, DateTime.UtcNow.Year, type);
-                        
-                        if (!isFull)
-                        {
-                            foreach (var ss in sub.SubscriptionSubjects)
-                            {
-                                sc.StudentClassSubjects.Add(new StudentClassSubject { SubjectId = ss.SubjectId });
-                            }
-                        }
-                        db.StudentClasses.Add(sc);
-                        enrollments++;
-                    }
+                    // Divide students evenly among available classes in the grade
+                    var targetClass = gradeClasses[i % gradeClasses.Count];
+                    
+                    var sc = StudentClass.Enroll(gradeStudents[i].StudentId, targetClass.ClassId, DateTime.UtcNow.Year, Masarak.Domain.Enums.EnrollmentType.FullClass);
+                    enrollments.Add(sc);
                 }
             }
+            db.StudentClasses.AddRange(enrollments);
             await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] {enrollments} student enrollments seeded.");
+            Console.WriteLine($"[Seeder] {enrollments.Count} student enrollments seeded (divided into classes).");
         }
         /// <summary>
         /// Phase 5: Seeds default AI prompt templates for weakness analysis, parent reports, and teaching suggestions.

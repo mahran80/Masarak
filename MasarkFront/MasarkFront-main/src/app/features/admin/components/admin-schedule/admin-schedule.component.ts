@@ -11,6 +11,7 @@ import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/compon
   standalone: true,
   imports: [IconComponent, CommonModule, FormsModule, DatePipe, WeeklyCalendarComponent],
   templateUrl: './admin-schedule.component.html',
+  styleUrl: './admin-schedule.component.css',
 })
 export class AdminScheduleComponent implements OnInit {
   private readonly academicApi = inject(AcademicApiService);

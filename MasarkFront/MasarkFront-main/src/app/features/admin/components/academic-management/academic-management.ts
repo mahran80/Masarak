@@ -1,6 +1,6 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject, signal, computed, HostListener } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicApiService } from '../../../../core/services/academic-api-service';
 import { AdminApiService } from '../../../../core/services/admin-api-service';
@@ -8,15 +8,25 @@ import { AdminApiService } from '../../../../core/services/admin-api-service';
 @Component({
   selector: 'app-academic-management',
   standalone: true,
-  imports: [IconComponent, CommonModule, FormsModule],
+  imports: [IconComponent, CommonModule, FormsModule, DecimalPipe],
   templateUrl: './academic-management.html',
   styleUrl: './academic-management.css',
 })
-export class AcademicManagementComponent implements OnInit {
+export class AcademicManagementComponent implements OnInit, OnDestroy {
   private readonly api = inject(AcademicApiService);
   private readonly adminApi = inject(AdminApiService);
 
   activeTab = signal<'grades' | 'subjects' | 'classes' | 'roster' | 'teachers' | 'specializations'>('grades');
+  
+  // Language & Translation State
+  lang = signal<'ar' | 'en'>('ar');
+  trans = computed(() => {
+    return this.lang() === 'ar' ? {
+      studentAllocation: 'توزيع الطلاب على الفصول'
+    } : {
+      studentAllocation: 'Student Class Allocation'
+    };
+  });
   
   // Data State
   grades = signal<any[]>([]);
@@ -45,6 +55,7 @@ export class AcademicManagementComponent implements OnInit {
   // Loading & Modals
   isLoading = signal<boolean>(false);
   isModalOpen = signal<boolean>(false);
+  isModalClosing = signal<boolean>(false);
   modalMode = signal<'create' | 'edit'>('create');
   modalType = signal<'grade' | 'subject' | 'class'>('grade');
 
@@ -55,6 +66,15 @@ export class AcademicManagementComponent implements OnInit {
   confirmAction = signal<{ msg: string, action: () => void } | null>(null);
 
   ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem('lang') as 'ar' | 'en';
+      if (savedLang) {
+        this.lang.set(savedLang);
+      } else {
+        const dir = document.documentElement.getAttribute('dir');
+        this.lang.set(dir === 'ltr' ? 'en' : 'ar');
+      }
+    }
     this.loadGrades();
     this.loadAvailableTeachers();
     this.loadAvailableStudents();
@@ -174,12 +194,35 @@ export class AcademicManagementComponent implements OnInit {
     this.modalType.set(type);
     this.modalMode.set(mode);
     this.formData = data ? { ...data } : {};
+    this.isModalClosing.set(false);
     this.isModalOpen.set(true);
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('modal-open');
+    }
   }
 
   closeModal() {
-    this.isModalOpen.set(false);
-    this.formData = {};
+    this.isModalClosing.set(true);
+    setTimeout(() => {
+      this.isModalOpen.set(false);
+      this.isModalClosing.set(false);
+      this.formData = {};
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('modal-open');
+      }
+    }, 200);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    if (this.isModalOpen()) this.closeModal();
+    if (this.confirmAction()) this.confirmAction.set(null);
+  }
+
+  ngOnDestroy() {
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('modal-open');
+    }
   }
 
   saveModal() {

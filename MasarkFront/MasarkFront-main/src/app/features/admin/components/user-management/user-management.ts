@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SubscriptionApiService } from '../../../../core/services/subscription-api-service';
 import { PlanDto, SubscriptionDto } from '../../../../core/models/subscription.model';
@@ -58,6 +58,26 @@ export class UserManagement implements OnInit {
   selectedUser = signal<AdminUser | null>(null);
   isEditing = signal(false);
   showAddModal = signal(false);
+  openActionMenuId = signal<number | null>(null);
+
+  toggleActionMenu(userId: number, event: Event): void {
+    event.stopPropagation();
+    this.openActionMenuId.update((current) => current === userId ? null : userId);
+  }
+
+  closeActionMenu(): void {
+    this.openActionMenuId.set(null);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeActionMenu();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeActionMenu();
+  }
 
   selectedPlanId = signal<number | null>(null);
   selectedStudentId = signal<number | null>(null);
@@ -79,7 +99,7 @@ export class UserManagement implements OnInit {
   set roleFilter(v: string) { this._roleFilter.set(v); this.currentPage.set(1); }
 
   currentPage = signal(1);
-  pageSize = signal(10);
+  pageSize = signal(20);
 
   // ── Form ──────────────────────────────────────────────────────────────────
   form = {
@@ -129,6 +149,45 @@ export class UserManagement implements OnInit {
   totalStudents = computed(() => this.users().filter((u) => u.role === 'Student').length);
   totalTeachers = computed(() => this.users().filter((u) => u.role === 'Teacher').length);
   totalSubscribed = computed(() => this.users().filter((u) => u.subscription?.status === 'Active').length);
+
+  // ── Subscription table pagination ────────────────────────────────────────
+  subCurrentPage = signal(1);
+  subPageSize = signal(10);
+  subTotalPages = computed(() => Math.max(1, Math.ceil(this.studentUsers().length / this.subPageSize())));
+  paginatedStudentSubs = computed(() => {
+    const start = (this.subCurrentPage() - 1) * this.subPageSize();
+    return this.studentUsers().slice(start, start + this.subPageSize());
+  });
+
+  subNextPage() {
+    if (this.subCurrentPage() < this.subTotalPages()) {
+      this.subCurrentPage.update(p => p + 1);
+    }
+  }
+
+  subPrevPage() {
+    if (this.subCurrentPage() > 1) {
+      this.subCurrentPage.update(p => p - 1);
+    }
+  }
+
+  getSubPaginationPages(): number[] {
+    const total = this.subTotalPages();
+    const current = this.subCurrentPage();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    const pages: number[] = [1];
+    const left = current - 1;
+    const right = current + 1;
+    if (left > 2) pages.push(-1);
+    if (left > 1) pages.push(left);
+    if (current !== 1 && current !== total) pages.push(current);
+    if (right < total) pages.push(right);
+    if (right < total - 1) pages.push(-1);
+    pages.push(total);
+    return pages;
+  }
 
   parentStudentSearch = signal('');
 
@@ -475,6 +534,10 @@ export class UserManagement implements OnInit {
     }
   }
 
+  subjectDisplayName(subject: { name: string; nameAr?: string }): string {
+    const isArabic = typeof document !== 'undefined' && document.documentElement.dir !== 'ltr';
+    return isArabic && subject.nameAr ? subject.nameAr : subject.name;
+  }
   toggleSubject(subjectId: number, event: any) {
     if (event.target.checked) {
       this.selectedSubjects.update(s => [...s, subjectId]);
@@ -573,7 +636,7 @@ export class UserManagement implements OnInit {
 
   roleLabel(role: string): string {
     const map: Record<string, string> = {
-      Student: 'طالب', Teacher: 'معلم', Admin: 'مدير', Parent: 'ولي أمر',
+      Student: 'طالب', Teacher: 'معلم', Admin: 'مدير النظام', Administrator: 'مدير النظام', SystemAdministrator: 'مدير النظام', Parent: 'ولي أمر',
     };
     return map[role] ?? role;
   }
@@ -595,5 +658,24 @@ export class UserManagement implements OnInit {
     } else {
       this.form.studentIds.splice(idx, 1);
     }
+  }
+
+  /** Returns array of page numbers with -1 for ellipsis */
+  getPaginationPages(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    const pages: number[] = [1];
+    const left = current - 1;
+    const right = current + 1;
+    if (left > 2) pages.push(-1);
+    if (left > 1) pages.push(left);
+    if (current !== 1 && current !== total) pages.push(current);
+    if (right < total) pages.push(right);
+    if (right < total - 1) pages.push(-1);
+    pages.push(total);
+    return pages;
   }
 }

@@ -11,6 +11,7 @@ import { PlanDto } from '../../../../core/models/subscription.model';
   standalone: true,
   imports: [IconComponent, CommonModule],
   templateUrl: './plans-component.html',
+  styleUrl: './plans-component.css',
 })
 export class PlansComponent implements OnInit {
   private subApi = inject(SubscriptionApiService);

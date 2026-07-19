@@ -62,6 +62,10 @@ export class TeacherCourses implements OnInit {
   readonly contentItems = signal<ContentItem[]>([]);
   readonly viewMode = signal<'list' | 'grid'>('list');
   readonly filterType = signal<string>('الكل');
+  readonly coursesPage = signal(1);
+  readonly coursesPageSize = signal(9);
+  readonly filesPage = signal(1);
+  readonly filesPageSize = signal(8);
 
   readonly isLoadingContent = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -98,6 +102,34 @@ export class TeacherCourses implements OnInit {
     return this.contentItems().filter((item) => f === 'الكل' || item.type === f);
   });
 
+  readonly coursesTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.teachingAssignments().length / this.coursesPageSize()))
+  );
+  readonly paginatedAssignments = computed(() => {
+    const start = (this.coursesPage() - 1) * this.coursesPageSize();
+    return this.teachingAssignments().slice(start, start + this.coursesPageSize());
+  });
+  readonly coursesRangeStart = computed(() =>
+    this.teachingAssignments().length ? (this.coursesPage() - 1) * this.coursesPageSize() + 1 : 0
+  );
+  readonly coursesRangeEnd = computed(() =>
+    Math.min(this.coursesPage() * this.coursesPageSize(), this.teachingAssignments().length)
+  );
+
+  readonly filesTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredContent().length / this.filesPageSize()))
+  );
+  readonly paginatedContent = computed(() => {
+    const start = (this.filesPage() - 1) * this.filesPageSize();
+    return this.filteredContent().slice(start, start + this.filesPageSize());
+  });
+  readonly filesRangeStart = computed(() =>
+    this.filteredContent().length ? (this.filesPage() - 1) * this.filesPageSize() + 1 : 0
+  );
+  readonly filesRangeEnd = computed(() =>
+    Math.min(this.filesPage() * this.filesPageSize(), this.filteredContent().length)
+  );
+
   constructor() {
     // Watch for assignment changes and load content
     effect(() => {
@@ -119,8 +151,45 @@ export class TeacherCourses implements OnInit {
   selectAssignment(taId: number): void {
     this.contextService.selectAssignment(taId);
     this.filterType.set('الكل');
+    this.filesPage.set(1);
     this.activeTab.set('files');
     this.resetUploadForm();
+  }
+
+  setCoursesPage(page: number): void {
+    this.coursesPage.set(Math.min(Math.max(page, 1), this.coursesTotalPages()));
+  }
+
+  changeCoursesPageSize(size: number | string): void {
+    this.coursesPageSize.set(Number(size));
+    this.coursesPage.set(1);
+  }
+
+  setFilesPage(page: number): void {
+    this.filesPage.set(Math.min(Math.max(page, 1), this.filesTotalPages()));
+  }
+
+  setContentFilter(filter: string): void {
+    this.filterType.set(filter);
+    this.filesPage.set(1);
+  }
+
+  setContentView(view: 'list' | 'grid'): void {
+    this.viewMode.set(view);
+    this.filesPage.set(1);
+  }
+
+  paginationPages(current: number, total: number): number[] {
+    if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+
+    const pages = new Set([1, total, current - 1, current, current + 1]);
+    const sorted = [...pages].filter((page) => page > 0 && page <= total).sort((a, b) => a - b);
+    const result: number[] = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) result.push(0);
+      result.push(page);
+    });
+    return result;
   }
 
   switchTab(tab: InnerTab): void {
@@ -266,12 +335,12 @@ export class TeacherCourses implements OnInit {
       });
   }
 
-  typeIcon(type: ContentType): string {
-    return ({ Video: 'play-circle', PDF: 'pdf', Notes: 'pencil-square', ExerciseSheet: 'clipboard-document-list' } as Record<ContentType, string>)[type] ?? 'doc';
+  typeIcon(type: string): string {
+    return ({ Video: 'play-circle', PDF: 'pdf', Notes: 'pencil-square', ExerciseSheet: 'clipboard-document-list' } as Record<string, string>)[type] ?? 'doc';
   }
 
-  typeLabel(type: ContentType): string {
-    return ({ Video: 'فيديو', PDF: 'PDF', Notes: 'ملاحظات', ExerciseSheet: 'ورقة تدريب' } as Record<ContentType, string>)[type] ?? type;
+  typeLabel(type: string): string {
+    return ({ Video: 'فيديو', PDF: 'PDF', Notes: 'ملاحظات', ExerciseSheet: 'ورقة تدريب' } as Record<string, string>)[type] ?? type;
   }
 
   formatBytes(bytes?: number): string {

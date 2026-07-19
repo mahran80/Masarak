@@ -6,6 +6,7 @@ import { StudentCourse } from '../../models';
   selector: 'app-student-course-card',
   standalone: true,
   templateUrl: './course-card.component.html',
+  styleUrl: './course-card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentCourseCardComponent {

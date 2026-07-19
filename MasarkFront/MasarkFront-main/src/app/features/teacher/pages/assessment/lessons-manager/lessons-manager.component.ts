@@ -24,6 +24,10 @@ export class LessonsManagerComponent implements OnInit {
   selectedTaId: number | null = null;
   lessons: Lesson[] = [];
   lessonDetails: { [key: number]: LessonDetail } = {};
+  lessonsPage = 1;
+  lessonsPageSize = 9;
+  isLoadingLessons = false;
+  lessonsError = '';
 
   lessonForm: FormGroup;
   isEditMode = false;
@@ -64,6 +68,7 @@ export class LessonsManagerComponent implements OnInit {
 
   onSelectTa(event: any) {
     this.selectedTaId = +event.target.value;
+    this.lessonsPage = 1;
     if (this.selectedTaId) {
       this.loadLessons();
     } else {
@@ -73,14 +78,67 @@ export class LessonsManagerComponent implements OnInit {
 
   loadLessons() {
     if (!this.selectedTaId) return;
+    this.isLoadingLessons = true;
+    this.lessonsError = '';
     this.lessonsService.getLessons(this.selectedTaId).subscribe({
       next: (data) => {
         setTimeout(() => {
           this.lessons = data.sort((a, b) => a.orderNum - b.orderNum);
+          this.lessonsPage = Math.min(this.lessonsPage, this.lessonsTotalPages);
+          this.isLoadingLessons = false;
           this.cdr.detectChanges();
         });
       },
+      error: () => {
+        this.isLoadingLessons = false;
+        this.lessonsError = 'تعذّر تحميل الدروس. يرجى المحاولة مرة أخرى.';
+        this.cdr.detectChanges();
+      },
     });
+  }
+
+  get selectedAssignment(): any | null {
+    return this.teachingAssignments.find(ta => ta.id === this.selectedTaId) || null;
+  }
+
+  get lessonsTotalPages(): number {
+    return Math.max(1, Math.ceil(this.lessons.length / this.lessonsPageSize));
+  }
+
+  get paginatedLessons(): Lesson[] {
+    const start = (this.lessonsPage - 1) * this.lessonsPageSize;
+    return this.lessons.slice(start, start + this.lessonsPageSize);
+  }
+
+  get lessonsRangeStart(): number {
+    return this.lessons.length ? (this.lessonsPage - 1) * this.lessonsPageSize + 1 : 0;
+  }
+
+  get lessonsRangeEnd(): number {
+    return Math.min(this.lessonsPage * this.lessonsPageSize, this.lessons.length);
+  }
+
+  setLessonsPage(page: number): void {
+    this.lessonsPage = Math.min(Math.max(page, 1), this.lessonsTotalPages);
+  }
+
+  changeLessonsPageSize(event: Event): void {
+    this.lessonsPageSize = Number((event.target as HTMLSelectElement).value);
+    this.lessonsPage = 1;
+  }
+
+  paginationPages(): number[] {
+    if (this.lessonsTotalPages <= 7) {
+      return Array.from({ length: this.lessonsTotalPages }, (_, index) => index + 1);
+    }
+    const pages = new Set([1, this.lessonsTotalPages, this.lessonsPage - 1, this.lessonsPage, this.lessonsPage + 1]);
+    const sorted = [...pages].filter(page => page > 0 && page <= this.lessonsTotalPages).sort((a, b) => a - b);
+    const result: number[] = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) result.push(0);
+      result.push(page);
+    });
+    return result;
   }
 
   openCreateForm() {

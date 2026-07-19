@@ -1,157 +1,48 @@
-<div class="max-w-7xl mx-auto px-4 py-12 font-sans text-slate-800" dir="rtl">
-  
-  <!-- Page Header (Top Section) -->
-  <div class="mb-8 text-start">
-    <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
-      الاشتراكات الدراسية
-    </h1>
-    <p class="mt-2 text-slate-500 text-lg font-medium">
-      إدارة وتتبع باقاتك الحالية
-    </p>
-  </div>
+<main class="plans-page" dir="rtl">
+  <header class="plans-hero">
+    <div class="hero-copy"><span>خطط مرنة لكل طالب</span><h1>اختر خطتك التعليمية</h1><p>ابدأ رحلتك مع مسارك، وتعلّم بالطريقة والمدة التي تناسب أهدافك.</p></div>
+    <div class="hero-points"><span><b>✓</b> محتوى تعليمي متكامل</span><span><b>✓</b> مساعد ذكي للتعلم</span><span><b>✓</b> حصص ومراجعات مباشرة</span></div>
+  </header>
 
-  <!-- Active Plans Dashed Container -->
-  <div class="mb-16 p-10 rounded-xl border-2 border-dashed border-slate-200 bg-white shadow-sm flex flex-col items-center justify-center text-center">
-    <h2 class="text-xl font-bold text-slate-900 mb-2">الخطط النشطة</h2>
-    <p class="text-slate-500 font-medium">لا توجد اشتراكات نشطة حالياً.</p>
-  </div>
+  <section class="subscription-status">
+    <div class="status-icon"><app-icon name="academic-cap" size="22"></app-icon></div>
+    <div><small>اشتراكك الحالي</small><h2>لا توجد باقة نشطة حاليًا</h2><p>اختر إحدى الباقات التالية لتبدأ الوصول إلى مقرراتك ومزايا المنصة.</p></div>
+    <span class="status-badge">جاهز للبدء</span>
+  </section>
 
-  <!-- Error -->
-  @if (error() && !loading()) {
-    <div class="max-w-3xl mx-auto bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-center mb-10">
-      {{ error() }}
-      <button (click)="load()" class="block mx-auto mt-3 text-sm font-bold underline">إعادة المحاولة</button>
-    </div>
+  @if(error() && !loading()){
+    <section class="plans-error"><b>تعذر تحميل الباقات</b><span>{{ error() }}</span><button (click)="load()">إعادة المحاولة</button></section>
   }
 
-  <!-- Main Section: Available Plans Row Layout -->
-  @if (!loading() && !error() && plans().length > 0) {
-    <div class="mb-6 text-start">
-      <h2 class="text-2xl font-black text-slate-900">باقات الاشتراك المتاحة</h2>
-    </div>
-
-    <div class="space-y-8">
-      @for (plan of plans(); track plan.planId; let i = $index) {
-        
-        <div class="flex flex-col md:flex-row bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
-          
-          <!-- Text & Actions Content (75%) -->
-          <div class="w-full md:w-3/4 p-8 lg:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-l border-slate-100">
-            
-            <h3 class="text-2xl font-black text-slate-900 mb-2 relative inline-flex items-center gap-2">
-              @if (i === 0) { 
-                اشتراك حسب المادة 
-              }
-              @else if (i === 1) { 
-                الاشتراك الشهري الشامل
-                <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm font-bold mt-1">الخيار الأفضل</span>
-              }
-              @else { 
-                باقة المنهج الكامل سنوياً 
-              }
-            </h3>
-            
-            <p class="text-slate-600 font-medium leading-relaxed mb-6">
-              @if (i === 0) { افتح آفاقاً جديدة وفرصاً مميزة للتعلم الفردي عند اختيارك مادة محددة: }
-              @else if (i === 1) { استمتع بالوصول اللامحدود لكافة الميزات والمواد التعليمية دفعة واحدة: }
-              @else { احصل على رحلة تعليمية متكاملة بضمان الوصول الشامل على مدار العام: }
-            </p>
-
-            <div class="space-y-4 mb-8">
-              
-              <div class="flex items-start gap-3">
-                <div class="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center text-green-600">
-                  <app-icon name="check" size="1.2em"></app-icon>
-                </div>
-                <span class="text-slate-700 font-semibold leading-tight">
-                  @if (i === 0) { صلاحية وصول كاملة للمادة لمدة ٣٠ يوماً }
-                  @else if (i === 1) { صلاحية وصول كاملة لجميع المواد لمدة ٣٠ يوماً }
-                  @else { صلاحية وصول كاملة لمدة عام دراسي كامل (٣٦٥ يوماً) }
-                </span>
-              </div>
-
-              <div class="flex items-start gap-3">
-                <div class="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center text-green-600">
-                  <app-icon name="check" size="1.2em"></app-icon>
-                </div>
-                <span class="text-slate-700 font-semibold leading-tight">
-                  @if (i === 0) { مساعد التعلم الذكي المدعوم بالذكاء الاصطناعي }
-                  @else if (i === 1) { مساعد التعلم الذكي المدعوم بالذكاء الاصطناعي على مدار الساعة }
-                  @else { مساعد التعلم الذكي المدعوم بالذكاء الاصطناعي على مدار العام }
-                </span>
-              </div>
-
-              <div class="flex items-start gap-3">
-                <div class="shrink-0 mt-0.5 w-5 h-5 flex items-center justify-center transition-colors"
-                     [class.text-green-600]="plan.hasLiveClass" [class.text-slate-300]="!plan.hasLiveClass">
-                  @if (plan.hasLiveClass) { <app-icon name="check" size="1.2em"></app-icon> }
-                  @else { <app-icon name="x-mark" size="1.2em"></app-icon> }
-                </div>
-                <span class="font-semibold leading-tight transition-colors" 
-                      [class.text-slate-700]="plan.hasLiveClass" [class.text-slate-400]="!plan.hasLiveClass">
-                  @if (i === 0) { حضور الحصص والورش المباشرة وتصفح المناهج }
-                  @else if (i === 1) { حضور كافة الحصص والورش المباشرة والمراجعات }
-                  @else { حضور كافة الحصص المباشرة والمراجعات النهائية }
-                </span>
-              </div>
-
-            </div>
-
-            <div class="flex flex-wrap items-center gap-6 mt-auto">
-              <button
-                (click)="onSelectPlan(plan)"
-                [disabled]="checkingOutPlanId() === plan.planId || disabledPlanId === plan.planId || isProcessingPlanId === plan.planId"
-                class="min-w-[160px] py-3 px-6 rounded-lg font-bold text-[15px] transition-all duration-200 ease-in-out"
-                [ngClass]="{
-                  'bg-slate-100 text-slate-400 cursor-not-allowed': disabledPlanId === plan.planId,
-                  'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200 disabled:opacity-50 hover:-translate-y-0.5': disabledPlanId !== plan.planId
-                }"
-              >
-                @if (checkingOutPlanId() === plan.planId || isProcessingPlanId === plan.planId) {
-                  جارٍ المعالجة...
-                } @else if (disabledPlanId === plan.planId) {
-                  خطتك الحالية
-                } @else {
-                  اشترك الآن
-                }
-              </button>
-              
-              <button class="text-blue-600 font-bold hover:underline transition-all outline-none">
-                لمعرفة المزيد
-              </button>
-            </div>
-
-          </div>
-
-          <!-- Visual Feature Banner (25%) -->
-          <div class="w-full md:w-1/4 bg-[#f0f7ff] relative flex flex-col items-center justify-center p-6 overflow-hidden min-h-[200px] border-r border-blue-50">
-            <!-- Decorative Dotted Pattern -->
-            <div class="absolute inset-0 opacity-[0.25]" style="background-image: radial-gradient(#60a5fa 1.2px, transparent 1.2px); background-size: 14px 14px;"></div>
-            
-            <div class="relative z-10 flex flex-col items-center justify-center gap-2">
-              <div class="w-11 h-11 text-blue-600 bg-white rounded-[14px] flex items-center justify-center shadow-sm border border-blue-100">
-                <app-icon name="academic-cap" size="22"></app-icon>
-              </div>
-              <div class="flex flex-col items-center justify-center leading-none mt-1">
-                <span class="text-[22px] font-bold text-slate-900 tracking-tight">{{ plan.price }}</span>
-                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wide mt-1.5">{{ plan.currency }}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
+  @if(loading()){
+    <div class="plans-grid">@for(item of [1,2,3];track item){<article class="plan-skeleton"><i></i><b></b><span></span><em></em></article>}</div>
+  } @else if(!error() && plans().length > 0){
+    <div class="plans-heading"><div><span>باقات الاشتراك</span><h2>استثمر في مستقبلك الدراسي</h2></div><p>يمكنك تغيير خطتك لاحقًا بكل سهولة</p></div>
+    <section class="plans-grid">
+      @for(plan of plans();track plan.planId;let i=$index){
+        <article class="plan-card" [class.featured-plan]="i === 1">
+          @if(i === 1){<div class="popular-ribbon">الأكثر اختيارًا</div>}
+          <div class="plan-top"><div class="plan-icon"><app-icon name="academic-cap" size="22"></app-icon></div><span class="plan-kind">{{ i === 0 ? 'مادة واحدة' : i === 1 ? 'شهري' : 'سنوي' }}</span></div>
+          <div class="plan-title"><h3>{{ i === 0 ? 'اشتراك حسب المادة' : i === 1 ? 'الاشتراك الشهري الشامل' : 'باقة المنهج الكامل' }}</h3><p>{{ i === 0 ? 'اختر المادة التي تحتاجها وركّز على هدفك.' : i === 1 ? 'وصول شامل لكل المواد بمرونة شهرية.' : 'رحلة تعليمية متكاملة طوال العام الدراسي.' }}</p></div>
+          <div class="plan-price"><strong>{{ plan.price }}</strong><span>{{ plan.currency }}</span><small>/ {{ plan.durationDays >= 365 ? 'عام' : 'شهر' }}</small></div>
+          <div class="price-note">صلاحية لمدة {{ plan.durationDays }} يومًا</div>
+          <ul>
+            <li><b>✓</b><span>{{ i === 0 ? 'وصول كامل للمادة المختارة' : 'وصول كامل لجميع المواد' }}</span></li>
+            <li><b>✓</b><span>المحتوى والدروس والواجبات والاختبارات</span></li>
+            <li [class.disabled-feature]="!plan.hasAi"><b>{{ plan.hasAi ? '✓' : '×' }}</b><span>مساعد التعلم المدعوم بالذكاء الاصطناعي</span></li>
+            <li [class.disabled-feature]="!plan.hasLiveClass"><b>{{ plan.hasLiveClass ? '✓' : '×' }}</b><span>الحصص والمراجعات المباشرة</span></li>
+          </ul>
+          <button class="select-plan" (click)="onSelectPlan(plan)" [disabled]="checkingOutPlanId() === plan.planId || disabledPlanId === plan.planId || isProcessingPlanId === plan.planId">
+            @if(checkingOutPlanId() === plan.planId || isProcessingPlanId === plan.planId){<span>جارٍ تجهيز الاشتراك...</span>}@else if(disabledPlanId === plan.planId){<span>باقتك الحالية</span>}@else{<span>اختر هذه الباقة</span><b>←</b>}
+          </button>
+          <p class="secure-note">دفع آمن • يمكنك الإلغاء في أي وقت</p>
+        </article>
       }
-    </div>
+    </section>
+    @if(checkoutError()){<div class="checkout-error" role="alert">{{ checkoutError() }}</div>}
+  } @else if(!error()){
+    <section class="plans-empty"><div>▤</div><h2>لا تتوفر باقات حاليًا</h2><p>يرجى العودة لاحقًا للاطلاع على الباقات الجديدة.</p></section>
   }
 
-  <!-- Empty State -->
-  @if (!loading() && !error() && plans().length === 0) {
-    <div class="flex flex-col items-center justify-center text-center py-20 bg-white rounded-2xl border border-slate-200 mt-6">
-      <svg class="mx-auto mb-4 h-12 w-12 text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-      </svg>
-      <h3 class="text-xl font-bold text-slate-700">لا تتوفر باقات حالياً</h3>
-      <p class="text-slate-400 mt-2 font-medium">يرجى التحقق لاحقاً.</p>
-    </div>
-  }
-</div>
+  <section class="plans-help"><div><span>هل تحتاج مساعدة؟</span><h2>سنساعدك في اختيار الخطة المناسبة</h2><p>تواصل مع الدعم الفني لمعرفة الباقة الأنسب لاحتياجاتك الدراسية.</p></div><button type="button">تواصل مع الدعم</button></section>
+</main>
