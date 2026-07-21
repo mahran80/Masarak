@@ -5,6 +5,14 @@ import { throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 
+const errorCopy: Record<string, string> = {
+  'User already has an active subscription': 'لديك اشتراك نشط بالفعل. يمكنك متابعة استخدام باقتك الحالية من صفحة الاشتراكات.',
+  'Failed to load plans.': 'تعذر تحميل باقات الاشتراك الآن. حاول مرة أخرى بعد قليل.',
+  'Could not start checkout. Please try again.': 'تعذر بدء عملية الدفع الآن. حاول مرة أخرى بعد قليل.',
+};
+
+const localizeError = (message: string): string => errorCopy[message] ?? message;
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toastService = inject(ToastService);
   const router = inject(Router);
@@ -33,7 +41,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           errorMsg = error.message;
         }
       }
-      toastService.error(errorMsg);
+      toastService.error(localizeError(errorMsg));
       return throwError(() => error);
     })
   );

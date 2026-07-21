@@ -1,51 +1,77 @@
 .toast-container {
   position: fixed;
-  inset: 20px 20px auto auto;
+  inset: 24px 24px auto auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
   z-index: 1300;
-  max-width: 380px;
+  max-width: 420px;
+  direction: rtl;
 }
 
 .toast {
-  min-width: 280px;
-  border-radius: 18px;
-  padding: 18px 18px 18px 20px;
-  box-shadow: 0 20px 50px rgba(17, 36, 71, 0.18);
+  min-width: 310px;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 18px 42px rgba(17, 36, 71, 0.16);
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  background: #ffffff;
-  border-left: 6px solid transparent;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255,255,255,.98);
+  border: 1px solid #e3eaf4;
+  border-right: 4px solid transparent;
   animation: toast-slide-in 0.35s ease-out;
 }
 
-.toast--success { border-left-color: #2d8a5d; }
-.toast--danger { border-left-color: #d04646; }
-.toast--warning { border-left-color: #d28c2f; }
-.toast--info { border-left-color: #1f5ea8; }
+.toast--success { border-right-color: #10b981; }
+.toast--danger { border-right-color: #ef4444; }
+.toast--warning { border-right-color: #f59e0b; }
+.toast--info { border-right-color: #2563eb; }
+
+.toast__icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: #edf3ff;
+}
+
+.toast__icon::before { font-size: 16px; font-weight: 900; }
+.toast--success .toast__icon { background: #eaf9f2; color: #059669; }
+.toast--success .toast__icon::before { content: '✓'; }
+.toast--danger .toast__icon { background: #fff0f2; color: #dc2626; }
+.toast--danger .toast__icon::before { content: '!'; }
+.toast--warning .toast__icon { background: #fff7e7; color: #d97706; }
+.toast--warning .toast__icon::before { content: '!'; }
+.toast--info .toast__icon { background: #edf3ff; color: #2563eb; }
+.toast--info .toast__icon::before { content: 'i'; }
 
 .toast__body strong {
   display: block;
   margin-bottom: 6px;
   color: #14233f;
-  font-size: 1rem;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .toast__body p {
   margin: 0;
-  font-size: 0.95rem;
-  color: #546178;
-  line-height: 1.6;
+  font-size: 12px;
+  color: #62718a;
+  line-height: 1.75;
 }
 
 .toast__close {
   border: none;
   background: transparent;
-  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  font-size: 19px;
   line-height: 1;
-  color: #8c99ab;
+  color: #8a99ad;
   padding: 0;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -53,6 +79,7 @@
 
 .toast__close:hover {
   color: #172543;
+  background: #f1f5f9;
 }
 
 @keyframes toast-slide-in {

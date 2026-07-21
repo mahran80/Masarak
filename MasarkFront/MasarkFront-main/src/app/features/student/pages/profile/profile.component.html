@@ -1,5 +1,5 @@
-<section class="space-y-6 text-slate-900" dir="rtl">
-  <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+<section class="student-page student-profile-page profile-page space-y-6 text-slate-900" dir="rtl">
+  <header class="profile-page-header flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div class="text-right">
       <p class="text-sm font-semibold text-sky-700">Profile</p>
       <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">Student Information</h1>
@@ -25,10 +25,10 @@
       </button>
     </article>
   } @else {
-    <div class="grid gap-6 xl:grid-cols-3">
-      <article class="rounded-lg border border-slate-200 bg-white p-6 text-right shadow-sm xl:col-span-2">
+    <div class="profile-layout grid gap-6 xl:grid-cols-3">
+      <article class="profile-main-card rounded-lg border border-slate-200 bg-white p-6 text-right shadow-sm xl:col-span-2">
         @if (profile(); as student) {
-          <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div class="profile-hero flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div class="min-w-0">
               <p class="text-sm font-semibold text-slate-500">Full Name</p>
               <h2 class="mt-2 truncate text-3xl font-bold text-slate-950">{{ student.fullName }}</h2>
@@ -56,7 +56,7 @@
         }
       </article>
 
-      <aside class="space-y-6">
+      <aside class="profile-summary space-y-6">
         <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
           <h2 class="text-lg font-bold text-slate-950">Class</h2>
           @if (classInfo(); as currentClass) {

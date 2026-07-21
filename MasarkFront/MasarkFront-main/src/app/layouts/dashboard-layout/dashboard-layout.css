@@ -8,8 +8,8 @@
 ─────────────────────────────────────── */
 :root {
   --admin-topbar-top: 14px;
-  --admin-topbar-height: 64px;
-  --sidebar-width: 270px;
+  --admin-topbar-height: 68px;
+  --sidebar-width: 252px;
 }
 
 @media (max-width: 767px) {
@@ -23,13 +23,10 @@
 .ml-dashboard-bg {
   min-height: 100dvh;
   width: 100%;
-  background: linear-gradient(
-    135deg,
-    #FFFFFF 0%,
-    #F8FBFF 30%,
-    #EEF5FF 65%,
-    #F4F1FF 100%
-  );
+  background:
+    radial-gradient(circle at 12% 8%, rgba(96,165,250,.12), transparent 28%),
+    radial-gradient(circle at 88% 12%, rgba(167,139,250,.10), transparent 26%),
+    #F6F9FF;
   position: relative;
   overflow-x: hidden;
 }
@@ -58,7 +55,7 @@
 
 .dashboard-shell {
   display: grid !important;
-  grid-template-columns: 270px minmax(0, 1fr) !important;
+  grid-template-columns: 252px minmax(0, 1fr) !important;
   gap: 24px !important;
   align-items: start !important;
 }
@@ -384,6 +381,7 @@
    is higher, so the Overlay correctly covers the Navbar.
 ─────────────────────────────────────── */
 .admin-topbar {
+  height: var(--admin-topbar-height);
   z-index: 1000 !important;
   pointer-events: auto !important;
 }
@@ -471,4 +469,149 @@
   border-color: rgba(167, 139, 250, 0.22);
   background: rgba(124, 58, 237, 0.18);
   color: #C4B5FD;
+}
+
+/* Phase 2 prototype — visual-only shared navigation refinements. */
+.admin-topbar {
+  height: clamp(68px, 5vw, 72px) !important;
+  border-color: color-mix(in srgb, var(--ds-border, #dbe3ef) 84%, transparent) !important;
+  box-shadow: var(--ds-shadow-float, 0 18px 44px rgba(37, 99, 235, .12)) !important;
+}
+
+.sidebar {
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  padding: 14px 14px !important;
+  border-radius: 20px !important;
+  box-shadow: var(--ds-shadow-card, 0 12px 32px rgba(15, 23, 42, .06)) !important;
+}
+
+.sidebar--collapsed { --sidebar-width: 72px !important; }
+
+.admin-sidebar-home-link {
+  margin-bottom: 4px;
+  color: var(--ds-primary, #2563eb) !important;
+  border: 1px solid color-mix(in srgb, var(--ds-primary, #2563eb) 12%, transparent);
+  background: var(--ds-primary-soft, #eff6ff) !important;
+}
+
+.admin-sidebar-home-link:hover {
+  border-color: color-mix(in srgb, var(--ds-primary, #2563eb) 28%, transparent) !important;
+  background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 70%, #fff) !important;
+}
+
+.admin-sidebar-link.sidebar-active-link,
+.admin-sidebar-link.ml-sidebar-active {
+  color: var(--ds-primary, #2563eb) !important;
+  background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 86%, #fff) !important;
+  box-shadow: inset 3px 0 0 var(--ds-primary, #2563eb) !important;
+}
+
+.admin-sidebar-link.sidebar-active-link app-icon,
+.admin-sidebar-link.ml-sidebar-active app-icon,
+.admin-sidebar-link.sidebar-active-link svg,
+.admin-sidebar-link.ml-sidebar-active svg,
+.admin-sidebar-link.sidebar-active-link svg path,
+.admin-sidebar-link.ml-sidebar-active svg path {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+.admin-sidebar-support-card {
+  padding: 9px 11px !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 62%, transparent) !important;
+}
+
+.admin-sidebar-logout-btn {
+  min-height: 40px;
+  height: 40px !important;
+  padding: 9px 12px !important;
+  color: #dc2626 !important;
+  background: rgba(239, 68, 68, .07) !important;
+  box-shadow: none !important;
+}
+
+.admin-sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, .13) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+:root[data-theme='dark'] .admin-sidebar-home-link,
+:root[data-theme='dark'] .admin-sidebar-link.sidebar-active-link,
+:root[data-theme='dark'] .admin-sidebar-link.ml-sidebar-active {
+  color: #93c5fd !important;
+  background: rgba(37, 99, 235, .16) !important;
+  border-color: rgba(96, 165, 250, .18) !important;
+  box-shadow: inset 3px 0 0 #60a5fa !important;
+}
+
+@media (max-width: 767px) {
+  .sidebar { width: 252px !important; max-width: 252px !important; }
+}
+
+/* P0 — collapsed sidebar and viewport-height safety.  Uses the existing
+   isSidebarCollapsed state only; no navigation or behavior is changed. */
+.dashboard-shell {
+  align-items: stretch !important;
+  min-height: calc(100dvh - var(--admin-topbar-height) - var(--admin-topbar-top) - 28px) !important;
+}
+
+.sidebar {
+  top: calc(var(--admin-topbar-top) + var(--admin-topbar-height) + 16px) !important;
+  height: calc(100dvh - var(--admin-topbar-top) - var(--admin-topbar-height) - 32px) !important;
+  max-height: calc(100dvh - var(--admin-topbar-top) - var(--admin-topbar-height) - 32px) !important;
+}
+
+.sidebar.sidebar--collapsed {
+  width: 74px !important;
+  min-width: 74px !important;
+  max-width: 74px !important;
+  padding: 14px 10px !important;
+  align-items: center !important;
+}
+
+.dashboard-home-link {
+  min-height:36px;
+  padding-inline:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  border:1px solid rgba(37,99,235,.14);
+  border-radius:12px;
+  background:#eff6ff;
+  color:#2563eb;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+  transition:transform 180ms ease,background-color 180ms ease;
+}
+.dashboard-home-link:hover{background:#dbeafe;transform:translateY(-1px)}
+:root[data-theme='dark'] .dashboard-home-link{background:rgba(37,99,235,.16);border-color:rgba(96,165,250,.2);color:#bfdbfe}
+
+.sidebar--collapsed .admin-sidebar-profile,
+.sidebar--collapsed .sidebar-navigation,
+.sidebar--collapsed .admin-nav-group {
+  width: 100%;
+}
+
+.sidebar--collapsed .admin-sidebar-profile { justify-content: center !important; padding-inline: 0 !important; }
+.sidebar--collapsed .admin-sidebar-link { width: 44px !important; min-width: 44px; margin-inline: auto; padding: 0 !important; justify-content: center !important; gap: 0 !important; }
+.sidebar--collapsed .admin-sidebar-link.sidebar-active-link,
+.sidebar--collapsed .admin-sidebar-link.ml-sidebar-active { box-shadow: 0 0 0 3px rgba(37,99,235,.12) !important; }
+.sidebar--collapsed .admin-sidebar-link span,
+.sidebar--collapsed .admin-sidebar-profile-info,
+.sidebar--collapsed .admin-nav-label { opacity: 0; transform: translateX(4px); pointer-events: none; }
+.sidebar--collapsed .admin-sidebar-profile-info,
+.sidebar--collapsed .admin-nav-label { display: none !important; }
+
+.sidebar-label,.sidebar-group-title,.sidebar-user-details,.admin-sidebar-profile-info,.admin-nav-label {
+  transition: opacity 160ms ease, transform 180ms ease;
+}
+
+@media (max-width: 767px) {
+  .sidebar.sidebar--collapsed { width: 74px !important; max-width: 74px !important; }
+  .sidebar { height: 100dvh !important; max-height: 100dvh !important; top: 0 !important; }
 }

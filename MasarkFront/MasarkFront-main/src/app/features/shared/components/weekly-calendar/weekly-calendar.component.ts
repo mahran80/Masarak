@@ -43,6 +43,7 @@ export class WeeklyCalendarComponent implements OnChanges {
   @Output() attendance = new EventEmitter<CalendarSession>();
 
   days: DayColumn[] = [];
+  selectedDayIndex = 0;
 
   readonly dayNamesAr = [
     'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'
@@ -50,6 +51,13 @@ export class WeeklyCalendarComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.buildCalendar();
+    const todayIndex = this.days.findIndex((day) => day.isToday);
+    const firstScheduledDay = this.days.findIndex((day) => day.sessions.length > 0);
+    this.selectedDayIndex = todayIndex >= 0 ? todayIndex : Math.max(firstScheduledDay, 0);
+  }
+
+  selectDay(index: number): void {
+    this.selectedDayIndex = index;
   }
 
   private buildCalendar(): void {

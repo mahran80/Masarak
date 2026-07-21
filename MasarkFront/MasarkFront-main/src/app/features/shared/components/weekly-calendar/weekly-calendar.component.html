@@ -4,9 +4,13 @@
     <!-- ═══════════════════════════════ Day Headers ════════════════════════════════ -->
     <div class="wc-header-row">
       @for (day of days; track day.date) {
-        <div
+        <button
+          type="button"
           class="wc-day-header"
-          [class.is-today]="day.isToday">
+          [class.is-today]="day.isToday"
+          [class.is-selected]="role === 'student' && selectedDayIndex === $index"
+          [attr.aria-pressed]="role === 'student' && selectedDayIndex === $index"
+          (click)="role === 'student' && selectDay($index)">
           <p class="wc-day-name" [class.is-today]="day.isToday">{{ day.dayName }}</p>
           <p class="wc-day-date" [class.is-today]="day.isToday">
             {{ day.date | date:'d MMM' }}
@@ -14,7 +18,7 @@
           @if (day.isToday) {
             <span class="wc-today-badge">اليوم</span>
           }
-        </div>
+        </button>
       }
     </div>
 
@@ -175,4 +179,36 @@
     <div class="wc-bottom-border"></div>
 
   </div>
+
+  @if (role === 'student' && days[selectedDayIndex]; as selectedDay) {
+    <section class="wc-student-agenda" aria-live="polite">
+      <div class="wc-agenda-heading">
+        <div>
+          <span>خطة اليوم</span>
+          <h2>{{ selectedDay.dayName }} · {{ selectedDay.date | date:'d MMMM' }}</h2>
+        </div>
+        <b>{{ selectedDay.sessions.length }} {{ selectedDay.sessions.length === 1 ? 'حصة' : 'حصص' }}</b>
+      </div>
+      @if (selectedDay.sessions.length > 0) {
+        <div class="wc-agenda-list">
+          @for (session of selectedDay.sessions; track session.id) {
+            <article class="wc-agenda-item">
+              <time dir="ltr">{{ session.scheduledAt | date:'h:mm a' }}</time>
+              <div class="wc-agenda-line"></div>
+              <div class="wc-agenda-copy">
+                <strong>{{ session.title }}</strong>
+                <span>{{ session.subjectName }} · أ. {{ session.teacherName }}</span>
+              </div>
+              <span class="wc-agenda-duration">{{ session.durationMinutes }} دقيقة</span>
+              @if (session.status === 'Live') {
+                <button type="button" class="wc-agenda-join" (click)="join.emit(session)">انضم الآن</button>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="wc-agenda-empty">لا توجد حصص في هذا اليوم.</div>
+      }
+    </section>
+  }
 </div>

@@ -593,3 +593,72 @@
   background: #111E33;
   border-top-color: rgba(148, 163, 184, 0.12);
 }
+
+/* Student planner interaction: select a day, then focus on its agenda. */
+.wc-day-header {
+  appearance: none;
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+}
+
+.wc-day-header.is-selected {
+  position: relative;
+  background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(124,58,237,.10));
+  box-shadow: inset 0 -3px 0 #4f46e5;
+}
+
+.wc-day-header.is-selected .wc-day-name,
+.wc-day-header.is-selected .wc-day-date { color: #334fe0; }
+
+.wc-student-agenda {
+  margin: 22px 0 0;
+  padding: 22px;
+  border: 1px solid #dce7f5;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff, #f7f9ff);
+  box-shadow: 0 12px 28px rgba(39,67,120,.07);
+}
+
+.wc-agenda-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8eef7;
+}
+
+.wc-agenda-heading span { color: #5b72e7; font-size: 11px; font-weight: 800; }
+.wc-agenda-heading h2 { margin: 4px 0 0; color: #14213d; font-size: 19px; font-weight: 900; }
+.wc-agenda-heading > b { min-width: 62px; padding: 8px 11px; border-radius: 999px; background: #edf3ff; color: #3e5fd8; font-size: 11px; text-align: center; }
+.wc-agenda-list { display: grid; gap: 4px; margin-top: 14px; }
+.wc-agenda-item { display: grid; grid-template-columns:78px 16px minmax(0,1fr) auto auto; align-items: center; gap: 12px; min-height:68px; padding:8px 10px; border-radius:13px; transition: background-color .2s ease; }
+.wc-agenda-item:hover { background: #f3f6ff; }
+.wc-agenda-item time { color: #30466c; font-size: 12px; font-weight: 900; text-align: center; }
+.wc-agenda-line { width: 10px; height: 10px; border: 3px solid #5b63e8; border-radius:50%; background:#fff; box-shadow:0 0 0 4px #edf0ff; }
+.wc-agenda-copy { min-width: 0; display: grid; gap: 3px; }
+.wc-agenda-copy strong { overflow: hidden; color:#17233e; font-size:13px; font-weight:900; text-overflow:ellipsis; white-space:nowrap; }
+.wc-agenda-copy span { overflow: hidden; color:#7888a1; font-size:11px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+.wc-agenda-duration { padding:6px 9px; border-radius:8px; background:#f1f5fb; color:#65758f; font-size:10px; font-weight:800; white-space:nowrap; }
+.wc-agenda-join { min-height:34px; padding:0 12px; border:0; border-radius:9px; background:linear-gradient(135deg,#2563eb,#6d3eee); color:#fff; font:inherit; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 7px 14px rgba(57,74,221,.18); }
+.wc-agenda-empty { display:grid; place-items:center; min-height:112px; margin-top:14px; border:1px dashed #c7d6f2; border-radius:14px; color:#8191aa; font-size:13px; font-weight:800; }
+
+:root[data-theme='dark'] .wc-day-header.is-selected { background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(124,58,237,.2)); box-shadow:inset 0 -3px 0 #8b8dff; }
+:root[data-theme='dark'] .wc-day-header.is-selected .wc-day-name,:root[data-theme='dark'] .wc-day-header.is-selected .wc-day-date { color:#c5d1ff; }
+:root[data-theme='dark'] .wc-student-agenda { border-color:rgba(104,135,186,.28); background:linear-gradient(135deg,#10203a,#111b34); box-shadow:0 14px 30px rgba(0,0,0,.22); }
+:root[data-theme='dark'] .wc-agenda-heading { border-color:rgba(148,163,184,.16); }
+:root[data-theme='dark'] .wc-agenda-heading h2,:root[data-theme='dark'] .wc-agenda-copy strong { color:#e7efff; }
+:root[data-theme='dark'] .wc-agenda-heading > b { background:#1a3159; color:#b9ceff; }
+:root[data-theme='dark'] .wc-agenda-item:hover { background:#172948; }
+:root[data-theme='dark'] .wc-agenda-item time { color:#c0d0e9; }
+:root[data-theme='dark'] .wc-agenda-line { background:#11213b; box-shadow:0 0 0 4px #1a3159; }
+:root[data-theme='dark'] .wc-agenda-copy span { color:#91a4c2; }
+:root[data-theme='dark'] .wc-agenda-duration { background:#1b2a43; color:#afbed3; }
+
+@media (max-width: 720px) {
+  .wc-student-agenda { padding:17px; }
+  .wc-agenda-item { grid-template-columns:62px 14px minmax(0,1fr); gap:9px; }
+  .wc-agenda-duration,.wc-agenda-join { grid-column:3; justify-self:start; }
+  .wc-agenda-item time { font-size:11px; }
+}

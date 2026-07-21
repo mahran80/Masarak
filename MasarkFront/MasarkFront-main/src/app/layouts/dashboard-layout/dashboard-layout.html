@@ -218,6 +218,9 @@
         <!-- ── STUDENT ROLE LINKS ── -->
         @if (userRole() === 'Student') {
           <div class="admin-nav-group">
+            @if (!isSidebarCollapsed()) {
+              <span class="admin-nav-label">الرئيسية</span>
+            }
             <a routerLink="student" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link"
                class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'لوحة التحكم للطالب' : ''">
               <app-icon name="chart" [size]="20"></app-icon>
@@ -226,6 +229,9 @@
           </div>
 
           <div class="admin-nav-group">
+            @if (!isSidebarCollapsed()) {
+              <span class="admin-nav-label">التعلم</span>
+            }
             <a routerLink="student/courses" routerLinkActive="ml-sidebar-active sidebar-active-link"
                class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'دروسي' : ''">
               <app-icon name="book" [size]="20"></app-icon>
@@ -259,6 +265,9 @@
           </div>
 
           <div class="admin-nav-group">
+            @if (!isSidebarCollapsed()) {
+              <span class="admin-nav-label">تقدمي</span>
+            }
             <a routerLink="/plans" routerLinkActive="ml-sidebar-active sidebar-active-link"
                class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الخطط والاشتراكات' : ''">
               <app-icon name="credit-card" [size]="18"></app-icon>
@@ -277,6 +286,9 @@
           </div>
 
           <div class="admin-nav-group">
+            @if (!isSidebarCollapsed()) {
+              <span class="admin-nav-label">التواصل</span>
+            }
             <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link"
                class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
               <app-icon name="chat" [size]="18"></app-icon>
