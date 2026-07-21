@@ -1,0 +1,143 @@
+<div class="admin-dashboard space-y-6 font-sans text-slate-800" dir="rtl">
+  
+  <div class="admin-page-header mb-6">
+    <div class="admin-title-row">
+      <h1 class="admin-page-title">لوحة تحكم الإدارة العامة</h1>
+      <span class="admin-badge">
+        حساب المدير (Admin)
+      </span>
+    </div>
+    <p class="admin-page-desc">مرحباً بك في لوحة تحكم الإدارة لمشروع مسارك</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-12">
+      <div class="w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+    </div>
+  } @else if (data(); as d) {
+    
+    <!-- Statistics Cards Grid -->
+    <div class="admin-stats-grid">
+      
+      <!-- Students Card -->
+      <div class="admin-stat-card card-students">
+        <div class="stat-icon-wrapper">
+          <span class="material-symbols-outlined stat-icon">school</span>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">إجمالي الطلاب</span>
+          <h3 class="stat-value">{{ d.totalStudents | number }}</h3>
+          <span class="stat-trend-badge trend-up">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span>12%</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Teachers Card -->
+      <div class="admin-stat-card card-teachers">
+        <div class="stat-icon-wrapper">
+          <span class="material-symbols-outlined stat-icon">person</span>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">المعلمون النشطون</span>
+          <h3 class="stat-value">{{ d.activeTeachers | number }}</h3>
+          <span class="stat-trend-badge trend-up">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span>8%</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Revenue Card -->
+      <div class="admin-stat-card card-revenue">
+        <div class="stat-icon-wrapper">
+          <span class="material-symbols-outlined stat-icon">payments</span>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">إجمالي الإيرادات</span>
+          <h3 class="stat-value">
+            {{ d.totalRevenue | number }}
+            <span class="currency">ر.س</span>
+          </h3>
+          <span class="stat-trend-badge trend-up">
+            <span class="material-symbols-outlined">trending_up</span>
+            <span>15%</span>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Courses Card -->
+      <div class="admin-stat-card card-courses">
+        <div class="stat-icon-wrapper">
+          <span class="material-symbols-outlined stat-icon">book</span>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">إجمالي المقررات</span>
+          <h3 class="stat-value">32</h3>
+          <span class="stat-trend-badge trend-neutral">
+            <span class="material-symbols-outlined">trending_flat</span>
+            <span>ثابت</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+
+
+    <!-- Bottom Layout Cards Grid -->
+    <div class="admin-bottom-grid mt-6">
+      
+      <!-- Upgrade Plan Card -->
+      <div class="admin-upgrade-card">
+        <div class="upgrade-content">
+          <h2 class="text-2xl font-black mb-3 text-white">ترقية خطة المؤسسة</h2>
+          <p class="text-blue-100/90 text-sm mb-6 leading-relaxed max-w-md">
+            افتح التحليلات المتقدمة، وتوزيع الفصول المدعوم بالذكاء الاصطناعي، ومساحة تخزين غير محدودة لجميع الهيئات التعليمية.
+          </p>
+          <div>
+            <button class="ml-btn ml-btn-upgrade">
+              <span>ابدأ الترقية الآن</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        <div class="upgrade-pattern-overlay"></div>
+      </div>
+
+      <!-- Alerts Column -->
+      <div class="space-y-4 flex flex-col justify-between">
+        
+        <div class="admin-alert-item alert-pending">
+          <div class="alert-info-group">
+            <div class="alert-icon-box">
+              <span class="material-symbols-outlined">pending_actions</span>
+            </div>
+            <div>
+              <h4 class="alert-title">طلبات بانتظار الموافقة</h4>
+              <p class="alert-desc">14 طلباً جديداً لمعلمين يتطلب مراجعة فورية وموافقة الإدارة</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined alert-chevron">chevron_left</span>
+        </div>
+
+        <div class="admin-alert-item alert-schedule">
+          <div class="alert-info-group">
+            <div class="alert-icon-box">
+              <span class="material-symbols-outlined">calendar_today</span>
+            </div>
+            <div>
+              <h4 class="alert-title">التقويم الأكاديمي</h4>
+              <p class="alert-desc">حان موعد مزامنة جدول الحصص للفصل الدراسي القادم وتوزيع القاعات</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined alert-chevron">chevron_left</span>
+        </div>
+        
+      </div>
+
+    </div>
+  }
+
+</div>

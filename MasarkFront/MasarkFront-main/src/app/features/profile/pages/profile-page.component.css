@@ -1,0 +1,312 @@
+/* Dashboard Shell alignment rules */
+::ng-deep .dashboard-shell {
+  display: grid !important;
+  grid-template-columns: 270px minmax(0, 1fr) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+}
+
+::ng-deep .dashboard-main {
+  min-width: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+}
+
+::ng-deep .sidebar {
+  height: 100% !important;
+  min-height: calc(100vh - var(--header-height) - 32px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+:host {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Profile Page base */
+.profile-page {
+  padding-top: 16px !important;
+  margin-top: 0 !important;
+}
+
+
+
+/* Content Grid */
+.profile-content-grid {
+  display: grid !important;
+  grid-template-columns: 320px minmax(0, 1fr) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+}
+
+.profile-summary-column {
+  grid-column: 1 / span 1 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+}
+
+.profile-form-card {
+  grid-column: 2 / span 1 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+/* RTL Layout Flow Swap */
+[dir='rtl'] .profile-content-grid {
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+}
+
+[dir='rtl'] .profile-summary-column {
+  grid-column: 2 / span 1 !important;
+}
+
+[dir='rtl'] .profile-form-card {
+  grid-column: 1 / span 1 !important;
+}
+
+/* Common Card Styles */
+.profile-form-card, .profile-identity-card, .account-info-card {
+  border-radius: 22px !important;
+  border: 1px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+  transition: transform 200ms ease, background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease !important;
+}
+
+.profile-form-card:hover, .profile-identity-card:hover, .account-info-card:hover {
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.10) !important;
+}
+
+:root[data-theme='dark'] .profile-form-card,
+:root[data-theme='dark'] .profile-identity-card,
+:root[data-theme='dark'] .account-info-card {
+  background: #111E33 !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Form Body & Structure */
+.profile-form-body {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.profile-form-body form {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.profile-form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  flex: 1 1 auto !important;
+}
+
+.full-width {
+  grid-column: 1 / -1 !important;
+}
+
+.form-actions {
+  margin-top: auto !important;
+  padding-top: 22px !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+:root[data-theme='dark'] .form-actions {
+  border-top-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+/* Input sizes and typography details */
+input, textarea {
+  border-radius: 13px !important;
+  font-size: 14px !important;
+  transition: border-color 200ms ease, box-shadow 200ms ease !important;
+}
+
+input {
+  height: 50px !important;
+}
+
+textarea {
+  min-height: 130px !important;
+}
+
+label {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Summary Panel alignment rules */
+.profile-identity-card {
+  flex: 0 0 auto !important;
+}
+
+.account-info-card {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.support-action {
+  margin-top: auto !important;
+  width: 100% !important;
+}
+
+/* WhatsApp support button styling */
+.support-whatsapp-btn {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.22) !important;
+  color: #047857 !important;
+  font-weight: 700 !important;
+  height: 46px !important;
+  transition: transform 200ms ease, background-color 200ms ease, border-color 200ms ease, color 200ms ease !important;
+}
+
+.support-whatsapp-btn:hover {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  border-color: #10B981 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Save Changes button styling */
+.btn-save-changes {
+  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 52%, #7C3AED 100%) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+  height: 48px !important;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  transition: transform 200ms ease, background-color 200ms ease, box-shadow 200ms ease !important;
+}
+
+.btn-save-changes:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25) !important;
+  filter: brightness(1.05) !important;
+}
+
+.btn-save-changes:active:not(:disabled) {
+  transform: scale(0.98) translateY(0) !important;
+}
+
+/* Input focus states */
+input:focus, textarea:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
+}
+
+.input-field--error {
+  border-color: #EF4444 !important;
+}
+
+.input-field--error:focus {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Avatar Hover Scale transition */
+.group:hover .w-\[92px\] {
+  transform: scale(1.03) !important;
+}
+.w-\[92px\] {
+  transition: transform 200ms ease !important;
+}
+
+/* Dark mode overrides */
+:root[data-theme='dark'] input:not([readonly]), :root[data-theme='dark'] textarea {
+  background-color: #15243B !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  color: #F8FAFC !important;
+}
+
+:root[data-theme='dark'] input[readonly] {
+  background-color: #0B172A !important;
+  border-color: rgba(148, 163, 184, 0.12) !important;
+  color: #94A3B8 !important;
+}
+
+/* Animations */
+@keyframes emptyFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-empty-fade {
+  animation: emptyFadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes profileFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: profileFadeIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-empty-fade,
+  .group:hover .w-\[92px\] {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Responsive grid flow overrides */
+@media (max-width: 1023px) {
+  .profile-content-grid {
+    grid-template-columns: 280px minmax(0, 1fr) !important;
+  }
+  [dir='rtl'] .profile-content-grid {
+    grid-template-columns: minmax(0, 1fr) 280px !important;
+  }
+  .profile-summary-column {
+    width: 280px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .profile-content-grid, [dir='rtl'] .profile-content-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .profile-summary-column, [dir='rtl'] .profile-summary-column {
+    grid-column: 1 / span 1 !important;
+    width: 100% !important;
+    position: relative !important;
+    top: 0 !important;
+  }
+  .main-profile-form, [dir='rtl'] .main-profile-form {
+    grid-column: 1 / span 1 !important;
+    order: 2 !important;
+  }
+  .profile-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .btn-save-changes, .support-whatsapp-btn {
+    width: 100% !important;
+  }
+}

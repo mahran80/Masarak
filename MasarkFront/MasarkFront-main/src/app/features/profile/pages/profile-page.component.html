@@ -1,0 +1,259 @@
+<div class="profile-page w-full animate-fade-in" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'" [class.text-right]="lang() === 'ar'" [class.text-left]="lang() === 'en'">
+  
+  @if (isLoading()) {
+    <div class="h-80 animate-pulse rounded-[22px] border border-[rgba(15,23,42,0.07)] bg-white dark:bg-[#111E33] p-5 shadow-sm"></div>
+  } @else {
+
+
+
+    <!-- Profile Content Grid -->
+    <div class="profile-content-grid">
+      
+      <!-- 1. Main Profile Form Card -->
+      <div class="profile-form-card bg-white dark:bg-[#111E33] border border-slate-200/85 dark:border-slate-805/85 shadow-[0_8px_24px_rgba(15,23,42,0.06)] rounded-[22px] overflow-hidden">
+        
+        <!-- Card Header -->
+        <div class="px-8 py-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-inner border border-blue-500/5">
+            <app-icon name="document-text" size="18"></app-icon>
+          </div>
+          <div class="text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+            <h2 class="font-extrabold text-[18px] md:text-[20px] text-slate-900 dark:text-white m-0 leading-tight">
+              {{ t().CARD_TITLE }}
+            </h2>
+            <p class="text-[13px] text-slate-400 dark:text-slate-500 font-bold m-0 mt-0.5">
+              {{ t().CARD_DESC }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Card Content Body -->
+        <div class="profile-form-body p-6 md:p-8">
+          @if (isReadOnly()) {
+            <!-- Read-only View for Student -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+              <div class="flex flex-col gap-1.5 font-semibold text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+                <label class="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{{ t().FULL_NAME }}</label>
+                <p class="text-slate-850 dark:text-slate-200 font-black text-sm m-0">{{ profile()?.fullName }}</p>
+              </div>
+              
+              <div class="flex flex-col gap-1.5 font-semibold text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+                <label class="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{{ t().EMAIL }}</label>
+                <p class="text-slate-850 dark:text-slate-200 font-black text-sm m-0" dir="ltr"><span class="inline-block">{{ profile()?.email }}</span></p>
+              </div>
+
+              <div class="md:col-span-2 flex flex-col items-start mt-2">
+                <label class="text-[11px] font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest">{{ t().ACADEMIC_STATUS }}</label>
+                <span class="inline-flex items-center px-4 py-1.5 bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black rounded-full border border-blue-500/5">
+                  {{ profile()?.studentDetails?.academicStatus === 'Active' ? t().ACTIVE : (profile()?.studentDetails?.academicStatus || t().ACTIVE) }}
+                </span>
+              </div>
+
+              <div class="md:col-span-2 flex flex-col mt-2 gap-1.5 text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+                <label class="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{{ t().BIO }}</label>
+                <p class="text-slate-700 dark:text-slate-350 font-semibold text-[13px] leading-relaxed bg-slate-50 dark:bg-[#0B172A] p-5 rounded-[16px] border border-slate-100 dark:border-slate-800 m-0">
+                  {{ profile()?.bio || t().NO_BIO }}
+                </p>
+              </div>
+            </div>
+          } @else {
+            <!-- Edit Form for Teacher/Parent -->
+            <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="h-full flex flex-col justify-between">
+              
+              <div class="profile-form-grid">
+                <!-- Full Name -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {{ t().FULL_NAME }} <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="relative flex items-center">
+                    <input 
+                      type="text" 
+                      formControlName="fullName" 
+                      [class.input-field--error]="profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid"
+                      class="h-[50px] w-full bg-white dark:bg-[#15243B] border border-slate-200 dark:border-slate-805 text-slate-850 dark:text-slate-100 rounded-[13px] px-4 focus:outline-none focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs font-semibold">
+                    @if (profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid) {
+                      <span class="absolute text-rose-500 flex items-center justify-center" [class.left-3.5]="lang() === 'ar'" [class.right-3.5]="lang() === 'en'">
+                        <app-icon name="exclamation-circle" size="14"></app-icon>
+                      </span>
+                    }
+                  </div>
+                  @if (profileForm.get('fullName')?.touched && profileForm.get('fullName')?.invalid) {
+                    <span class="text-rose-500 text-[10px] font-black mt-1 flex items-center gap-1">
+                      {{ t().REQUIRED_FIELD }}
+                    </span>
+                  }
+                </div>
+                
+                <!-- Email (Readonly visually) -->
+                <div class="flex flex-col gap-2">
+                  <label class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <span>{{ t().EMAIL }}</span>
+                    <app-icon name="lock-closed" size="12" class="text-slate-400 dark:text-slate-500"></app-icon>
+                  </label>
+                  <input 
+                    type="email" 
+                    [value]="profile()?.email" 
+                    readonly 
+                    class="h-[50px] w-full bg-slate-50 dark:bg-slate-800 border border-slate-150 dark:border-slate-805 text-slate-500 dark:text-slate-400 rounded-[13px] px-4 cursor-not-allowed text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap" 
+                    dir="ltr" 
+                    style="text-align: right;">
+                </div>
+
+                <!-- Phone Number -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ t().PHONE }}</label>
+                  <div class="flex items-center h-[50px]" dir="ltr">
+                    <!-- Country Code container -->
+                    <div class="h-full px-3 bg-slate-50 dark:bg-slate-800 border border-r-0 border-slate-200 dark:border-slate-805 rounded-l-[13px] flex items-center justify-center gap-1 text-slate-500 dark:text-slate-400">
+                      <span class="text-sm">🌍</span>
+                      <span class="text-xs font-bold">+</span>
+                    </div>
+                    <!-- Phone Input -->
+                    <input 
+                      type="text" 
+                      formControlName="phone" 
+                      [class.input-field--error]="profileForm.get('phone')?.touched && profileForm.get('phone')?.invalid"
+                      class="h-full flex-1 bg-white dark:bg-[#15243B] border border-slate-200 dark:border-slate-850 text-slate-850 dark:text-slate-100 rounded-r-[13px] px-4 focus:outline-none focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs font-semibold" 
+                      dir="ltr" 
+                      [placeholder]="t().PHONE">
+                  </div>
+                </div>
+
+                <!-- Country -->
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ t().COUNTRY }}</label>
+                  <input 
+                    type="text" 
+                    formControlName="country" 
+                    class="h-[50px] w-full bg-white dark:bg-[#15243B] border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-100 rounded-[13px] px-4 focus:outline-none focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs font-semibold">
+                </div>
+
+                <!-- Headline -->
+                <div class="flex flex-col gap-2 md:col-span-2 full-width">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {{ userRole() === 'Teacher' ? t().HEADLINE_TEACHER : t().HEADLINE_PARENT }}
+                  </label>
+                  <input 
+                    type="text" 
+                    formControlName="headline" 
+                    class="h-[50px] w-full bg-white dark:bg-[#15243B] border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-100 rounded-[13px] px-4 focus:outline-none focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs font-semibold">
+                </div>
+
+                <!-- Bio -->
+                <div class="flex flex-col gap-2 md:col-span-2 full-width">
+                  <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{ t().BIO }}</label>
+                  <textarea 
+                    formControlName="bio" 
+                    class="min-h-[130px] max-h-[180px] w-full bg-white dark:bg-[#15243B] border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-100 rounded-[13px] p-4 focus:outline-none focus:border-blue-500 dark:focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-xs font-semibold resize-y"></textarea>
+                </div>
+              </div>
+
+              <!-- Submit Button Action Row -->
+              <div class="form-actions flex justify-end">
+                <button 
+                  type="submit" 
+                  [disabled]="profileForm.invalid || isSaving()" 
+                  class="btn-save-changes h-[48px] text-white font-bold text-[15px] px-8 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border-none cursor-pointer">
+                  @if (isSaving()) {
+                    <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    {{ t().SAVING }}
+                  } @else {
+                    <app-icon name="check" size="18"></app-icon>
+                    {{ t().SAVE_CHANGES }}
+                  }
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+      
+      <!-- 2. Profile Summary Column -->
+      <div class="profile-summary-column">
+        
+        <!-- Profile Identity Card -->
+        <div class="profile-identity-card bg-white dark:bg-[#111E33] border border-slate-200/85 dark:border-slate-805/85 shadow-[0_8px_24px_rgba(15,23,42,0.06)] rounded-[22px] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          
+          <!-- Decorative Top Accent -->
+          <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-l from-blue-600 to-purple-600"></div>
+
+          <!-- Avatar Container -->
+          <div class="relative group mb-3">
+            <div class="w-[92px] h-[92px] rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-md bg-slate-50 dark:bg-slate-850 relative z-10 flex items-center justify-center">
+              @if (profile()?.avatarUrl) {
+                <img [src]="profile()?.avatarUrl" (error)="onAvatarError($event)" class="w-full h-full object-cover" [alt]="profile()?.fullName">
+              } @else {
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-2xl font-black">
+                  {{ getInitials() }}
+                </div>
+              }
+            </div>
+
+            <!-- Upload Overlay -->
+            @if (!isReadOnly()) {
+              <label class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer text-white z-20 backdrop-blur-[2px]">
+                <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.gif" (change)="onFileSelected($event)" [disabled]="isUploading()">
+                <div class="flex flex-col items-center gap-1.5">
+                  @if (isUploading()) {
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  } @else {
+                    <app-icon name="camera" size="18"></app-icon>
+                    <span class="text-[9px] font-black tracking-wider uppercase bg-black/20 px-1.5 py-0.5 rounded">{{ t().CHANGE_AVATAR }}</span>
+                  }
+                </div>
+              </label>
+            }
+          </div>
+          
+          <div class="flex items-center gap-1.5 justify-center">
+            <h2 class="text-[20px] font-black text-slate-900 dark:text-white leading-snug m-0">{{ profile()?.fullName }}</h2>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          </div>
+
+          <!-- Role Badge -->
+          <span class="inline-flex mt-1.5 px-2.5 py-0.5 bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-extrabold rounded-full border border-blue-500/5">
+            {{ roleLabel(profile()?.role) }}
+          </span>
+          
+          @if (profile()?.email) {
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-extrabold mt-2 truncate w-full max-w-[260px] m-0" dir="ltr">
+              {{ profile()?.email }}
+            </p>
+          }
+
+          <!-- Remove Photo Button -->
+          @if (!isReadOnly() && profile()?.avatarUrl) {
+            <button (click)="removeAvatar()" [disabled]="isUploading()" class="mt-4 h-[36px] text-[11px] font-black text-rose-500 hover:text-rose-600 transition-colors bg-rose-50 hover:bg-rose-100/80 dark:bg-rose-950/20 dark:hover:bg-rose-950/30 rounded-xl w-full flex items-center justify-center gap-2 border-none cursor-pointer">
+              <app-icon name="trash" size="12"></app-icon>
+              {{ t().REMOVE_AVATAR }}
+            </button>
+          }
+        </div>
+
+        <!-- Account Info & Support Card (Fills remaining height) -->
+        <div class="account-info-card bg-white dark:bg-[#111E33] border border-slate-200/85 dark:border-slate-805/85 shadow-[0_8px_24px_rgba(15,23,42,0.06)] rounded-[22px] p-5">
+          <div class="flex items-center gap-2.5 mb-2.5">
+            <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shadow-inner border border-slate-200/5 dark:border-slate-800/5">
+              <app-icon name="shield-check" size="14"></app-icon>
+            </div>
+            <h3 class="font-extrabold text-[14px] text-slate-900 dark:text-white m-0">{{ t().INFO_TITLE }}</h3>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-[1.7] mb-3.5 m-0">
+            {{ t().INFO_DESC }}
+          </p>
+          <div class="support-action mt-auto w-full">
+            <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer" class="support-whatsapp-btn h-[46px] w-full flex items-center justify-center gap-2 rounded-[13px] transition-colors font-bold text-xs no-underline">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              <span>{{ t().CONTACT_SUPPORT }}</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  }
+</div>

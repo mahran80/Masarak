@@ -1,0 +1,925 @@
+<div class="academic-container space-y-6" dir="rtl">
+
+  <!-- Page Header / Hero -->
+  <div class="academic-hero">
+    <div class="space-y-1.5 text-right">
+      <span class="academic-hero-badge">الإدارة الأكاديمية</span>
+      <h1 class="academic-hero-title">الإدارة الأكاديمية</h1>
+      <p class="academic-hero-desc">إدارة المراحل الدراسية والمواد والفصول والمعلمين في النظام</p>
+    </div>
+    <div class="academic-hero-icon shrink-0">
+      <app-icon name="graduation" size="1.6em"></app-icon>
+    </div>
+  </div>
+
+  <!-- Academic Navigation Tabs -->
+  <div class="academic-tabs">
+    <button
+      (click)="setTab('grades')"
+      [class.active]="activeTab() === 'grades'"
+      class="academic-tab-btn">
+      <app-icon name="academic-cap" [size]="18"></app-icon>
+      <span>المراحل الدراسية</span>
+    </button>
+    <button
+      (click)="setTab('subjects')"
+      [class.active]="activeTab() === 'subjects'"
+      class="academic-tab-btn">
+      <app-icon name="book-open" [size]="18"></app-icon>
+      <span>المواد الدراسية</span>
+    </button>
+    <button
+      (click)="setTab('classes')"
+      [class.active]="activeTab() === 'classes'"
+      class="academic-tab-btn">
+      <app-icon name="building" [size]="18"></app-icon>
+      <span>الفصول الدراسية</span>
+    </button>
+    <button
+      (click)="setTab('roster')"
+      [class.active]="activeTab() === 'roster'"
+      class="academic-tab-btn">
+      <app-icon name="users" [size]="18"></app-icon>
+      <span>{{ trans().studentAllocation }}</span>
+    </button>
+    <button
+      (click)="setTab('teachers')"
+      [class.active]="activeTab() === 'teachers'"
+      class="academic-tab-btn">
+      <app-icon name="user" [size]="18"></app-icon>
+      <span>تعيين المعلمين</span>
+    </button>
+    <button
+      (click)="setTab('specializations')"
+      [class.active]="activeTab() === 'specializations'"
+      class="academic-tab-btn">
+      <app-icon name="check-badge" [size]="18"></app-icon>
+      <span>تخصصات المعلمين</span>
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="w-full min-w-0">
+
+    <!-- Global Loader -->
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-20">
+        <div class="w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    }
+
+    <!-- Feedback Banner -->
+    @if (feedbackMsg()) {
+      <div
+        [class]="feedbackType() === 'success'
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/40'
+          : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/40'"
+        class="flex items-center gap-3 p-4 mb-6 rounded-xl border text-sm font-medium">
+        @if (feedbackType() === 'success') {
+          <app-icon name="check-circle" size="1.1em"></app-icon>
+        } @else {
+          <app-icon name="x-mark" size="1.1em"></app-icon>
+        }
+        <span>{{ feedbackMsg() }}</span>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 1: GRADES                                     -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'grades' && !isLoading()) {
+      <div class="academic-card-container animate-fade-in">
+        <div class="academic-card-header">
+          <div>
+            <h2 class="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <app-icon name="academic-cap" [size]="18" class="text-blue-600 dark:text-blue-400"></app-icon>
+              المراحل الدراسية
+            </h2>
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-bold mt-1">{{ grades().length }} مرحلة مسجلة</p>
+          </div>
+        </div>
+
+        <div>
+          @if (grades().length === 0) {
+            <div class="text-center py-16 text-slate-400 dark:text-slate-600 text-sm">لا توجد مراحل دراسية بعد.</div>
+          } @else {
+            <div class="grades-grid">
+              @for (g of grades(); track g.gradeId) {
+                <div
+                  (click)="onGradeSelect(g.gradeId); setTab('subjects')"
+                  class="grade-card group">
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="grade-icon-container">
+                      <app-icon name="academic-cap" [size]="18"></app-icon>
+                    </div>
+                    <span class="grade-arrow-btn">
+                      <app-icon name="chevron-left" [size]="14"></app-icon>
+                    </span>
+                  </div>
+                  <div class="space-y-1">
+                    <p class="font-bold text-slate-800 dark:text-slate-100 text-[15px]">{{ g.nameAr || g.name }}</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">{{ g.name }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 2: SUBJECTS                                   -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'subjects' && !isLoading()) {
+      <div class="academic-card-container animate-fade-in">
+        <div class="subjects-section-header">
+          <div class="flex items-center gap-3">
+            <div class="subject-icon-container shrink-0">
+              <app-icon name="book-open" [size]="20"></app-icon>
+            </div>
+            <div class="space-y-0.5 text-right">
+              <h2 class="text-lg font-black text-slate-800 dark:text-slate-100">
+                المواد الدراسية
+              </h2>
+              <p class="text-xs text-slate-400 dark:text-slate-500 font-bold">اختر مرحلة لعرض موادها الدراسية</p>
+            </div>
+          </div>
+          
+          <div class="subjects-actions">
+            <div class="subject-select-wrapper">
+              <select
+                [ngModel]="selectedGrade()"
+                (ngModelChange)="onGradeSelect($event)"
+                class="subject-select"
+                aria-label="اختر المرحلة الدراسية">
+                <option [ngValue]="null">-- اختر المرحلة --</option>
+                @for (g of grades(); track g.gradeId) {
+                  <option [ngValue]="g.gradeId">{{ g.nameAr || g.name }}</option>
+                }
+              </select>
+            </div>
+            @if (selectedGrade()) {
+              <button
+                (click)="openModal('subject', 'create')"
+                class="subject-add-btn"
+                aria-label="إضافة مادة جديدة">
+                <app-icon name="plus" [size]="14"></app-icon>
+                <span>إضافة مادة</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          @if (!selectedGrade()) {
+            <div class="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 shadow-inner">
+                <app-icon name="book" size="2em"></app-icon>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-[16px] font-black text-slate-800 dark:text-slate-200">اختر المرحلة الدراسية</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto leading-relaxed">
+                  اختر مرحلة لعرض المواد الدراسية المرتبطة بها.
+                </p>
+              </div>
+            </div>
+          } @else if (subjects().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 shadow-inner">
+                <app-icon name="exclamation-triangle" size="2em"></app-icon>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-[16px] font-black text-slate-800 dark:text-slate-200">لا توجد مواد دراسية لهذه المرحلة</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto leading-relaxed">
+                  يمكنك إضافة أول مادة باستخدام زر إضافة مادة.
+                </p>
+              </div>
+            </div>
+          } @else {
+            <div class="subjects-grid">
+              @for (s of subjects(); track s.subjectId) {
+                <div class="subject-card group">
+                  <div class="flex items-center justify-between">
+                    <div class="subject-icon-container">
+                      <app-icon name="book-open" [size]="18"></app-icon>
+                    </div>
+                    <button
+                      (click)="openModal('subject', 'edit', s)"
+                      class="subject-edit-btn"
+                      title="تعديل المادة"
+                      aria-label="تعديل المادة">
+                      <app-icon name="pencil" [size]="14"></app-icon>
+                    </button>
+                  </div>
+                  <div class="space-y-1 pt-4 text-right">
+                    <p class="font-bold text-slate-800 dark:text-slate-100 text-[16px]">{{ s.nameAr || s.name }}</p>
+                    <div class="inline-flex">
+                      <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[11px] font-mono rounded font-bold">
+                        {{ s.code }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 3: CLASSES                                    -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'classes' && !isLoading()) {
+      <div class="academic-card-container animate-fade-in">
+        <!-- Section Header -->
+        <div class="classrooms-section-header">
+          <div class="flex items-center gap-3">
+            <div class="subject-icon-container shrink-0">
+              <app-icon name="building" [size]="20"></app-icon>
+            </div>
+            <div class="space-y-0.5 text-right">
+              <h2 class="text-lg font-black text-slate-800 dark:text-slate-100">الفصول الدراسية</h2>
+              <p class="text-xs text-slate-400 dark:text-slate-500 font-bold">اختر المرحلة والسنة الأكاديمية لعرض الفصول وإدارتها</p>
+            </div>
+          </div>
+
+          <div class="classrooms-actions">
+            <!-- Grade Select -->
+            <div class="classroom-select-wrapper">
+              <select
+                [ngModel]="selectedGrade()"
+                (ngModelChange)="onGradeSelect($event)"
+                class="classroom-select"
+                aria-label="اختر المرحلة الدراسية">
+                <option [ngValue]="null">-- اختر المرحلة --</option>
+                @for (g of grades(); track g.gradeId) {
+                  <option [ngValue]="g.gradeId">{{ g.nameAr || g.name }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Academic Year Input -->
+            <div class="classroom-year-wrapper">
+              <app-icon name="calendar" [size]="14" class="classroom-year-icon"></app-icon>
+              <input
+                type="text"
+                [(ngModel)]="academicYear"
+                placeholder="2026"
+                class="classroom-year-input"
+                aria-label="السنة الأكاديمية"
+                (change)="loadClasses()">
+            </div>
+
+            <!-- Add Class Button -->
+            @if (selectedGrade()) {
+              <button
+                (click)="openModal('class', 'create')"
+                class="classroom-add-btn"
+                aria-label="إضافة فصل دراسي جديد">
+                <app-icon name="plus" [size]="14"></app-icon>
+                <span>إضافة فصل</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div>
+          @if (!selectedGrade()) {
+            <div class="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-inner">
+                <app-icon name="building" size="2em"></app-icon>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-[16px] font-black text-slate-800 dark:text-slate-200">اختر المرحلة والسنة الأكاديمية</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto leading-relaxed">
+                  اختر الفلاتر أعلاه لعرض الفصول الدراسية المتاحة وإدارتها.
+                </p>
+              </div>
+            </div>
+          } @else if (classes().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 text-center space-y-4">
+              <div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-inner">
+                <app-icon name="exclamation-triangle" size="2em"></app-icon>
+              </div>
+              <div class="space-y-2">
+                <h3 class="text-[16px] font-black text-slate-800 dark:text-slate-200">لا توجد فصول لهذه المرحلة</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto leading-relaxed">
+                  يمكنك إنشاء أول فصل باستخدام زر إضافة فصل.
+                </p>
+                <button
+                  (click)="openModal('class', 'create')"
+                  class="classroom-add-btn mt-2 mx-auto">
+                  <app-icon name="plus" [size]="14"></app-icon>
+                  <span>إضافة فصل</span>
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="classrooms-grid">
+              @for (c of classes(); track c.classId) {
+                <div class="classroom-card">
+                  <!-- Card Header -->
+                  <div class="classroom-card__header">
+                    <div class="flex items-center gap-3">
+                      <div class="classroom-icon-container">
+                        <app-icon name="building" [size]="18"></app-icon>
+                      </div>
+                      <div class="text-right">
+                        <p class="classroom-name">
+                          {{ lang() === 'ar' ? 'الفصل ' : 'Class ' }}{{ c.name }}
+                        </p>
+                        <div class="flex items-center gap-1 mt-1">
+                          <app-icon name="calendar" [size]="11" class="text-slate-400 dark:text-slate-500"></app-icon>
+                          <span class="text-[12px] text-slate-400 dark:text-slate-500 font-bold">{{ c.academicYear }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="classroom-status-badge"
+                        [class.active]="c.isActive"
+                        [class.inactive]="!c.isActive">
+                        <span class="status-dot"></span>
+                        {{ c.isActive ? 'نشط' : 'غير نشط' }}
+                      </span>
+                      <button
+                        (click)="openModal('class', 'edit', c)"
+                        class="classroom-edit-btn"
+                        title="تعديل الفصل"
+                        aria-label="تعديل الفصل">
+                        <app-icon name="pencil" [size]="14"></app-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Enrollment Progress -->
+                  <div class="students-capacity">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-1.5">
+                        <app-icon name="users" [size]="13" class="text-slate-400 dark:text-slate-500"></app-icon>
+                        <span class="text-[12px] font-bold text-slate-500 dark:text-slate-400">
+                          {{ c.enrollmentCount }} {{ lang() === 'ar' ? 'من' : 'of' }} {{ c.maxCapacity }} {{ lang() === 'ar' ? 'طالب' : 'students' }}
+                        </span>
+                      </div>
+                      <span class="text-[11px] font-bold text-blue-600 dark:text-blue-400">
+                        {{ c.maxCapacity > 0 ? ((c.enrollmentCount / c.maxCapacity) * 100 | number:'1.0-0') : 0 }}%
+                      </span>
+                    </div>
+                    <div class="enrollment-track">
+                      <div
+                        class="enrollment-fill"
+                        [style.width.%]="c.maxCapacity > 0 ? (c.enrollmentCount / c.maxCapacity) * 100 : 0">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="classroom-card__actions">
+                    <button
+                      (click)="onClassSelect(c.classId); setTab('roster')"
+                      class="classroom-action-btn students-btn">
+                      <app-icon name="users" [size]="14"></app-icon>
+                      <span>{{ lang() === 'ar' ? 'الطلاب' : 'Students' }}</span>
+                    </button>
+                    <button
+                      (click)="onClassSelect(c.classId); setTab('teachers')"
+                      class="classroom-action-btn teachers-btn">
+                      <app-icon name="user" [size]="14"></app-icon>
+                      <span>{{ lang() === 'ar' ? 'المعلمون' : 'Teachers' }}</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 4: ROSTER                                     -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'roster' && !isLoading()) {
+      <div class="academic-card-container animate-fade-in">
+        <div class="academic-card-header">
+          <div>
+            <h2 class="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <app-icon name="users" [size]="18" class="text-blue-600 dark:text-blue-400"></app-icon>
+              {{ trans().studentAllocation }}
+            </h2>
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-bold mt-1">إدارة قوائم الطلاب في الفصول</p>
+          </div>
+        </div>
+
+        <div>
+          @if (!selectedClass()) {
+            <div class="text-center py-16 text-slate-400 dark:text-slate-600 text-sm">
+              <p class="mb-3">يرجى اختيار المرحلة والفصل أولاً.</p>
+              <button (click)="setTab('classes')" class="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline">الذهاب إلى الفصول</button>
+            </div>
+          } @else {
+            <!-- Enroll Student Form -->
+            <div class="p-4 mb-4 rounded-xl bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80">
+              <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+                <select #studentSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 dark:border-slate-850 rounded-lg text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all">
+                  <option value="">-- اختر الطالب للتسجيل --</option>
+                  @for (s of filteredStudentsForGrade(); track s.userId) {
+                    <option [value]="s.userId">{{ s.fullName }} ({{ s.email }})</option>
+                  }
+                </select>
+                <button
+                  (click)="enrollStudent(studentSelect.value); studentSelect.value = ''"
+                  class="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
+                  <app-icon name="plus" [size]="14"></app-icon>
+                  تسجيل طالب
+                </button>
+              </div>
+            </div>
+
+            <!-- Roster Table -->
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+              <table class="w-full text-right text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300">
+                    <th class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider">الطالب</th>
+                    <th class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider">البريد الإلكتروني</th>
+                    <th class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider">نوع التسجيل</th>
+                    <th class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider w-24">إجراء</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950">
+                  @for (r of roster(); track r.studentId) {
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            {{ r.fullName?.charAt(0) || 'T' }}
+                          </div>
+                          <span class="font-semibold">{{ r.fullName }}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-mono">{{ r.email }}</td>
+                      <td class="px-6 py-4">
+                        @if (r.enrollmentType === 'FullClass') {
+                          <span class="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40 rounded-full text-xs font-semibold">فصل كامل</span>
+                        } @else {
+                          <div class="flex flex-wrap gap-1">
+                            <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/40 rounded-full text-xs font-semibold">جزئي</span>
+                            @for (sub of r.enrolledSubjects; track sub) {
+                              <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-medium">{{ sub }}</span>
+                            }
+                          </div>
+                        }
+                      </td>
+                      <td class="px-6 py-4">
+                        <button
+                          (click)="unenrollStudent(r.studentClassId)"
+                          class="px-3 py-1.5 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/40 rounded-lg text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-950 transition-colors">
+                          إلغاء
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="px-6 py-16 text-center text-slate-400 dark:text-slate-600 text-sm">لا يوجد طلاب مسجلين في هذا الفصل.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 5: TEACHERS                                   -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'teachers' && !isLoading()) {
+      <section class="teacher-assignments-section animate-fade-in">
+        <header class="teacher-assignments-header">
+          <div class="teacher-assignments-title">
+            <span class="teacher-assignments-title__icon"><app-icon name="user" [size]="19"></app-icon></span>
+            <div>
+              <h2>تعيين المعلمين</h2>
+              <p>ربط المعلمين بالمواد الدراسية والفصول المناسبة.</p>
+            </div>
+          </div>
+          <span class="teacher-assignments-count">{{ teachers().length }} تعيينات حالية</span>
+        </header>
+
+        @if (!selectedClass()) {
+          <div class="teacher-assignments-empty">
+            <span class="teacher-assignments-empty__icon"><app-icon name="building" [size]="25"></app-icon></span>
+            <h3>اختر المرحلة والفصل أولًا</h3>
+            <p>يجب تحديد الفصل الذي تريد ربط المعلمين به قبل إنشاء التعيينات.</p>
+            <button type="button" (click)="setTab('classes')">الذهاب إلى الفصول</button>
+          </div>
+        } @else {
+          <div class="assignment-form-card">
+            <div class="assignment-workflow-labels" aria-hidden="true">
+              <span><b>01</b> اختر المعلم</span><i></i><span><b>02</b> اختر المادة</span><i></i><span><b>03</b> تأكيد التعيين</span>
+            </div>
+            <div class="assignment-controls">
+              <div class="assignment-field">
+                <label for="assignment-teacher">المعلم</label>
+                <div class="assignment-select-wrap">
+                  <app-icon name="user" [size]="16"></app-icon>
+                  <select #teacherSelect id="assignment-teacher">
+                    <option value="">اختر المعلم</option>
+                    @for (t of availableTeachers(); track t.teacherId) {
+                      <option [value]="t.teacherId">{{ t.fullName }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="assignment-field">
+                <label for="assignment-subject">المادة الدراسية</label>
+                <div class="assignment-select-wrap">
+                  <app-icon name="book-open" [size]="16"></app-icon>
+                  <select #subjectSelect id="assignment-subject">
+                    <option value="">اختر المادة</option>
+                    @for (s of subjects(); track s.subjectId) {
+                      <option [value]="s.subjectId">{{ lang() === 'ar' ? (s.nameAr || s.name) : s.name }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="assignment-submit-btn"
+                (click)="assignTeacher(teacherSelect.value, subjectSelect.value); teacherSelect.value = ''; subjectSelect.value = ''"
+                aria-label="تعيين المعلم للمادة المختارة">
+                <app-icon name="plus" [size]="16"></app-icon>
+                <span>تعيين المعلم</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="assignments-list-header">
+            <div>
+              <h3>التعيينات الحالية</h3>
+              <p>المعلمون المرتبطون بالمواد والفصول.</p>
+            </div>
+            <span>{{ teachers().length }} تعيين</span>
+          </div>
+
+          @if (teachers().length === 0) {
+            <div class="teacher-assignments-empty compact">
+              <span class="teacher-assignments-empty__icon"><app-icon name="link" [size]="24"></app-icon></span>
+              <h3>لا توجد تعيينات حالية</h3>
+              <p>اختر معلمًا ومادة لإنشاء أول تعيين لهذا الفصل.</p>
+            </div>
+          } @else {
+            <div class="assignments-grid">
+              @for (t of teachers(); track t.id) {
+                <article class="assignment-card">
+                  <div class="assignment-avatar">{{ t.teacherName?.charAt(0) || 'م' }}</div>
+                  <div class="assignment-card__content">
+                    <h4 [title]="t.teacherName">{{ t.teacherName }}</h4>
+                    <div class="assignment-meta">
+                      <span class="assignment-chip subject"><app-icon name="book-open" [size]="12"></app-icon>{{ lang() === 'ar' ? (t.subjectNameAr || t.subjectName) : t.subjectName }}</span>
+                      <span class="assignment-chip class"><app-icon name="building" [size]="12"></app-icon>{{ lang() === 'ar' ? (t.classNameAr || ('فصل ' + t.className.replace('Class ', ''))) : t.className }}</span>
+                    </div>
+                  </div>
+                  <button type="button" class="assignment-unassign-btn"
+                    (click)="unassignTeacher(t.id)"
+                    [title]="'إلغاء تعيين ' + t.teacherName"
+                    [attr.aria-label]="'إلغاء تعيين المعلم ' + t.teacherName">
+                    <app-icon name="link-slash" [size]="16"></app-icon>
+                  </button>
+                </article>
+              }
+            </div>
+          }
+        }
+      </section>
+    }
+    <!-- ══════════════════════════════════════════════════ -->
+    <!-- TAB 6: SPECIALIZATIONS                           -->
+    <!-- ══════════════════════════════════════════════════ -->
+    @if (activeTab() === 'specializations' && !isLoading()) {
+      <div class="teacher-specializations-layout animate-fade-in">
+        
+        <!-- Teacher List Panel -->
+        <div class="teacher-list-panel animate-fade-in">
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800/80 text-right space-y-1.5">
+            <h2 class="text-[17px] font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <app-icon name="user" [size]="18" class="text-blue-600 dark:text-blue-400"></app-icon>
+              اختر المعلم
+            </h2>
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-bold leading-normal">
+              اختر معلماً لإدارة المواد وتخصيص المقررات التي يستطيع تدريسها
+            </p>
+          </div>
+
+          <div class="teacher-list">
+            @for (t of availableTeachers(); track t.teacherId) {
+              <button
+                (click)="onTeacherSelect(t.teacherId)"
+                [class.selected-teacher]="selectedTeacher() === t.teacherId"
+                class="teacher-list-item">
+                <div class="teacher-avatar shrink-0">
+                  {{ t.fullName?.charAt(0) || 'م' }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-slate-800 dark:text-slate-100 text-sm truncate">{{ t.fullName }}</p>
+                  <p class="text-xs text-slate-400 dark:text-slate-500 font-mono truncate mt-0.5">{{ t.email }}</p>
+                </div>
+                @if (selectedTeacher() === t.teacherId) {
+                  <div class="w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center shrink-0">
+                    <app-icon name="check" [size]="12"></app-icon>
+                  </div>
+                }
+              </button>
+            } @empty {
+              <div class="flex flex-col items-center justify-center py-20 text-center text-slate-400 dark:text-slate-600 text-sm">
+                <app-icon name="users" [size]="32" class="mb-2 text-slate-300 dark:text-slate-700"></app-icon>
+                <span>لا يوجد معلمون مسجلون.</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Specializations Panel -->
+        <div class="teacher-specializations-content academic-card-container animate-fade-in">
+          @if (!selectedTeacher()) {
+            <div class="flex flex-col items-center justify-center py-24 text-center space-y-4">
+              <div class="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-600 shadow-inner">
+                <app-icon name="user" size="2em"></app-icon>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-[16px] font-black text-slate-800 dark:text-slate-200">اختر معلماً للبدء</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto leading-relaxed">
+                  يرجى اختيار معلم من القائمة الجانبية لعرض وتعديل تخصصاته التدريسية ومراجعتها.
+                </p>
+              </div>
+            </div>
+          } @else {
+            <div class="space-y-6">
+              <div class="academic-card-header flex-wrap gap-4">
+                <div class="space-y-1 text-right">
+                  <h2 class="text-[17px] font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <app-icon name="check-badge" [size]="18" class="text-blue-600 dark:text-blue-400"></app-icon>
+                    المواد المتاحة للتدريس
+                  </h2>
+                  <p class="text-xs text-slate-400 dark:text-slate-500 font-bold leading-normal">
+                    قم بتفعيل أو إلغاء تخصص المعلم لكل مادة من المواد المسجلة في النظام.
+                  </p>
+                </div>
+              </div>
+
+              <div class="subjects-selection-grid">
+                @for (category of allCategories(); track category.subjectCategoryId) {
+                  <div
+                    (click)="toggleTeacherSubjectByName(category)"
+                    [class.selected-subject]="hasSpecialization(category)"
+                    class="subject-option group">
+                    <div class="flex items-center gap-3">
+                      <div class="subject-icon-container shrink-0">
+                        <app-icon name="book-open" [size]="16"></app-icon>
+                      </div>
+                      <div class="text-right">
+                        <span class="font-bold text-slate-700 dark:text-slate-200 text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {{ (category.nameAr || category.name) === 'Uncategorized' ? (lang() === 'ar' ? 'غير مصنفة' : 'Uncategorized') : (category.nameAr || category.name) }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        type="checkbox"
+                        [checked]="hasSpecialization(category)"
+                        (click)="$event.stopPropagation(); toggleTeacherSubjectByName(category)"
+                        class="w-4.5 h-4.5 accent-blue-600 rounded cursor-pointer">
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="col-span-full flex flex-col items-center justify-center py-12 text-center space-y-3">
+                    <div class="w-12 h-12 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 shadow-inner">
+                      <app-icon name="exclamation-triangle" size="1.5em"></app-icon>
+                    </div>
+                    <div class="space-y-0.5">
+                      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">لا توجد مواد متاحة</h3>
+                      <p class="text-slate-500 dark:text-slate-400 text-xs max-w-xs mx-auto">
+                        لم تتم إضافة مواد دراسية يمكن إسنادها لهذا المعلم.
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Current Specializations Badge Row -->
+              @if (teacherSpecializations().length > 0) {
+                <div class="p-5 bg-slate-50/60 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 rounded-2xl">
+                  <div class="flex items-center gap-2 mb-3">
+                    <p class="text-xs font-black text-slate-700 dark:text-slate-300">التخصصات التدريسية الحالية</p>
+                    <span class="px-2.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded-full">
+                      {{ teacherSpecializations().length }} مادة
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    @for (spec of teacherSpecializations(); track spec.subjectId) {
+                      <span class="inline-flex items-center gap-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs px-3.5 py-1.5 rounded-full font-bold shadow-sm">
+                        <app-icon name="check-badge" [size]="12"></app-icon>
+                        {{ spec.name === 'Uncategorized' ? (lang() === 'ar' ? 'غير مصنفة' : 'Uncategorized') : spec.name }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Save Button -->
+              <div class="form-actions">
+                <button
+                  (click)="showFeedback('تم حفظ التخصصات بنجاح.')"
+                  class="subject-add-btn h-[48px] px-8 text-sm font-black flex items-center gap-2">
+                  <app-icon name="check" [size]="16"></app-icon>
+                  <span>حفظ التخصصات</span>
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MODAL — uses global masarak-* CSS from styles.css          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+@if (isModalOpen()) {
+  <div
+    class="masarak-overlay"
+    [class.is-closing]="isModalClosing()"
+    (click)="closeModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="acad-modal-title">
+    <div
+      class="masarak-dialog masarak-dialog--md"
+      [class.is-closing]="isModalClosing()"
+      (click)="$event.stopPropagation()"
+      dir="rtl">
+
+      <!-- Header -->
+      <div class="masarak-modal-header">
+        <div class="flex items-center gap-3">
+          <div class="masarak-modal-header__icon">
+            <app-icon
+              [name]="modalType() === 'grade' ? 'academic-cap' : modalType() === 'subject' ? 'book-open' : 'building'"
+              [size]="20">
+            </app-icon>
+          </div>
+          <div class="masarak-modal-header__info">
+            <h3 id="acad-modal-title" class="masarak-modal-title">
+              {{ modalMode() === 'create' ? 'إضافة' : 'تعديل' }}
+              {{ modalType() === 'grade' ? 'مرحلة دراسية' : modalType() === 'subject' ? 'مادة دراسية' : 'فصل دراسي' }}
+            </h3>
+            <p class="masarak-modal-subtitle">
+              {{ modalMode() === 'create' ? 'أدخل البيانات المطلوبة لإنشاء السجل.' : 'عدّل البيانات ثم احفظ التغييرات.' }}
+            </p>
+          </div>
+        </div>
+        <button
+          (click)="closeModal()"
+          class="masarak-modal-close"
+          aria-label="إغلاق النافذة">
+          <app-icon name="x-mark" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="masarak-modal-body">
+        <div class="masarak-form-field">
+          <label class="masarak-form-label">
+            الاسم بالإنجليزية
+            <span class="masarak-form-required" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="formData.name"
+            class="masarak-form-input"
+            placeholder="مثال: Mathematics">
+        </div>
+
+        <div class="masarak-form-field">
+          <label class="masarak-form-label">الاسم بالعربية</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.nameAr"
+            class="masarak-form-input"
+            placeholder="مثال: الرياضيات">
+        </div>
+
+        @if (modalType() === 'subject') {
+          <div class="masarak-form-field">
+            <label class="masarak-form-label">
+              رمز المادة
+              <span class="masarak-form-required" aria-hidden="true">*</span>
+              <span class="masarak-form-hint">مثال: MATH-01</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="formData.code"
+              maxlength="20"
+              class="masarak-form-input"
+              placeholder="MATH-01">
+          </div>
+        }
+
+        @if (modalType() === 'class') {
+          <div class="masarak-form-field">
+            <label class="masarak-form-label">
+              الطاقة الاستيعابية
+              <span class="masarak-form-required" aria-hidden="true">*</span>
+            </label>
+            <input
+              type="number"
+              [(ngModel)]="formData.maxCapacity"
+              min="1" max="500"
+              class="masarak-form-input"
+              placeholder="30">
+          </div>
+        }
+
+        @if (modalMode() === 'edit') {
+          <div class="masarak-toggle-row">
+            <div class="masarak-toggle-info">
+              <span class="masarak-toggle-label">نشط</span>
+              <span class="masarak-toggle-desc">السجل متاح ومفعّل داخل النظام.</span>
+            </div>
+            <label class="masarak-switch" aria-label="تفعيل أو تعطيل">
+              <input
+                type="checkbox"
+                [(ngModel)]="formData.isActive"
+                class="masarak-switch__input">
+              <span class="masarak-switch__track"></span>
+            </label>
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="masarak-modal-footer">
+        <button (click)="saveModal()" class="masarak-btn-primary">
+          <app-icon name="check" [size]="16"></app-icon>
+          حفظ التغييرات
+        </button>
+        <button (click)="closeModal()" class="masarak-btn-secondary">إلغاء</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- CONFIRM DIALOG — uses global masarak-* CSS                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+@if (confirmAction()) {
+  <div
+    class="masarak-overlay masarak-overlay--confirm"
+    (click)="confirmAction.set(null)"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="acad-confirm-title">
+    <div
+      class="masarak-dialog masarak-dialog--sm"
+      (click)="$event.stopPropagation()"
+      dir="rtl">
+
+      <!-- Header -->
+      <div class="masarak-modal-header">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
+            <app-icon name="exclamation-triangle" [size]="18" class="text-red-500 dark:text-red-400"></app-icon>
+          </div>
+          <h3 id="acad-confirm-title" class="masarak-modal-title">تأكيد الإجراء</h3>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="masarak-modal-body" style="text-align:center">
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{{ confirmAction()?.msg }}</p>
+      </div>
+
+      <!-- Footer -->
+      <div class="masarak-modal-footer">
+        <button
+          (click)="confirmAction()?.action(); confirmAction.set(null)"
+          class="masarak-btn-danger">
+          تأكيد
+        </button>
+        <button
+          (click)="confirmAction.set(null)"
+          class="masarak-btn-secondary">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

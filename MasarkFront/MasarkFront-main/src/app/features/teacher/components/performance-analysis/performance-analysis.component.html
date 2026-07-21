@@ -1,0 +1,27 @@
+<div class="perf-analysis">
+  <h1 class="perf-analysis__title">تحليل الأداء بالذكاء الاصطناعي</h1>
+
+  <div class="perf-analysis__grid">
+    <div class="card perf-analysis__level-card">
+      <h3 class="perf-analysis__card-title">مستوى الطالب العام</h3>
+      <div class="level-bar">
+        <span class="level-bar__segment level-bar__segment--weak">ضعيف</span>
+        <span class="level-bar__segment level-bar__segment--mid">متوسط</span>
+        <span class="level-bar__segment level-bar__segment--strong">قوي</span>
+        <span class="level-bar__marker" [style.right.%]="100 - overallLevelPercent"></span>
+      </div>
+      <p class="perf-analysis__pct">{{ overallLevelPercent }}%</p>
+    </div>
+
+    <div class="card perf-analysis__mistakes-card">
+      <h3 class="perf-analysis__card-title">أبرز الأخطاء الشائعة</h3>
+      <ul class="perf-analysis__mistakes">
+        <li *ngFor="let m of mistakes; let i = index">
+          <span class="perf-analysis__mistake-index">{{ i + 1 }}.</span>
+          <app-icon [name]="m.icon" [size]="16"></app-icon>
+          {{ m.text }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,130 @@
+<div class="space-y-8 pb-12 font-sans text-slate-800" dir="rtl">
+
+  <!-- Header -->
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-2 text-[13px] font-semibold text-slate-400">
+      <span>الرئيسية</span>
+      <app-icon name="chevron-left" [size]="12"></app-icon>
+      <span class="text-slate-700 font-bold">حالة النظام</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm">
+        <app-icon name="globe" [size]="20"></app-icon>
+      </div>
+      <div>
+        <h1 class="text-2xl font-black text-slate-900">مراقبة حالة النظام</h1>
+        <p class="text-[13px] font-semibold text-slate-500">نظرة عامة على أداء المنصة والخدمات المرتبطة بها</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div *ngFor="let m of metrics()"
+         class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-[#4F8CD4]/30 hover:shadow-md transition-all duration-200 flex items-start gap-4">
+      <!-- Unified monochromatic icon wrapper -->
+      <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 text-[#4F8CD4]">
+        <app-icon [name]="m.icon" [size]="20"></app-icon>
+      </div>
+      <div class="flex flex-col flex-1 min-w-0">
+        <span class="text-[12px] font-bold text-slate-400 mb-1 uppercase tracking-wide">{{ m.label }}</span>
+        <span class="text-[28px] font-black text-slate-800 leading-none mb-2">{{ m.value }}</span>
+        <!-- Unified formal status indicator -->
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#4F8CD4]"></span>
+          {{ m.statusLabel }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Queue & Errors -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+    <!-- Queue & Jobs -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+      <!-- Card Header -->
+      <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm">
+          <app-icon name="settings" [size]="16"></app-icon>
+        </div>
+        <h3 class="text-[15px] font-black text-slate-800">حالة الطابور والمهام</h3>
+        <span class="text-[11px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">RabbitMQ</span>
+      </div>
+
+      <div class="p-6 flex flex-col gap-0">
+        <!-- Queue Depth Row -->
+        <div class="flex justify-between items-center py-4 border-b border-slate-100">
+          <span class="text-[13px] font-semibold text-slate-600">عمق الطابور الحالي</span>
+          <span class="text-[13px] font-black text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
+            {{ queueDepth() }} <span class="text-slate-400 font-semibold">رسالة</span>
+          </span>
+        </div>
+
+        <!-- SignalR Row -->
+        <div class="flex justify-between items-center py-4 border-b border-slate-100 mb-2">
+          <div class="flex flex-col gap-0.5">
+            <span class="text-[13px] font-semibold text-slate-600">اتصالات نشطة</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SignalR</span>
+          </div>
+          <span class="text-[13px] font-black text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
+            {{ signalRConnections() }} <span class="text-slate-400 font-semibold">اتصال</span>
+          </span>
+        </div>
+
+        <!-- Active Jobs -->
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">المهام النشطة حاليًا</p>
+
+        <div *ngFor="let job of activeJobs()"
+             class="flex justify-between items-center py-2.5 px-3 rounded-lg hover:bg-slate-50 transition-colors">
+          <span class="text-[13px] font-semibold text-slate-700">{{ job.name }}</span>
+          <span class="text-[11px] font-bold px-3 py-1 rounded-lg bg-[#4F8CD4]/10 text-[#4F8CD4]">
+            {{ job.statusLabel }}
+          </span>
+        </div>
+
+        <div *ngIf="activeJobs().length === 0"
+             class="text-center py-8 text-[13px] font-semibold text-slate-400 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 mt-2">
+          لا توجد مهام نشطة حاليًا
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Errors -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+      <!-- Card Header -->
+      <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 shadow-sm">
+          <app-icon name="exclamation-triangle" [size]="16"></app-icon>
+        </div>
+        <h3 class="text-[15px] font-black text-slate-800">آخر الأخطاء المسجلة</h3>
+      </div>
+
+      <div class="p-6 flex flex-col gap-3">
+        <div *ngFor="let err of recentErrors()"
+             class="flex items-start gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+          <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+            <app-icon name="alert-triangle" [size]="14"></app-icon>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-[13px] font-bold text-slate-700 leading-snug">{{ err.message }}</span>
+            <span class="text-[11px] font-semibold text-slate-400 mt-1">{{ err.time }}</span>
+          </div>
+        </div>
+
+        <!-- All clear state -->
+        <div *ngIf="recentErrors().length === 0"
+             class="flex flex-col items-center justify-center py-12 bg-slate-50/50 rounded-xl border border-dashed border-slate-200 text-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm">
+            <app-icon name="check-circle" [size]="20"></app-icon>
+          </div>
+          <div>
+            <p class="text-[14px] font-black text-slate-700">النظام يعمل بشكل سليم</p>
+            <p class="text-[12px] font-semibold text-slate-400 mt-0.5">لا توجد أخطاء مسجلة حالياً</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

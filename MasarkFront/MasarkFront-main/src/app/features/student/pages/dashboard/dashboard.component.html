@@ -1,0 +1,91 @@
+<section class="student-dashboard" dir="rtl">
+  <header class="dashboard-hero">
+    <div class="hero-copy">
+      <span class="hero-badge">لوحة الطالب</span>
+      <h1>مرحبًا بك في مسارك التعليمي</h1>
+      <p>تابع دروسك ومواعيدك ومستواك الدراسي من مكان واحد وبخطوات بسيطة.</p>
+    </div>
+    <div class="hero-actions">
+      <a routerLink="courses" class="hero-link hero-link-primary">
+        <span>استكشف مقرراتي</span>
+        <span aria-hidden="true">←</span>
+      </a>
+      <button type="button" class="refresh-button" [disabled]="isLoading()" (click)="loadDashboard()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7h-5V2M4 17h5v5m10.5-9A8 8 0 0 0 6 6.5L4 9m16 6-2 2.5A8 8 0 0 1 4.5 11"/>
+        </svg>
+        {{ isLoading() ? 'جارٍ التحديث...' : 'تحديث البيانات' }}
+      </button>
+    </div>
+  </header>
+
+  <nav class="student-quick-links" aria-label="الوصول السريع">
+    <a routerLink="courses"><span class="quick-icon quick-icon-blue">▣</span><span><b>مقرراتي</b><small>واصل التعلّم</small></span></a>
+    <a routerLink="assignments"><span class="quick-icon quick-icon-orange">✓</span><span><b>الواجبات</b><small>تابع المطلوب</small></span></a>
+    <a routerLink="exams"><span class="quick-icon quick-icon-purple">✎</span><span><b>الاختبارات</b><small>استعد واختبر نفسك</small></span></a>
+    <a routerLink="schedule"><span class="quick-icon quick-icon-green">◷</span><span><b>جدولي</b><small>مواعيدك القادمة</small></span></a>
+  </nav>
+
+  @if (isLoading()) {
+    <div class="dashboard-skeleton" aria-label="جارٍ تحميل لوحة الطالب">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="skeleton-card"><i></i><span></span><strong></strong></div>
+      }
+    </div>
+  } @else if (errorMessage()) {
+    <article class="dashboard-state" [class.enrollment-state]="isEnrollmentError()">
+      <div class="state-illustration">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 14 3 9l9-5 9 5-9 5Zm0 0 6.2-3.45V16M6 11.2V16c2.8 2.3 9.2 2.3 12 0"/>
+        </svg>
+      </div>
+      @if (isEnrollmentError()) {
+        <span class="state-label">حسابك جاهز</span>
+        <h2>بانتظار إسنادك إلى الفصل الدراسي</h2>
+        <p>لم يتم ربط حسابك بفصل للعام الدراسي الحالي بعد. تواصل مع إدارة المدرسة، وستظهر مقرراتك وجدولك هنا تلقائيًا فور إتمام الإسناد.</p>
+        <div class="state-steps">
+          <span><b>1</b> تواصل مع الإدارة</span><i></i><span><b>2</b> يتم إسناد الفصل</span><i></i><span><b>3</b> تبدأ رحلتك</span>
+        </div>
+      } @else {
+        <span class="state-label state-label-error">تعذر الاتصال</span>
+        <h2>لم نتمكن من تحميل لوحة الطالب</h2>
+        <p>حدثت مشكلة مؤقتة أثناء جلب بياناتك. جرّب مرة أخرى، وإن استمرت المشكلة تواصل مع الدعم الفني.</p>
+      }
+      <div class="state-actions">
+        <button type="button" (click)="loadDashboard()">إعادة المحاولة</button>
+        <a routerLink="profile">عرض ملفي الشخصي</a>
+      </div>
+    </article>
+  } @else if (data(); as dashboard) {
+    <app-student-dashboard-cards
+      [profile]="dashboard.profile" [classInfo]="dashboard.classInfo" [courses]="dashboard.courses"
+      [attendance]="dashboard.attendance" [performance]="dashboard.performance" [schedule]="dashboard.schedule" />
+
+    <div class="dashboard-content-grid">
+      <section class="dashboard-panel schedule-panel">
+        <div class="panel-heading"><div><span>خطتك اليومية</span><h2>المواعيد القادمة</h2></div><a routerLink="schedule">عرض الجدول بالكامل ←</a></div>
+        @if (upcomingSchedule().length > 0) {
+          <div class="schedule-list">
+            @for (session of upcomingSchedule(); track session.sessionId ?? session.sessionDate + session.sessionTitle) {
+              <app-student-schedule-card [session]="session" (joinSession)="joinSession($event)" />
+            }
+          </div>
+        } @else {
+          <div class="compact-empty"><span>◷</span><div><b>لا توجد حصص قادمة</b><p>استمتع بوقتك، سنعرض مواعيدك الجديدة هنا.</p></div></div>
+        }
+      </section>
+      <app-student-attendance-summary [summary]="dashboard.attendance" />
+    </div>
+
+    <section class="dashboard-panel courses-panel">
+      <div class="panel-heading"><div><span>واصل من حيث توقفت</span><h2>مقرراتي الدراسية</h2></div><a routerLink="courses">عرض كل المقررات ←</a></div>
+      @if (recentCourses().length > 0) {
+        <div class="courses-grid">
+          @for (course of recentCourses(); track course.subjectId) { <app-student-course-card [course]="course" /> }
+        </div>
+      } @else {
+        <div class="compact-empty"><span>▣</span><div><b>لا توجد مقررات مسندة بعد</b><p>ستظهر مقررات فصلك هنا بمجرد إضافتها.</p></div></div>
+      }
+    </section>
+  }
+</section>

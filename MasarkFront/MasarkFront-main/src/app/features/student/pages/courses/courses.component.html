@@ -1,0 +1,30 @@
+<section class="courses-page" dir="rtl">
+  <header class="courses-hero">
+    <div><span>رحلتك التعليمية</span><h1>مقرراتي الدراسية</h1><p>اختر المقرر وابدأ متابعة المحتوى والواجبات والاختبارات بسهولة.</p></div>
+    <div class="hero-stat"><strong>{{ courses().length }}</strong><small>مقرر مسند</small></div>
+    <button type="button" class="refresh-courses" [disabled]="isLoading()" (click)="loadCourses()">↻ <span>{{ isLoading() ? 'جارٍ التحديث' : 'تحديث المقررات' }}</span></button>
+  </header>
+
+  @if (isLoading()) {
+    <div class="course-skeleton-grid">@for(item of [1,2,3,4,5,6];track item){<div class="course-skeleton"><i></i><b></b><span></span><em></em></div>}</div>
+  } @else if (errorMessage()) {
+    <article class="courses-state error-state"><div class="state-icon">!</div><h2>تعذر تحميل المقررات</h2><p>{{ errorMessage() }}</p><button type="button" (click)="loadCourses()">إعادة المحاولة</button></article>
+  } @else if (courses().length > 0) {
+    @if (selectedCourse(); as course) {
+      <aside class="selected-course-bar">
+        <div class="selected-icon">{{ course.subjectName.charAt(0) }}</div>
+        <div class="selected-title"><small>المقرر المحدد</small><h2>{{ course.subjectArabicName || course.subjectName }}</h2><p>{{ course.subjectName }}</p></div>
+        <div class="selected-meta"><span><small>المعلم</small><b>{{ course.teacherName || 'لم يحدد بعد' }}</b></span><span><small>الصف</small><b>{{ course.gradeName || '—' }}</b></span></div>
+        <div class="selected-actions"><a routerLink="../content">مكتبة المحتوى</a><a routerLink="../assignments">الواجبات</a><a routerLink="../exams">الاختبارات</a></div>
+      </aside>
+    }
+    <div class="courses-section-heading"><div><span>كل المقررات</span><h2>اختر المادة التي تريد دراستها</h2></div><p>{{ courses().length }} مواد متاحة لك</p></div>
+    <div class="courses-grid">
+      @for(course of courses();track course.subjectId){
+        <app-student-course-card [course]="course" [selected]="selectedCourse()?.subjectId === course.subjectId" (viewDetails)="selectCourse($event)" />
+      }
+    </div>
+  } @else {
+    <article class="courses-state"><div class="state-icon">▣</div><h2>لا توجد مقررات مسندة بعد</h2><p>ستظهر مقررات فصلك هنا بمجرد إضافتها من إدارة المدرسة.</p><a routerLink="../profile">عرض ملفي الشخصي</a></article>
+  }
+</section>

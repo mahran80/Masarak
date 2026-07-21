@@ -1,0 +1,283 @@
+<div class="space-y-12 animate-fade-in relative z-10 pt-6 pb-20 max-w-7xl mx-auto px-4 sm:px-6 font-sans">
+  
+  <!-- 1. PAGE HEADER (Hero Banner) -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-900 dark:to-purple-900 rounded-[24px] p-8 md:p-12 shadow-lg relative overflow-hidden text-white flex flex-col md:flex-row items-center justify-between gap-8">
+    <div class="absolute inset-0 bg-white/5 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
+    <!-- Soft Radial Glow -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-400/30 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-400/30 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10 max-w-2xl space-y-4">
+      <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-black tracking-widest border border-white/20">منصة مسارك التعليمية</span>
+      <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-tight">اختر الباقة الأنسب لمستقبل أبنائك</h1>
+      <p class="text-sm md:text-base text-blue-50 font-medium leading-relaxed max-w-xl">
+        وفر لطفلك بيئة تعليمية متكاملة مدعومة بالذكاء الاصطناعي مع نخبة من أفضل المعلمين لضمان التفوق الدراسي والتميز.
+      </p>
+    </div>
+
+    <!-- Illustration Image -->
+    <div class="relative z-10 hidden md:block shrink-0">
+      <div class="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/20 shadow-2xl overflow-hidden">
+        <app-icon name="academic-cap" size="64" class="text-white opacity-90"></app-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. STUDENT SELECTOR & CURRENT SUBSCRIPTION -->
+  @if (parentService.hasStudents()) {
+    <div class="flex flex-col gap-6">
+      
+      <!-- Student Selector -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[24px] flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm hover-lift transition-all">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center font-black text-2xl border border-blue-100 dark:border-blue-800/50 shadow-inner">
+            {{ selectedStudent ? selectedStudent.fullName.substring(0, 1) : 'ط' }}
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white text-lg">{{ selectedStudent?.fullName }}</h3>
+            <span class="text-sm text-slate-500 font-medium mt-0.5 block">المرحلة الإعدادية | مسار عام</span>
+          </div>
+        </div>
+        
+        <div class="w-full md:w-auto flex items-center gap-4 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+          <span class="text-sm font-bold text-slate-600 dark:text-slate-300 mr-2">تبديل الطالب:</span>
+          <select 
+            class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-xl block py-3 px-5 outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer shadow-sm min-w-[200px]"
+            [value]="parentService.selectedStudentId()"
+            (change)="onStudentChange($event)"
+          >
+            @for (student of parentService.linkedStudents(); track student.studentUserId) {
+              <option [value]="student.studentUserId">
+                {{ student.fullName }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Stripe & Backend Alerts -->
+      @if (errorMsg()) {
+        <div class="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-800/50 text-rose-700 dark:text-rose-400 p-4 rounded-[16px] text-sm font-medium text-right shadow-sm">
+          <div class="flex items-center gap-2 mb-2">
+            <app-icon name="exclamation-circle" size="18"></app-icon>
+            <strong>حدث خطأ:</strong>
+          </div>
+          <p class="text-xs">{{ errorMsg() }}</p>
+        </div>
+      }
+      @if (successMsg()) {
+        <div class="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 p-4 rounded-[16px] text-sm font-medium text-right shadow-sm">
+          {{ successMsg() }}
+        </div>
+      }
+
+      <!-- Current Subscription Card -->
+      @if (parentService.selectedStudentId()) {
+        @if (loadingSubscription()) {
+          <div class="text-center py-12 text-slate-500 font-bold animate-pulse">جاري تحميل البيانات...</div>
+        } @else {
+          @if (activeSubscription()) {
+            <!-- Active Sub Premium Card -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[24px] shadow-sm relative overflow-hidden hover-lift transition-all">
+              <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500 rounded-r-[24px]"></div>
+              
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10 pr-4">
+                <div class="flex items-center gap-5">
+                  <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center text-3xl border border-emerald-100 dark:border-emerald-800/50 shadow-sm">
+                    <app-icon name="check-circle" size="32"></app-icon>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] font-black border border-emerald-100/50 dark:border-emerald-800/50 uppercase tracking-widest">
+                      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                      اشتراك نشط
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ activeSubscription().planName }}</h3>
+                    <p class="text-sm text-slate-500 font-medium">صالح حتى: {{ activeSubscription().endDate | date:'longDate' }}</p>
+                  </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full md:w-72 space-y-2 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                  <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span>المدة المتبقية</span>
+                    <span>18 يوم من 30</span>
+                  </div>
+                  <div class="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden shadow-inner">
+                    <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full" style="width: 60%"></div>
+                  </div>
+                </div>
+                
+                <!-- CTA -->
+                <div class="flex items-center gap-3 shrink-0">
+                  @if (activeSubscription().isStripeManaged) {
+                    @if (!isChangingPlan()) {
+                      <button 
+                        (click)="startChangePlan()"
+                        class="bg-gradient-to-l from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3.5 rounded-2xl text-sm font-black transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                        ترقية الباقة
+                      </button>
+                    } @else {
+                      <button 
+                        (click)="cancelChangePlan()"
+                        class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-8 py-3.5 rounded-2xl text-sm font-black transition-all border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm hover:shadow">
+                        إلغاء الترقية
+                      </button>
+                    }
+                  } @else {
+                    <span class="text-xs font-black text-amber-700 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200/50 shadow-sm">باقة مخصصة</span>
+                  }
+                </div>
+              </div>
+            </div>
+          } @else {
+            <!-- Empty State Card -->
+            <div class="text-center py-16 px-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] shadow-sm flex flex-col items-center">
+              <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-full flex items-center justify-center text-4xl shadow-inner mb-6 border border-slate-100 dark:border-slate-700">
+                <app-icon name="credit-card" size="32"></app-icon>
+              </div>
+              <h3 class="text-xl font-black text-slate-900 dark:text-white mb-3">لا يوجد اشتراك نشط حالياً</h3>
+              <p class="text-slate-500 text-sm max-w-md leading-relaxed font-medium">
+                اختر إحدى الباقات بالأسفل لبدء رحلة التعلم التفاعلية مع طفلك وتحقيق أفضل النتائج الدراسية.
+              </p>
+            </div>
+          }
+        }
+      }
+    </div>
+  }
+
+  <!-- 3. SUBSCRIPTION PLANS -->
+  @if (parentService.selectedStudentId() && (!activeSubscription() || isChangingPlan())) {
+    <div class="space-y-10 mt-12">
+      <div class="text-center max-w-2xl mx-auto space-y-4">
+        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          {{ activeSubscription() ? 'باقات مسارك الاحترافية' : 'باقات مسارك الاحترافية' }}
+        </h2>
+        <p class="text-sm font-medium text-slate-500 leading-relaxed">
+          جميع الباقات تتضمن كافة مزايا المنصة، الاختلاف الوحيد هو في <strong>عدد المواد الدراسية</strong> المتاحة للطالب.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch text-right">
+        @for (plan of plans(); track plan.planId; let i = $index) {
+          
+          <div class="relative flex flex-col justify-between bg-white dark:bg-slate-900 rounded-[24px] p-8 transition-all duration-300 hover:-translate-y-1 group"
+               [class]="i === 2 ? 'border-0 shadow-xl shadow-blue-900/10 dark:shadow-blue-900/20 scale-[1.02] z-10' : 'border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md'">
+            
+            <!-- Glow for Featured -->
+            @if (i === 2) {
+              <div class="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-[24px] pointer-events-none border border-blue-200 dark:border-blue-800"></div>
+              <div class="absolute -top-4 right-1/2 translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-md tracking-widest uppercase">الأكثر طلباً</div>
+            }
+
+            <div class="relative z-10 space-y-6">
+              <!-- Plan Header -->
+              <div>
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">
+                  @if (i === 0) { باقة المادة الواحدة }
+                  @else if (i === 1) { باقة مواد متعددة }
+                  @else { المنهج الدراسي الكامل }
+                </h3>
+                <p class="text-xs text-slate-500 font-medium mt-2">
+                  @if (i === 0) { الوصول لمادة واحدة فقط من اختيارك }
+                  @else if (i === 1) { اختر عدد محدد من المواد الدراسية }
+                  @else { استثمار متكامل لجميع المواد في المنهج }
+                </p>
+              </div>
+
+              <!-- Price -->
+              <div class="py-6 border-y border-slate-100 dark:border-slate-800">
+                <div class="flex items-end gap-2">
+                  <span class="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{{ plan.price }}</span>
+                  <span class="text-sm font-bold text-slate-500 mb-1">USD / شهرياً</span>
+                </div>
+              </div>
+
+              <!-- Shared Features List -->
+              <div class="space-y-3.5 py-2">
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block mb-3">مزايا الباقة:</span>
+                
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shrink-0"><app-icon name="check" size="12"></app-icon></div>
+                  <span class="text-sm font-bold text-slate-600 dark:text-slate-300">دروس تفاعلية مسجلة وملفات PDF</span>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shrink-0"><app-icon name="check" size="12"></app-icon></div>
+                  <span class="text-sm font-bold text-slate-600 dark:text-slate-300">مساعد الذكاء الاصطناعي للمراجعة</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shrink-0"><app-icon name="check" size="12"></app-icon></div>
+                  <span class="text-sm font-bold text-slate-600 dark:text-slate-300">الواجبات والامتحانات الدورية</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center shrink-0"><app-icon name="check" size="12"></app-icon></div>
+                  <span class="text-sm font-bold text-slate-600 dark:text-slate-300">لوحة متابعة لولي الأمر</span>
+                </div>
+
+                <!-- Differentiating Features -->
+                <div class="flex items-center gap-3 opacity-100 transition-opacity">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                       [class.bg-emerald-50]="i >= 1" [class.dark:bg-emerald-900]="i >= 1" [class.text-emerald-600]="i >= 1"
+                       [class.bg-slate-100]="i === 0" [class.dark:bg-slate-800]="i === 0" [class.text-slate-400]="i === 0">
+                    <app-icon [name]="i >= 1 ? 'check' : 'x-mark'" size="12"></app-icon>
+                  </div>
+                  <span class="text-sm font-bold"
+                        [class.text-slate-600]="i >= 1" [class.dark:text-slate-300]="i >= 1"
+                        [class.text-slate-400]="i === 0" [class.dark:text-slate-500]="i === 0">
+                    حضور الحصص والورش المباشرة
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 opacity-100 transition-opacity">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                       [class.bg-emerald-50]="i >= 1" [class.dark:bg-emerald-900]="i >= 1" [class.text-emerald-600]="i >= 1"
+                       [class.bg-slate-100]="i === 0" [class.dark:bg-slate-800]="i === 0" [class.text-slate-400]="i === 0">
+                    <app-icon [name]="i >= 1 ? 'check' : 'x-mark'" size="12"></app-icon>
+                  </div>
+                  <span class="text-sm font-bold"
+                        [class.text-slate-600]="i >= 1" [class.dark:text-slate-300]="i >= 1"
+                        [class.text-slate-400]="i === 0" [class.dark:text-slate-500]="i === 0">
+                    تقارير أداء دورية مفصلة
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 opacity-100 transition-opacity">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                       [class.bg-emerald-50]="i === 2" [class.dark:bg-emerald-900]="i === 2" [class.text-emerald-600]="i === 2"
+                       [class.bg-slate-100]="i !== 2" [class.dark:bg-slate-800]="i !== 2" [class.text-slate-400]="i !== 2">
+                    <app-icon [name]="i === 2 ? 'check' : 'x-mark'" size="12"></app-icon>
+                  </div>
+                  <span class="text-sm font-bold"
+                        [class.text-slate-600]="i === 2" [class.dark:text-slate-300]="i === 2"
+                        [class.text-slate-400]="i !== 2" [class.dark:text-slate-500]="i !== 2">
+                    دعم أكاديمي مخصص 24/7
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="relative z-10 mt-8">
+              <button
+                (click)="onPlanSelected(plan)"
+                [disabled]="processingPlanId() === plan.planId || activeSubscription()?.planId === plan.planId"
+                class="w-full py-4 rounded-2xl text-sm font-black transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:hover:-translate-y-0 disabled:hover:shadow-sm"
+                [class]="i === 2 && activeSubscription()?.planId !== plan.planId ? 'bg-gradient-to-l from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700' : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700'">
+                @if (processingPlanId() === plan.planId) {
+                  جاري الدفع...
+                } @else if (activeSubscription()?.planId === plan.planId) {
+                  باقاتك الحالية
+                } @else {
+                  اختر هذه الباقة
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

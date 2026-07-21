@@ -1,0 +1,408 @@
+<div class="schedule-page" dir="rtl">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCHEDULE HERO                                              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="schedule-hero">
+    <div>
+      <div class="schedule-hero-badge">
+        <app-icon name="academic-cap" [size]="12"></app-icon>
+        الإدارة الأكاديمية
+      </div>
+      <h1 class="schedule-hero-title">جدول الحصص</h1>
+      <p class="schedule-hero-desc">إدارة الجداول الأسبوعية للفصول الدراسية ومتابعة مواعيد الحصص.</p>
+    </div>
+    <div class="schedule-hero-icon">
+      <app-icon name="calendar" [size]="26"></app-icon>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCHEDULE CONTROLS CARD                                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="schedule-controls">
+
+    <!-- Grade Pills -->
+    <div>
+      <div class="schedule-controls-label">الصف الدراسي</div>
+      <div class="grade-pills">
+        @for (g of grades(); track g.gradeId) {
+          <button
+            type="button"
+            class="grade-pill"
+            [class.active]="selectedGradeId() === g.gradeId"
+            (click)="onGradeSelect(g.gradeId)">
+            {{ g.nameAr || g.name }}
+          </button>
+        } @empty {
+          <span class="text-sm font-semibold" style="color:#94A3B8">جاري تحميل الصفوف...</span>
+        }
+      </div>
+    </div>
+
+    <!-- Class Pills — only when a grade is selected -->
+    @if (selectedGradeId()) {
+      <div class="class-pills">
+        <span class="schedule-controls-label" style="margin-bottom:0;white-space:nowrap">الفصل:</span>
+        @for (c of classes(); track c.classId) {
+          <button
+            type="button"
+            class="class-pill"
+            [class.active]="selectedClassId() === c.classId"
+            (click)="onClassSelect(c.classId)">
+            @if (selectedClassId() === c.classId) {
+              <svg class="class-pill-check" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
+            فصل {{ c.name || c.className }}
+          </button>
+        } @empty {
+          <span class="text-sm font-semibold" style="color:#94A3B8">لا توجد فصول مسجلة لهذا الصف</span>
+        }
+      </div>
+    }
+
+    <!-- Actions Row: View Toggle + Week/Date + Add -->
+    @if (selectedClassId() || viewMode() === 'list') {
+      <div class="schedule-actions-row">
+
+        <!-- Left cluster: View Toggle + Week/Date selector -->
+        <div class="flex items-center gap-3 flex-wrap">
+
+          <!-- View Mode Toggle -->
+          <div class="view-toggle">
+            <button
+              type="button"
+              class="view-toggle-btn"
+              [class.active]="viewMode() === 'week'"
+              (click)="viewMode.set('week'); loadSessions()">
+              <app-icon name="squares-2x2" [size]="14"></app-icon>
+              أسبوعي
+            </button>
+            <button
+              type="button"
+              class="view-toggle-btn"
+              [class.active]="viewMode() === 'list'"
+              (click)="viewMode.set('list'); loadSessions()">
+              <app-icon name="list-bullet" [size]="14"></app-icon>
+              قائمة
+            </button>
+          </div>
+
+          <!-- Week selector (week mode) -->
+          @if (viewMode() === 'week') {
+            <div class="week-select-wrap">
+              <app-icon name="calendar" [size]="15" class="week-select-icon"></app-icon>
+              <select
+                class="week-select"
+                [ngModel]="selectedWeek()"
+                (change)="onWeekChange($event)"
+                dir="rtl">
+                @for (week of academicWeeks(); track week.value) {
+                  <option [value]="week.value">{{ week.label }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- Date range (list mode) -->
+          @if (viewMode() === 'list') {
+            <div class="date-range-wrap">
+              <app-icon name="calendar" [size]="14" class="week-select-icon"></app-icon>
+              <span class="date-range-label">من:</span>
+              <input
+                type="date"
+                class="date-range-input"
+                [ngModel]="fromDate()"
+                (ngModelChange)="fromDate.set($event); loadSessions()">
+              <div class="date-range-divider"></div>
+              <span class="date-range-label">إلى:</span>
+              <input
+                type="date"
+                class="date-range-input"
+                [ngModel]="toDate()"
+                (ngModelChange)="toDate.set($event); loadSessions()">
+            </div>
+          }
+        </div>
+
+        <!-- Add Lesson Button -->
+        @if (selectedClassId()) {
+          <button type="button" class="btn-add-lesson" (click)="openModal()">
+            <app-icon name="plus" [size]="16"></app-icon>
+            جدولة حصة جديدة
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCHEDULE WORKSPACE                                         -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="schedule-workspace">
+
+    @if (selectedClassId() || viewMode() === 'list') {
+
+      <!-- Weekly Calendar View -->
+      @if (viewMode() === 'week') {
+        <div class="schedule-scroll">
+          <app-weekly-calendar
+            [weekStart]="weekStart()"
+            [sessions]="calendarSessions()"
+            role="admin"
+            (cancel)="onCalendarCancel($event)"
+            (edit)="onCalendarEdit($event)">
+          </app-weekly-calendar>
+        </div>
+      }
+
+      <!-- List View -->
+      @if (viewMode() === 'list') {
+        <div class="schedule-scroll">
+          <table class="schedule-list-table">
+            <thead>
+              <tr>
+                <th>عنوان الحصة</th>
+                <th>المادة / المعلم</th>
+                <th>الموعد والمدة</th>
+                <th>الحالة</th>
+                <th style="text-align:center">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of sessions(); track s.sessionId) {
+                <tr>
+                  <td>
+                    <div class="table-cell-title">{{ s.title }}</div>
+                  </td>
+                  <td>
+                    <div class="table-cell-title" style="font-size:13px">{{ s.subjectName }}</div>
+                    <div class="table-cell-sub">{{ s.teacherName }}</div>
+                  </td>
+                  <td>
+                    <div class="table-cell-title" style="font-size:12.5px">
+                      {{ s.scheduledAt | date:'MMM d, yyyy h:mm a' }}
+                    </div>
+                    <div class="table-cell-sub">{{ s.durationMinutes }} دقيقة</div>
+                  </td>
+                  <td>
+                    <span class="status-badge"
+                      [class.status-scheduled]="s.status === 'Scheduled'"
+                      [class.status-live]="s.status === 'Live'"
+                      [class.status-completed]="s.status === 'Completed'"
+                      [class.status-cancelled]="s.status === 'Cancelled'">
+                      {{ s.status === 'Scheduled' ? 'مجدولة'
+                       : s.status === 'Live'      ? 'مباشر الآن'
+                       : s.status === 'Completed' ? 'مكتملة'
+                       : 'ملغاة' }}
+                    </span>
+                  </td>
+                  <td style="text-align:center">
+                    @if (s.status === 'Scheduled') {
+                      <div class="flex items-center justify-center gap-2">
+                        <button class="action-btn-cancel" (click)="cancelSession(s, false)">إلغاء حصة</button>
+                        @if (s.seriesId) {
+                          <button class="action-btn-cancel" (click)="cancelSession(s, true)">إلغاء السلسلة</button>
+                        }
+                      </div>
+                    } @else if (s.status === 'Completed' || s.status === 'Cancelled') {
+                      <button class="action-btn-reactivate" (click)="reactivateSession(s)">إعادة تنشيط</button>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="table-empty-state">لا يوجد حصص مجدولة لهذا الفصل</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+    } @else {
+
+      <!-- Empty State — no class selected -->
+      <div class="workspace-empty">
+        <div class="workspace-empty-icon">
+          <app-icon name="calendar" [size]="28"></app-icon>
+        </div>
+        <div class="workspace-empty-title">اختر صفًا وفصلاً دراسياً</div>
+        <p class="workspace-empty-desc">اختر الصف الدراسي ثم الفصل لعرض جدول الحصص الأسبوعي.</p>
+      </div>
+
+    }
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADD LESSON MODAL — uses global masarak-* system            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+@if (isModalOpen()) {
+  <div
+    class="masarak-overlay"
+    (click)="closeModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="schedule-modal-title">
+    <div
+      class="masarak-dialog masarak-dialog--lg"
+      (click)="$event.stopPropagation()"
+      dir="rtl">
+
+      <!-- Header -->
+      <div class="masarak-modal-header">
+        <div class="flex items-center gap-3">
+          <div class="masarak-modal-header__icon">
+            <app-icon name="calendar" [size]="20"></app-icon>
+          </div>
+          <div class="masarak-modal-header__info">
+            <h3 id="schedule-modal-title" class="masarak-modal-title">جدولة حصة جديدة</h3>
+            <p class="masarak-modal-subtitle">أدخل بيانات الحصة وحدد موعدها داخل الجدول الأسبوعي.</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="masarak-modal-close"
+          aria-label="إغلاق النافذة">
+          <app-icon name="x-mark" [size]="18"></app-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="masarak-modal-body">
+
+        <!-- Subject & Teacher -->
+        <div class="masarak-form-field">
+          <label class="masarak-form-label">
+            المادة والمعلم
+            <span class="masarak-form-required" aria-hidden="true">*</span>
+          </label>
+          <select
+            class="masarak-form-select"
+            [ngModel]="formSubjectId()"
+            (ngModelChange)="onSubjectChange($event)">
+            <option [ngValue]="null" disabled>اختر المادة</option>
+            @for (ta of assignments(); track ta.id) {
+              <option [ngValue]="ta.subjectId">{{ ta.subjectName }} (أ. {{ ta.teacherName }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Title -->
+        <div class="masarak-form-field">
+          <label class="masarak-form-label">
+            عنوان الحصة
+            <span class="masarak-form-required" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            class="masarak-form-input"
+            [ngModel]="formTitle()"
+            (ngModelChange)="formTitle.set($event)"
+            placeholder="مثال: الحصة الأولى — مقدمة في الجبر">
+        </div>
+
+        <!-- Description -->
+        <div class="masarak-form-field">
+          <label class="masarak-form-label">الوصف <span class="masarak-form-hint">(اختياري)</span></label>
+          <textarea
+            class="schedule-modal-textarea"
+            [ngModel]="formDescription()"
+            (ngModelChange)="formDescription.set($event)"
+            rows="2"
+            placeholder="ملاحظات إضافية..."></textarea>
+        </div>
+
+        <!-- Date + Time + Duration (3-col grid) -->
+        <div class="flex gap-3">
+          <div class="masarak-form-field flex-1">
+            <label class="masarak-form-label">
+              التاريخ
+              <span class="masarak-form-required" aria-hidden="true">*</span>
+            </label>
+            <input
+              type="date"
+              class="masarak-form-input"
+              [ngModel]="formDate()"
+              (ngModelChange)="formDate.set($event)">
+          </div>
+          <div class="masarak-form-field flex-1">
+            <label class="masarak-form-label">
+              الوقت
+              <span class="masarak-form-required" aria-hidden="true">*</span>
+            </label>
+            <select
+              class="masarak-form-select"
+              [ngModel]="formTime()"
+              (ngModelChange)="formTime.set($event)">
+              <option value="" disabled>اختر الوقت</option>
+              @for (slot of availableTimeSlots(); track slot.value) {
+                <option [value]="slot.value" [disabled]="slot.disabled">
+                  {{ slot.label }}{{ slot.disabled ? ' (محجوز)' : '' }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="masarak-form-field" style="width:110px;flex-shrink:0">
+            <label class="masarak-form-label">المدة (د)</label>
+            <input
+              type="number"
+              class="masarak-form-input"
+              [ngModel]="formDuration()"
+              (ngModelChange)="formDuration.set($event)"
+              min="15" step="5">
+          </div>
+        </div>
+
+        <!-- Recurring -->
+        <div class="recurring-section">
+          <label class="recurring-toggle">
+            <label class="masarak-switch" aria-label="تكرار أسبوعي">
+              <input
+                type="checkbox"
+                class="masarak-switch__input"
+                [ngModel]="formIsRecurring()"
+                (ngModelChange)="formIsRecurring.set($event)">
+              <span class="masarak-switch__track"></span>
+            </label>
+            <span class="recurring-toggle-label">تكرار أسبوعي</span>
+          </label>
+
+          @if (formIsRecurring()) {
+            <div class="masarak-form-field" style="margin-top:14px">
+              <label class="masarak-form-label">
+                تكرار حتى تاريخ
+                <span class="masarak-form-required" aria-hidden="true">*</span>
+              </label>
+              <input
+                type="date"
+                class="masarak-form-input"
+                [ngModel]="formRecurUntil()"
+                (ngModelChange)="formRecurUntil.set($event)">
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="masarak-modal-footer">
+        <button
+          type="button"
+          class="masarak-btn-primary"
+          (click)="saveSession()"
+          [disabled]="isSaving()">
+          <app-icon name="check" [size]="16"></app-icon>
+          {{ isSaving() ? 'جاري الحفظ...' : 'حفظ الجدول' }}
+        </button>
+        <button type="button" class="masarak-btn-secondary" (click)="closeModal()">إلغاء</button>
+      </div>
+
+    </div>
+  </div>
+}

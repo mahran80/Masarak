@@ -1,0 +1,32 @@
+<div class="live-schedule-page" dir="rtl">
+  <section class="schedule-hero">
+    <div class="hero-copy"><span class="hero-badge">لوحة المدرس</span><h1>جدول الحصص</h1><p>تابع حصصك الأسبوعية، مواعيدها، والفصول المرتبطة بها من مكان واحد.</p></div>
+    <div class="hero-side">@if (selectedClassId()) { <div class="hero-stat"><strong>{{ calendarSessions().length }}</strong><span>حصة هذا الأسبوع</span></div> }<span class="hero-icon"><app-icon name="calendar" [size]="30"></app-icon></span></div>
+  </section>
+
+  <section class="schedule-controls">
+    <div class="week-control"><label for="teacher-week-select">الأسبوع الدراسي</label><div class="week-select-wrap"><span><app-icon name="calendar" [size]="17"></app-icon></span><select id="teacher-week-select" [ngModel]="selectedWeek()" (change)="onWeekChange($event)" dir="rtl">@for (week of academicWeeks(); track week.value) { <option [value]="week.value">{{ week.label }}</option> }</select><i><app-icon name="chevron-down" [size]="15"></app-icon></i></div></div>
+    <div class="controls-summary"><span><app-icon name="clock" [size]="17"></app-icon></span><div><small>الأسبوع المحدد</small><strong>{{ weekStart() | date:'dd MMM yyyy' }}</strong></div><b>{{ calendarSessions().length }} حصة</b></div>
+    <button type="button" class="sidebar-toggle" (click)="isSidebarOpen.set(!isSidebarOpen())" [attr.aria-expanded]="isSidebarOpen()" aria-label="إظهار أو إخفاء قائمة الفصول"><app-icon name="menu" [size]="18"></app-icon><span>{{ isSidebarOpen() ? 'إخفاء الفصول' : 'اختيار الفصل' }}</span></button>
+  </section>
+
+  <div class="schedule-layout" [class.sidebar-closed]="!isSidebarOpen()">
+    <aside class="classes-sidebar" [class.is-closed]="!isSidebarOpen()">
+      <div class="classes-panel"><header><span><app-icon name="academic-cap" [size]="20"></app-icon></span><div><h2>الفصول الدراسية</h2><p>اختر الصف ثم الفصل.</p></div></header>
+        <div class="grades-list">@for (g of grades(); track g.gradeId) { <div class="grade-group"><button type="button" class="grade-button" [class.is-active]="selectedGradeId() === g.gradeId" (click)="onGradeSelect(g.gradeId)"><span>{{ g.name }}</span><app-icon name="chevron-down" [size]="14"></app-icon></button>@if (selectedGradeId() === g.gradeId) { <div class="classes-list">@for (c of classes(); track c.classId) { <button type="button" [class.is-active]="selectedClassId() === c.classId" (click)="onClassSelect(c.classId)"><i></i><span>{{ c.name }}</span>@if (selectedClassId() === c.classId) { <app-icon name="check-circle" [size]="15"></app-icon> }</button> }</div> }</div> }</div>
+      </div>
+    </aside>
+
+    <main class="schedule-main">
+      @if (selectedClassId()) {
+        <section class="schedule-workspace"><header class="workspace-header"><div class="workspace-title"><span><app-icon name="calendar" [size]="21"></app-icon></span><div><h2>حصص الأسبوع</h2><p>الجدول الأسبوعي للحصص والمواعيد.</p></div></div><div class="workspace-meta"><span>{{ weekStart() | date:'dd MMM yyyy' }}</span><b>{{ calendarSessions().length }} حصة</b></div></header>
+          @if (isLoading()) { <div class="schedule-loading" aria-label="جاري تحميل جدول الحصص">@for (item of [1,2,3,4,5,6,7]; track item) { <div><span></span><span></span><span></span></div> }</div> }
+          @else if (errorMessage()) { <div class="schedule-error" role="alert"><span><app-icon name="exclamation-triangle" [size]="25"></app-icon></span><div><h3>تعذّر تحميل جدول الحصص</h3><p>{{ errorMessage() }}</p></div><button type="button" (click)="loadSessions()">إعادة المحاولة</button></div> }
+          @else { <app-weekly-calendar [weekStart]="weekStart()" [sessions]="calendarSessions()" role="teacher" (start)="onCalendarStart($event)" (join)="onCalendarJoin($event)" (complete)="onCalendarComplete($event)" (attendance)="onCalendarAttendance($event)"></app-weekly-calendar> }
+        </section>
+      } @else {
+        <section class="select-class-empty"><span><app-icon name="calendar" [size]="38"></app-icon></span><h2>اختر فصلًا دراسيًا</h2><p>اختر الصف ثم الفصل من القائمة لعرض جدول الحصص الأسبوعي الخاص بك.</p><button type="button" (click)="isSidebarOpen.set(true)"><app-icon name="academic-cap" [size]="16"></app-icon><span>اختيار الفصل</span></button></section>
+      }
+    </main>
+  </div>
+</div>

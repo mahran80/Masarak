@@ -1,0 +1,19 @@
+Using launch settings from Masarak.API\Properties\launchSettings.json...
+info: Microsoft.EntityFrameworkCore.Migrations[20411]
+      Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+[Seeder] Roles verified.
+[Seeder] Admin exists. Skipped.
+info: Masarak.Infrastructure.Services.SubscriptionExpiryJob[0]
+      Subscription Expiry Job started.
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: https://localhost:49179
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:49180
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\ITI\GradProj\Masarak\Masarak.API

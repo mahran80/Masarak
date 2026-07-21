@@ -1,0 +1,190 @@
+<div class="space-y-8 pb-12 font-sans text-slate-800" dir="rtl" (click)="closeMenus()">
+
+  <!-- Header -->
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-2 text-[13px] font-semibold text-slate-400">
+      <span>الرئيسية</span>
+      <app-icon name="chevron-left" [size]="12"></app-icon>
+      <span>لوحة التحكم</span>
+      <app-icon name="chevron-left" [size]="12"></app-icon>
+      <span class="text-slate-700 font-bold">الاشتراكات والمدفوعات</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm">
+        <app-icon name="credit-card" [size]="20"></app-icon>
+      </div>
+      <div>
+        <h1 class="text-2xl font-black text-slate-900">إدارة الاشتراكات والمدفوعات</h1>
+        <p class="text-[13px] font-semibold text-slate-500">متابعة الاشتراكات النشطة والإيرادات الشهرية</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Active Subscriptions -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-[#4F8CD4]/30 hover:shadow-md transition-all flex items-start justify-between">
+      <div class="flex flex-col">
+        <span class="text-[12px] font-bold text-slate-400 mb-2 uppercase tracking-wide">عدد الاشتراكات النشطة</span>
+        <span class="text-[36px] font-black text-slate-800 leading-none">{{ activeCount() }}</span>
+        <span class="text-[11px] font-semibold text-slate-400 mt-2 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#4F8CD4]"></span>
+          نشط حالياً
+        </span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 text-[#4F8CD4] flex items-center justify-center shrink-0">
+        <app-icon name="users" [size]="22"></app-icon>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue — blue theme, no green -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-[#4F8CD4]/30 hover:shadow-md transition-all flex items-start justify-between">
+      <div class="flex flex-col">
+        <span class="text-[12px] font-bold text-slate-400 mb-2 uppercase tracking-wide">إجمالي الإيرادات هذا الشهر</span>
+        <span class="text-[36px] font-black text-slate-800 leading-none flex items-baseline gap-2">
+          {{ monthlyRevenue() | number }}
+          <span class="text-[18px] font-bold text-slate-400">ر.س</span>
+        </span>
+        <span class="text-[11px] font-semibold text-slate-400 mt-2 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#4F8CD4]"></span>
+          إيرادات الشهر الحالي
+        </span>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 text-[#4F8CD4] flex items-center justify-center shrink-0">
+        <app-icon name="wallet" [size]="22"></app-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Records Table -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" (click)="$event.stopPropagation()">
+
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 border-b border-slate-100 gap-4 bg-slate-50/40">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[#4F8CD4] shadow-sm">
+          <app-icon name="document-text" [size]="16"></app-icon>
+        </div>
+        <h3 class="text-[15px] font-black text-slate-800">سجل المدفوعات</h3>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+            <app-icon name="search" [size]="15"></app-icon>
+          </div>
+          <input type="text"
+                 placeholder="البحث عن طالب..."
+                 class="h-[40px] bg-white border border-slate-200 text-[13px] font-semibold text-slate-700 rounded-xl focus:ring-4 focus:ring-sky-50 focus:border-sky-400 outline-none block w-full pr-10 pl-4 transition-all shadow-sm placeholder:text-slate-400"
+                 [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)">
+        </div>
+        <!-- Filter Button -->
+        <button class="h-[40px] flex items-center gap-2 px-4 bg-white border border-slate-200 rounded-xl text-[13px] font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+          <app-icon name="filter" [size]="15"></app-icon>
+          الفلاتر
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Header -->
+    <div class="grid grid-cols-[64px_1fr_140px_130px_130px_110px] bg-slate-50 border-b border-slate-200 px-4 py-3 text-[11px] font-black text-slate-500 uppercase tracking-wider">
+      <span class="text-center">إجراء</span>
+      <span>اسم الطالب</span>
+      <span>خطة الاشتراك</span>
+      <span>المبلغ</span>
+      <span>تاريخ الاشتراك</span>
+      <span>حالة الدفع</span>
+    </div>
+
+    <!-- Table Rows -->
+    <div class="flex flex-col divide-y divide-slate-100">
+      <div *ngFor="let r of filteredRecords(); let i = index"
+           class="grid grid-cols-[64px_1fr_140px_130px_130px_110px] items-center px-4 py-4 hover:bg-slate-50/60 transition-colors text-[13px]">
+
+        <!-- Action Menu -->
+        <div class="flex items-center justify-center relative">
+          <button (click)="$event.stopPropagation(); toggleMenu(r.id ?? i)"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-[#4F8CD4] hover:bg-[#4F8CD4]/5 border border-transparent hover:border-[#4F8CD4]/20 transition-all">
+            <app-icon name="dots" [size]="18"></app-icon>
+          </button>
+          <!-- Floating Dropdown -->
+          @if (openMenuId() === (r.id ?? i)) {
+            <div class="absolute top-full right-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden py-1"
+                 (click)="$event.stopPropagation()">
+              <button class="w-full text-right px-4 py-2.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <app-icon name="eye" [size]="14"></app-icon>
+                عرض التفاصيل
+              </button>
+              <button class="w-full text-right px-4 py-2.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <app-icon name="pencil" [size]="14"></app-icon>
+                تعديل الاشتراك
+              </button>
+              <div class="border-t border-slate-100 my-1"></div>
+              <button class="w-full text-right px-4 py-2.5 text-[13px] font-semibold text-rose-500 hover:bg-rose-50 transition-colors flex items-center gap-2">
+                <app-icon name="trash" [size]="14"></app-icon>
+                إلغاء الاشتراك
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Student Name -->
+        <div class="font-bold text-slate-800 truncate">{{ r.studentName }}</div>
+
+        <!-- Plan -->
+        <div class="font-semibold text-slate-600 truncate">{{ r.plan }}</div>
+
+        <!-- Amount -->
+        <div class="font-black text-slate-800">
+          {{ r.amount }} <span class="text-[11px] font-semibold text-slate-400">ر.س</span>
+        </div>
+
+        <!-- Date -->
+        <div class="font-semibold text-slate-500">{{ r.createdAt | date:'shortDate' }}</div>
+
+        <!-- Status Badge — clean blue/slate, no green -->
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                [class.bg-[#4F8CD4]/10]="r.status === 'مدفوع'"
+                [class.text-[#4F8CD4]]="r.status === 'مدفوع'"
+                [class.bg-amber-50]="r.status === 'معلق'"
+                [class.text-amber-600]="r.status === 'معلق'"
+                [class.bg-slate-100]="r.status === 'ملغى'"
+                [class.text-slate-500]="r.status === 'ملغى'">
+            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+            {{ r.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredRecords().length === 0"
+         class="flex flex-col items-center justify-center py-16 text-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400">
+        <app-icon name="search" [size]="20"></app-icon>
+      </div>
+      <div>
+        <p class="text-[15px] font-black text-slate-700">لا توجد نتائج</p>
+        <p class="text-[13px] font-semibold text-slate-400 mt-1">لم يتم العثور على أي اشتراكات مطابقة لعملية البحث.</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="filteredRecords().length > 0"
+         class="flex items-center justify-center gap-4 px-6 py-4 border-t border-slate-100 bg-slate-50/40">
+      <button class="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 flex items-center justify-center transition-all shadow-sm">
+        <app-icon name="chevron-right" [size]="14"></app-icon>
+      </button>
+      <span class="text-[13px] font-bold text-slate-500">
+        الصفحة {{ currentPage() }} من {{ totalPages }}
+      </span>
+      <button class="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 hover:border-slate-300 flex items-center justify-center transition-all shadow-sm">
+        <app-icon name="chevron-left" [size]="14"></app-icon>
+      </button>
+    </div>
+
+  </div>
+</div>

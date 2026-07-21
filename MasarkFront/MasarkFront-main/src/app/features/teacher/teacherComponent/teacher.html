@@ -1,0 +1,137 @@
+<div class="teacher-dashboard-container" dir="rtl">
+  <section class="teacher-hero">
+    <div class="teacher-hero__content">
+      <span class="teacher-hero__badge"><app-icon name="academic-cap" [size]="14"></app-icon> لوحة المدرس</span>
+      <h1>مرحبًا بك، أستاذنا</h1>
+      <p>تابع جدولك اليومي، طلابك، الواجبات والتصحيح من مكان واحد.</p>
+      <div class="teacher-hero__meta">
+        <span><app-icon name="calendar" [size]="14"></app-icon>{{ today }}</span>
+        <span><app-icon name="clock" [size]="14"></app-icon>لديك {{ sessions().length }} حصص اليوم</span>
+      </div>
+      <div class="quick-actions" aria-label="الإجراءات السريعة">
+        <a routerLink="/dashboard/teacher/assessment/assignments/create" class="quick-action primary">
+          <app-icon name="plus" [size]="17"></app-icon><span>إضافة واجب جديد</span>
+        </a>
+        <a routerLink="/dashboard/teacher/assessment/exams/create" class="quick-action secondary">
+          <app-icon name="pencil-square" [size]="17"></app-icon><span>إنشاء اختبار</span>
+        </a>
+      </div>
+    </div>
+    <div class="teacher-hero__visual" aria-hidden="true">
+      <span class="hero-visual-ring"></span>
+      <span class="hero-visual-icon"><app-icon name="academic-cap" [size]="39"></app-icon></span>
+    </div>
+  </section>
+
+  <section class="teacher-stats-grid" aria-label="إحصائيات لوحة المدرس">
+    <article class="teacher-stat pending">
+      <span class="teacher-stat__icon"><app-icon name="clipboard" [size]="20"></app-icon></span>
+      <div><p>التصحيح المعلّق</p><strong>{{ isLoadingStats() ? '...' : pendingGradingCount() }}</strong><small>أعمال تحتاج إلى مراجعتك</small></div>
+    </article>
+    <article class="teacher-stat students">
+      <span class="teacher-stat__icon"><app-icon name="users" [size]="20"></app-icon></span>
+      <div><p>إجمالي الطلاب</p><strong>{{ stats()?.totalStudents ?? '...' }}</strong><small>طلابك المسجلون حاليًا</small></div>
+    </article>
+    <article class="teacher-stat courses">
+      <span class="teacher-stat__icon"><app-icon name="book-open" [size]="20"></app-icon></span>
+      <div><p>المقررات النشطة</p><strong>{{ stats()?.activeCourses ?? '...' }}</strong><small>المقررات المتاحة للتدريس</small></div>
+    </article>
+    <article class="teacher-stat performance">
+      <span class="teacher-stat__icon"><app-icon name="trend-up" [size]="20"></app-icon></span>
+      <div><p>متوسط الأداء</p><strong>{{ stats()?.averagePerformance ?? '...' }}٪</strong><small>متوسط أداء الطلاب</small></div>
+    </article>
+  </section>
+
+  <div class="teacher-dashboard-grid">
+    <section class="today-schedule-card">
+      <header class="dashboard-card-header">
+        <div class="dashboard-card-title">
+          <span><app-icon name="calendar" [size]="18"></app-icon></span>
+          <div><h2>جدول اليوم</h2><p>{{ today }}</p></div>
+        </div>
+        <span class="dashboard-count-badge">{{ sessions().length }} حصص</span>
+      </header>
+
+      <div class="schedule-content">
+        @if (isLoadingSessions()) {
+          <div class="schedule-loading" aria-label="جاري تحميل الحصص">
+            @for (item of [1,2,3]; track item) {
+              <div class="lesson-skeleton"><i></i><span><b></b><small></small></span></div>
+            }
+          </div>
+        } @else if (sessions().length === 0) {
+          <div class="schedule-empty">
+            <span class="schedule-empty__glow"></span>
+            <span class="schedule-empty__icon"><app-icon name="calendar" [size]="34"></app-icon></span>
+            <h3>لا توجد حصص متبقية اليوم</h3>
+            <p>يمكنك استثمار الوقت في مراجعة الواجبات أو تجهيز الاختبارات القادمة.</p>
+            <a routerLink="/dashboard/teacher/courses"><app-icon name="book-open" [size]="15"></app-icon>عرض المقررات</a>
+          </div>
+        } @else {
+          <div class="lessons-list">
+            @for (s of sessions(); track s.id) {
+              <article class="lesson-row" [class.live]="s.status === 'live'" [class.done]="s.status === 'done'">
+                <time>{{ s.time }}</time>
+                <div class="lesson-row__content">
+                  <h3>{{ s.title }}</h3>
+                  <p><span><app-icon name="book-open" [size]="12"></app-icon>{{ s.subject }}</span><span><app-icon name="building" [size]="12"></app-icon>{{ s.grade }}</span></p>
+                </div>
+                <div class="lesson-row__actions">
+                  <span class="lesson-status" [class.live]="s.status === 'live'" [class.upcoming]="s.status === 'upcoming'" [class.done]="s.status === 'done'">
+                    @if (s.status === 'live') { <i></i> }{{ sessionStatusLabel(s.status) }}
+                  </span>
+                  @if (s.status === 'live') {
+                    <button type="button" (click)="onSessionClick(s)">ابدأ الجلسة</button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <aside class="teacher-insights">
+      <section class="insight-card attendance-card">
+        <header><span><app-icon name="chart" [size]="17"></app-icon></span><div><h2>ملخص الحضور</h2><p>نظرة عامة على حضور الطلاب</p></div></header>
+        <div class="attendance-content">
+          <div class="attendance-ring" role="img" aria-label="نسبة الحضور 92 بالمائة">
+            <svg viewBox="0 0 96 96"><circle class="ring-track" cx="48" cy="48" r="36"></circle><circle class="ring-value" cx="48" cy="48" r="36"></circle></svg>
+            <span><b>٩٢٪</b><small>حضور</small></span>
+          </div>
+          <div class="attendance-legend">
+            <div><i class="present"></i><span>حضور</span><b>١١٤</b></div>
+            <div><i class="absent"></i><span>غائب</span><b>٥</b></div>
+            <div><i class="late"></i><span>متأخر</span><b>٣</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="insight-card grading-card" [class.is-clear]="pendingGradingCount() === 0">
+        <header><span><app-icon [name]="pendingGradingCount() === 0 ? 'check-circle' : 'clipboard-document-list'" [size]="18"></app-icon></span><div><h2>التصحيح المعلّق</h2><p>واجبات واختبارات بانتظار التصحيح</p></div></header>
+        <div class="grading-summary">
+          <strong>{{ isLoadingStats() ? '...' : pendingGradingCount() }}</strong>
+          <p>{{ pendingGradingCount() === 0 ? 'لا توجد أعمال معلقة حاليًا.' : 'عملًا يحتاج إلى المراجعة والتقييم.' }}</p>
+        </div>
+        <div class="grading-progress" [class.has-work]="pendingGradingCount() > 0"><span></span></div>
+        <a routerLink="/dashboard/teacher/assessment/grading">عرض لوحة التصحيح<app-icon name="chevron-left" [size]="13"></app-icon></a>
+      </section>
+
+      <section class="insight-card activities-card">
+        <header><span><app-icon name="bell" [size]="17"></app-icon></span><div><h2>الإشعارات الحديثة</h2><p>آخر التحديثات على أنشطتك</p></div></header>
+        <div class="activity-feed">
+          @if (activities().length === 0) {
+            <div class="activity-empty"><app-icon name="check-circle" [size]="22"></app-icon><span>لا توجد إشعارات حديثة</span></div>
+          } @else {
+            @for (a of activities().slice(0, 4); track $index) {
+              <article class="activity-feed__item">
+                <span class="activity-feed__icon"><app-icon name="clipboard-document" [size]="15"></app-icon></span>
+                <div><p>{{ a.text }}</p><time>{{ a.time }}</time></div><i aria-hidden="true"></i>
+              </article>
+            }
+          }
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>

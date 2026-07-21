@@ -1,0 +1,46 @@
+<div class="exams-page" dir="rtl">
+  <section class="exams-hero">
+    <div><span class="hero-badge">لوحة المدرس</span><h1>إدارة الاختبارات</h1><p>أنشئ الاختبارات وحدد وقتها، ثم تابع حالتها من مكان واحد منظم.</p></div>
+    <div class="hero-side">@if (selectedTaId() !== null) { <div class="hero-stat"><strong>{{ exams().length }}</strong><span>اختبار في الفصل</span></div> }<span class="hero-icon"><app-icon name="pencil" size="30"></app-icon></span></div>
+  </section>
+
+  <section class="exams-controls">
+    <div class="context-control"><label for="exam-context-select">الفصل والمقرر</label>
+      @if (isLoadingContext()) { <div class="select-skeleton"></div> }
+      @else { <div class="select-wrap"><span><app-icon name="book" size="17"></app-icon></span><select id="exam-context-select" [ngModel]="selectedTaId()" (ngModelChange)="selectAssignment($event)"><option [ngValue]="null" disabled>اختر الفصل الدراسي</option>@for (ta of teachingAssignments(); track ta.id) { <option [ngValue]="ta.id">{{ ta.subjectName }} — {{ ta.className }}</option> }</select><i><app-icon name="chevron-down" size="15"></app-icon></i></div> }
+    </div>
+    @if (selectedContext(); as context) { <div class="context-summary"><span><app-icon name="check-circle" size="16"></app-icon></span><div><small>الفصل المحدد</small><strong>{{ context.subjectName }}</strong></div><em>{{ context.className }}</em><b>{{ exams().length }} اختبار</b></div> }
+    <a class="create-exam" routerLink="/dashboard/teacher/assessment/exams/create"><app-icon name="plus" size="17"></app-icon><span>إنشاء اختبار جديد</span></a>
+  </section>
+
+  <section class="exams-section">
+    <header class="section-header"><div class="section-title"><span><app-icon name="clipboard-document-list" size="21"></app-icon></span><div><h2>الاختبارات</h2><p>عرض وإدارة اختبارات الفصل والمقرر المحددين.</p></div></div><div class="header-meta"><b>{{ exams().length }} اختبار</b><label><span>عرض</span><select [ngModel]="examsPageSize()" (ngModelChange)="changeExamsPageSize($event)"><option [ngValue]="10">10</option><option [ngValue]="20">20</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option></select><span>اختبار</span></label></div></header>
+
+    @if (isLoading()) {
+      <div class="loading-state" aria-label="جاري تحميل الاختبارات">@for (i of [1,2,3,4,5,6]; track i) { <div><span></span><span></span><span></span></div> }</div>
+    } @else if (errorMessage()) {
+      <div class="error-state" role="alert"><span><app-icon name="exclamation-triangle" size="25"></app-icon></span><div><h3>تعذّر تحميل الاختبارات</h3><p>{{ errorMessage() }}</p></div>@if (selectedTaId() !== null) { <button type="button" (click)="loadExams(selectedTaId()!)">إعادة المحاولة</button> }</div>
+    } @else if (exams().length === 0) {
+      <div class="empty-state"><div class="empty-visual"><span class="empty-icon"><app-icon name="pencil" size="36"></app-icon></span></div>
+        @if (selectedTaId() !== null) { <h3>لا توجد اختبارات بعد</h3><p>أنشئ أول اختبار للفصل المحدد، وحدد نافذة الإتاحة والأسئلة والدرجات.</p>@if (selectedContext(); as context) { <span class="empty-badge">{{ context.subjectName }} · {{ context.className }}</span> }<a class="create-exam" routerLink="/dashboard/teacher/assessment/exams/create"><app-icon name="plus" size="16"></app-icon><span>إنشاء أول اختبار</span></a> }
+        @else { <h3>اختر فصلًا لعرض الاختبارات</h3><p>استخدم القائمة أعلاه لتحديد الفصل والمقرر الذي تريد إدارته.</p> }
+      </div>
+    } @else {
+      <div class="table-scroll"><table class="exams-table"><thead><tr><th>عنوان الاختبار</th><th>المدة</th><th>نافذة الاختبار</th><th>الأسئلة والدرجات</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>
+        @for (e of paginatedExams(); track e.examId) { <tr>
+          <td><div class="exam-identity"><span><app-icon name="pencil" size="18"></app-icon></span><strong [title]="e.title">{{ e.title }}</strong></div></td>
+          <td><span class="duration"><app-icon name="clock" size="15"></app-icon>{{ e.durationMinutes }} دقيقة</span></td>
+          <td><div class="exam-window"><span><i>من</i>{{ e.startTime | date:'dd/MM/yyyy h:mm a' }}</span><span><i>إلى</i>{{ e.endTime | date:'dd/MM/yyyy h:mm a' }}</span></div></td>
+          <td><div class="exam-numbers"><span><strong>{{ e.questionCount }}</strong> سؤال</span><span><strong>{{ e.totalMarks }}</strong> درجة</span></div></td>
+          <td><span class="exam-status" [class.is-draft]="e.status === 'Draft'" [class.is-published]="e.status === 'Published'" [class.is-closed]="e.status === 'Closed'"><i></i>{{ statusLabel(e.status) }}</span></td>
+          <td><div class="exam-actions">@if (e.status === 'Draft') { <button type="button" class="publish" (click)="publishExam(e.examId)" title="نشر الاختبار"><app-icon name="check-badge" size="16"></app-icon><span>نشر</span></button> }@if (e.status === 'Published') { <button type="button" class="close" (click)="closeExam(e.examId)" title="إغلاق الاختبار"><app-icon name="x-mark" size="16"></app-icon><span>إغلاق</span></button> }@if (e.status === 'Closed') { <span class="no-actions">لا توجد إجراءات</span> }</div></td>
+        </tr> }
+      </tbody></table></div>
+      @if (exams().length > examsPageSize()) { <footer class="pagination"><p>عرض <strong>{{ examsRangeStart() }}–{{ examsRangeEnd() }}</strong> من أصل <strong>{{ exams().length }}</strong> اختبارًا</p><div>
+        <button type="button" (click)="setExamsPage(effectiveExamsPage() - 1)" [disabled]="effectiveExamsPage() === 1"><app-icon name="chevron-right" size="14"></app-icon><span>السابق</span></button>
+        @for (page of paginationPages(); track $index) { @if (page === 0) { <span class="ellipsis">…</span> } @else { <button type="button" (click)="setExamsPage(page)" [class.is-active]="page === effectiveExamsPage()" [attr.aria-current]="page === effectiveExamsPage() ? 'page' : null">{{ page }}</button> } }
+        <button type="button" (click)="setExamsPage(effectiveExamsPage() + 1)" [disabled]="effectiveExamsPage() === examsTotalPages()"><span>التالي</span><app-icon name="chevron-left" size="14"></app-icon></button>
+      </div></footer> }
+    }
+  </section>
+</div>

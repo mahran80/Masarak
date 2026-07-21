@@ -1,0 +1,214 @@
+<div class="wc-root">
+  <div class="wc-scroll">
+
+    <!-- ═══════════════════════════════ Day Headers ════════════════════════════════ -->
+    <div class="wc-header-row">
+      @for (day of days; track day.date) {
+        <button
+          type="button"
+          class="wc-day-header"
+          [class.is-today]="day.isToday"
+          [class.is-selected]="role === 'student' && selectedDayIndex === $index"
+          [attr.aria-pressed]="role === 'student' && selectedDayIndex === $index"
+          (click)="role === 'student' && selectDay($index)">
+          <p class="wc-day-name" [class.is-today]="day.isToday">{{ day.dayName }}</p>
+          <p class="wc-day-date" [class.is-today]="day.isToday">
+            {{ day.date | date:'d MMM' }}
+          </p>
+          @if (day.isToday) {
+            <span class="wc-today-badge">اليوم</span>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- ═══════════════════════════════ Day Body ═══════════════════════════════════ -->
+    <div class="wc-body-row">
+      @for (day of days; track day.date) {
+
+        <div
+          class="wc-day-cell"
+          [class.is-today]="day.isToday">
+
+          @if (day.sessions.length > 0) {
+
+            <!-- ── Lesson Cards ── -->
+            @for (s of day.sessions; track s.id) {
+              <div class="wc-lesson-card">
+
+                <!-- Status strip (right side for RTL) -->
+                <div
+                  class="wc-status-strip"
+                  [class.strip-scheduled]="s.status === 'Scheduled'"
+                  [class.strip-live]="s.status === 'Live'"
+                  [class.strip-completed]="s.status === 'Completed'"
+                  [class.strip-cancelled]="s.status === 'Cancelled'">
+                </div>
+
+                <!-- Card Content -->
+                <div class="wc-card-inner">
+
+                  <!-- Row 1: Title + Live indicator -->
+                  <div class="flex items-start justify-between gap-8px">
+                    <p class="wc-card-title">{{ s.title }}</p>
+                    @if (s.status === 'Live') {
+                      <div class="wc-live-ping">
+                        <div class="wc-live-dot-outer">
+                          <span class="wc-live-dot-ping"></span>
+                          <span class="wc-live-dot-core"></span>
+                        </div>
+                        <span class="wc-live-label">مباشر</span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Row 2: Subject -->
+                  <div class="wc-card-row">
+                    <span class="wc-card-dot dot-subject"></span>
+                    <span class="wc-card-text-subject">{{ s.subjectName }}</span>
+                  </div>
+
+                  <!-- Row 3: Teacher (admin / student) -->
+                  @if (role === 'admin' || role === 'student') {
+                    <div class="wc-card-row">
+                      <span class="wc-card-dot dot-teacher"></span>
+                      <span class="wc-card-text-teacher">أ. {{ s.teacherName }}</span>
+                    </div>
+                  }
+
+                  <!-- Row 3b: Class (admin / teacher) -->
+                  @if ((role === 'admin' || role === 'teacher') && s.className) {
+                    <div class="wc-card-row">
+                      <span class="wc-card-dot dot-class"></span>
+                      <span class="wc-card-text-class">{{ s.className }}</span>
+                    </div>
+                  }
+
+                  <!-- Row 4: Time + Duration -->
+                  <div class="wc-card-time-row">
+                    <span class="wc-card-time-text">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="color:#94A3B8;flex-shrink:0">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                      </svg>
+                      <span dir="ltr">{{ s.scheduledAt | date:'h:mm a' }}</span>
+                    </span>
+                    <span class="wc-card-duration-text">{{ s.durationMinutes }} د</span>
+                  </div>
+
+                </div>
+
+                <!-- ── Actions ── -->
+                @if (role === 'teacher' || role === 'student' || role === 'admin') {
+                  <div class="wc-card-actions">
+
+                    <!-- TEACHER actions -->
+                    @if (role === 'teacher') {
+                      @if (s.status === 'Scheduled') {
+                        <button
+                          type="button"
+                          class="wc-btn wc-btn-start"
+                          (click)="start.emit(s)"
+                          [disabled]="!canStartSession(s)">
+                          بدء الحصة
+                        </button>
+                      }
+                      @if (s.status === 'Live') {
+                        <div class="wc-btn-group">
+                          <button type="button" class="wc-btn wc-btn-join" (click)="join.emit(s)">انضمام</button>
+                          <button type="button" class="wc-btn wc-btn-complete" (click)="complete.emit(s)">إنهاء</button>
+                        </div>
+                      }
+                      @if (s.status === 'Completed') {
+                        <button type="button" class="wc-btn wc-btn-attendance" (click)="attendance.emit(s)">
+                          سجل الحضور
+                        </button>
+                      }
+                    }
+
+                    <!-- STUDENT actions -->
+                    @if (role === 'student') {
+                      @if (s.status === 'Live') {
+                        <button type="button" class="wc-btn wc-btn-join" (click)="join.emit(s)">
+                          انضمام الآن
+                        </button>
+                      } @else if (s.status === 'Scheduled') {
+                        <button type="button" class="wc-btn wc-btn-waiting" disabled>
+                          بانتظار البدء
+                        </button>
+                      }
+                    }
+
+                    <!-- ADMIN actions -->
+                    @if (role === 'admin') {
+                      @if (s.status === 'Scheduled') {
+                        <button type="button" class="wc-btn wc-btn-cancel" (click)="cancel.emit(s)">
+                          إلغاء الحصة
+                        </button>
+                      }
+                      @if (s.status === 'Cancelled' || s.status === 'Completed') {
+                        <button type="button" class="wc-btn wc-btn-reactivate" (click)="edit.emit(s)">
+                          إعادة تنشيط
+                        </button>
+                      }
+                    }
+
+                  </div>
+                }
+
+              </div>
+            }
+
+          } @else {
+
+            <!-- ── Empty Day ── -->
+            <div class="wc-empty-day">
+              <div class="wc-empty-icon">
+                <app-icon name="calendar" [size]="20"></app-icon>
+              </div>
+              <p class="wc-empty-title">لا توجد حصص</p>
+              <p class="wc-empty-desc">يوم حر</p>
+            </div>
+
+          }
+
+        </div>
+      }
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="wc-bottom-border"></div>
+
+  </div>
+
+  @if (role === 'student' && days[selectedDayIndex]; as selectedDay) {
+    <section class="wc-student-agenda" aria-live="polite">
+      <div class="wc-agenda-heading">
+        <div>
+          <span>خطة اليوم</span>
+          <h2>{{ selectedDay.dayName }} · {{ selectedDay.date | date:'d MMMM' }}</h2>
+        </div>
+        <b>{{ selectedDay.sessions.length }} {{ selectedDay.sessions.length === 1 ? 'حصة' : 'حصص' }}</b>
+      </div>
+      @if (selectedDay.sessions.length > 0) {
+        <div class="wc-agenda-list">
+          @for (session of selectedDay.sessions; track session.id) {
+            <article class="wc-agenda-item">
+              <time dir="ltr">{{ session.scheduledAt | date:'h:mm a' }}</time>
+              <div class="wc-agenda-line"></div>
+              <div class="wc-agenda-copy">
+                <strong>{{ session.title }}</strong>
+                <span>{{ session.subjectName }} · أ. {{ session.teacherName }}</span>
+              </div>
+              <span class="wc-agenda-duration">{{ session.durationMinutes }} دقيقة</span>
+              @if (session.status === 'Live') {
+                <button type="button" class="wc-agenda-join" (click)="join.emit(session)">انضم الآن</button>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="wc-agenda-empty">لا توجد حصص في هذا اليوم.</div>
+      }
+    </section>
+  }
+</div>

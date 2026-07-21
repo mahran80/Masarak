@@ -1,0 +1,48 @@
+<main class="plans-page" dir="rtl">
+  <header class="plans-hero">
+    <div class="hero-copy"><span>خطط مرنة لكل طالب</span><h1>اختر خطتك التعليمية</h1><p>ابدأ رحلتك مع مسارك، وتعلّم بالطريقة والمدة التي تناسب أهدافك.</p></div>
+    <div class="hero-points"><span><b>✓</b> محتوى تعليمي متكامل</span><span><b>✓</b> مساعد ذكي للتعلم</span><span><b>✓</b> حصص ومراجعات مباشرة</span></div>
+  </header>
+
+  <section class="subscription-status">
+    <div class="status-icon"><app-icon name="academic-cap" size="22"></app-icon></div>
+    <div><small>اشتراكك الحالي</small><h2>لا توجد باقة نشطة حاليًا</h2><p>اختر إحدى الباقات التالية لتبدأ الوصول إلى مقرراتك ومزايا المنصة.</p></div>
+    <span class="status-badge">جاهز للبدء</span>
+  </section>
+
+  @if(error() && !loading()){
+    <section class="plans-error"><b>تعذر تحميل الباقات</b><span>{{ error() }}</span><button (click)="load()">إعادة المحاولة</button></section>
+  }
+
+  @if(loading()){
+    <div class="plans-grid">@for(item of [1,2,3];track item){<article class="plan-skeleton"><i></i><b></b><span></span><em></em></article>}</div>
+  } @else if(!error() && plans().length > 0){
+    <div class="plans-heading"><div><span>باقات الاشتراك</span><h2>استثمر في مستقبلك الدراسي</h2></div><p>يمكنك تغيير خطتك لاحقًا بكل سهولة</p></div>
+    <section class="plans-grid">
+      @for(plan of plans();track plan.planId;let i=$index){
+        <article class="plan-card" [class.featured-plan]="i === 1">
+          @if(i === 1){<div class="popular-ribbon">الأكثر اختيارًا</div>}
+          <div class="plan-top"><div class="plan-icon"><app-icon name="academic-cap" size="22"></app-icon></div><span class="plan-kind">{{ i === 0 ? 'مادة واحدة' : i === 1 ? 'شهري' : 'سنوي' }}</span></div>
+          <div class="plan-title"><h3>{{ i === 0 ? 'اشتراك حسب المادة' : i === 1 ? 'الاشتراك الشهري الشامل' : 'باقة المنهج الكامل' }}</h3><p>{{ i === 0 ? 'اختر المادة التي تحتاجها وركّز على هدفك.' : i === 1 ? 'وصول شامل لكل المواد بمرونة شهرية.' : 'رحلة تعليمية متكاملة طوال العام الدراسي.' }}</p></div>
+          <div class="plan-price"><strong>{{ plan.price }}</strong><span>{{ plan.currency }}</span><small>/ {{ plan.durationDays >= 365 ? 'عام' : 'شهر' }}</small></div>
+          <div class="price-note">صلاحية لمدة {{ plan.durationDays }} يومًا</div>
+          <ul>
+            <li><b>✓</b><span>{{ i === 0 ? 'وصول كامل للمادة المختارة' : 'وصول كامل لجميع المواد' }}</span></li>
+            <li><b>✓</b><span>المحتوى والدروس والواجبات والاختبارات</span></li>
+            <li [class.disabled-feature]="!plan.hasAi"><b>{{ plan.hasAi ? '✓' : '×' }}</b><span>مساعد التعلم المدعوم بالذكاء الاصطناعي</span></li>
+            <li [class.disabled-feature]="!plan.hasLiveClass"><b>{{ plan.hasLiveClass ? '✓' : '×' }}</b><span>الحصص والمراجعات المباشرة</span></li>
+          </ul>
+          <button class="select-plan" (click)="onSelectPlan(plan)" [disabled]="checkingOutPlanId() === plan.planId || disabledPlanId === plan.planId || isProcessingPlanId === plan.planId">
+            @if(checkingOutPlanId() === plan.planId || isProcessingPlanId === plan.planId){<span>جارٍ تجهيز الاشتراك...</span>}@else if(disabledPlanId === plan.planId){<span>باقتك الحالية</span>}@else{<span>اختر هذه الباقة</span><b>←</b>}
+          </button>
+          <p class="secure-note">دفع آمن • يمكنك الإلغاء في أي وقت</p>
+        </article>
+      }
+    </section>
+    @if(checkoutError()){<div class="checkout-error" role="alert">{{ checkoutError() }}</div>}
+  } @else if(!error()){
+    <section class="plans-empty"><div>▤</div><h2>لا تتوفر باقات حاليًا</h2><p>يرجى العودة لاحقًا للاطلاع على الباقات الجديدة.</p></section>
+  }
+
+  <section class="plans-help"><div><span>هل تحتاج مساعدة؟</span><h2>سنساعدك في اختيار الخطة المناسبة</h2><p>تواصل مع الدعم الفني لمعرفة الباقة الأنسب لاحتياجاتك الدراسية.</p></div><button type="button">تواصل مع الدعم</button></section>
+</main>

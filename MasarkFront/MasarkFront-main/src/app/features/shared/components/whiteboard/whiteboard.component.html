@@ -1,0 +1,45 @@
+<div class="whiteboard-container">
+  <div class="toolbar" *ngIf="canDraw">
+    <div class="tool-group">
+      <button (click)="setMode('draw')" [class.active]="currentMode === 'draw'" title="Draw">
+        <i class="fas fa-pen"></i>
+      </button>
+      <button (click)="setMode('erase')" [class.active]="currentMode === 'erase'" title="Erase">
+        <i class="fas fa-eraser"></i>
+      </button>
+
+      <button (click)="clearBoard()" class="clear-btn" title="Clear Board">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    
+    <div class="tool-group colors">
+      <button class="color-btn" style="background-color: #000000;" (click)="setColor('#000000')"></button>
+      <button class="color-btn" style="background-color: #e74c3c;" (click)="setColor('#e74c3c')"></button>
+      <button class="color-btn" style="background-color: #3498db;" (click)="setColor('#3498db')"></button>
+      <button class="color-btn" style="background-color: #2ecc71;" (click)="setColor('#2ecc71')"></button>
+      <button class="color-btn" style="background-color: #f1c40f;" (click)="setColor('#f1c40f')"></button>
+    </div>
+
+    <div class="tool-group sizes">
+      <button (click)="setSize(2)" [class.active]="currentSize === 2" class="size-btn size-small"></button>
+      <button (click)="setSize(5)" [class.active]="currentSize === 5" class="size-btn size-medium"></button>
+      <button (click)="setSize(10)" [class.active]="currentSize === 10" class="size-btn size-large"></button>
+    </div>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas #board
+            (mousedown)="startDrawing($event)"
+            (mousemove)="draw($event)"
+            (mouseup)="stopDrawing($event)"
+            (mouseout)="stopDrawing($event)"
+            (touchstart)="startDrawing($event)"
+            (touchmove)="draw($event)"
+            (touchend)="stopDrawing($event)">
+    </canvas>
+    <div class="readonly-overlay" *ngIf="!canDraw">
+      <span>Read-Only Mode</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,358 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  effect
+} from '@angular/core';
+import { DatePipe, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { of, catchError, forkJoin } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
+import { TeacherContextService } from '../../services/teacher-context.service';
+import { TeacherLessonsService } from '../../services/teacher-lessons.service';
+import { Lesson } from '../../models/teacher-lessons.model';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+
+export type ContentType = 'Video' | 'PDF' | 'Notes' | 'ExerciseSheet';
+export type InnerTab = 'files' | 'upload';
+
+interface TeachingAssignment {
+  id: number;
+  className: string;
+  subjectName: string;
+  academicYear: number;
+}
+
+interface ContentItem {
+  contentItemId: number;
+  type: ContentType;
+  sourceType: string;
+  title: string;
+  description?: string;
+  resourceUrl: string;
+  fileSizeBytes?: number;
+  createdAt: string;
+  isActive: boolean;
+  lessonId?: number;
+  lessonTitle?: string;
+}
+
+@Component({
+  selector: 'app-teacher-courses',
+  standalone: true,
+  imports: [NgClass, DatePipe, FormsModule, IconComponent],
+  templateUrl: './teacher-courses.html',
+  styleUrl: './teacher-courses.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class TeacherCourses implements OnInit {
+  private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly contextService = inject(TeacherContextService);
+  private readonly lessonsService = inject(TeacherLessonsService);
+  private readonly teacherBaseUrl = `${environment.apiUrl}/teacher`;
+
+  // ─── State ─────────────────────────────────────────────────────────────────
+  readonly contentItems = signal<ContentItem[]>([]);
+  readonly viewMode = signal<'list' | 'grid'>('list');
+  readonly filterType = signal<string>('الكل');
+  readonly coursesPage = signal(1);
+  readonly coursesPageSize = signal(9);
+  readonly filesPage = signal(1);
+  readonly filesPageSize = signal(8);
+
+  readonly isLoadingContent = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  
+  readonly lessons = signal<Lesson[]>([]);
+
+  // ─── Inner Tabs ────────────────────────────────────────────────────────────
+  readonly activeTab = signal<InnerTab>('files');
+
+  // ─── Upload Form ──────────────────────────────────────────────────────────
+  readonly uploadMode = signal<'file' | 'url'>('file');
+  readonly isUploading = signal(false);
+  readonly uploadError = signal<string | null>(null);
+  readonly uploadSuccess = signal<string | null>(null);
+
+  uploadTitle = '';
+  uploadDescription = '';
+  uploadContentType: ContentType = 'PDF';
+  uploadFile: File | null = null;
+  uploadUrl = '';
+  uploadLessonId: number | null = null;
+
+  readonly contentTypes: ContentType[] = ['Video', 'PDF', 'Notes', 'ExerciseSheet'];
+  readonly filterOptions = ['الكل', 'Video', 'PDF', 'Notes', 'ExerciseSheet'];
+
+  // ─── Computed ──────────────────────────────────────────────────────────────
+  readonly teachingAssignments = this.contextService.assignments;
+  readonly isLoadingAssignments = this.contextService.isLoading;
+  readonly selectedTaId = this.contextService.selectedAssignmentId;
+  readonly selectedAssignment = this.contextService.selectedAssignment;
+
+  readonly filteredContent = computed(() => {
+    const f = this.filterType();
+    return this.contentItems().filter((item) => f === 'الكل' || item.type === f);
+  });
+
+  readonly coursesTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.teachingAssignments().length / this.coursesPageSize()))
+  );
+  readonly paginatedAssignments = computed(() => {
+    const start = (this.coursesPage() - 1) * this.coursesPageSize();
+    return this.teachingAssignments().slice(start, start + this.coursesPageSize());
+  });
+  readonly coursesRangeStart = computed(() =>
+    this.teachingAssignments().length ? (this.coursesPage() - 1) * this.coursesPageSize() + 1 : 0
+  );
+  readonly coursesRangeEnd = computed(() =>
+    Math.min(this.coursesPage() * this.coursesPageSize(), this.teachingAssignments().length)
+  );
+
+  readonly filesTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredContent().length / this.filesPageSize()))
+  );
+  readonly paginatedContent = computed(() => {
+    const start = (this.filesPage() - 1) * this.filesPageSize();
+    return this.filteredContent().slice(start, start + this.filesPageSize());
+  });
+  readonly filesRangeStart = computed(() =>
+    this.filteredContent().length ? (this.filesPage() - 1) * this.filesPageSize() + 1 : 0
+  );
+  readonly filesRangeEnd = computed(() =>
+    Math.min(this.filesPage() * this.filesPageSize(), this.filteredContent().length)
+  );
+
+  constructor() {
+    // Watch for assignment changes and load content
+    effect(() => {
+      const taId = this.selectedTaId();
+      if (taId !== null) {
+        this.loadContent(taId);
+        this.loadLessons(taId);
+      } else {
+        this.contentItems.set([]);
+        this.lessons.set([]);
+      }
+    }, { allowSignalWrites: true });
+  }
+
+  ngOnInit(): void {
+    this.contextService.loadAssignments();
+  }
+
+  selectAssignment(taId: number): void {
+    this.contextService.selectAssignment(taId);
+    this.filterType.set('الكل');
+    this.filesPage.set(1);
+    this.activeTab.set('files');
+    this.resetUploadForm();
+  }
+
+  setCoursesPage(page: number): void {
+    this.coursesPage.set(Math.min(Math.max(page, 1), this.coursesTotalPages()));
+  }
+
+  changeCoursesPageSize(size: number | string): void {
+    this.coursesPageSize.set(Number(size));
+    this.coursesPage.set(1);
+  }
+
+  setFilesPage(page: number): void {
+    this.filesPage.set(Math.min(Math.max(page, 1), this.filesTotalPages()));
+  }
+
+  setContentFilter(filter: string): void {
+    this.filterType.set(filter);
+    this.filesPage.set(1);
+  }
+
+  setContentView(view: 'list' | 'grid'): void {
+    this.viewMode.set(view);
+    this.filesPage.set(1);
+  }
+
+  paginationPages(current: number, total: number): number[] {
+    if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+
+    const pages = new Set([1, total, current - 1, current, current + 1]);
+    const sorted = [...pages].filter((page) => page > 0 && page <= total).sort((a, b) => a - b);
+    const result: number[] = [];
+    sorted.forEach((page, index) => {
+      if (index && page - sorted[index - 1] > 1) result.push(0);
+      result.push(page);
+    });
+    return result;
+  }
+
+  switchTab(tab: InnerTab): void {
+    this.activeTab.set(tab);
+    this.uploadError.set(null);
+    this.uploadSuccess.set(null);
+  }
+
+  loadContent(taId: number): void {
+    this.isLoadingContent.set(true);
+    this.errorMessage.set(null);
+    this.http
+      .get<ContentItem[]>(`${this.teacherBaseUrl}/content/${taId}`)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err: HttpErrorResponse) => {
+          this.errorMessage.set(this.resolveError(err));
+          this.isLoadingContent.set(false);
+          return of([]);
+        }),
+      )
+      .subscribe((items) => {
+        this.contentItems.set(items.filter((i) => i.isActive));
+        this.isLoadingContent.set(false);
+      });
+  }
+
+  loadLessons(taId: number): void {
+    this.lessonsService.getLessons(taId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (lessonsData) => {
+          this.lessons.set(lessonsData.sort((a, b) => a.orderNum - b.orderNum));
+        },
+        error: (err) => console.error('Failed to load lessons', err)
+      });
+  }
+
+  openFile(url: string): void {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.uploadFile = input.files?.[0] ?? null;
+    if (this.uploadFile && !this.uploadTitle) {
+      this.uploadTitle = this.uploadFile.name.replace(/\.[^.]+$/, '');
+    }
+  }
+
+  submitUpload(): void {
+    const taId = this.selectedTaId();
+    if (!taId || !this.uploadTitle.trim()) {
+      this.uploadError.set('يرجى ملء حقل العنوان.');
+      return;
+    }
+    this.uploadMode() === 'file' ? this.submitFileUpload(taId) : this.submitUrlUpload(taId);
+  }
+
+  private submitFileUpload(taId: number): void {
+    if (!this.uploadFile) { this.uploadError.set('يرجى اختيار ملف.'); return; }
+
+    const formData = new FormData();
+    formData.append('file', this.uploadFile);
+    formData.append('teachingAssignmentId', String(taId));
+    formData.append('type', this.uploadContentType);
+    formData.append('title', this.uploadTitle.trim());
+    if (this.uploadDescription.trim()) formData.append('description', this.uploadDescription.trim());
+    if (this.uploadLessonId) formData.append('lessonId', String(this.uploadLessonId));
+
+    this.isUploading.set(true);
+    this.uploadError.set(null);
+    this.uploadSuccess.set(null);
+
+    this.http.post<ContentItem>(`${this.teacherBaseUrl}/content/file`, formData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (item) => {
+          this.contentItems.update((items) => [item, ...items]);
+          this.isUploading.set(false);
+          this.uploadSuccess.set(`تم رفع "${item.title}" بنجاح!`);
+          this.resetUploadForm();
+          setTimeout(() => { this.activeTab.set('files'); this.uploadSuccess.set(null); }, 1800);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isUploading.set(false);
+          this.uploadError.set(this.resolveError(err));
+        },
+      });
+  }
+
+  private submitUrlUpload(taId: number): void {
+    if (!this.uploadUrl.trim()) { this.uploadError.set('يرجى إدخال الرابط.'); return; }
+
+    const body = {
+      teachingAssignmentId: taId,
+      type: this.uploadContentType,
+      sourceType: 'URL',
+      title: this.uploadTitle.trim(),
+      description: this.uploadDescription.trim() || null,
+      url: this.uploadUrl.trim(),
+      lessonId: this.uploadLessonId || null,
+    };
+
+    this.isUploading.set(true);
+    this.uploadError.set(null);
+    this.uploadSuccess.set(null);
+
+    this.http.post<ContentItem>(`${this.teacherBaseUrl}/content/url`, body)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (item) => {
+          this.contentItems.update((items) => [item, ...items]);
+          this.isUploading.set(false);
+          this.uploadSuccess.set(`تمت إضافة "${item.title}" بنجاح!`);
+          this.resetUploadForm();
+          setTimeout(() => { this.activeTab.set('files'); this.uploadSuccess.set(null); }, 1800);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isUploading.set(false);
+          this.uploadError.set(this.resolveError(err));
+        },
+      });
+  }
+
+  private resetUploadForm(): void {
+    this.uploadTitle = '';
+    this.uploadDescription = '';
+    this.uploadContentType = 'PDF';
+    this.uploadFile = null;
+    this.uploadUrl = '';
+    this.uploadLessonId = null;
+    this.uploadError.set(null);
+  }
+
+  deleteContent(id: number): void {
+    if (!confirm('هل أنت متأكد من حذف هذا المحتوى؟')) return;
+    this.http.delete<void>(`${this.teacherBaseUrl}/content/${id}`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.contentItems.update((items) => items.filter((i) => i.contentItemId !== id)),
+        error: (err: HttpErrorResponse) => this.errorMessage.set(this.resolveError(err)),
+      });
+  }
+
+  typeIcon(type: string): string {
+    return ({ Video: 'play-circle', PDF: 'pdf', Notes: 'pencil-square', ExerciseSheet: 'clipboard-document-list' } as Record<string, string>)[type] ?? 'doc';
+  }
+
+  typeLabel(type: string): string {
+    return ({ Video: 'فيديو', PDF: 'PDF', Notes: 'ملاحظات', ExerciseSheet: 'ورقة تدريب' } as Record<string, string>)[type] ?? type;
+  }
+
+  formatBytes(bytes?: number): string {
+    if (!bytes) return '--';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private resolveError(err: HttpErrorResponse): string {
+    if (err.status === 0) return 'لا يمكن الوصول إلى الخادم. تحقق من اتصالك.';
+    const msg = err.error?.message ?? err.error?.detail ?? err.error?.error ?? null;
+    return msg ?? `حدث خطأ (${err.status}). الرجاء المحاولة مرة أخرى.`;
+  }
+}

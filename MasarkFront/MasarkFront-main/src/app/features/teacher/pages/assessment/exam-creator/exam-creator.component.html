@@ -1,0 +1,353 @@
+<div class="exam-builder-page" dir="rtl">
+  <!-- ── Page Header ── -->
+  <div class="exam-builder-hero">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-2xl font-black text-slate-900 flex items-center gap-2">
+        <app-icon name="pencil-square" size="28" class="text-blue-600"></app-icon>
+        إنشاء اختبار جديد
+      </h1>
+      <p class="text-sm font-semibold text-slate-400">إعداد اختبار وتحديد الأسئلة الخاصة به ونشره للطلاب.</p>
+    </div>
+    <div class="exam-hero-icon"><app-icon name="clipboard-document-list" size="30"></app-icon></div>
+  </div>
+
+  <!-- ── Stepper ── -->
+  <div class="exam-stepper">
+    <div class="flex items-center w-full justify-around relative">
+      <!-- Connection line -->
+      <div class="absolute top-1/2 left-1/4 right-1/4 h-[3px] bg-slate-100 -translate-y-1/2 z-0">
+        <div class="h-full bg-blue-600 transition-all duration-500" [style.width]="currentStep() === 2 ? '100%' : '0%'"></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="flex flex-col items-center gap-2 z-10">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-sm"
+             [class.bg-blue-600]="currentStep() >= 1" [class.text-white]="currentStep() >= 1"
+             [class.bg-slate-100]="currentStep() < 1" [class.text-slate-400]="currentStep() < 1">
+          <app-icon name="clipboard" size="18"></app-icon>
+        </div>
+        <span class="text-xs font-bold transition-colors duration-300" 
+              [class.text-blue-600]="currentStep() === 1" [class.text-slate-500]="currentStep() !== 1">
+          بيانات الاختبار
+        </span>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flex flex-col items-center gap-2 z-10">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 shadow-sm"
+             [class.bg-blue-600]="currentStep() === 2" [class.text-white]="currentStep() === 2"
+             [class.bg-slate-100]="currentStep() !== 2" [class.text-slate-400]="currentStep() !== 2">
+          <app-icon name="list-bullet" size="18"></app-icon>
+        </div>
+        <span class="text-xs font-bold transition-colors duration-300" 
+              [class.text-blue-600]="currentStep() === 2" [class.text-slate-500]="currentStep() !== 2">
+          إضافة الأسئلة
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Error Message ── -->
+  @if (errorMessage()) {
+    <div class="bg-rose-50 text-rose-600 p-4 rounded-2xl text-sm font-bold border border-rose-100 animate-fade-in flex items-center gap-2">
+      <app-icon name="exclamation-triangle" size="20" class="text-rose-500"></app-icon>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- ── STEP 1: EXAM META FORM ── -->
+  @if (currentStep() === 1) {
+    <form [formGroup]="examForm" (ngSubmit)="onSaveMeta()" class="exam-meta-form">
+      
+      <!-- Card Group 1: Basic Information -->
+      <div class="exam-form-section">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <app-icon name="book" size="18"></app-icon>
+          </div>
+          <h3 class="text-md font-black text-slate-800">المعلومات الأساسية</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Course Selection -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-500">المقرر الدراسي <span class="text-rose-500">*</span></label>
+            <div class="relative">
+              <select formControlName="teachingAssignmentId"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl pr-4 pl-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                @for (ta of teachingAssignments(); track ta.id) {
+                  <option [value]="ta.id">{{ ta.subjectName }} - {{ ta.className }}</option>
+                }
+              </select>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <app-icon name="chevron-down" size="16"></app-icon>
+              </span>
+            </div>
+            @if (examForm.get('teachingAssignmentId')?.touched && examForm.get('teachingAssignmentId')?.invalid) {
+              <p class="text-xs text-rose-500 font-bold mt-1">المقرر الدراسي مطلوب.</p>
+            }
+          </div>
+
+          <!-- Lesson Selection -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-500">الدرس (اختياري)</label>
+            <div class="relative">
+              <select formControlName="lessonId"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl pr-4 pl-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all appearance-none cursor-pointer">
+                <option value="">-- بدون درس / مادة عامة --</option>
+                @for (lesson of lessons(); track lesson.lessonId) {
+                  <option [value]="lesson.lessonId">{{ lesson.title }}</option>
+                }
+              </select>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <app-icon name="chevron-down" size="16"></app-icon>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exam Title -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-500">عنوان الاختبار <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="title" placeholder="مثال: اختبار منتصف الفصل - العلوم"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+        </div>
+
+        <!-- Instructions -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-500">التعليمات</label>
+          <textarea formControlName="instructions" rows="3" placeholder="تعليمات الاختبار للطلاب..."
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"></textarea>
+          <span class="text-[10px] text-slate-400 font-bold block mt-1">تلميح: أضف القواعد، عدد الأسئلة، ونسبة النجاح لتنبيه الطلاب.</span>
+        </div>
+      </div>
+
+      <!-- Card Group 2: Scheduling -->
+      <div class="exam-form-section">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <app-icon name="calendar" size="18"></app-icon>
+          </div>
+          <h3 class="text-md font-black text-slate-800">التوقيت والجدولة</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Start Time -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-500">وقت البدء <span class="text-rose-500">*</span></label>
+            <input type="datetime-local" formControlName="startTime"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          </div>
+          
+          <!-- End Time -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-500">وقت الانتهاء <span class="text-rose-500">*</span></label>
+            <input type="datetime-local" formControlName="endTime"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Group 3: Exam Settings -->
+      <div class="exam-form-section">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <app-icon name="clock" size="18"></app-icon>
+          </div>
+          <h3 class="text-md font-black text-slate-800">إعدادات الاختبار</h3>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-500">مدة الاختبار (بالدقائق) <span class="text-rose-500">*</span></label>
+          <div class="relative max-w-xs">
+            <input type="number" formControlName="durationMinutes" placeholder="60" min="1" max="600"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl pr-4 pl-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">دقائق</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky Footer Actions for Form Meta -->
+      <div class="exam-form-actions">
+        <div class="exam-form-actions-inner">
+          <button type="button" routerLink="/dashboard/teacher"
+            class="px-6 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-100 transition-colors">
+            إلغاء
+          </button>
+          
+          <button type="submit" [disabled]="isSubmitting()"
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2">
+            <span>{{ isSubmitting() ? 'جاري الحفظ...' : 'التالي' }}</span>
+            <app-icon name="chevron-left" size="16"></app-icon>
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+
+  <!-- ── STEP 2: ADD QUESTIONS ── -->
+  @if (currentStep() === 2) {
+    <div class="questions-workspace">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
+        <h3 class="text-lg font-black text-slate-900 flex items-center gap-2">
+          <app-icon name="list-bullet" size="22" class="text-blue-600"></app-icon>
+          أسئلة الاختبار
+          <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">{{ questions().length }}</span>
+        </h3>
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="openQuestionBank()"
+            class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-indigo-100 flex items-center gap-1.5">
+            <app-icon name="book-open" size="16"></app-icon> استيراد من بنك الأسئلة
+          </button>
+          <button type="button" (click)="openAddQuestion()"
+            class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-emerald-100 flex items-center gap-1.5">
+            <app-icon name="plus" size="16"></app-icon> إضافة سؤال
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        @for (q of questions(); track q.questionId) {
+          <div class="border border-slate-150 rounded-xl p-5 flex items-start justify-between bg-slate-50/50 hover:bg-slate-50 transition-all shadow-sm">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2.5 py-0.5 rounded-md border border-blue-100 uppercase">{{ q.type }}</span>
+                <span class="text-slate-400 text-xs font-bold">{{ q.marks }} درجات</span>
+              </div>
+              <p class="font-bold text-slate-800 text-sm leading-relaxed">{{ q.text }}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0 mr-4">
+              <button (click)="openEditQuestion(q)" class="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center gap-1">
+                <app-icon name="edit" size="14"></app-icon> تعديل
+              </button>
+              <button (click)="deleteQuestion(q.questionId)" class="text-rose-600 hover:text-rose-800 text-xs font-bold flex items-center gap-1">
+                <app-icon name="trash" size="14"></app-icon> حذف
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <!-- Modern premium empty state -->
+          <div class="text-center py-12 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/20 max-w-md mx-auto space-y-4">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+              <app-icon name="list-bullet" size="32"></app-icon>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-sm font-black text-slate-700">لم يتم إضافة أي أسئلة بعد</h4>
+              <p class="text-xs text-slate-400 font-semibold px-6">أضف أسئلة مخصصة أو قم باستيراد الأسئلة من بنك الأسئلة الخاص بالمقرر.</p>
+            </div>
+            <div class="pt-2 flex justify-center gap-2">
+              <button (click)="openQuestionBank()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                استيراد أسئلة
+              </button>
+              <button (click)="openAddQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                إضافة أول سؤال
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Sticky Footer Actions for Questions Edit -->
+      <div class="exam-form-actions">
+        <div class="exam-form-actions-inner">
+          <button type="button" (click)="currentStep.set(1)"
+            class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-2.5 rounded-xl text-sm transition-all">
+            السابق
+          </button>
+          
+          <button type="button" (click)="onPublishExam()" [disabled]="isSubmitting() || questions().length === 0"
+            class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2">
+            <app-icon name="check-circle" size="18"></app-icon>
+            <span>{{ isSubmitting() ? 'جاري النشر...' : 'نشر الاختبار' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Question Editor Overlay Modal ── -->
+  @if (showQuestionEditor()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 animate-scale-up">
+        <app-question-editor 
+          [examId]="createdExam()!.examId" 
+          [questionToEdit]="selectedQuestionForEdit()"
+          (saved)="onQuestionSaved($event)"
+          (cancelled)="closeQuestionEditor()">
+        </app-question-editor>
+      </div>
+    </div>
+  }
+
+  <!-- ── Question Bank Overlay Modal ── -->
+  @if (showQuestionBank()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 animate-scale-up">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+            <app-icon name="folder-open" size="22" class="text-indigo-600"></app-icon>
+            استيراد من بنك الأسئلة
+          </h2>
+          <button (click)="closeQuestionBank()" class="text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-lg hover:bg-slate-50">
+            <app-icon name="close" size="20"></app-icon>
+          </button>
+        </div>
+        
+        <!-- Modal Body Content -->
+        <div class="p-6 overflow-y-auto flex-1 space-y-4">
+          @if (isFetchingBank()) {
+            <div class="text-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p class="text-slate-500 font-bold mt-4 text-xs">جاري تحميل أسئلة المقرر من البنك...</p>
+            </div>
+          } @else {
+            @for (q of bankQuestions(); track q.questionId) {
+              <div class="border rounded-xl p-4 flex items-start gap-4 transition-all cursor-pointer hover:border-blue-300"
+                   [class.border-blue-500]="selectedBankQuestionIds().includes(q.questionId)"
+                   [class.bg-blue-50/40]="selectedBankQuestionIds().includes(q.questionId)"
+                   [class.border-slate-200]="!selectedBankQuestionIds().includes(q.questionId)"
+                   (click)="toggleBankQuestionSelection(q.questionId)">
+                <div class="mt-1">
+                  <input type="checkbox" 
+                         [checked]="selectedBankQuestionIds().includes(q.questionId)"
+                         (change)="toggleBankQuestionSelection(q.questionId); $event.stopPropagation()"
+                         class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                </div>
+                <div class="flex-1 space-y-2">
+                  <div class="flex items-center gap-2">
+                    <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-indigo-100 uppercase">{{ q.type }}</span>
+                    <span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-100">{{ q.difficulty }}</span>
+                    <span class="text-slate-400 text-xs font-bold">{{ q.marks }} درجات</span>
+                  </div>
+                  <p class="font-bold text-slate-800 text-sm leading-relaxed">{{ q.text }}</p>
+                </div>
+              </div>
+            } @empty {
+              <div class="text-center py-12 border-2 border-dashed border-slate-200 rounded-2xl max-w-sm mx-auto space-y-3">
+                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                  <app-icon name="exclamation-triangle" size="24"></app-icon>
+                </div>
+                <p class="text-slate-400 text-xs font-bold">لا توجد أسئلة مسجلة في بنك الأسئلة لهذا المقرر.</p>
+              </div>
+            }
+          }
+        </div>
+        
+        <!-- Modal Footer Buttons -->
+        <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 rounded-b-3xl">
+          <button (click)="closeQuestionBank()" class="px-6 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 transition-colors">
+            إلغاء
+          </button>
+          <button (click)="importSelectedQuestions()" 
+                  [disabled]="selectedBankQuestionIds().length === 0 || isSubmitting()"
+                  class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-xs hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm flex items-center gap-1.5">
+            <app-icon name="download" size="16"></app-icon>
+            استيراد ({{ selectedBankQuestionIds().length }})
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

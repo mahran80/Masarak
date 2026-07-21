@@ -1,0 +1,12 @@
+<article class="course-card" [class.course-card-selected]="selected()" dir="rtl">
+  <div class="course-accent"></div>
+  <header><div class="course-symbol">{{ course().subjectName.charAt(0) }}</div><span>مقرر دراسي</span></header>
+  <div class="course-copy"><small>{{ course().subjectArabicName || 'المادة الدراسية' }}</small><h3 [title]="course().subjectName">{{ course().subjectName }}</h3>
+    @if(course().description){<p>{{ course().description }}</p>}@else{<p class="no-description">ابدأ رحلتك في هذا المقرر واستكشف المحتوى والدروس المتاحة.</p>}
+  </div>
+  <dl>
+    <div><dt>المعلم</dt><dd [title]="course().teacherName">{{ course().teacherName || 'لم يحدد بعد' }}</dd></div>
+    <div><dt>الصف</dt><dd>{{ course().gradeName || '—' }}</dd></div>
+  </dl>
+  <button type="button" (click)="viewDetails.emit(course())"><span>{{ selected() ? 'المقرر محدد' : 'عرض تفاصيل المقرر' }}</span><b>←</b></button>
+</article>

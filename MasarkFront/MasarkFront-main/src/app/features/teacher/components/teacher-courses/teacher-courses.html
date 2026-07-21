@@ -1,0 +1,367 @@
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  
+  <!-- ─── Header ─── -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+    <div class="space-y-1">
+      <h1 class="text-xl font-bold text-slate-900">إدارة المحتوى الدراسي</h1>
+      <p class="text-xs text-slate-400 font-medium">رفع وإفراغ الملفات التعليمية وإدارة الموارد المتاحة للطلاب.</p>
+    </div>
+    @if (selectedTaId() !== null) {
+      <div class="flex items-center gap-2">
+        <button (click)="switchTab('files')" 
+                class="px-4 py-2 text-xs font-semibold rounded-lg border transition-colors focus:outline-none"
+                [class]="activeTab() === 'files' ? 'bg-slate-100 text-slate-800 border-slate-350' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'">
+          عرض الملفات
+        </button>
+        <button (click)="switchTab('upload')"
+                class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none flex items-center gap-1">
+          <app-icon name="plus" size="14"></app-icon>
+          رفع محتوى جديد
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- ─── Course Selector ─── -->
+  <section class="course-selection-section" aria-labelledby="courses-title">
+    <div class="course-selection-header">
+      <div class="course-selection-title">
+        <span class="course-selection-icon"><app-icon name="book" size="23"></app-icon></span>
+        <div>
+          <span class="section-eyebrow">المقررات المسندة إليك</span>
+          <h2 id="courses-title">اختر المقرر لإدارة محتواه</h2>
+          <p>اختر مقررًا لعرض الملفات التعليمية أو رفع محتوى جديد.</p>
+        </div>
+      </div>
+      @if (!isLoadingAssignments() && teachingAssignments().length > 0) {
+        <label class="page-size-control">
+          <span>عرض</span>
+          <select [ngModel]="coursesPageSize()" (ngModelChange)="changeCoursesPageSize($event)" aria-label="عدد المقررات في الصفحة">
+            @for (size of [6, 9, 12]; track size) { <option [ngValue]="size">{{ size }}</option> }
+          </select>
+          <span>مقررات</span>
+        </label>
+      }
+    </div>
+    @if (isLoadingAssignments()) {
+      <div class="courses-grid" aria-label="جاري تحميل المقررات">
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) { <div class="course-card course-card-skeleton"></div> }
+      </div>
+    } @else if (teachingAssignments().length === 0) {
+      <div class="empty-assignment-state"><app-icon name="exclamation-triangle" size="18"></app-icon><span>لم يتم تعيينك في أي مقرر حتى الآن. يرجى التواصل مع الإدارة.</span></div>
+    } @else {
+      <div class="courses-grid">
+        @for (ta of paginatedAssignments(); track ta.id) {
+          <button type="button" (click)="selectAssignment(ta.id)" class="course-card" [class.is-selected]="selectedTaId() === ta.id" [attr.aria-pressed]="selectedTaId() === ta.id">
+            <span class="course-icon"><app-icon name="book" size="18"></app-icon></span>
+            <span class="course-copy"><strong [title]="ta.subjectName">{{ ta.subjectName }}</strong><small><app-icon name="graduation" size="12"></app-icon>{{ ta.className }}</small></span>
+            @if (selectedTaId() === ta.id) { <span class="selected-indicator" aria-label="المقرر المحدد"><app-icon name="check" size="12"></app-icon></span> }
+          </button>
+        }
+      </div>
+      <nav class="pagination-bar pagination-wrapper" aria-label="صفحات المقررات">
+        <p>عرض <strong>{{ coursesRangeStart() }}–{{ coursesRangeEnd() }}</strong> من أصل <strong>{{ teachingAssignments().length }}</strong> مقررًا</p>
+        <div class="pagination-actions">
+          <button type="button" class="pagination-nav" (click)="setCoursesPage(coursesPage() - 1)" [disabled]="coursesPage() === 1"><app-icon name="chevron-right" size="14"></app-icon><span>السابق</span></button>
+          @for (page of paginationPages(coursesPage(), coursesTotalPages()); track $index) {
+            @if (page === 0) { <span class="pagination-ellipsis">…</span> }
+            @else { <button type="button" class="pagination-page" (click)="setCoursesPage(page)" [class.is-active]="page === coursesPage()" [attr.aria-current]="page === coursesPage() ? 'page' : null">{{ page }}</button> }
+          }
+          <button type="button" class="pagination-nav" (click)="setCoursesPage(coursesPage() + 1)" [disabled]="coursesPage() === coursesTotalPages()"><span>التالي</span><app-icon name="chevron-left" size="14"></app-icon></button>
+        </div>
+      </nav>
+    }
+  </section>
+  <!-- ─── Content Panel ─── -->
+  @if (selectedTaId() !== null) {
+    <div class="files-workspace">
+      <header class="files-workspace-header">
+        <div class="files-heading">
+          @if (activeTab() === 'upload') {
+            <span class="files-heading-icon"><app-icon name="upload" size="24"></app-icon></span>
+            <div class="files-heading-copy">
+              <span class="upload-page-badge">إدارة المحتوى</span>
+              <h2>رفع محتوى جديد</h2>
+              <p>أضف موردًا تعليميًا جديدًا وحدّد نوعه والمقرر المرتبط به.</p>
+            </div>
+          } @else {
+            <span class="files-heading-icon"><app-icon name="folder-open" size="24"></app-icon></span>
+            <div class="files-heading-copy">
+              <h2>الملفات المرفوعة</h2>
+              <p>إدارة الملفات والموارد التعليمية الخاصة بالمقرر المحدد.</p>
+            </div>
+          }
+        </div>
+
+        <div class="files-header-actions">
+          @if (selectedAssignment(); as assignment) {
+            <div class="selected-course-summary">
+              <span class="selected-course-icon"><app-icon name="book" size="17"></app-icon></span>
+              <span class="selected-course-copy">
+                <small>المقرر الحالي</small>
+                <strong [title]="assignment.subjectName">{{ assignment.subjectName }}</strong>
+              </span>
+              <span class="selected-course-class">{{ assignment.className }}</span>
+            </div>
+          }
+
+          @if (activeTab() === 'files') {
+            <button type="button" class="files-primary-action" (click)="switchTab('upload')">
+              <app-icon name="upload" size="17"></app-icon><span>رفع محتوى جديد</span>
+            </button>
+          } @else {
+            <button type="button" class="files-back-action" (click)="switchTab('files')">
+              <app-icon name="arrow-right" size="16"></app-icon><span>العودة إلى الملفات</span>
+            </button>
+          }
+        </div>
+      </header>
+
+      @if (activeTab() === 'files') {
+        <div class="files-toolbar">
+          <div class="file-type-tabs" role="group" aria-label="تصفية الملفات حسب النوع">
+            @for (opt of filterOptions; track opt) {
+              <button type="button" (click)="setContentFilter(opt)" [class.is-active]="filterType() === opt">
+                @if (opt !== 'الكل') { <app-icon [name]="typeIcon(opt)" size="14"></app-icon> }
+                @else { <app-icon name="folder-open" size="14"></app-icon> }
+                <span>{{ opt === 'الكل' ? 'الكل' : typeLabel(opt) }}</span>
+              </button>
+            }
+          </div>
+
+          <div class="view-toggle" role="group" aria-label="طريقة عرض الملفات">
+            <button type="button" (click)="setContentView('list')" [class.is-active]="viewMode() === 'list'" aria-label="عرض قائمة" title="عرض قائمة">
+              <app-icon name="list-bullet" size="17"></app-icon>
+            </button>
+            <button type="button" (click)="setContentView('grid')" [class.is-active]="viewMode() === 'grid'" aria-label="عرض شبكي" title="عرض شبكي">
+              <app-icon name="squares-2x2" size="17"></app-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="files-content">
+          @if (errorMessage()) {
+            <div class="files-error-state" role="alert">
+              <span class="files-error-icon"><app-icon name="exclamation-triangle" size="26"></app-icon></span>
+              <div><h3>تعذّر تحميل الملفات</h3><p>{{ errorMessage() }}</p></div>
+              <button type="button" (click)="loadContent(selectedTaId()!)">إعادة المحاولة</button>
+            </div>
+          } @else if (isLoadingContent()) {
+            @if (viewMode() === 'grid') {
+              <div class="files-grid files-loading-grid">
+                @for (i of [1,2,3,4,5,6]; track i) { <div class="file-card file-card-skeleton"></div> }
+              </div>
+            } @else {
+              <div class="files-list files-loading-list">
+                @for (i of [1,2,3,4,5]; track i) { <div class="file-row file-row-skeleton"></div> }
+              </div>
+            }
+          } @else if (paginatedContent().length === 0) {
+            <div class="empty-files-state">
+              <div class="empty-files-visual" aria-hidden="true">
+                <span class="empty-file-chip chip-pdf"><app-icon name="pdf" size="14"></app-icon></span>
+                <span class="empty-file-chip chip-video"><app-icon name="video" size="14"></app-icon></span>
+                <span class="empty-files-icon"><app-icon name="folder-open" size="36"></app-icon></span>
+                <span class="empty-file-chip chip-doc"><app-icon name="doc" size="14"></app-icon></span>
+              </div>
+              <h3>لا توجد ملفات مرفوعة لهذا المقرر</h3>
+              <p>ابدأ برفع أول مورد تعليمي ليصبح متاحًا للطلاب.</p>
+              <button type="button" class="files-primary-action empty-files-action" (click)="switchTab('upload')">
+                <app-icon name="upload" size="17"></app-icon><span>رفع أول ملف</span>
+              </button>
+              <small>يمكنك رفع فيديوهات، ملفات PDF، ملاحظات وأوراق تدريب.</small>
+            </div>
+          } @else {
+            @if (viewMode() === 'list') {
+              <div class="files-list">
+                @for (item of paginatedContent(); track item.contentItemId) {
+                  <article class="file-row" [attr.data-file-type]="item.type">
+                    <a [href]="item.resourceUrl" target="_blank" rel="noopener noreferrer" class="file-row-main">
+                      <span class="file-type-icon"><app-icon [name]="typeIcon(item.type)" size="19"></app-icon></span>
+                      <span class="file-row-copy">
+                        <strong [title]="item.title">{{ item.title }}</strong>
+                        <span class="file-meta">
+                          <span class="file-type-label">{{ typeLabel(item.type) }}</span>
+                          @if (item.lessonTitle) { <span>درس: {{ item.lessonTitle }}</span> }
+                          <span>{{ item.createdAt | date:'dd/MM/yyyy' }}</span>
+                          @if (item.fileSizeBytes) { <span>{{ formatBytes(item.fileSizeBytes) }}</span> }
+                        </span>
+                      </span>
+                    </a>
+                    <div class="file-actions">
+                      <a [href]="item.resourceUrl" target="_blank" rel="noopener noreferrer" aria-label="عرض الملف" title="عرض الملف"><app-icon name="arrow-top-right-on-square" size="16"></app-icon></a>
+                      <button type="button" (click)="deleteContent(item.contentItemId)" class="delete-action" aria-label="حذف الملف" title="حذف الملف"><app-icon name="trash" size="16"></app-icon></button>
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="files-grid">
+                @for (item of paginatedContent(); track item.contentItemId) {
+                  <article class="file-card" [attr.data-file-type]="item.type">
+                    <div class="file-card-top">
+                      <span class="file-type-icon"><app-icon [name]="typeIcon(item.type)" size="22"></app-icon></span>
+                      <button type="button" (click)="deleteContent(item.contentItemId)" class="file-card-delete" aria-label="حذف الملف" title="حذف الملف"><app-icon name="trash" size="15"></app-icon></button>
+                    </div>
+                    <a [href]="item.resourceUrl" target="_blank" rel="noopener noreferrer" class="file-card-body">
+                      <strong [title]="item.title">{{ item.title }}</strong>
+                      @if (item.lessonTitle) { <span class="lesson-chip">درس: {{ item.lessonTitle }}</span> }
+                      <span class="file-card-meta"><span>{{ typeLabel(item.type) }}</span><span>{{ formatBytes(item.fileSizeBytes) }}</span></span>
+                    </a>
+                    <a [href]="item.resourceUrl" target="_blank" rel="noopener noreferrer" class="file-preview-action">
+                      <app-icon name="arrow-top-right-on-square" size="15"></app-icon><span>عرض الملف</span>
+                    </a>
+                  </article>
+                }
+              </div>
+            }
+          }
+
+          @if (!isLoadingContent() && !errorMessage() && filteredContent().length > 0) {
+            <nav class="pagination-bar files-pagination" aria-label="صفحات الملفات">
+              <p>عرض <strong>{{ filesRangeStart() }}–{{ filesRangeEnd() }}</strong> من أصل <strong>{{ filteredContent().length }}</strong> ملفًا</p>
+              <div class="pagination-actions">
+                <button type="button" class="pagination-nav" (click)="setFilesPage(filesPage() - 1)" [disabled]="filesPage() === 1"><app-icon name="chevron-right" size="14"></app-icon><span>السابق</span></button>
+                @for (page of paginationPages(filesPage(), filesTotalPages()); track $index) {
+                  @if (page === 0) { <span class="pagination-ellipsis">…</span> }
+                  @else { <button type="button" class="pagination-page" (click)="setFilesPage(page)" [class.is-active]="page === filesPage()" [attr.aria-current]="page === filesPage() ? 'page' : null">{{ page }}</button> }
+                }
+                <button type="button" class="pagination-nav" (click)="setFilesPage(filesPage() + 1)" [disabled]="filesPage() === filesTotalPages()"><span>التالي</span><app-icon name="chevron-left" size="14"></app-icon></button>
+              </div>
+            </nav>
+          }
+        </div>
+      }
+
+      <!-- ══════════════════════════════════════════════════════════════════════ -->      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      <!-- TAB: Upload New Content                                               -->
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      @if (activeTab() === 'upload') {
+        <div class="content-upload-page">
+          <div class="upload-method-tabs" role="group" aria-label="طريقة إضافة المحتوى">
+            <button type="button" (click)="uploadMode.set('file')" [class.is-active]="uploadMode() === 'file'" [attr.aria-pressed]="uploadMode() === 'file'">
+              <app-icon name="upload" size="16"></app-icon><span>رفع ملف محلي</span>
+            </button>
+            <button type="button" (click)="uploadMode.set('url')" [class.is-active]="uploadMode() === 'url'" [attr.aria-pressed]="uploadMode() === 'url'">
+              <app-icon name="link" size="16"></app-icon><span>إضافة رابط ويب</span>
+            </button>
+          </div>
+
+          <div class="content-upload-layout">
+            <main class="content-form-card">
+              <section class="form-section">
+                <div class="form-section-heading">
+                  <span class="form-section-number">01</span>
+                  <div><h3>المعلومات الأساسية</h3><p>أدخل عنوان المحتوى ووصفًا مختصرًا يساعد الطلاب على فهمه.</p></div>
+                </div>
+                <div class="form-grid">
+                  <div class="upload-field full-width">
+                    <label for="upload-title">عنوان المحتوى <span aria-hidden="true">*</span></label>
+                    <input id="upload-title" type="text" [(ngModel)]="uploadTitle" placeholder="مثال: ورقة تدريب الفصل الأول" />
+                  </div>
+                  <div class="upload-field full-width">
+                    <label for="upload-description">وصف قصير <small>اختياري</small></label>
+                    <textarea id="upload-description" [(ngModel)]="uploadDescription" placeholder="اكتب وصفًا مختصرًا لمحتوى المورد..." rows="4"></textarea>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="form-section-heading">
+                  <span class="form-section-number">02</span>
+                  <div><h3>نوع المحتوى</h3><p>اختر التصنيف الأنسب حتى يسهل على الطلاب الوصول إلى المورد.</p></div>
+                </div>
+                <div class="content-type-grid" role="radiogroup" aria-label="نوع المحتوى">
+                  @for (ct of contentTypes; track ct) {
+                    <button type="button" class="content-type-option" (click)="uploadContentType = ct" [class.is-selected]="uploadContentType === ct" role="radio" [attr.aria-checked]="uploadContentType === ct">
+                      @if (uploadContentType === ct) { <span class="type-selected-check"><app-icon name="check" size="11"></app-icon></span> }
+                      <span class="content-type-icon" [attr.data-content-type]="ct"><app-icon [name]="typeIcon(ct)" size="21"></app-icon></span>
+                      <strong>{{ typeLabel(ct) }}</strong>
+                    </button>
+                  }
+                </div>
+              </section>
+
+              <section class="form-section compact-form-section">
+                <div class="form-section-heading">
+                  <span class="form-section-number">03</span>
+                  <div><h3>إعدادات المقرر</h3><p>حدّد الدرس أو الوحدة التي يرتبط بها هذا المحتوى.</p></div>
+                </div>
+                <div class="upload-field lesson-field">
+                  <label for="upload-lesson">الربط بدرس</label>
+                  <div class="select-field-wrap">
+                    <span class="select-leading-icon"><app-icon name="book" size="16"></app-icon></span>
+                    <select id="upload-lesson" [(ngModel)]="uploadLessonId">
+                      <option [ngValue]="null">محتوى عام للمادة</option>
+                      @for (lesson of lessons(); track lesson.lessonId) { <option [ngValue]="lesson.lessonId">{{ lesson.title }}</option> }
+                    </select>
+                    <span class="select-chevron"><app-icon name="chevron-down" size="14"></app-icon></span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="form-section-heading">
+                  <span class="form-section-number">04</span>
+                  <div><h3>{{ uploadMode() === 'file' ? 'مرفق المحتوى' : 'رابط المحتوى' }}</h3><p>{{ uploadMode() === 'file' ? 'اختر الملف التعليمي الذي تريد إتاحته للطلاب.' : 'أضف رابطًا مباشرًا وآمنًا للمورد التعليمي.' }}</p></div>
+                </div>
+
+                @if (uploadMode() === 'file') {
+                  <label class="upload-dropzone" [class.has-file]="uploadFile" tabindex="0">
+                    <input type="file" (change)="onFileSelected($event)" aria-label="اختيار ملف للرفع" />
+                    @if (uploadFile) {
+                      <span class="selected-file-icon"><app-icon [name]="typeIcon(uploadContentType)" size="26"></app-icon></span>
+                      <div class="selected-file-copy"><strong [title]="uploadFile.name">{{ uploadFile.name }}</strong><span>{{ formatBytes(uploadFile.size) }}</span><small><app-icon name="check-circle" size="13"></app-icon> جاهز للرفع · اضغط لتغيير الملف</small></div>
+                    } @else {
+                      <span class="dropzone-icon"><app-icon name="upload" size="30"></app-icon></span>
+                      <strong>اسحب الملف هنا أو اضغط للاختيار</strong>
+                      <p>اختر ملفًا من جهازك لرفعه إلى المقرر.</p>
+                      <span class="browse-file-button">اختيار ملف</span>
+                      <small>PDF، MP4، DOCX، PPTX · الحد الأقصى 500 ميغابايت</small>
+                    }
+                  </label>
+                } @else {
+                  <div class="upload-field url-upload-field">
+                    <label for="upload-url">رابط ويب مباشر <span aria-hidden="true">*</span></label>
+                    <div class="url-field-wrap"><span><app-icon name="link" size="17"></app-icon></span><input id="upload-url" type="url" [(ngModel)]="uploadUrl" placeholder="https://youtube.com/watch?v=..." dir="ltr" /></div>
+                    <small>أدخل رابطًا مباشرًا يبدأ بـ https://</small>
+                  </div>
+                }
+              </section>
+
+              @if (uploadError()) {
+                <div class="upload-feedback is-error" role="alert"><app-icon name="exclamation-triangle" size="18"></app-icon><span>{{ uploadError() }}</span></div>
+              }
+              @if (uploadSuccess()) {
+                <div class="upload-feedback is-success" role="status"><app-icon name="check-circle" size="18"></app-icon><span>{{ uploadSuccess() }}</span></div>
+              }
+
+              <footer class="form-actions">
+                <button type="button" class="upload-cancel-button" (click)="switchTab('files')">إلغاء</button>
+                <button type="button" id="btn-submit-upload" class="upload-submit-button" (click)="submitUpload()" [disabled]="isUploading()">
+                  @if (isUploading()) { <span class="upload-spinner"></span><span>جاري الحفظ والرفع...</span> }
+                  @else if (uploadMode() === 'file') { <app-icon name="upload" size="17"></app-icon><span>حفظ ورفع المحتوى</span> }
+                  @else { <app-icon name="link" size="17"></app-icon><span>حفظ وإضافة الرابط</span> }
+                </button>
+              </footer>
+            </main>
+
+            <aside class="content-summary-panel" aria-label="ملخص المحتوى">
+              <div class="summary-panel-heading"><span><app-icon name="clipboard" size="18"></app-icon></span><div><h3>ملخص المحتوى</h3><p>راجع اختياراتك قبل الحفظ.</p></div></div>
+              @if (selectedAssignment(); as assignment) {
+                <div class="summary-course"><span><app-icon name="book" size="17"></app-icon></span><div><small>المقرر</small><strong>{{ assignment.subjectName }}</strong><em>{{ assignment.className }}</em></div></div>
+              }
+              <dl class="summary-list">
+                <div><dt>العنوان</dt><dd [class.is-empty]="!uploadTitle">{{ uploadTitle || 'لم يُحدد بعد' }}</dd></div>
+                <div><dt>نوع المحتوى</dt><dd><span class="summary-type-icon"><app-icon [name]="typeIcon(uploadContentType)" size="14"></app-icon></span>{{ typeLabel(uploadContentType) }}</dd></div>
+                <div><dt>{{ uploadMode() === 'file' ? 'الملف' : 'الرابط' }}</dt><dd [class.is-empty]="uploadMode() === 'file' ? !uploadFile : !uploadUrl">{{ uploadMode() === 'file' ? (uploadFile?.name || 'لم يُحدد بعد') : (uploadUrl || 'لم يُحدد بعد') }}</dd></div>
+              </dl>
+              <div class="summary-hint"><app-icon name="check-circle" size="16"></app-icon><span>تأكد من العنوان والمرفق قبل رفع المحتوى للطلاب.</span></div>
+            </aside>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
