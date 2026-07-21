@@ -255,8 +255,19 @@ namespace Masarak.API.Extensions
             services.AddSingleton<Masarak.Infrastructure.Services.AI.GeminiProvider>();
             services.AddSingleton<IAiProviderFactory, Masarak.Infrastructure.Services.AI.AiProviderFactory>();
 
-            services.AddScoped<IAiAnalyticsService, Masarak.Infrastructure.Services.AI.AiAnalyticsService>();
+            // Core analytics service registered under a key
+            services.AddKeyedScoped<IAiAnalyticsService, Masarak.Infrastructure.Services.AI.AiAnalyticsService>("core");
 
+            // New hybrid components
+            services.AddScoped<IHybridQuotaService, Masarak.Infrastructure.Services.AI.Hybrid.HybridQuotaService>();
+            services.AddScoped<IHybridAuditLogger, Masarak.Infrastructure.Services.AI.Hybrid.HybridAuditLogger>();
+            services.AddScoped<Masarak.Infrastructure.Services.AI.Hybrid.HybridIntentClassifier>();
+            services.AddScoped<Masarak.Infrastructure.Services.AI.Hybrid.HybridAuthGuard>();
+            services.AddScoped<Masarak.Infrastructure.Services.AI.Hybrid.HybridContextComposer>();
+            services.AddScoped<Masarak.Infrastructure.Services.AI.Hybrid.DeterministicResponseResolver>();
+
+            // Orchestrator as the default IAiAnalyticsService
+            services.AddScoped<IAiAnalyticsService, Masarak.Infrastructure.Services.AI.Hybrid.HybridAiOrchestrator>();
             // ── Phase 6 Notifications & Admin ─────────────────────────────────
             services.AddScoped<INotificationRepository, Masarak.Infrastructure.Persistence.Repositories.NotificationRepository>();
             services.AddScoped<IAdminUserRepository, Masarak.Infrastructure.Persistence.Repositories.AdminUserRepository>();

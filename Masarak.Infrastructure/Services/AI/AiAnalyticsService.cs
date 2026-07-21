@@ -24,6 +24,7 @@ namespace Masarak.Infrastructure.Services.AI
         private readonly IBus _bus;
         private readonly ILogger<AiAnalyticsService> _logger;
         private readonly ISubscriptionAccessService _accessService;
+        private readonly Hybrid.HybridContextComposer _contextComposer;
 
         public AiAnalyticsService(
             Context context,
@@ -35,7 +36,8 @@ namespace Masarak.Infrastructure.Services.AI
             IDistributedCache cache,
             IBus bus,
             ILogger<AiAnalyticsService> logger,
-            ISubscriptionAccessService accessService)
+            ISubscriptionAccessService accessService,
+            Hybrid.HybridContextComposer contextComposer)
         {
             _context = context;
             _recRepo = recRepo;
@@ -47,6 +49,7 @@ namespace Masarak.Infrastructure.Services.AI
             _bus = bus;
             _logger = logger;
             _accessService = accessService;
+            _contextComposer = contextComposer;
         }
 
         // ── Student: Learning Insights ──────────────────────────────────────
@@ -664,7 +667,10 @@ namespace Masarak.Infrastructure.Services.AI
                 return "No template configured.";
             var userPrompt = template.UserPromptTemplate;
             foreach (var kv in placeholders)
-                userPrompt = userPrompt.Replace($"{{{kv.Key}}}", kv.Value);
+            {
+                var safeValue = _contextComposer.SanitizeForPrompt(kv.Value);
+                userPrompt = userPrompt.Replace($"{{{kv.Key}}}", safeValue);
+            }
 
             var request = new AiPromptRequest(template.SystemPrompt, userPrompt, template.MaxTokens, template.Temperature);
 

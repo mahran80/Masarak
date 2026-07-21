@@ -26,6 +26,12 @@ import {
               رؤى التعلم الذكية
             </h1>
             <p class="text-sm text-slate-500 mt-1">تحليل نقاط الضعف والقوة لديك مع توصيات مخصصة بالذكاء الاصطناعي</p>
+            @if (data()?.dataSource === 'Cache') {
+              <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                <app-icon name="bolt" size="12"></app-icon>
+                من الذاكرة المؤقتة
+              </span>
+            }
           </div>
         </div>
       </div>
