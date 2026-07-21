@@ -1,9 +1,10 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-analytics.model';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-student-insight',
@@ -134,7 +135,7 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
               <span><app-icon name="sparkles" size="1.2em"></app-icon></span> اقتراح تعليمي من الذكاء الاصطناعي
             </h3>
             <button (click)="generateSuggestion()"
-                    [disabled]="isGenerating()"
+                    [disabled]="isGenerating() || isSuggestionDegraded()"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
               @if (isGenerating()) {
                 <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -150,6 +151,12 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
 
           @if (suggestion()) {
             <div class="bg-gradient-to-l from-indigo-50 to-violet-50 rounded-xl p-5 border border-indigo-100">
+              @if (isSuggestionDegraded()) {
+                <div class="mb-3 flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  <app-icon name="exclamation-triangle" size="14"></app-icon>
+                  تم تجاوز الحد اليومي — اقتراح مبسّط
+                </div>
+              }
               <p class="text-slate-700 leading-relaxed mb-4">{{ suggestion()!.suggestion }}</p>
               <h4 class="text-sm font-bold text-slate-800 mb-2">خطوات مقترحة:</h4>
               <ul class="space-y-2">
@@ -176,6 +183,12 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
 export class StudentInsightComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly aiService = inject(AiAnalyticsService);
+  private readonly toast = inject(ToastService);
+
+  isSuggestionDegraded = computed(() => {
+    const s = this.suggestion();
+    return s?.dataSource?.includes('Quota_Exceeded') ?? false;
+  });
 
   data = signal<StudentInsightDto | null>(null);
   suggestion = signal<TeachingSuggestionDto | null>(null);
@@ -219,6 +232,9 @@ export class StudentInsightComponent implements OnInit {
       next: (res) => {
         this.suggestion.set(res);
         this.isGenerating.set(false);
+        if (res.dataSource?.includes('Quota_Exceeded')) {
+          this.toast.warning('تم تجاوز الحد اليومي للذكاء الاصطناعي. الاقتراح المعروض مبسّط.');
+        }
       },
       error: () => {
         this.isGenerating.set(false);

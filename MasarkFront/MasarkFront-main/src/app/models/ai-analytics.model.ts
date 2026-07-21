@@ -51,6 +51,7 @@ export interface LearningInsightsDashboardDto {
   recommendations: ContentRecommendationDto[];
   activeAlerts: PerformanceAlertDto[];
   performanceTrends: PerformanceTrendDto[];
+  dataSource?: string;
 }
 
 export interface ParentReportDto {
@@ -61,6 +62,7 @@ export interface ParentReportDto {
   subjects: SubjectSummaryDto[];
   aiNarrative: string;
   generatedAt: string;
+  dataSource?: string;
 }
 
 export interface SubjectSummaryDto {
@@ -86,6 +88,7 @@ export interface TeachingSuggestionDto {
   suggestion: string;
   actionItems: string[];
   generatedAt: string;
+  dataSource?: string;
 }
 
 export interface StudentInsightDto {

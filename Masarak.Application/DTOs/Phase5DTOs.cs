@@ -32,7 +32,10 @@ namespace Masarak.Application.DTOs
         decimal AttendancePercentage,
         IEnumerable<SubjectSummaryDto> Subjects,
         string AiNarrative,
-        DateTime GeneratedAt);
+        DateTime GeneratedAt)
+    {
+        public string DataSource { get; init; } = "LLM";
+    }
 
     public record SubjectSummaryDto(
         string SubjectName,
@@ -54,7 +57,10 @@ namespace Masarak.Application.DTOs
         string SubjectName,
         string Suggestion,
         IEnumerable<string> ActionItems,
-        DateTime GeneratedAt);
+        DateTime GeneratedAt)
+    {
+        public string DataSource { get; init; } = "LLM";
+    }
 
     public record StudentInsightDto(
         string StudentName,
@@ -72,7 +78,10 @@ namespace Masarak.Application.DTOs
         IEnumerable<WeaknessAnalysisDto> SubjectAnalyses,
         IEnumerable<ContentRecommendationDto> Recommendations,
         IEnumerable<PerformanceAlertDto> ActiveAlerts,
-        IEnumerable<PerformanceTrendDto> PerformanceTrends);
+        IEnumerable<PerformanceTrendDto> PerformanceTrends)
+    {
+        public string DataSource { get; init; } = "LLM";
+    }
 
     public record PerformanceTrendDto(
         string SubjectName,

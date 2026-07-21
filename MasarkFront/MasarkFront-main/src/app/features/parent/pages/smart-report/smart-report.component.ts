@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import { ParentReportDto } from '../../../../models/ai-analytics.model';
+import { ToastService } from '../../../../core/services/toast.service';
 
 const AR = {
   PAGE_BADGE: "التقارير الذكية",
@@ -135,7 +136,7 @@ const EN = {
 
           <button 
             (click)="generateReport()"
-            [disabled]="isGenerating() || isLoading()"
+            [disabled]="isGenerating() || isLoading() || isQuotaExceeded()"
             class="btn-generate-report w-full sm:w-auto flex items-center justify-center gap-2"
           >
             @if (isGenerating()) {
@@ -190,7 +191,7 @@ const EN = {
             <p class="text-slate-500 dark:text-slate-400 text-xs md:text-sm mb-8 leading-relaxed max-w-xs font-bold">
               {{ t().EMPTY_DESC }}
             </p>
-            <button (click)="generateReport()" [disabled]="isGenerating()" class="btn-generate-report flex items-center justify-center gap-2">
+            <button (click)="generateReport()" [disabled]="isGenerating() || isQuotaExceeded()" class="btn-generate-report flex items-center justify-center gap-2">
               @if (isGenerating()) {
                 <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -234,7 +235,33 @@ const EN = {
           </div>
         </div>
 
-        <!-- 3. Performance Summary Grid -->
+         <!-- DataSource Indicator Banner -->
+        @if (report()?.dataSource && report()?.dataSource !== 'LLM') {
+          <div class="data-source-banner flex items-center gap-3 p-4 rounded-xl border text-sm font-bold mt-4"
+               [class.bg-blue-50]="isCached()"
+               [class.border-blue-200]="isCached()"
+               [class.text-blue-700]="isCached()"
+               [class.bg-amber-50]="isQuotaExceeded() && !isDegraded()"
+               [class.border-amber-200]="isQuotaExceeded() && !isDegraded()"
+               [class.text-amber-700]="isQuotaExceeded() && !isDegraded()"
+               [class.bg-orange-50]="isDegraded()"
+               [class.border-orange-200]="isDegraded()"
+               [class.text-orange-700]="isDegraded()"
+          >
+            @if (isCached()) {
+              <app-icon name="bolt" size="18"></app-icon>
+              <span>{{ lang() === 'ar' ? 'تم تحميل هذا التقرير من الذاكرة المؤقتة للحصول على استجابة أسرع.' : 'This report was loaded from cache for a faster response.' }}</span>
+            } @else if (isDegraded()) {
+              <app-icon name="exclamation-triangle" size="18"></app-icon>
+              <span>{{ lang() === 'ar' ? 'تم تجاوز الحد اليومي للذكاء الاصطناعي. هذا عرض مبسّط وسيتجدد غداً.' : 'Daily AI limit reached. This is a simplified view that will refresh tomorrow.' }}</span>
+            } @else if (isQuotaExceeded()) {
+              <app-icon name="exclamation-triangle" size="18"></app-icon>
+              <span>{{ lang() === 'ar' ? 'تم تجاوز الحد اليومي. يتم عرض آخر تقرير متاح.' : 'Daily limit reached. Showing last available report.' }}</span>
+            }
+          </div>
+         }
+
+         <!-- 3. Performance Summary Grid -->
         <div class="performance-summary-grid">
           <!-- Card 1: General Average -->
           <div class="performance-card flex flex-col justify-between p-6">
@@ -327,10 +354,22 @@ const EN = {
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-slate-400 dark:text-slate-500">{{ t().STATUS_LABEL }}</span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                @if (isDegraded()) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    {{ lang() === 'ar' ? 'مبسّط' : 'Simplified' }}
+                  </span>
+                } @else if (isCached()) {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    {{ lang() === 'ar' ? 'من الذاكرة' : 'Cached' }}
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   {{ lang() === 'ar' ? 'معتمد' : 'Verified' }}
                 </span>
+                }
               </div>
             </div>
           </div>
@@ -737,6 +776,23 @@ export class SmartReportComponent implements OnInit, OnDestroy {
   lang = signal<'ar' | 'en'>('ar');
   t = computed(() => this.lang() === 'ar' ? AR : EN);
   private observer?: MutationObserver;
+  private toast = inject(ToastService);
+
+  isQuotaExceeded = computed(() => {
+    const r = this.report();
+    if (!r?.dataSource) return false;
+    return r.dataSource.includes('Quota_Exceeded');
+  });
+
+  isCached = computed(() => {
+    const r = this.report();
+    return r?.dataSource === 'Cache';
+  });
+
+  isDegraded = computed(() => {
+    const r = this.report();
+    return r?.dataSource === 'Quota_Exceeded_Degraded';
+  });
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -821,6 +877,14 @@ export class SmartReportComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.report.set(res);
         this.isGenerating.set(false);
+         if (res.dataSource?.includes('Quota_Exceeded')) {
+          this.toast.warning(
+            this.lang() === 'ar'
+              ? 'تم تجاوز الحد اليومي للذكاء الاصطناعي. يتم عرض تقرير مبسّط.'
+              : 'Daily AI limit reached. Showing a simplified report.',
+            this.lang() === 'ar' ? 'تنبيه' : 'Notice'
+          );
+         }
       },
       error: () => {
         this.error.set(this.lang() === 'ar' ? 'فشل توليد التقرير بسبب مشكلة في السيرفر أو اشتراك غير فعال.' : 'Report generation failed due to a server error or inactive subscription.');
