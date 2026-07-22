@@ -235,7 +235,7 @@ const EN = {
           </div>
         </div>
 
-        <!-- DataSource Indicator Banner -->
+         <!-- DataSource Indicator Banner -->
         @if (report()?.dataSource && report()?.dataSource !== 'LLM') {
           <div class="data-source-banner flex items-center gap-3 p-4 rounded-xl border text-sm font-bold mt-4"
                [class.bg-blue-50]="isCached()"
@@ -259,9 +259,9 @@ const EN = {
               <span>{{ lang() === 'ar' ? 'تم تجاوز الحد اليومي. يتم عرض آخر تقرير متاح.' : 'Daily limit reached. Showing last available report.' }}</span>
             }
           </div>
-        }
+         }
 
-        <!-- 3. Performance Summary Grid -->
+         <!-- 3. Performance Summary Grid -->
         <div class="performance-summary-grid">
           <!-- Card 1: General Average -->
           <div class="performance-card flex flex-col justify-between p-6">
@@ -367,8 +367,8 @@ const EN = {
                 } @else {
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    {{ lang() === 'ar' ? 'معتمد' : 'Verified' }}
-                  </span>
+                  {{ lang() === 'ar' ? 'معتمد' : 'Verified' }}
+                </span>
                 }
               </div>
             </div>
@@ -877,14 +877,14 @@ export class SmartReportComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.report.set(res);
         this.isGenerating.set(false);
-        if (res.dataSource?.includes('Quota_Exceeded')) {
+         if (res.dataSource?.includes('Quota_Exceeded')) {
           this.toast.warning(
             this.lang() === 'ar'
               ? 'تم تجاوز الحد اليومي للذكاء الاصطناعي. يتم عرض تقرير مبسّط.'
               : 'Daily AI limit reached. Showing a simplified report.',
             this.lang() === 'ar' ? 'تنبيه' : 'Notice'
           );
-        }
+         }
       },
       error: () => {
         this.error.set(this.lang() === 'ar' ? 'فشل توليد التقرير بسبب مشكلة في السيرفر أو اشتراك غير فعال.' : 'Report generation failed due to a server error or inactive subscription.');

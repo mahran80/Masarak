@@ -1,11 +1,10 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
 import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-analytics.model';
 import { ToastService } from '../../../../core/services/toast.service';
-import { computed } from '@angular/core';
 
 @Component({
   selector: 'app-student-insight',
