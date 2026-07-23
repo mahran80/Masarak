@@ -108,21 +108,31 @@
 
           <!-- Date range (list mode) -->
           @if (viewMode() === 'list') {
-            <div class="date-range-wrap">
+            <div class="date-range-wrap flex items-center">
               <app-icon name="calendar" [size]="14" class="week-select-icon"></app-icon>
               <span class="date-range-label">من:</span>
-              <input
-                type="date"
-                class="date-range-input"
-                [ngModel]="fromDate()"
-                (ngModelChange)="fromDate.set($event); loadSessions()">
-              <div class="date-range-divider"></div>
+              <div class="relative flex items-center">
+                <input
+                  [matDatepicker]="pickerFrom"
+                  class="date-range-input"
+                  [ngModel]="fromDate()"
+                  (ngModelChange)="fromDate.set($event); loadSessions()"
+                  (click)="pickerFrom.open()">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerFrom" class="absolute left-1 scale-75 text-slate-400"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFrom></mat-datepicker>
+              </div>
+              <div class="date-range-divider mx-2"></div>
               <span class="date-range-label">إلى:</span>
-              <input
-                type="date"
-                class="date-range-input"
-                [ngModel]="toDate()"
-                (ngModelChange)="toDate.set($event); loadSessions()">
+              <div class="relative flex items-center">
+                <input
+                  [matDatepicker]="pickerTo"
+                  class="date-range-input"
+                  [ngModel]="toDate()"
+                  (ngModelChange)="toDate.set($event); loadSessions()"
+                  (click)="pickerTo.open()">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerTo" class="absolute left-1 scale-75 text-slate-400"></mat-datepicker-toggle>
+                <mat-datepicker #pickerTo></mat-datepicker>
+              </div>
             </div>
           }
         </div>
@@ -325,11 +335,17 @@
               التاريخ
               <span class="masarak-form-required" aria-hidden="true">*</span>
             </label>
-            <input
-              type="date"
-              class="masarak-form-input"
-              [ngModel]="formDate()"
-              (ngModelChange)="formDate.set($event)">
+            <div class="relative flex items-center">
+              <input
+                [matDatepicker]="pickerForm"
+                [min]="minDate"
+                class="masarak-form-input pr-10"
+                [ngModel]="formDate()"
+                (ngModelChange)="formDate.set($event)"
+                (click)="pickerForm.open()">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerForm" class="absolute left-1 scale-75 text-slate-400"></mat-datepicker-toggle>
+              <mat-datepicker #pickerForm panelClass="masarak-scheduling-datepicker"></mat-datepicker>
+            </div>
           </div>
           <div class="masarak-form-field flex-1">
             <label class="masarak-form-label">
@@ -379,11 +395,17 @@
                 تكرار حتى تاريخ
                 <span class="masarak-form-required" aria-hidden="true">*</span>
               </label>
-              <input
-                type="date"
-                class="masarak-form-input"
-                [ngModel]="formRecurUntil()"
-                (ngModelChange)="formRecurUntil.set($event)">
+              <div class="relative flex items-center">
+                <input
+                  [matDatepicker]="pickerRecur"
+                  [min]="minDate"
+                  class="masarak-form-input pr-10"
+                  [ngModel]="formRecurUntil()"
+                  (ngModelChange)="formRecurUntil.set($event)"
+                  (click)="pickerRecur.open()">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerRecur" class="absolute left-1 scale-75 text-slate-400"></mat-datepicker-toggle>
+                <mat-datepicker #pickerRecur panelClass="masarak-scheduling-datepicker"></mat-datepicker>
+              </div>
             </div>
           }
         </div>

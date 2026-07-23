@@ -156,6 +156,60 @@ export class AcademicManagementComponent implements OnInit, OnDestroy {
   }
 
   // ── UI HELPERS ──
+  getGradeImage(name: string = '', arName: string = ''): string {
+    const images = [
+      'media__1784694453431.jpg', // Backpack with books
+      'media__1784694459705.jpg', // Floating backpack
+      'media__1784694466479.jpg', // Microscope pink
+      'media__1784694470296.jpg', // Microscope blue
+      'media__1784694483496.jpg'  // Graduation cap laptop
+    ];
+    
+    // Create a deterministic hash based on the grade name
+    let hash = 0;
+    const keyStr = (name + arName).toLowerCase();
+    for (let i = 0; i < keyStr.length; i++) {
+      hash += keyStr.charCodeAt(i);
+    }
+    
+    // Pick one of the 5 images deterministically
+    const index = hash % images.length;
+    return `/assets/images/${images[index]}`;
+  }
+  getSubjectImage(name: string = '', arName: string = ''): string {
+    const n = name.toLowerCase();
+    const ar = arName || '';
+    let key = 'science';
+    
+    if (n.includes('math') || ar.includes('رياضيات')) key = 'math';
+    else if (n.includes('physic') || ar.includes('فيزياء')) key = 'physics';
+    else if (n.includes('chem') || ar.includes('كيمياء')) key = 'chemistry';
+    else if (n.includes('biolog') || ar.includes('أحياء') || ar.includes('احياء')) key = 'biology';
+    else if (n.includes('arabic') || n.includes('عربي') || ar.includes('عربية') || ar.includes('عربي') || ar.includes('اللغة العربية')) key = 'arabic';
+    else if (n.includes('english') || ar.includes('إنجليزية') || ar.includes('انجليزية') || ar.includes('اللغة الإنجليزية')) key = 'english';
+    else if (n.includes('french') || ar.includes('فرنسية') || ar.includes('فرنسي')) key = 'french';
+    else if (n.includes('computer') || n.includes('comput') || ar.includes('حاسب') || ar.includes('برمجة') || ar.includes('تكنولوجيا')) key = 'computer';
+    else if (n.includes('history') || ar.includes('تاريخ')) key = 'history';
+    else if (n.includes('geograph') || ar.includes('جغرافيا') || ar.includes('جغرافية')) key = 'geography';
+    else if (n.includes('islam') || ar.includes('إسلامية') || ar.includes('دين') || ar.includes('تربية إسلامية')) key = 'islamic';
+    
+    switch (key) {
+      case 'math': return '/assets/images/student/subject-mathematics-3d.png';
+      case 'science': return '/assets/images/student/subject-science-3d.png';
+      case 'arabic': return '/assets/images/student/subject-arabic-3d.png';
+      case 'english': return '/assets/images/student/subject-english-3d.png';
+      case 'computer': return '/assets/images/student/subject-computing-3d.png';
+      case 'chemistry': return '/assets/images/student/subject-chemistry-3d.jpg';
+      case 'physics': return '/assets/images/student/subject-physics-3d.jpg';
+      case 'biology': return '/assets/images/student/subject-biology-3d.jpg';
+      case 'history': return '/assets/images/student/subject-history-3d.jpg';
+      case 'geography': return '/assets/images/student/subject-geography-3d.jpg';
+      case 'islamic': return '/assets/images/student/subject-islamic-3d.jpg';
+      case 'french': return '/assets/images/student/subject-french-3d.jpg';
+      default: return '/assets/images/student/subject-science-3d.png';
+    }
+  }
+
   onGradeSelect(gid: number) {
     this.selectedGrade.set(gid);
     this.selectedClass.set(null);

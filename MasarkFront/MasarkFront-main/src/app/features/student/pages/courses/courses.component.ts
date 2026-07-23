@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { StudentCourseCardComponent } from '../../components/course-card/course-card.component';
 import { StudentCourse, StudentEntityId } from '../../models';
@@ -25,6 +25,7 @@ import { StudentService } from '../../services/student.service';
 export class StudentCoursesPageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   readonly courses = signal<StudentCourse[]>([]);
   readonly selectedSubjectId = signal<StudentEntityId | null>(null);
@@ -72,5 +73,6 @@ export class StudentCoursesPageComponent implements OnInit {
 
   selectCourse(course: StudentCourse): void {
     this.selectedSubjectId.set(course.subjectId);
+    this.router.navigate(['/dashboard/student/courses', course.subjectId]);
   }
 }

@@ -2,9 +2,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { StudentPerformance } from '../../models';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-student-performance-table',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './performance-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

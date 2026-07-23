@@ -16,7 +16,24 @@
       </div></section>
 
       <section class="form-section"><header class="section-heading"><span>03</span><div><h2>التسليم والتقييم</h2><p>حدّد آخر موعد للتسليم والدرجة القصوى للواجب.</p></div></header><div class="form-grid">
-        <div class="form-field"><label for="assignment-due-date" class="field-label"><app-icon name="calendar" size="15"></app-icon><span>آخر موعد للتسليم</span><b>*</b></label><div class="field-control"><app-icon name="calendar" size="17"></app-icon><input id="assignment-due-date" type="datetime-local" formControlName="dueDate" [class.is-invalid]="assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid" aria-describedby="date-error"></div>@if (assignmentForm.get('dueDate')?.touched && assignmentForm.get('dueDate')?.invalid) { <p id="date-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>موعد التسليم مطلوب.</p> }</div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-field">
+            <label for="assignment-due-date" class="field-label"><app-icon name="calendar" size="15"></app-icon><span>تاريخ التسليم</span><b>*</b></label>
+            <div class="field-control relative flex items-center pr-10">
+              <input id="assignment-due-date" [matDatepicker]="pickerDue" [min]="minDate" formControlName="dueDateDate" [class.is-invalid]="assignmentForm.get('dueDateDate')?.touched && assignmentForm.get('dueDateDate')?.invalid" aria-describedby="date-error" (click)="pickerDue.open()">
+              <mat-datepicker-toggle matIconSuffix [for]="pickerDue" class="absolute right-2 scale-75 text-slate-400"></mat-datepicker-toggle>
+              <mat-datepicker #pickerDue panelClass="masarak-scheduling-datepicker"></mat-datepicker>
+            </div>
+            @if (assignmentForm.get('dueDateDate')?.touched && assignmentForm.get('dueDateDate')?.invalid) { <p id="date-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>تاريخ التسليم مطلوب.</p> }
+          </div>
+          <div class="form-field">
+            <label for="assignment-due-time" class="field-label"><app-icon name="clock" size="15"></app-icon><span>وقت التسليم</span><b>*</b></label>
+            <div class="field-control">
+              <input id="assignment-due-time" type="time" formControlName="dueDateTime" [class.is-invalid]="assignmentForm.get('dueDateTime')?.touched && assignmentForm.get('dueDateTime')?.invalid">
+            </div>
+            @if (assignmentForm.get('dueDateTime')?.touched && assignmentForm.get('dueDateTime')?.invalid) { <p class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>وقت التسليم مطلوب.</p> }
+          </div>
+        </div>
         <div class="form-field"><label for="assignment-score" class="field-label"><app-icon name="trophy" size="15"></app-icon><span>الدرجة القصوى</span><b>*</b></label><div class="score-control"><div class="field-control"><app-icon name="trophy" size="17"></app-icon><input id="assignment-score" type="number" step="0.01" formControlName="maxScore" placeholder="100" min="0" max="1000" [class.is-invalid]="assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid" aria-describedby="score-error"></div><span>درجة</span></div>@if (assignmentForm.get('maxScore')?.touched && assignmentForm.get('maxScore')?.invalid) { <p id="score-error" class="field-error"><app-icon name="exclamation-triangle" size="13"></app-icon>درجة الواجب غير صالحة.</p> }</div>
       </div></section>
 
@@ -27,7 +44,7 @@
       <div><small>المقرر والفصل</small><strong>@for (ta of teachingAssignments(); track ta.id) { @if (ta.id == assignmentForm.get('teachingAssignmentId')?.value) { {{ ta.subjectName }} · {{ ta.className }} } } @if (!assignmentForm.get('teachingAssignmentId')?.value) { لم يُحدد بعد }</strong></div>
       <div><small>الدرس</small><strong>@if (assignmentForm.get('lessonId')?.value) { @for (lesson of lessons(); track lesson.lessonId) { @if (lesson.lessonId == assignmentForm.get('lessonId')?.value) { {{ lesson.title }} } } } @else { بدون درس محدد }</strong></div>
       <div><small>عنوان الواجب</small><strong>{{ assignmentForm.get('title')?.value || 'لم يُحدد بعد' }}</strong></div>
-      <div><small>موعد التسليم</small><strong dir="ltr">{{ assignmentForm.get('dueDate')?.value || 'لم يُحدد بعد' }}</strong></div>
+      <div><small>موعد التسليم</small><strong dir="ltr">{{ assignmentForm.get('dueDateDate')?.value ? (assignmentForm.get('dueDateDate')?.value | date:'shortDate') + ' ' + (assignmentForm.get('dueDateTime')?.value || '') : 'لم يُحدد بعد' }}</strong></div>
       <div><small>الدرجة القصوى</small><strong>{{ assignmentForm.get('maxScore')?.value ?? 'لم تُحدد بعد' }} درجة</strong></div>
     </div><div class="summary-note"><app-icon name="check-badge" size="17"></app-icon><p>سيتم حفظ الواجب ثم نشره مباشرة باستخدام الإعدادات الحالية.</p></div></aside>
   </form>

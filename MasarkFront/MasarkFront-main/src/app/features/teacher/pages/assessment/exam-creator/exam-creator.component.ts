@@ -9,11 +9,13 @@ import { TeacherAssessmentService } from '../../../services/teacher-assessment.s
 import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateExamRequest, TeacherExam, TeacherQuestion } from '../../../models/teacher-assessment.model';
 import { QuestionEditorComponent } from '../question-editor/question-editor.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-exam-creator',
   standalone: true,
-  imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
+  imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent, MatDatepickerModule, MatNativeDateModule],
   templateUrl: './exam-creator.component.html',
   styleUrl: './exam-creator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +27,8 @@ export class ExamCreatorComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
   private readonly lessonsService = inject(TeacherLessonsService);
+
+  readonly minDate = new Date();
 
   readonly currentStep = signal<1 | 2>(1);
   readonly createdExam = signal<TeacherExam | null>(null);
@@ -52,7 +56,9 @@ export class ExamCreatorComponent implements OnInit {
       lessonId: [''],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
+      startDate: ['', [Validators.required]],
       startTime: ['', [Validators.required]],
+      endDate: ['', [Validators.required]],
       endTime: ['', [Validators.required]],
       durationMinutes: [60, [Validators.required, Validators.min(1), Validators.max(600)]],
     });
@@ -92,12 +98,26 @@ export class ExamCreatorComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+    const startDVal = new Date(this.examForm.value.startDate);
+    const startTStr = this.examForm.value.startTime;
+    if (startTStr) {
+      const [h, m] = startTStr.split(':');
+      startDVal.setHours(parseInt(h, 10), parseInt(m, 10));
+    }
+
+    const endDVal = new Date(this.examForm.value.endDate);
+    const endTStr = this.examForm.value.endTime;
+    if (endTStr) {
+      const [h, m] = endTStr.split(':');
+      endDVal.setHours(parseInt(h, 10), parseInt(m, 10));
+    }
+
     const request: CreateExamRequest = {
       ...this.examForm.value,
       teachingAssignmentId: Number(this.examForm.value.teachingAssignmentId),
       lessonId: this.examForm.value.lessonId ? Number(this.examForm.value.lessonId) : undefined,
-      startTime: new Date(this.examForm.value.startTime).toISOString(),
-      endTime: new Date(this.examForm.value.endTime).toISOString(),
+      startTime: startDVal.toISOString(),
+      endTime: endDVal.toISOString(),
     };
 
     this.assessmentService.createExam(request)

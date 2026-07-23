@@ -1,0 +1,22 @@
+.ml-stat-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease !important;
+}
+
+.ml-stat-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.ml-stat-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+}
+
+.ml-stat-card:hover .ml-stat-icon {
+  transform: scale(1.08) rotate(3deg);
+}

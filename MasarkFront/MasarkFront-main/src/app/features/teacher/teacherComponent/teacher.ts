@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../shared/components/icon/icon.component';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -34,7 +34,7 @@ interface RecentActivity {
   templateUrl: './teacher.html',
   styleUrl: './teacher.css',
 })
-export class TeacherComponent implements OnInit {
+export class TeacherComponent implements OnInit, OnDestroy {
   private readonly assessmentService = inject(TeacherAssessmentService);
   private readonly sessionService = inject(TeacherSessionService);
   private readonly dashboardService = inject(TeacherDashboardService);
@@ -57,6 +57,41 @@ export class TeacherComponent implements OnInit {
   readonly activities = signal<RecentActivity[]>([]);
 
   readonly stats = signal<any>(null);
+
+  // Hero Slider State
+  readonly activeSlide = signal<number>(0);
+  private slideInterval: any;
+
+  ngOnDestroy(): void {
+    this.stopAutoSlide();
+  }
+
+  startAutoSlide(): void {
+    this.stopAutoSlide();
+    this.slideInterval = setInterval(() => {
+      this.nextSlide();
+    }, 6000);
+  }
+
+  stopAutoSlide(): void {
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+    }
+  }
+
+  setSlide(idx: number): void {
+    this.activeSlide.set(idx);
+    this.startAutoSlide(); // Reset
+  }
+
+  nextSlide(): void {
+    this.activeSlide.update(curr => (curr + 1) % 3);
+  }
+
+  prevSlide(): void {
+    this.activeSlide.update(curr => (curr - 1 + 3) % 3);
+  }
+
 
   ngOnInit(): void {
     this.dashboardService.getStats()

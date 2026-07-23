@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthApiService } from '../../core/services/auth-api-service';
 import { AuthStateService } from '../../core/services/auth-state-service';
@@ -35,6 +35,12 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   readonly lang = signal<'ar' | 'en'>('ar');
   readonly theme = signal<'light' | 'dark'>('light');
   readonly showLangDropdown = signal(false);
+  readonly dashboardFooterMessage = computed(() => {
+    const messages = this.lang() === 'ar'
+      ? ['استمر، كل درس يقربك من هدفك.', 'خطوة صغيرة اليوم تصنع فرقًا كبيرًا غدًا.', 'رحلتك التعليمية تستحق أن تفتخر بها.']
+      : ['Keep going — every lesson brings you closer to your goal.', 'A small step today makes a big difference tomorrow.', 'Your learning journey is worth celebrating.'];
+    return messages[new Date().getDate() % messages.length];
+  });
 
   get userInitials(): string {
     const name = this.userName()?.fullName;
@@ -59,6 +65,19 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     };
     const label = labels[normalized];
     return label ? label[this.lang()] : (role || (this.lang() === 'ar' ? 'مستخدم' : 'User'));
+  }
+
+  roleContext(role: string | null | undefined): string {
+    const normalized = (role ?? '').replace(/[\s_-]/g, '').toLowerCase();
+    const contexts: Record<string, { ar: string; en: string }> = {
+      student: { ar: 'رحلتك التعليمية', en: 'Your learning journey' },
+      teacher: { ar: 'إدارة صفوفك ومحتواك', en: 'Manage your classes and content' },
+      parent: { ar: 'متابعة الأبناء', en: 'Follow your children’s progress' },
+      admin: { ar: 'إدارة المنصة', en: 'Platform administration' },
+      administrator: { ar: 'إدارة المنصة', en: 'Platform administration' },
+      systemadministrator: { ar: 'إدارة المنصة', en: 'Platform administration' },
+    };
+    return contexts[normalized]?.[this.lang()] ?? (this.lang() === 'ar' ? 'حساب مسارك' : 'Masarak account');
   }
   get isOnboarding(): boolean {
     return this.router.url.includes('/add-student');

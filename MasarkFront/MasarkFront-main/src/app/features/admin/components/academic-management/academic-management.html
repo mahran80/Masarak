@@ -107,18 +107,29 @@
               @for (g of grades(); track g.gradeId) {
                 <div
                   (click)="onGradeSelect(g.gradeId); setTab('subjects')"
-                  class="grade-card group">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="grade-icon-container">
-                      <app-icon name="academic-cap" [size]="18"></app-icon>
-                    </div>
-                    <span class="grade-arrow-btn">
+                  class="grade-card group !p-0 overflow-hidden flex flex-col h-full border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(37,99,235,0.12)] transition-all duration-300 rounded-[24px] bg-white dark:bg-[#1E293B] cursor-pointer">
+                  
+                  <!-- Arrow overlay -->
+                  <div class="absolute top-3 left-3 flex items-start justify-between z-20 pointer-events-none">
+                    <span class="pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-white/60 dark:bg-slate-800/60 text-slate-500 group-hover:bg-white group-hover:text-blue-600 dark:group-hover:bg-slate-700 dark:text-slate-300 dark:group-hover:text-blue-400 backdrop-blur-md shadow-sm transition-all duration-300 transform group-hover:-translate-x-1">
                       <app-icon name="chevron-left" [size]="14"></app-icon>
                     </span>
                   </div>
-                  <div class="space-y-1">
-                    <p class="font-bold text-slate-800 dark:text-slate-100 text-[15px]">{{ g.nameAr || g.name }}</p>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">{{ g.name }}</p>
+
+                  <!-- Image Area (65%) -->
+                  <div class="relative w-full h-[140px] bg-slate-50/50 dark:bg-slate-800/20 shrink-0 flex items-center justify-center p-4">
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-white dark:to-[#1E293B] opacity-40"></div>
+                    <img [src]="getGradeImage(g.name, g.nameAr)" [alt]="g.nameAr || g.name" class="w-full h-full object-contain relative z-10 drop-shadow-md group-hover:scale-105 transition-transform duration-500">
+                  </div>
+
+                  <!-- Text Area (35%) -->
+                  <div class="space-y-1.5 p-5 text-center flex-1 flex flex-col justify-end bg-white dark:bg-[#1E293B] relative z-20">
+                    <h3 class="font-black text-slate-800 dark:text-slate-100 text-[18px] tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {{ g.nameAr || g.name }}
+                    </h3>
+                    <p class="text-slate-400 dark:text-slate-500 text-[13px] font-medium tracking-wide uppercase">
+                      {{ g.name }}
+                    </p>
                   </div>
                 </div>
               }
@@ -200,25 +211,30 @@
             <div class="subjects-grid">
               @for (s of subjects(); track s.subjectId) {
                 <div class="subject-card group">
-                  <div class="flex items-center justify-between">
-                    <div class="subject-icon-container">
-                      <app-icon name="book-open" [size]="18"></app-icon>
-                    </div>
+                  <!-- Top actions overlay -->
+                  <div class="absolute top-3 left-3 flex items-start justify-between z-20 pointer-events-none">
                     <button
                       (click)="openModal('subject', 'edit', s)"
-                      class="subject-edit-btn"
+                      class="pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:bg-white hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 shadow-sm border border-slate-100 dark:border-slate-700 transition-all duration-300 transform hover:scale-110"
                       title="تعديل المادة"
                       aria-label="تعديل المادة">
                       <app-icon name="pencil" [size]="14"></app-icon>
                     </button>
                   </div>
-                  <div class="space-y-1 pt-4 text-right">
-                    <p class="font-bold text-slate-800 dark:text-slate-100 text-[16px]">{{ s.nameAr || s.name }}</p>
-                    <div class="inline-flex">
-                      <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[11px] font-mono rounded font-bold">
-                        {{ s.code }}
-                      </span>
-                    </div>
+
+                  <!-- Image Area -->
+                  <div class="subject-card-img-wrap bg-slate-50/50 dark:bg-slate-800/30">
+                    <img [src]="getSubjectImage(s.name, s.nameAr)" onerror="this.src='/assets/images/media__1784690589519.jpg'" [alt]="s.nameAr || s.name" class="drop-shadow-md">
+                  </div>
+
+                  <!-- Text Area -->
+                  <div class="p-4 text-center flex-1 flex flex-col justify-center bg-white dark:bg-[#1E293B] relative z-20">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-[18px] tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {{ s.nameAr || s.name }}
+                    </h3>
+                    <p class="text-slate-400 dark:text-slate-500 text-[12px] mt-1 tracking-wider uppercase font-semibold">
+                      {{ s.name || s.code }}
+                    </p>
                   </div>
                 </div>
               }

@@ -1,4 +1,4 @@
-<div class="wc-root">
+<div class="wc-root wc-agenda-mode">
   <div class="wc-scroll">
 
     <!-- ═══════════════════════════════ Day Headers ════════════════════════════════ -->
@@ -8,9 +8,9 @@
           type="button"
           class="wc-day-header"
           [class.is-today]="day.isToday"
-          [class.is-selected]="role === 'student' && selectedDayIndex === $index"
-          [attr.aria-pressed]="role === 'student' && selectedDayIndex === $index"
-          (click)="role === 'student' && selectDay($index)">
+          [class.is-selected]="selectedDayIndex === $index"
+          [attr.aria-pressed]="selectedDayIndex === $index"
+          (click)="selectDay($index)">
           <p class="wc-day-name" [class.is-today]="day.isToday">{{ day.dayName }}</p>
           <p class="wc-day-date" [class.is-today]="day.isToday">
             {{ day.date | date:'d MMM' }}
@@ -18,17 +18,26 @@
           @if (day.isToday) {
             <span class="wc-today-badge">اليوم</span>
           }
+          <span class="wc-day-count">{{ day.sessions.length }} حصة</span>
         </button>
       }
     </div>
 
     <!-- ═══════════════════════════════ Day Body ═══════════════════════════════════ -->
+    @if (days[selectedDayIndex]; as selectedDay) {
+      <div class="wc-selected-day-summary">
+        <div class="wc-selected-day-date"><span>{{ selectedDay.dayName }}</span><b>{{ selectedDay.date | date:'d MMMM' }}</b></div>
+        <div><strong>{{ selectedDay.sessions.length }} {{ selectedDay.sessions.length === 1 ? 'حصة' : 'حصص' }}</strong><small>ضمن جدول هذا الأسبوع</small></div>
+      </div>
+    }
+
     <div class="wc-body-row">
       @for (day of days; track day.date) {
 
         <div
           class="wc-day-cell"
-          [class.is-today]="day.isToday">
+          [class.is-today]="day.isToday"
+          [class.is-selected]="selectedDayIndex === $index">
 
           @if (day.sessions.length > 0) {
 
@@ -162,9 +171,7 @@
 
             <!-- ── Empty Day ── -->
             <div class="wc-empty-day">
-              <div class="wc-empty-icon">
-                <app-icon name="calendar" [size]="20"></app-icon>
-              </div>
+            <img class="wc-empty-illustration" src="/assets/images/student/schedule-empty-3d.png" alt="">
               <p class="wc-empty-title">لا توجد حصص</p>
               <p class="wc-empty-desc">يوم حر</p>
             </div>

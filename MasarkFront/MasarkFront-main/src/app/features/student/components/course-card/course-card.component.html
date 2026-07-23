@@ -1,12 +1,50 @@
-<article class="course-card" [class.course-card-selected]="selected()" dir="rtl">
-  <div class="course-accent"></div>
-  <header><div class="course-symbol">{{ course().subjectName.charAt(0) }}</div><span>مقرر دراسي</span></header>
-  <div class="course-copy"><small>{{ course().subjectArabicName || 'المادة الدراسية' }}</small><h3 [title]="course().subjectName">{{ course().subjectName }}</h3>
-    @if(course().description){<p>{{ course().description }}</p>}@else{<p class="no-description">ابدأ رحلتك في هذا المقرر واستكشف المحتوى والدروس المتاحة.</p>}
+<article class="course-card-premium" [class.course-card-premium--selected]="selected()" dir="rtl">
+  
+  <!-- Glowing border accent -->
+  <div class="card-glow-accent"></div>
+
+  <!-- Subject 3D Illustration (occupies ~45-55% of card) -->
+  <div class="card-illustration-container">
+    <img [src]="imageUrl()" [alt]="course().subjectArabicName || course().subjectName" class="card-illustration-img">
   </div>
-  <dl>
-    <div><dt>المعلم</dt><dd [title]="course().teacherName">{{ course().teacherName || 'لم يحدد بعد' }}</dd></div>
-    <div><dt>الصف</dt><dd>{{ course().gradeName || '—' }}</dd></div>
-  </dl>
-  <button type="button" (click)="viewDetails.emit(course())"><span>{{ selected() ? 'المقرر محدد' : 'عرض تفاصيل المقرر' }}</span><b>←</b></button>
+
+  <!-- Content & Details -->
+  <div class="card-details-wrapper">
+    <div class="flex items-center justify-between mb-2">
+      <span class="subject-badge">مقرر دراسي</span>
+      <span class="grade-badge">{{ course().gradeName || 'المستوى الدراسي' }}</span>
+    </div>
+    
+    <h3 class="subject-name" [title]="course().subjectArabicName || course().subjectName">
+      {{ course().subjectArabicName || course().subjectName }}
+    </h3>
+    
+    <!-- Teacher Details -->
+    <div class="teacher-info flex items-center gap-2 mt-3 select-none">
+      <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center text-[10px] font-bold overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
+        {{ (course().teacherName || 'م').charAt(0) }}
+      </div>
+      <span class="teacher-name" [title]="course().teacherName">{{ course().teacherName || 'لم يعين معلم بعد' }}</span>
+    </div>
+
+    <!-- Simulated Progress Bar -->
+    <div class="progress-section mt-4 select-none">
+      <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5">
+        <span>تقدم المقرر</span>
+        <span>{{ progress() }}%</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" [style.width.%]="progress()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Action Footer -->
+  <div class="card-footer mt-auto pt-4">
+    <button type="button" (click)="viewDetails.emit(course())" class="card-action-btn w-full">
+      <span>{{ selected() ? 'المقرر محدد' : 'عرض تفاصيل المقرر' }}</span>
+      <i class="fa-solid fa-arrow-left text-xs transition-transform duration-200"></i>
+    </button>
+  </div>
+
 </article>

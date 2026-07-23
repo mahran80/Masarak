@@ -132,18 +132,42 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Start Time -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-500">وقت البدء <span class="text-rose-500">*</span></label>
-            <input type="datetime-local" formControlName="startTime"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          <!-- Start Time (Split into Date and Time) -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-500">تاريخ البدء <span class="text-rose-500">*</span></label>
+              <div class="relative flex items-center pr-10">
+                <input [matDatepicker]="pickerStart" [min]="minDate" formControlName="startDate"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  (click)="pickerStart.open()">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerStart" class="absolute right-2 scale-75 text-slate-400"></mat-datepicker-toggle>
+                <mat-datepicker #pickerStart panelClass="masarak-scheduling-datepicker"></mat-datepicker>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-500">ساعة البدء <span class="text-rose-500">*</span></label>
+              <input type="time" formControlName="startTime"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+            </div>
           </div>
           
-          <!-- End Time -->
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-500">وقت الانتهاء <span class="text-rose-500">*</span></label>
-            <input type="datetime-local" formControlName="endTime"
-              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+          <!-- End Time (Split into Date and Time) -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-500">تاريخ الانتهاء <span class="text-rose-500">*</span></label>
+              <div class="relative flex items-center pr-10">
+                <input [matDatepicker]="pickerEnd" [min]="minDate" formControlName="endDate"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  (click)="pickerEnd.open()">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerEnd" class="absolute right-2 scale-75 text-slate-400"></mat-datepicker-toggle>
+                <mat-datepicker #pickerEnd panelClass="masarak-scheduling-datepicker"></mat-datepicker>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-500">ساعة الانتهاء <span class="text-rose-500">*</span></label>
+              <input type="time" formControlName="endTime"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+            </div>
           </div>
         </div>
       </div>

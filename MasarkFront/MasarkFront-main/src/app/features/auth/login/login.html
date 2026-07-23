@@ -9,6 +9,13 @@
 
   <!-- Top Corner Toggles (COMPACT) -->
   <div class="ml-auth-toggles-corner">
+    <!-- Back to Landing Page Icon Button -->
+    <a routerLink="/" class="ml-home-btn" aria-label="Back to landing page" [title]="lang() === 'ar' ? 'العودة للرئيسية' : 'Back to Home'">
+      <span class="material-symbols-outlined">
+        home
+      </span>
+    </a>
+
     <!-- Globe Language Dropdown -->
     <div class="ml-lang-dropdown-wrapper">
       <button type="button" class="ml-globe-btn" (click)="showLangDropdown.set(!showLangDropdown())" aria-label="Language selection">

@@ -9,10 +9,15 @@ import {
   StudentScheduleSession,
 } from '../../models';
 
+import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+
 @Component({
   selector: 'app-student-dashboard-cards',
   standalone: true,
+  imports: [CommonModule, IconComponent],
   templateUrl: './dashboard-cards.component.html',
+  styleUrl: './dashboard-cards.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentDashboardCardsComponent {

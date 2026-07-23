@@ -1,20 +1,20 @@
-<div [class]="isStandalonePage ? 'standalone-shell min-h-screen font-sans' : 'admin-shell min-h-screen ml-dashboard-bg flex flex-col font-sans'" dir="rtl" (click)="closeMenus()">
+<div [class]="isOnboarding ? 'min-h-screen font-sans' : 'h-screen overflow-hidden ml-dashboard-bg flex flex-col font-sans'" dir="rtl" (click)="closeMenus()">
   <!-- Ambient Blurred Blobs -->
-  @if (!isStandalonePage) {
+  @if (!isOnboarding) {
     <div class="ml-dashboard-blob ml-dashboard-blob-1"></div>
     <div class="ml-dashboard-blob ml-dashboard-blob-2"></div>
   }
 
   <!-- Top Navigation Bar -->
-  @if (!isStandalonePage) {
-  <div class="admin-topbar fixed top-3 md:top-4 inset-x-0 mx-auto w-[calc(100%-24px)] md:w-[calc(100%-48px)] max-w-[1240px] h-[54px] md:h-[58px] bg-[rgba(255,255,255,0.94)] dark:bg-slate-900/94 backdrop-blur-xl border border-slate-900/5 dark:border-slate-800/80 rounded-[28px] z-[100] shadow-[0_12px_34px_rgba(37,99,235,0.10)] dark:shadow-[0_12px_34px_rgba(0,0,0,0.3)] transition-all flex items-center ml-navbar-container" (click)="$event.stopPropagation()">
-    <header class="w-full px-4 md:px-[24px] flex items-center justify-between h-full">
+  @if (!isOnboarding) {
+  <div class="fixed top-6 inset-x-4 md:inset-x-8 max-w-7xl mx-auto h-[60px] bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-100 dark:border-slate-800/80 rounded-full z-50 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.06)] transition-all flex items-center" (click)="$event.stopPropagation()">
+    <header class="w-full px-5 md:px-6 flex items-center justify-between h-full">
       <!-- Right/Left: Logo & Sidebar Toggle -->
-      <div class="flex items-center gap-3 relative z-10">
+      <div class="flex items-center gap-4 relative z-10">
         <!-- Sidebar Toggle -->
         <button
           (click)="toggleSidebar($event)"
-          class="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all focus:outline-none shrink-0"
+          class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all focus:outline-none shrink-0"
           title="تبديل القائمة الجانبية"
         >
           <app-icon name="bars-3" [size]="18"></app-icon>
@@ -22,45 +22,45 @@
 
         <!-- Logo -->
         <a routerLink="/" class="flex items-center gap-2 shrink-0">
-          <div class="w-[40px] h-[40px] bg-[#EEF5FF] dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-400 rounded-lg flex items-center justify-center font-bold">
-            <app-icon name="book-open" [size]="16"></app-icon>
+          <div class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center font-bold">
+            <app-icon name="book-open" [size]="18"></app-icon>
           </div>
-          <span class="font-black text-[20px] text-[#0F172A] dark:text-white tracking-tight">{{ lang() === 'ar' ? 'مسارك' : 'Masarak' }}</span>
+          <span class="font-black text-lg text-slate-900 dark:text-white tracking-tight">{{ lang() === 'ar' ? 'مسارك' : 'Masarak' }}</span>
         </a>
       </div>
 
       <!-- Left/Right: Actions -->
-      <div class="flex items-center gap-2 md:gap-2.5 relative z-10">
+      <div class="flex items-center gap-1.5 md:gap-2 relative z-10">
         <!-- Language Toggle -->
         <button type="button" 
-                class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-[#475569] dark:text-slate-300 hover:bg-[#EEF5FF] hover:text-[#2563EB] dark:hover:bg-slate-700 transition-colors shrink-0"
+                class="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all font-black text-[12px] shrink-0"
                 (click)="lang() === 'ar' ? setLang('en') : setLang('ar')" aria-label="Toggle language">
-          <span class="material-symbols-outlined text-[20px]">language</span>
+          {{ lang() === 'ar' ? 'EN' : 'AR' }}
         </button>
 
         <!-- Adaptive Dark Mode Icon Button -->
         <button type="button" 
-                class="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-[#475569] dark:text-slate-300 hover:bg-[#EEF5FF] hover:text-[#2563EB] dark:hover:bg-slate-700 transition-colors shrink-0"
+                class="w-9 h-9 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shrink-0"
                 (click)="toggleTheme()" aria-label="Toggle theme">
-          <span class="material-symbols-outlined text-[20px]">
+          <span class="material-symbols-outlined text-[18px]">
             {{ theme() === 'light' ? 'dark_mode' : 'light_mode' }}
           </span>
         </button>
 
         <!-- Notifications Bell -->
-        <div class="w-[40px] h-[40px] rounded-full bg-slate-50 dark:bg-slate-800 text-[#475569] dark:text-slate-300 hover:bg-[#EEF5FF] hover:text-[#2563EB] transition-colors flex items-center justify-center shrink-0">
-          <app-notification-bell class="relative scale-95 origin-center"></app-notification-bell>
+        <div class="w-9 h-9 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+          <app-notification-bell class="relative scale-90 origin-center"></app-notification-bell>
         </div>
 
-        <div class="h-[22px] w-px bg-slate-200 dark:bg-slate-800 mx-0.5"></div>
+        <div class="h-5 w-px bg-slate-200 dark:bg-slate-850 mx-1"></div>
 
         <!-- Profile Avatar Dropdown -->
         <div class="relative">
           <button
             (click)="toggleUserMenu($event)"
-            class="flex items-center gap-2 focus:outline-none transition-transform hover:scale-105"
+            class="flex items-center gap-2 focus:outline-none hover:opacity-85 transition-opacity"
           >
-            <div class="w-[40px] h-[40px] rounded-full bg-[#EEF5FF] text-[#2563EB] dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center font-bold overflow-hidden border border-[#DCE8FE] dark:border-blue-800/50 shadow-sm">
+            <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center font-bold overflow-hidden shadow-[0_2px_8px_-2px_rgba(37,99,235,0.2)]">
               @if (userName()?.avatarUrl) {
                 <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
               } @else {
@@ -70,25 +70,34 @@
           </button>
 
           @if (isUserMenuOpen) {
-            <div class="dropdown-menu-container w-[300px] max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-[22px] shadow-[0_16px_48px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)] p-4 z-[110] transition-all flex flex-col gap-3 animate-profile-dropdown" (click)="$event.stopPropagation()">
+            <div class="dropdown-menu-container premium-profile-popover w-[300px] max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 border border-slate-150/80 dark:border-slate-800/80 rounded-[24px] shadow-[0_20px_48px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_48px_rgba(0,0,0,0.4)] p-5 z-[110] transition-all flex flex-col gap-4 animate-profile-dropdown" (click)="$event.stopPropagation()">
               
-              <!-- User Profile Summary Header -->
-              <div class="flex items-center gap-3 px-1 py-1">
-                <!-- Avatar -->
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 border-2 border-white dark:border-slate-800 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
-                  @if (userName()?.avatarUrl) {
-                    <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
-                  } @else {
-                    <span class="text-white font-black text-base leading-none flex items-center justify-center">{{ userInitials }}</span>
-                  }
+              <!-- Popover Identity Header -->
+              <div class="flex items-center gap-4 text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+                <!-- Large Avatar -->
+                <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-md flex items-center justify-center shrink-0 overflow-hidden">
+                  <div class="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 p-0.5">
+                    @if (userName()?.avatarUrl) {
+                      <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover rounded-full" (error)="onAvatarError($event)" alt="Avatar" />
+                    } @else {
+                      <div class="w-full h-full rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 font-black text-lg flex items-center justify-center">
+                        {{ userInitials }}
+                      </div>
+                    }
+                  </div>
                 </div>
-                <div class="min-w-0 flex-1 flex flex-col justify-center text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
-                  <p class="font-extrabold text-slate-900 dark:text-slate-100 text-sm truncate leading-tight">{{ userName()?.fullName ?? 'User' }}</p>
+                <!-- Details -->
+                <div class="min-w-0 flex-1 flex flex-col justify-center">
+                  <h4 class="font-black text-slate-955 dark:text-slate-50 text-sm truncate leading-tight">
+                    {{ userName()?.fullName ?? 'User' }}
+                  </h4>
                   @if (userName()?.email) {
-                    <p class="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">{{ userName()?.email }}</p>
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-1">
+                      {{ userName()?.email }}
+                    </p>
                   }
-                  <div class="flex items-center gap-1.5 mt-1 justify-start">
-                    <span class="admin-role-badge">
+                  <div class="flex items-center gap-1.5 mt-1.5 justify-start">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[10px] font-extrabold text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800/40">
                       {{ roleLabel(userRole()) }}
                     </span>
                   </div>
@@ -96,37 +105,44 @@
               </div>
 
               <!-- Divider -->
-              <div class="h-px w-full bg-slate-100 dark:bg-slate-800/80"></div>
+              <div class="h-px w-full bg-slate-100 dark:bg-slate-800/60"></div>
 
-              <!-- Add Student Button (CTA) -->
-              @if (userRole() === 'Parent') {
-                <button routerLink="/add-student" (click)="closeMenus()" class="w-full bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all font-bold text-xs shadow-sm">
-                  <app-icon name="plus" [size]="14"></app-icon>
-                  <span>{{ lang() === 'ar' ? 'إضافة طالب جديد' : 'Add New Student' }}</span>
-                </button>
-              }
-
-              <!-- Menu Items (Manage Account, Settings) -->
-              <div class="flex flex-col gap-1">
-                <a routerLink="/dashboard/profile" (click)="closeMenus()" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors w-full text-right cursor-pointer">
+              <!-- Quick Actions Links -->
+              <div class="flex flex-col gap-1.5">
+                <!-- My Profile -->
+                <a routerLink="/dashboard/profile" (click)="closeMenus()" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all w-full text-right cursor-pointer">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 dark:group-hover:bg-slate-700 transition-colors shadow-sm">
-                      <app-icon name="user" [size]="15"></app-icon>
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:bg-slate-700/65 dark:group-hover:text-blue-400 transition-colors shadow-sm border border-slate-100 dark:border-slate-800">
+                      <app-icon name="user" [size]="14"></app-icon>
                     </div>
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
-                      {{ lang() === 'ar' ? 'إدارة حسابي' : 'Manage My Account' }}
+                      {{ lang() === 'ar' ? 'الملف الشخصي' : 'My Profile' }}
                     </span>
                   </div>
                   <app-icon [name]="lang() === 'ar' ? 'chevron-left' : 'chevron-right'" [size]="12" class="text-slate-300 dark:text-slate-600 group-hover:text-blue-400 transition-colors"></app-icon>
                 </a>
 
-                <a routerLink="/dashboard/settings" (click)="closeMenus()" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors w-full text-right cursor-pointer">
+                <!-- Settings -->
+                <a routerLink="/dashboard/settings" (click)="closeMenus()" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all w-full text-right cursor-pointer">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 dark:group-hover:bg-slate-700 transition-colors shadow-sm">
-                      <app-icon name="cog" [size]="15"></app-icon>
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:bg-slate-700/65 dark:group-hover:text-blue-400 transition-colors shadow-sm border border-slate-100 dark:border-slate-800">
+                      <app-icon name="cog" [size]="14"></app-icon>
                     </div>
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
-                      {{ lang() === 'ar' ? 'الإعدادات والتفضيلات' : 'Settings & Preferences' }}
+                      {{ lang() === 'ar' ? 'الإعدادات' : 'Settings' }}
+                    </span>
+                  </div>
+                  <app-icon [name]="lang() === 'ar' ? 'chevron-left' : 'chevron-right'" [size]="12" class="text-slate-300 dark:text-slate-600 group-hover:text-blue-400 transition-colors"></app-icon>
+                </a>
+
+                <!-- Help -->
+                <a routerLink="/dashboard/chat" (click)="closeMenus()" class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all w-full text-right cursor-pointer">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:bg-slate-700/65 dark:group-hover:text-blue-400 transition-colors shadow-sm border border-slate-100 dark:border-slate-800">
+                      <app-icon name="help" [size]="14"></app-icon>
+                    </div>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-white transition-colors">
+                      {{ lang() === 'ar' ? 'المساعدة والدعم' : 'Help & Support' }}
                     </span>
                   </div>
                   <app-icon [name]="lang() === 'ar' ? 'chevron-left' : 'chevron-right'" [size]="12" class="text-slate-300 dark:text-slate-600 group-hover:text-blue-400 transition-colors"></app-icon>
@@ -134,19 +150,19 @@
               </div>
 
               <!-- Divider -->
-              <div class="h-px w-full bg-slate-100 dark:bg-slate-800/80"></div>
+              <div class="h-px w-full bg-slate-100 dark:bg-slate-800/60"></div>
 
-              <!-- Soft Red Logout Button inside Dropdown -->
+              <!-- Logout Button -->
               <button
                 type="button"
                 (click)="logout(); closeMenus()"
-                class="dropdown-logout-btn group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all w-full text-right cursor-pointer"
+                class="group flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-all w-full text-right cursor-pointer border-0 bg-transparent"
               >
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 text-[#DC2626] dark:text-red-400 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors shadow-sm">
-                    <app-icon name="arrow-right-on-rectangle" [size]="15"></app-icon>
+                  <div class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors shadow-sm border border-red-100/50 dark:border-red-900/30">
+                    <app-icon name="arrow-right-on-rectangle" [size]="14"></app-icon>
                   </div>
-                  <span class="text-xs font-bold text-[#DC2626] dark:text-red-400 group-hover:text-white transition-colors">
+                  <span class="text-xs font-bold text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors">
                     {{ lang() === 'ar' ? 'تسجيل الخروج' : 'Log Out' }}
                   </span>
                 </div>
@@ -161,395 +177,361 @@
   }
 
   <!-- Sidebar + Main Content Layout -->
-  <div class="dashboard-container" [class.dashboard-container--standalone]="isStandalonePage">
-    <div class="dashboard-shell" [class.dashboard-shell--standalone]="isStandalonePage">
-      <!-- Dark overlay for Mobile drawer when sidebar is expanded -->
-      @if (!isSidebarCollapsed() && !isStandalonePage) {
-        <div 
-          class="md:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[98] transition-opacity duration-300"
-          (click)="toggleSidebar($event)"
-        ></div>
-      }
-
-      <!-- Sidebar Navigation -->
-      @if (!isStandalonePage) {
-      <aside
-        class="sidebar"
-        [class.sidebar--collapsed]="isSidebarCollapsed()"
-        (click)="$event.stopPropagation()"
-      >
-      <!-- User Profile Summary in Sidebar -->
-      <div class="admin-sidebar-profile flex items-center justify-between gap-3 px-3 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-800/50" [class.justify-center]="isSidebarCollapsed()">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="relative shrink-0">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200/50 dark:border-blue-800/30 flex items-center justify-center font-bold overflow-hidden shadow-sm">
-              @if (userName()?.avatarUrl) {
-                <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
-              } @else {
-                <span class="text-blue-600 dark:text-blue-400 text-xs font-black leading-none flex items-center justify-center">{{ userInitials }}</span>
-              }
-            </div>
-            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900"></span>
-          </div>
-          <div class="admin-sidebar-profile-info min-w-0 flex-1 text-right flex flex-col justify-center" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'" [class.hidden]="isSidebarCollapsed()">
-            <div class="font-extrabold text-[13px] text-slate-800 dark:text-slate-200 truncate leading-none mb-1.5">{{ userName()?.fullName ?? 'User' }}</div>
-            <div>
-              <span class="admin-role-badge admin-role-badge--compact">
-                {{ roleLabel(userRole()) }}
-              </span>
-            </div>
+  <div class="flex flex-1 p-4 pt-28 gap-4 overflow-hidden relative">
+    <!-- Sidebar Navigation -->
+    @if (!isOnboarding) {
+    <aside
+      class="bg-surface/80 dark:bg-surface-muted/80 backdrop-blur-md flex flex-col sidebar-transition shrink-0 z-40 rounded-2xl overflow-hidden"
+      [class.w-[230px]]="!isSidebarCollapsed()"
+      [class.w-20]="isSidebarCollapsed()"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Sidebar Header Profile Card -->
+      <div class="p-3 flex items-center gap-3 overflow-hidden whitespace-nowrap relative group/profile bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100/80 dark:border-slate-800/40 rounded-[18px] mx-2 mt-3 mb-2 shadow-sm" [class.p-2]="isSidebarCollapsed()">
+        <div class="w-[40px] h-[40px] rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+          <div class="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 p-0.5">
+            @if (userName()?.avatarUrl) {
+              <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover rounded-full" (error)="onAvatarError($event)" alt="Avatar" />
+            } @else {
+              <div class="w-full h-full rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 font-bold text-xs flex items-center justify-center">
+                {{ userInitials }}
+              </div>
+            }
           </div>
         </div>
-
-        <!-- Close Button (Mobile Only) -->
-        @if (!isSidebarCollapsed()) {
-          <button 
-            (click)="toggleSidebar($event)" 
-            class="md:hidden w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400 flex items-center justify-center transition-colors focus:outline-none shrink-0"
-            [attr.aria-label]="lang() === 'ar' ? 'إغلاق القائمة' : 'Close Menu'"
-          >
-            <app-icon name="x-mark" [size]="16"></app-icon>
-          </button>
-        }
+        <div class="transition-all duration-300 flex-1 min-w-0" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">
+          <h4 class="font-black text-slate-800 dark:text-slate-200 text-[13px] truncate leading-tight">{{ userName()?.fullName ?? 'User' }}</h4>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-[9px] font-extrabold text-blue-600 dark:text-blue-400 mt-1">
+            {{ roleLabel(userRole()) }}
+          </span>
+        </div>
       </div>
 
-      <!-- Nav + Footer in one scroll container (sidebar itself scrolls) -->
-      <nav class="sidebar-navigation">
+      <!-- Navigation links scroll area -->
+      <nav class="flex-1 min-h-0 p-3 space-y-6 overflow-y-auto custom-scrollbar sidebar-nav-scroll pb-10">
         <!-- ── STUDENT ROLE LINKS ── -->
         @if (userRole() === 'Student') {
-          <div class="admin-nav-group">
+          <!-- Group 1: الرئيسية -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">الرئيسية</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الرئيسية</p>
             }
-            <a routerLink="student" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'لوحة التحكم للطالب' : ''">
+            <a routerLink="student" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'لوحة التحكم للطالب' : ''">
               <app-icon name="chart" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">لوحة التحكم للطالب</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">لوحة التحكم للطالب</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
+          <!-- Group 2: الأكاديمية -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">التعلم</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الأكاديمية</p>
             }
-            <a routerLink="student/courses" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'دروسي' : ''">
+            <a routerLink="student/courses" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'دروسي' : ''">
               <app-icon name="book" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">دروسي</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">دروسي</span>
             </a>
-            <a routerLink="student/lessons" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الدروس والوحدات' : ''">
+            <a routerLink="student/lessons" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الدروس والوحدات' : ''">
               <app-icon name="book-open" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الدروس والوحدات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الدروس والوحدات</span>
             </a>
-            <a routerLink="student/library" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'مكتبه الدروس' : ''">
+            <a routerLink="student/library" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'مكتبه الدروس' : ''">
               <app-icon name="archive" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">مكتبه الدروس</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">مكتبه الدروس</span>
             </a>
-            <a routerLink="student/assignments" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الواجبات' : ''">
+            <a routerLink="student/assignments" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الواجبات' : ''">
               <app-icon name="clipboard-document-list" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الواجبات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الواجبات</span>
             </a>
-            <a routerLink="student/exams" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الاختبارات' : ''">
+            <a routerLink="student/exams" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الاختبارات' : ''">
               <app-icon name="document-check" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الاختبارات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الاختبارات</span>
             </a>
-            <a routerLink="student/schedule" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الجدول الأسبوعي' : ''">
+            <a routerLink="student/schedule" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الجدول الأسبوعي' : ''">
               <app-icon name="calendar" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الجدول الأسبوعي</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الجدول الأسبوعي</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
+          <!-- Group 3: الإدارة والتقييم -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">تقدمي</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الإدارة والتقييم</p>
             }
-            <a routerLink="/plans" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الخطط والاشتراكات' : ''">
-              <app-icon name="credit-card" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الخطط والاشتراكات</span>
+            <a routerLink="/plans" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الخطط والاشتراكات' : ''">
+              <app-icon name="credit-card" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الخطط والاشتراكات</span>
             </a>
-            <a routerLink="student/grades" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الدرجات' : ''">
+            <a routerLink="student/grades" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الدرجات' : ''">
               <app-icon name="check-badge" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الدرجات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الدرجات</span>
             </a>
-            <a routerLink="student/insights" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'رؤى التعلم' : ''">
+            <a routerLink="student/insights" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'رؤى التعلم' : ''">
               <app-icon name="trend-up" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">رؤى التعلم</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">رؤى التعلم</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
+          <!-- Group 4: النظام والتواصل -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">التواصل</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">النظام والتواصل</p>
             }
-            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
-              <app-icon name="chat" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">المحادثات</span>
+            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
+              <app-icon name="chat" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">المحادثات</span>
             </a>
           </div>
         }
 
         <!-- ── TEACHER ROLE LINKS ── -->
         @if (userRole() === 'Teacher') {
-          <div class="admin-nav-group">
-            <a routerLink="teacher" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'لوحة المدرس' : ''">
+          <!-- Group 1: الرئيسية -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الرئيسية</p>
+            }
+            <a routerLink="teacher" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'لوحة المدرس' : ''">
               <app-icon name="chart" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">لوحة المدرس</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">لوحة المدرس</span>
             </a>
           </div>
 
-
-          <div class="admin-nav-group">
-            <a routerLink="teacher/courses" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المقررات الدراسيه' : ''">
+          <!-- Group 2: الأكاديمية -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الأكاديمية</p>
+            }
+            <a routerLink="teacher/courses" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'المقررات الدراسيه' : ''">
               <app-icon name="book-open" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">المقررات الدراسيه</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">المقررات الدراسيه</span>
             </a>
-            <a routerLink="teacher/lessons" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الدروس' : ''">
+            <a routerLink="teacher/lessons" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الدروس' : ''">
               <app-icon name="academic-cap" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الدروس</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الدروس</span>
             </a>
-            <a routerLink="teacher/students" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الطلاب' : ''">
+            <a routerLink="teacher/students" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الطلاب' : ''">
               <app-icon name="users" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الطلاب</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الطلاب</span>
             </a>
-            <a routerLink="teacher/assignments" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الواجبات' : ''">
+            <a routerLink="teacher/assignments" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الواجبات' : ''">
               <app-icon name="clipboard-document-list" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الواجبات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الواجبات</span>
             </a>
-            <a routerLink="/dashboard/teacher/exams" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الاختبارات' : ''">
+            <a routerLink="/dashboard/teacher/exams" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الاختبارات' : ''">
               <app-icon name="document-check" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الاختبارات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الاختبارات</span>
             </a>
-            <a routerLink="/dashboard/teacher/sessions" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الحصص المباشرة' : ''">
+            <a routerLink="/dashboard/teacher/sessions" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الحصص المباشرة' : ''">
               <app-icon name="video" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الحصص المباشرة</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الحصص المباشرة</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
-            <a routerLink="/dashboard/teacher/assessment/grading" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'لوحة التصحيح' : ''">
+          <!-- Group 3: التقييم والإدارة -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">التقييم والإدارة</p>
+            }
+            <a routerLink="/dashboard/teacher/assessment/grading" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'لوحة التصحيح' : ''">
               <app-icon name="check-badge" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">لوحة التصحيح</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">لوحة التصحيح</span>
             </a>
-            <a routerLink="/dashboard/teacher/assessment/assignments/create" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'إنشاء واجب' : ''">
+            <a routerLink="/dashboard/teacher/assessment/assignments/create" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'إنشاء واجب' : ''">
               <app-icon name="plus" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">إنشاء واجب</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">إنشاء واجب</span>
             </a>
-            <a routerLink="/dashboard/teacher/assessment/exams/create" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'إنشاء اختبار' : ''">
+            <a routerLink="/dashboard/teacher/assessment/exams/create" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'إنشاء اختبار' : ''">
               <app-icon name="pencil-square" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">إنشاء اختبار</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">إنشاء اختبار</span>
             </a>
-            <a routerLink="/dashboard/teacher/assessment/question-bank" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'بنك الأسئلة' : ''">
+            <a routerLink="/dashboard/teacher/assessment/question-bank" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'بنك الأسئلة' : ''">
               <app-icon name="folder-open" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">بنك الأسئلة</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">بنك الأسئلة</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
-            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
-              <app-icon name="chat" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">المحادثات</span>
+          <!-- Group 4: النظام والتواصل -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">النظام والتواصل</p>
+            }
+            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
+              <app-icon name="chat" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">المحادثات</span>
             </a>
           </div>
         }
 
-        <!-- ── ADMIN ROLE LINKS (with nav groups matching mockup) ── -->
+        <!-- ── ADMIN ROLE LINKS ── -->
         @if (userRole() === 'Admin') {
-          <div class="admin-nav-group">
+          <!-- Group 1: الرئيسية -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">الرئيسية</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الرئيسية</p>
             }
-            <a routerLink="/dashboard/admin" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'نظرة عامة' : ''">
+            <a routerLink="/dashboard/admin" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'نظرة عامة للمدير' : ''">
               <app-icon name="chart" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">نظرة عامة للمدير</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">نظرة عامة للمدير</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
+          <!-- Group 2: الأكاديمية -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">الأكاديمية</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الأكاديمية</p>
             }
-            <a routerLink="admin/teachers" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'دليل المعلمين' : ''">
+            <a routerLink="admin/teachers" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'دليل المعلمين' : ''">
               <app-icon name="user" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">دليل المعلمين</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">دليل المعلمين</span>
             </a>
-            <a routerLink="admin/academic" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الإدارة الأكاديمية' : ''">
+            <a routerLink="admin/academic" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الإدارة الأكاديمية' : ''">
               <app-icon name="building" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الإدارة الأكاديمية</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الإدارة الأكاديمية</span>
             </a>
-            <a routerLink="admin/schedule" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'جدول الحصص' : ''">
+            <a routerLink="admin/schedule" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'جدول الحصص' : ''">
               <app-icon name="calendar" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">جدول الحصص</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">جدول الحصص</span>
             </a>
           </div>
 
-          <div class="admin-nav-group">
+          <!-- Group 3: الإدارة -->
+          <div class="space-y-1">
             @if (!isSidebarCollapsed()) {
-              <span class="admin-nav-label">الإدارة</span>
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الإدارة</p>
             }
-            <a routerLink="admin/users" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'إدارة المستخدمين' : ''">
+            <a routerLink="admin/users" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'إدارة المستخدمين' : ''">
               <app-icon name="users" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">إدارة المستخدمين</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">إدارة المستخدمين</span>
             </a>
-            <a routerLink="admin/performance" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'تقارير الأداء' : ''">
+            <a routerLink="admin/performance" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'تقارير الأداء' : ''">
               <app-icon name="trend-up" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">تقارير الأداء</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">تقارير الأداء</span>
             </a>
-            <a routerLink="admin/system-health" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'حالة النظام' : ''">
+            <a routerLink="admin/system-health" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'حالة النظام' : ''">
               <app-icon name="robot" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">حالة النظام</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">حالة النظام</span>
             </a>
-            <a routerLink="admin/content-moderation" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'إدارة المحتوى' : ''">
+            <a routerLink="admin/content-moderation" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'إدارة المحتوى' : ''">
               <app-icon name="shield" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">إدارة المحتوى</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">إدارة المحتوى</span>
             </a>
-            <a routerLink="admin/subscriptions" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'إدارة الاشتراكات' : ''">
+            <a routerLink="admin/subscriptions" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'إدارة الاشتراكات' : ''">
               <app-icon name="credit-card" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">إدارة الاشتراكات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">إدارة الاشتراكات</span>
             </a>
-            <a routerLink="admin/platform-analytics" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'تحليلات المنصة' : ''">
+          </div>
+
+          <!-- Group 4: الذكاء الاصطناعي -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">الذكاء الاصطناعي</p>
+            }
+            <a routerLink="admin/platform-analytics" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'تحليلات المنصة' : ''">
               <app-icon name="chart" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">تحليلات المنصة</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">تحليلات المنصة</span>
             </a>
-            <a routerLink="admin/prompt-editor" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'قوالب الذكاء الاصطناعي' : ''">
+            <a routerLink="admin/prompt-editor" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'قوالب الذكاء الاصطناعي' : ''">
               <app-icon name="robot" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">قوالب الذكاء الاصطناعي</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">قوالب الذكاء الاصطناعي</span>
             </a>
-            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
+          </div>
+
+          <!-- Group 5: النظام والتواصل -->
+          <div class="space-y-1">
+            @if (!isSidebarCollapsed()) {
+              <p class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 transition-opacity duration-300">النظام والتواصل</p>
+            }
+            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
               <app-icon name="chat" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">المحادثات</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">المحادثات</span>
             </a>
           </div>
         }
 
         <!-- ── PARENT ROLE LINKS ── -->
         @if (userRole() === 'Parent') {
-          <div class="admin-nav-group">
-            <a routerLink="parent" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الرئيسية' : ''">
-              <app-icon name="home" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الرئيسية</span>
+          <div class="space-y-1">
+            <a routerLink="/dashboard/parent/subscriptions" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الخطط والاشتراكات' : ''">
+              <app-icon name="credit-card" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الخطط والاشتراكات</span>
             </a>
-            
-            <a routerLink="parent/children" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'أبنائي' : ''">
-              <app-icon name="family" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">أبنائي</span>
+            <a routerLink="parent" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'الرئيسية' : ''">
+              <app-icon name="home" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">الرئيسية</span>
             </a>
-            
-            <a routerLink="/dashboard/parent/subscriptions" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'الخطط والاشتراكات' : ''">
-              <app-icon name="credit-card" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">الخطط والاشتراكات</span>
+            <a routerLink="parent/children" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'أبنائي' : ''">
+              <app-icon name="family" [size]="20"></app-icon>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">أبنائي</span>
             </a>
-            
-            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
+            <a routerLink="/dashboard/chat" routerLinkActive="ml-sidebar-active sidebar-active-link font-bold text-white shadow-sm"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200" [title]="isSidebarCollapsed() ? 'المحادثات' : ''">
               <app-icon name="chat" [size]="20"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">المحادثات</span>
-            </a>
-            
-            <a routerLink="/dashboard/profile" routerLinkActive="ml-sidebar-active sidebar-active-link"
-               class="admin-sidebar-link" [title]="isSidebarCollapsed() ? 'حسابي' : ''">
-              <app-icon name="user" [size]="18"></app-icon>
-              <span [class.hidden]="isSidebarCollapsed()">حسابي</span>
+              <span class="text-sm font-medium transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">المحادثات</span>
             </a>
           </div>
         }
-
-        
-
       </nav>
 
-      <!-- Sidebar Footer (Support, Logout, Collapse) -->
-      <div class="sidebar-footer" [class.hidden]="isSidebarCollapsed()">
-        <!-- Support Mini Card -->
-        <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer"
-           class="admin-sidebar-support-card">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-600/10 dark:bg-blue-400/20 text-[#2563EB] dark:text-blue-400 flex items-center justify-center shrink-0 support-card-icon">
-              <app-icon name="chat-bubble-left-ellipsis" [size]="18"></app-icon>
-            </div>
-            <div class="flex-1 min-w-0 text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
-              <div class="flex items-center gap-1.5 justify-between">
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  {{ lang() === 'ar' ? 'الدعم الفني' : 'Technical Support' }}
-                </span>
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              </div>
-              <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                {{ lang() === 'ar' ? 'تحتاج مساعدة؟ نحن هنا لدعمك' : 'Need help? We are here to support you' }}
-              </p>
-            </div>
-          </div>
-        </a>
-
-        <!-- Logout -->
+      <!-- Sidebar Footer (Logout) -->
+      <div class="p-3 mt-auto">
+        <div class="border-t border-slate-100 dark:border-slate-800/60 pt-3 mb-2"></div>
         <button
           type="button"
           (click)="logout()"
-          class="admin-sidebar-logout-btn"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/20 dark:hover:text-rose-400 transition-all duration-200 cursor-pointer"
+          [title]="isSidebarCollapsed() ? 'تسجيل الخروج' : ''"
         >
-          <app-icon name="arrow-right-on-rectangle" [size]="18"></app-icon>
-          <span>{{ lang() === 'ar' ? 'تسجيل الخروج' : 'Log Out' }}</span>
+          <app-icon name="arrow-right-on-rectangle" [size]="20"></app-icon>
+          <span class="text-sm font-bold transition-opacity duration-300" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">تسجيل الخروج</span>
         </button>
       </div>
-
-      <!-- Collapsed: only logout icon -->
-      @if (isSidebarCollapsed()) {
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:center;padding-top:8px;">
-          <button type="button" (click)="logout()"
-            style="width:40px;height:40px;border-radius:12px;background:rgba(220,38,38,0.08);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#DC2626;"
-            [title]="lang() === 'ar' ? 'تسجيل الخروج' : 'Log Out'">
-            <app-icon name="arrow-right-on-rectangle" [size]="18"></app-icon>
-          </button>
-          <button type="button" (click)="toggleSidebar($event)"
-            style="width:40px;height:40px;border-radius:12px;background:rgba(37,99,235,0.08);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#2563EB;"
-            [title]="lang() === 'ar' ? 'توسيع القائمة' : 'Expand Sidebar'">
-            <app-icon name="chevron-double-left" [size]="16"></app-icon>
-          </button>
-        </div>
-      }
-
     </aside>
     }
 
     <!-- Main Content Panel -->
-    <main class="dashboard-main transition-all duration-300" [class.dashboard-main--standalone]="isStandalonePage">
-      <router-outlet></router-outlet>
+    <main class="flex-1 bg-white dark:bg-[#0F172A] rounded-[24px] border border-slate-200/50 dark:border-slate-800 shadow-sm overflow-hidden relative transition-all duration-300 ml-main-content">
+      <div class="absolute inset-0 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   </div>
-</div>
 </div>

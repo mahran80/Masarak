@@ -1,3 +1,4 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
 @tailwind base;
 
 @tailwind components;
@@ -8,25 +9,25 @@
 
 :root {
 
-  --primary: #3B82F6;
+  --primary: #2563EB;
 
-  --primary-hover: #2563EB;
+  --primary-hover: #1D4ED8;
 
-  --primary-light: #EEF5FF;
+  --primary-light: #F4F1FF;
 
-  --secondary: #60A5FA;
+  --secondary: #4F7BFF;
 
-  --accent: #8B5CF6;
+  --accent: #7C3AED;
 
-  --accent-purple: #8B5CF6;
+  --accent-purple: #7C3AED;
 
   
 
   /* Premium Gradients */
 
-  --gradient-primary: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
+  --gradient-primary: linear-gradient(135deg, #2563EB 0%, #4F7BFF 45%, #7C3AED 100%);
 
-  --gradient-hover: linear-gradient(90deg, #2563EB 0%, #7C3AED 100%);
+  --gradient-hover: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #6D28D9 100%);
 
   
 
@@ -38,11 +39,11 @@
 
   --surface: #FFFFFF;
 
-  --surface-muted: #F8FAFC;
+  --surface-muted: #F7F9FF;
 
-  --surface-border: #E2E8F0;
+  --surface-border: #E8EEF9;
 
-  --background-gradient: linear-gradient(135deg, #FFFFFF 0%, #F8FBFF 28%, #EEF5FF 62%, #F4F1FF 100%);
+  --background-gradient: linear-gradient(135deg, #F8FBFF 0%, #EEF4FF 55%, #F7F1FF 100%);
 
   --font-arabic: 'Cairo', 'Noto Sans Arabic', 'Tajawal', sans-serif;
 
@@ -294,11 +295,10 @@ body[dir="ltr"], [dir="ltr"] {
   /* Clean Card Styling for overall page polishing */
 
   .card {
-
-    @apply bg-white rounded-2xl border border-slate-100 p-6 md:p-8;
-    box-shadow: var(--shadow-sm);
+    background: #FFFFFF !important;
+    border: 1px solid #E8EEF9 !important;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.06) !important;
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.28s ease;
-
   }
 
 
@@ -448,7 +448,7 @@ body[dir="ltr"], [dir="ltr"] {
 }
 
 .ml-btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background: var(--gradient-primary);
   background-size: 200% auto;
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
@@ -457,7 +457,7 @@ body[dir="ltr"], [dir="ltr"] {
 .ml-btn-primary:hover {
   background-position: right center;
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 16px 35px rgba(79, 123, 255, 0.28);
 }
 
 .ml-btn-outline {
@@ -1385,7 +1385,8 @@ body[dir="ltr"], [dir="ltr"] {
 }
 
 .ml-auth-bg .ml-globe-btn, 
-.ml-auth-bg .ml-theme-icon-btn {
+.ml-auth-bg .ml-theme-icon-btn,
+.ml-auth-bg .ml-home-btn {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-full);
@@ -1401,7 +1402,8 @@ body[dir="ltr"], [dir="ltr"] {
 }
 
 .ml-auth-bg .ml-globe-btn:hover, 
-.ml-auth-bg .ml-theme-icon-btn:hover {
+.ml-auth-bg .ml-theme-icon-btn:hover,
+.ml-auth-bg .ml-home-btn:hover {
   transform: translateY(-1px);
   color: var(--primary);
   border-color: var(--primary);
@@ -2094,33 +2096,117 @@ body[data-theme='dark'] .masarak-form-input:focus {
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
 }
 
-/* Select element */
-.masarak-form-select {
+/* Select elements */
+.masarak-form-select,
+.subject-select,
+.classroom-select,
+.um-select,
+select {
   width: 100%;
-  height: 50px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: 1.5px solid #E2E8F0;
-  font-size: 14px;
-  font-weight: 500;
-  color: #0F172A;
-  background-color: #FFFFFF;
-  outline: none;
-  cursor: pointer;
-  transition: all 200ms ease;
-  appearance: none;
+  height: 54px !important;
+  padding: 0 20px !important;
+  border-radius: 18px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #0F172A !important;
+  background-color: #FFFFFF !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: left 16px center !important;
+  background-size: 16px !important;
+}
+
+[dir='ltr'] .masarak-form-select,
+[dir='ltr'] .subject-select,
+[dir='ltr'] .classroom-select,
+[dir='ltr'] .um-select,
+[dir='ltr'] select {
+  background-position: right 16px center !important;
 }
 
 :root[data-theme='dark'] .masarak-form-select,
-body[data-theme='dark'] .masarak-form-select {
-  background-color: #15243B;
-  border-color: rgba(148, 163, 184, 0.16);
-  color: #F1F5F9;
+body[data-theme='dark'] .masarak-form-select,
+:root[data-theme='dark'] select,
+body[data-theme='dark'] select {
+  background-color: #15243B !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  color: #F1F5F9 !important;
 }
 
-.masarak-form-select:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+.masarak-form-select:hover,
+.subject-select:hover,
+.classroom-select:hover,
+.um-select:hover,
+select:hover {
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+:root[data-theme='dark'] .masarak-form-select:hover,
+body[data-theme='dark'] .masarak-form-select:hover,
+:root[data-theme='dark'] select:hover,
+body[data-theme='dark'] select:hover {
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+.masarak-form-select:focus,
+.subject-select:focus,
+.classroom-select:focus,
+.um-select:focus,
+select:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15) !important;
+  transform: translateY(0px) !important;
+}
+
+:root[data-theme='dark'] .masarak-form-select:focus,
+body[data-theme='dark'] .masarak-form-select:focus,
+:root[data-theme='dark'] select:focus,
+body[data-theme='dark'] select:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
+}
+
+/* Time Pickers & Inputs styling */
+input[type="time"] {
+  height: 54px !important;
+  padding: 0 16px !important;
+  border-radius: 18px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #0F172A !important;
+  background-color: #FFFFFF !important;
+  outline: none !important;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+:root[data-theme='dark'] input[type="time"] {
+  background-color: #15243B !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  color: #F1F5F9 !important;
+}
+
+input[type="time"]:hover {
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+input[type="time"]:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15) !important;
+  transform: translateY(0px) !important;
+}
+
+:root[data-theme='dark'] input[type="time"]:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
 }
 
 /* ─── Toggle Row ──────────────────────────────────────────── */
@@ -2368,7 +2454,8 @@ body[data-theme='dark'] .masarak-btn-secondary:hover {
 
 :root {
   --color-primary: #2563eb;
-  --color-primary-light: #60a5fa;
+  --color-primary-light: #F4F1FF;
+  --color-primary-soft: rgba(37, 99, 235, 0.12);
   --color-primary-dark: #1d4ed8;
   --color-purple: #7c3aed;
   --color-purple-light: #a78bfa;
@@ -2377,19 +2464,19 @@ body[data-theme='dark'] .masarak-btn-secondary:hover {
   --color-danger: #ef4444;
   --color-info: #38bdf8;
 
-  --page-bg: #f6f9ff;
+  --page-bg: #F7F9FF;
   --surface-card: #ffffff;
-  --surface-soft: #f8fafc;
+  --surface-soft: #F7F9FF;
   --surface-elevated: #ffffff;
-  --text-primary: #0f172a;
+  --text-primary: #1E293B;
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
+  --border-color: #E8EEF9;
   --focus-ring: rgba(37, 99, 235, 0.16);
 
-  --gradient-masarak: linear-gradient(135deg, #2563eb 0%, #4f46e5 52%, #7c3aed 100%);
-  --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.05);
-  --shadow-card-hover: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --gradient-masarak: linear-gradient(135deg, #2563eb 0%, #4f7bff 45%, #7c3aed 100%);
+  --shadow-card: 0 12px 30px rgba(37, 99, 235, 0.06);
+  --shadow-card-hover: 0 16px 35px rgba(79, 123, 255, 0.12);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -2981,3 +3068,147 @@ body[data-theme='dark'],
 :root[data-theme='dark'] .profile-page .profile-main-card dl > div { background:#15243b !important; }
 @media(max-width:1100px){.profile-layout{grid-template-columns:1fr !important}.profile-main-card,.profile-summary{order:initial}.profile-summary{grid-template-columns:repeat(2,minmax(0,1fr));display:grid;gap:18px}.profile-summary article{margin:0!important}}
 @media(max-width:640px){.student-dashboard .dashboard-panel{padding:18px}.profile-main-card{padding:18px!important}.profile-hero{margin:-18px -18px 20px;padding:24px 18px}.profile-page .profile-main-card dl,.profile-summary{grid-template-columns:1fr}.profile-page-header button{width:100%}}
+
+/* ═══════════════════════════════════════════════════
+   MASARAK PREMIUM DATEPICKER THEME
+   ═══════════════════════════════════════════════════ */
+
+/* Global Datepicker Font */
+.mat-datepicker-content,
+.mat-calendar {
+  font-family: inherit !important;
+  border-radius: 20px !important;
+}
+
+/* Base popup styling */
+.mat-datepicker-content {
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(37, 99, 235, 0.05) !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+}
+
+:root[data-theme='dark'] .mat-datepicker-content {
+  background: #111E33 !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.1) !important;
+}
+
+:root[data-theme='dark'] .mat-calendar-table-header th {
+  color: #94A3B8 !important;
+}
+
+:root[data-theme='dark'] .mat-calendar-body-cell-content {
+  color: #E2E8F0 !important;
+}
+
+:root[data-theme='dark'] .mat-calendar-body-label {
+  color: #CBD5E1 !important;
+}
+
+/* Disabled Dates - Soft Red (Global) */
+.mat-calendar-body-disabled > .mat-calendar-body-cell-content {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #DC2626 !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+:root[data-theme='dark'] .mat-calendar-body-disabled > .mat-calendar-body-cell-content {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #FCA5A5 !important;
+}
+
+/* Future / Selectable Dates (Only for Scheduling Pickers) - Soft Green */
+.masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):not(.mat-calendar-body-selected):not(.mat-calendar-body-active) > .mat-calendar-body-cell-content {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  color: #047857 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+:root[data-theme='dark'] .masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):not(.mat-calendar-body-selected):not(.mat-calendar-body-active) > .mat-calendar-body-cell-content {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+}
+
+/* Hover effects for selectable dates (Only for Scheduling Pickers) */
+.masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover > .mat-calendar-body-cell-content {
+  transform: scale(1.03) !important;
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Today Date Outline - Primary Blue */
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border: none !important;
+}
+.mat-calendar-body-today:not(.mat-calendar-body-selected) > .mat-calendar-body-cell-content {
+  box-shadow: inset 0 0 0 2px #3B82F6 !important;
+  background-color: transparent !important;
+  color: #3B82F6 !important;
+}
+:root[data-theme='dark'] .mat-calendar-body-today:not(.mat-calendar-body-selected) > .mat-calendar-body-cell-content {
+  box-shadow: inset 0 0 0 2px #60A5FA !important;
+  color: #60A5FA !important;
+}
+
+/* Selected Date - Primary Gradient */
+.mat-calendar-body-selected {
+  background-color: transparent !important;
+}
+.mat-calendar-body-selected > .mat-calendar-body-cell-content {
+  background: linear-gradient(135deg, #2563EB, #8B5CF6) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.2) !important;
+  border-radius: 50% !important;
+  transform: scale(1.05) !important;
+}
+
+/* Clean up Material Default Buttons */
+.mat-calendar-controls {
+  margin: 12px 12px 0 !important;
+}
+.mat-calendar-previous-button, .mat-calendar-next-button {
+  background: rgba(241, 245, 249, 0.8) !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+.mat-calendar-previous-button:hover, .mat-calendar-next-button:hover {
+  background: #E2E8F0 !important;
+  transform: translateY(-2px) !important;
+}
+:root[data-theme='dark'] .mat-calendar-previous-button, :root[data-theme='dark'] .mat-calendar-next-button {
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #F8FAFC !important;
+}
+:root[data-theme='dark'] .mat-calendar-previous-button:hover, :root[data-theme='dark'] .mat-calendar-next-button:hover {
+  background: #334155 !important;
+}
+
+/* Field Container Styling (form-field) to match existing Masarak forms */
+.mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+.mat-mdc-text-field-wrapper {
+  background-color: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  padding: 0 16px !important;
+  transition: all 0.2s ease !important;
+}
+.mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+:root[data-theme='dark'] .mat-mdc-text-field-wrapper {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: #FFFFFF !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+}
+:root[data-theme='dark'] .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: #0F172A !important;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1) !important;
+}
+.mdc-line-ripple {
+  display: none !important;
+}

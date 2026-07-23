@@ -16,6 +16,8 @@ import { StudentDashboardCardsComponent } from '../../components/dashboard-cards
 import { StudentScheduleCardComponent } from '../../components/schedule-card/schedule-card.component';
 import { StudentDashboardData, StudentScheduleSession } from '../../models';
 import { StudentService } from '../../services/student.service';
+import { AuthStateService } from '../../../../core/services/auth-state-service';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-student-dashboard-page',
@@ -26,6 +28,7 @@ import { StudentService } from '../../services/student.service';
     StudentCourseCardComponent,
     StudentDashboardCardsComponent,
     StudentScheduleCardComponent,
+    IconComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -33,8 +36,37 @@ import { StudentService } from '../../services/student.service';
 })
 export class StudentDashboardPageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
+  private readonly authStateService = inject(AuthStateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+
+  readonly user = this.authStateService.user;
+  readonly detectedGender = computed<'male' | 'female'>(() => {
+    const name = this.user()?.fullName ?? '';
+    if (!name) return 'male';
+    const femaleEnds = ['ة', 'ى', 'اء', 'ام', 'ين'];
+    const femaleNames = [
+      'مريم', 'زينب', 'هدى', 'نهى', 'سارة', 'فاطمة', 'شروق', 'حبيبة', 'ياسمين', 
+      'إيمان', 'منار', 'أسماء', 'ندى', 'نور', 'سلمى', 'رنا', 'منى', 'ضحى', 
+      'آية', 'عبير', 'نورهان', 'رانيا', 'دعاء', 'رحمة', 'ندين', 'فريدة', 
+      'روان', 'شهد', 'ملاك', 'جنا', 'ملك', 'نرمين', 'ماري', 'ساره', 'هبة', 'شيرين'
+    ];
+    const firstWord = name.trim().split(' ')[0];
+    if (femaleNames.includes(firstWord)) return 'female';
+
+    const lastChar = firstWord.charAt(firstWord.length - 1);
+    const lastTwo = firstWord.slice(-2);
+    if (femaleEnds.includes(lastChar) || lastTwo === 'ات' || lastTwo === 'ان') {
+      const maleExclusions = [
+        'أحمد', 'محمد', 'مروان', 'عثمان', 'سليمان', 'حسين', 'حسن', 'مصطفى', 
+        'يحيى', 'مجدي', 'هاني', 'علي', 'رامي', 'شادي', 'سامي', 'فادي', 'علاء', 'سليمان'
+      ];
+      if (!maleExclusions.includes(firstWord)) {
+        return 'female';
+      }
+    }
+    return 'male';
+  });
 
   readonly data = signal<StudentDashboardData | null>(null);
   readonly isLoading = signal<boolean>(true);

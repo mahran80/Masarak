@@ -296,6 +296,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
   activeSection = signal<string>('home');
+  showBackToTop = signal(false);
 
   /* ============ LOCALE & THEME ============ */
   lang = signal<'ar' | 'en'>('ar');
@@ -431,6 +432,7 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const currentScroll = window.scrollY;
     this.isScrolled.set(currentScroll > 12);
+    this.showBackToTop.set(currentScroll > 400);
 
     const sections = ['home', 'features', 'stages', 'why-choose', 'journey', 'faq'];
     let current = 'home';
@@ -442,6 +444,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.activeSection() !== current) this.activeSection.set(current);
+  }
+
+  scrollToTop(event: Event): void {
+    event.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /* ============ HERO AUTOPLAY ============ */

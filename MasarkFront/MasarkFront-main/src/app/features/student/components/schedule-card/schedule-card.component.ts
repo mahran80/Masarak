@@ -3,10 +3,13 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import { StudentScheduleSession } from '../../models';
 
+import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+
 @Component({
   selector: 'app-student-schedule-card',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, CommonModule, IconComponent],
   templateUrl: './schedule-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

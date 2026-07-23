@@ -22,6 +22,10 @@ export const STUDENT_ROUTES: Routes = [
       import('../pages/courses/courses.component').then((m) => m.StudentCoursesPageComponent),
   },
   {
+    path: 'courses/:subjectId',
+    loadComponent: () => import('../pages/course-details/course-details.component').then((m) => m.StudentCourseDetailsPageComponent),
+  },
+  {
     path: 'content',
     loadComponent: () =>
       import('../pages/content/content.component').then((m) => m.StudentContentPageComponent),

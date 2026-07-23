@@ -1,14 +1,40 @@
 <div class="admin-dashboard space-y-6 font-sans text-slate-800" dir="rtl">
   
-  <div class="admin-page-header mb-6">
-    <div class="admin-title-row">
-      <h1 class="admin-page-title">لوحة تحكم الإدارة العامة</h1>
-      <span class="admin-badge">
-        حساب المدير (Admin)
-      </span>
+  <!-- Premium Admin Hero Slider -->
+  <!-- Premium Static Admin Hero Section -->
+  <header class="admin-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none mb-6" style="min-height: 280px;">
+    
+    <!-- Premium Gradient Background & Ambient Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+    
+    <!-- Floating particles and 3D icons -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <!-- Glow spots -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-[100px]"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px]"></div>
+      
+      <!-- Sparkles / Stars -->
+      <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60"></div>
+      <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40"></div>
+      <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50"></div>
     </div>
-    <p class="admin-page-desc">مرحباً بك في لوحة تحكم الإدارة لمشروع مسارك</p>
-  </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 w-full px-8 md:px-12 py-8 flex-1 h-full">
+      <div class="w-full text-right">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[11px] font-extrabold backdrop-blur-md border border-white/10 mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+          حساب المدير (Admin)
+        </span>
+        <h1 class="text-3xl md:text-4xl font-black text-white leading-tight mb-3 tracking-tight">
+          لوحة تحكم الإدارة العامة
+        </h1>
+        <p class="text-white/80 text-sm md:text-base font-semibold leading-relaxed max-w-[800px]">
+          مرحباً بك في لوحة تحكم الإدارة لمشروع مسارك. تابع أداء المنصة والحسابات النشطة وعمليات المراقبة والتحقق اليومية.
+        </p>
+      </div>
+    </div>
+  </header>
 
   @if (isLoading()) {
     <div class="flex justify-center py-12">

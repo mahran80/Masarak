@@ -1,22 +1,73 @@
 <section class="student-dashboard" dir="rtl">
-  <header class="dashboard-hero">
-    <div class="hero-copy">
-      <span class="hero-badge">لوحة الطالب</span>
-      <h1>مرحبًا بك في مسارك التعليمي</h1>
-      <p>تابع دروسك ومواعيدك ومستواك الدراسي من مكان واحد وبخطوات بسيطة.</p>
+  <header class="student-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none" style="min-height: 320px;">
+    
+    <!-- Premium Gradient Background & Ambient Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+    
+    <!-- Floating particles and 3D icons -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <!-- Glow spots -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+      
+      <!-- Sparkles / Stars -->
+      <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
+      <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
+      <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
+      <div class="absolute top-[15%] left-[50%] w-1.5 h-1.5 bg-purple-200 rounded-full opacity-70 animate-sparkle-4"></div>
+      
+      <!-- Floating icons -->
+      <svg class="absolute top-[12%] left-[45%] w-6 h-6 text-white/15 animate-float-slow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
+      <svg class="absolute bottom-[15%] right-[40%] w-5 h-5 text-white/10 animate-float-slower" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
+      <svg class="absolute top-[25%] left-[8%] w-8 h-8 text-white/12 animate-float-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"/>
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+      </svg>
     </div>
-    <div class="hero-actions">
-      <a routerLink="courses" class="hero-link hero-link-primary">
-        <span>استكشف مقرراتي</span>
-        <span aria-hidden="true">←</span>
-      </a>
-      <button type="button" class="refresh-button" [disabled]="isLoading()" (click)="loadDashboard()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7h-5V2M4 17h5v5m10.5-9A8 8 0 0 0 6 6.5L4 9m16 6-2 2.5A8 8 0 0 1 4.5 11"/>
-        </svg>
-        {{ isLoading() ? 'جارٍ التحديث...' : 'تحديث البيانات' }}
-      </button>
-    </div>
+
+    @if (isLoading()) {
+      <div class="hero-skeleton relative z-10 px-8 md:px-12 py-10" aria-label="جارٍ تحميل الترحيب">
+        <i></i><b></b><span></span><em></em>
+      </div>
+    } @else {
+      <!-- Hero Content -->
+      <div class="relative z-10 px-8 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-8 w-full flex-1">
+        <!-- RIGHT SIDE: Text Content -->
+        <div class="flex-1 space-y-4 text-right">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[11px] font-extrabold backdrop-blur-md border border-white/10 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            لوحة الطالب
+          </span>
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
+            مرحبًا بك في مسارك التعليمي، {{ user()?.fullName?.split(' ')?.at(0) }}
+          </h1>
+          <p class="text-white/85 text-xs md:text-sm font-semibold leading-relaxed max-w-xl">
+            تابع دروسك ومواعيدك ومستواك الدراسي من مكان واحد وبخطوات بسيطة.
+          </p>
+
+          <div class="flex flex-wrap gap-4 justify-start pt-2">
+            <a routerLink="courses" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm shadow-md">
+              <span>استكشف مقرراتي</span>
+              <span aria-hidden="true" class="mr-1.5">←</span>
+            </a>
+            <button type="button" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm backdrop-blur-md" [disabled]="isLoading()" (click)="loadDashboard()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 ml-2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7h-5V2M4 17h5v5m10.5-9A8 8 0 0 0 6 6.5L4 9m16 6-2 2.5A8 8 0 0 1 4.5 11"/>
+              </svg>
+              {{ isLoading() ? 'جارٍ التحديث...' : 'تحديث البيانات' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- LEFT SIDE: Illustration -->
+        <div class="hidden md:flex w-[45%] relative items-center justify-center select-none z-10">
+          <div class="relative w-full max-w-[420px] h-[270px] flex items-center justify-center">
+            <img [src]="'/assets/images/dashboard-heroes/' + (detectedGender() === 'female' ? 'student-female-hero.png' : 'student-male-hero.png')" class="w-full h-full object-contain student-hero-image" alt="الطالب">
+          </div>
+        </div>
+      </div>
+    }
   </header>
 
   <nav class="student-quick-links" aria-label="الوصول السريع">

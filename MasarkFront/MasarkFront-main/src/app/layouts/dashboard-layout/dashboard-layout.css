@@ -26,7 +26,7 @@
   background:
     radial-gradient(circle at 12% 8%, rgba(96,165,250,.12), transparent 28%),
     radial-gradient(circle at 88% 12%, rgba(167,139,250,.10), transparent 26%),
-    #F6F9FF;
+    linear-gradient(135deg, #F8FBFF 0%, #EEF4FF 55%, #F7F1FF 100%) !important;
   position: relative;
   overflow-x: hidden;
 }
@@ -133,8 +133,8 @@
   display: flex !important;
   flex-direction: column !important;
   padding: 14px 16px !important;
-  background: #FFFFFF !important;
-  border: 1px solid rgba(226, 232, 240, 0.80) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 249, 255, 0.98)) !important;
+  border: 1px solid #E8EEF9 !important;
   border-radius: 18px !important;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04) !important;
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), 
@@ -272,31 +272,78 @@
   height: 19px !important;
 }
 
-.admin-sidebar-link:hover {
-  background: rgba(37, 99, 235, 0.05) !important;
+/* Inactive Nav Links - Styling */
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active) {
+  color: #64748B !important;
+  background: transparent !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
+  background: rgba(79, 123, 255, 0.08) !important;
+  color: #2563EB !important;
+  transform: translateX(-3px);
+}
+
+[dir='ltr'] nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
+  transform: translateX(3px);
+}
+
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover app-icon,
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover svg {
   color: #2563EB !important;
 }
 
-:root[data-theme='dark'] .admin-sidebar-link:hover {
-  background: rgba(37, 99, 235, 0.10) !important;
-  color: #3B82F6 !important;
+:root[data-theme='dark'] nav a:not(.sidebar-active-link):not(.ml-sidebar-active) {
+  color: #94A3B8 !important;
+}
+
+:root[data-theme='dark'] nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
+  background: rgba(79, 123, 255, 0.12) !important;
+  color: #60A5FA !important;
 }
 
 /* Active Nav Links */
-.admin-sidebar-link.sidebar-active-link,
-.admin-sidebar-link.ml-sidebar-active {
-  background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%) !important;
+nav a.sidebar-active-link,
+nav a.ml-sidebar-active {
+  background: linear-gradient(135deg, #2563EB 0%, #4F7BFF 45%, #7C3AED 100%) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.22) !important;
-  transform: none !important;
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25) !important;
+  transform: translateY(-1px);
 }
 
-.admin-sidebar-link.sidebar-active-link app-icon,
-.admin-sidebar-link.ml-sidebar-active app-icon,
-.admin-sidebar-link.sidebar-active-link svg,
-.admin-sidebar-link.sidebar-active-link svg path {
+nav a.sidebar-active-link app-icon,
+nav a.ml-sidebar-active app-icon,
+nav a.sidebar-active-link svg,
+nav a.ml-sidebar-active svg,
+nav a.sidebar-active-link svg path,
+nav a.ml-sidebar-active svg path {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
+  fill: transparent !important;
+}
+
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active) app-icon,
+nav a:not(.sidebar-active-link):not(.ml-sidebar-active) svg {
+  transition: color 0.2s ease !important;
+}
+
+/* Inactive icons dynamic color scheme matching Masarak style */
+nav div:nth-of-type(4n+1) a:not(.sidebar-active-link):not(.ml-sidebar-active) app-icon,
+nav div:nth-of-type(4n+1) a:not(.sidebar-active-link):not(.ml-sidebar-active) svg {
+  color: #3B82F6 !important;
+}
+nav div:nth-of-type(4n+2) a:not(.sidebar-active-link):not(.ml-sidebar-active) app-icon,
+nav div:nth-of-type(4n+2) a:not(.sidebar-active-link):not(.ml-sidebar-active) svg {
+  color: #6366F1 !important;
+}
+nav div:nth-of-type(4n+3) a:not(.sidebar-active-link):not(.ml-sidebar-active) app-icon,
+nav div:nth-of-type(4n+3) a:not(.sidebar-active-link):not(.ml-sidebar-active) svg {
+  color: #8B5CF6 !important;
+}
+nav div:nth-of-type(4n+4) a:not(.sidebar-active-link):not(.ml-sidebar-active) app-icon,
+nav div:nth-of-type(4n+4) a:not(.sidebar-active-link):not(.ml-sidebar-active) svg {
+  color: #4F6EF7 !important;
 }
 
 /* ───────────────────────────────────────
@@ -474,8 +521,17 @@
 /* Phase 2 prototype — visual-only shared navigation refinements. */
 .admin-topbar {
   height: clamp(68px, 5vw, 72px) !important;
-  border-color: color-mix(in srgb, var(--ds-border, #dbe3ef) 84%, transparent) !important;
-  box-shadow: var(--ds-shadow-float, 0 18px 44px rgba(37, 99, 235, .12)) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(232, 238, 249, 0.75) !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.03) !important;
+}
+
+:root[data-theme='dark'] .admin-topbar {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 .sidebar {
@@ -501,51 +557,10 @@
   background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 70%, #fff) !important;
 }
 
-.admin-sidebar-link.sidebar-active-link,
-.admin-sidebar-link.ml-sidebar-active {
-  color: var(--ds-primary, #2563eb) !important;
-  background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 86%, #fff) !important;
-  box-shadow: inset 3px 0 0 var(--ds-primary, #2563eb) !important;
-}
-
-.admin-sidebar-link.sidebar-active-link app-icon,
-.admin-sidebar-link.ml-sidebar-active app-icon,
-.admin-sidebar-link.sidebar-active-link svg,
-.admin-sidebar-link.ml-sidebar-active svg,
-.admin-sidebar-link.sidebar-active-link svg path,
-.admin-sidebar-link.ml-sidebar-active svg path {
-  color: currentColor !important;
-  stroke: currentColor !important;
-}
-
-.admin-sidebar-support-card {
-  padding: 9px 11px !important;
-  border-radius: 14px !important;
-  background: color-mix(in srgb, var(--ds-primary-soft, #eff6ff) 62%, transparent) !important;
-}
-
-.admin-sidebar-logout-btn {
-  min-height: 40px;
-  height: 40px !important;
-  padding: 9px 12px !important;
-  color: #dc2626 !important;
-  background: rgba(239, 68, 68, .07) !important;
-  box-shadow: none !important;
-}
-
-.admin-sidebar-logout-btn:hover {
-  background: rgba(239, 68, 68, .13) !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-:root[data-theme='dark'] .admin-sidebar-home-link,
-:root[data-theme='dark'] .admin-sidebar-link.sidebar-active-link,
-:root[data-theme='dark'] .admin-sidebar-link.ml-sidebar-active {
+:root[data-theme='dark'] .admin-sidebar-home-link {
   color: #93c5fd !important;
   background: rgba(37, 99, 235, .16) !important;
   border-color: rgba(96, 165, 250, .18) !important;
-  box-shadow: inset 3px 0 0 #60a5fa !important;
 }
 
 @media (max-width: 767px) {

@@ -1,27 +1,83 @@
 <div class="teacher-dashboard-container" dir="rtl">
-  <section class="teacher-hero">
-    <div class="teacher-hero__content">
-      <span class="teacher-hero__badge"><app-icon name="academic-cap" [size]="14"></app-icon> لوحة المدرس</span>
-      <h1>مرحبًا بك، أستاذنا</h1>
-      <p>تابع جدولك اليومي، طلابك، الواجبات والتصحيح من مكان واحد.</p>
-      <div class="teacher-hero__meta">
-        <span><app-icon name="calendar" [size]="14"></app-icon>{{ today }}</span>
-        <span><app-icon name="clock" [size]="14"></app-icon>لديك {{ sessions().length }} حصص اليوم</span>
+  <!-- Premium Static Teacher Hero Section -->
+  <header class="teacher-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none mb-6" style="min-height: 360px;">
+    
+    <!-- Premium Gradient Background & Ambient Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+    
+    <!-- Floating particles and 3D icons -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <!-- Glow spots -->
+      <div class="absolute -top-32 -right-32 w-[400px] h-[400px] bg-white/12 rounded-full blur-[100px] animate-pulse-slow"></div>
+      <div class="absolute -bottom-32 -left-32 w-[350px] h-[350px] bg-purple-400/20 rounded-full blur-[90px] animate-pulse-slow"></div>
+      
+      <!-- Sparkles / Stars -->
+      <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
+      <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
+      <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
+      <div class="absolute top-[15%] left-[50%] w-1.5 h-1.5 bg-purple-200 rounded-full opacity-70 animate-sparkle-4"></div>
+      
+      <!-- Floating decorative stars -->
+      <svg class="absolute top-[12%] left-[45%] w-6 h-6 text-white/10 animate-float-slow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
+      <svg class="absolute bottom-[15%] right-[40%] w-5 h-5 text-white/8 animate-float-slower" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
+    </div>
+
+    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 w-full px-8 md:px-12 py-8 flex-1">
+      <!-- RIGHT SIDE: Text Content -->
+      <div class="flex-1 space-y-5 w-full text-right">
+        <!-- Badge & Meta -->
+        <div class="flex flex-wrap items-center gap-3 justify-start">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/12 dark:bg-white/8 backdrop-blur-md rounded-full border border-white/18 text-xs font-black text-white shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>لوحة المدرس</span>
+          </div>
+          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+            <app-icon name="calendar" size="14" class="text-white"></app-icon>
+            {{ today }}
+          </span>
+          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+            <app-icon name="clock" size="14" class="text-white"></app-icon>
+            لديك {{ sessions().length }} حصص اليوم
+          </span>
+        </div>
+        <div class="space-y-3 pt-1">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
+            مرحباً بك أستاذي،
+          </h1>
+          <p class="text-sm md:text-base text-white/90 max-w-xl leading-relaxed font-semibold">
+            تابع حصصك، أنشئ الواجبات والاختبارات، وراقب تقدم طلابك بسهولة ويسر.
+          </p>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap gap-4 justify-start pt-2">
+          <a routerLink="sessions" class="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-white text-[#1E40AF] hover:bg-slate-50 hover:scale-[1.02] active:scale-95 hover:shadow-lg transition-all duration-200 font-extrabold text-sm shadow-md">
+            <app-icon name="calendar" [size]="16" class="ml-2"></app-icon>
+            جدول الحصص
+          </a>
+          <a routerLink="assignments" class="inline-flex items-center justify-center px-6 py-3 rounded-2xl border border-white/40 text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm">
+            <app-icon name="clipboard" [size]="16" class="ml-2"></app-icon>
+            الواجبات والمهام
+          </a>
+        </div>
       </div>
-      <div class="quick-actions" aria-label="الإجراءات السريعة">
-        <a routerLink="/dashboard/teacher/assessment/assignments/create" class="quick-action primary">
-          <app-icon name="plus" [size]="17"></app-icon><span>إضافة واجب جديد</span>
-        </a>
-        <a routerLink="/dashboard/teacher/assessment/exams/create" class="quick-action secondary">
-          <app-icon name="pencil-square" [size]="17"></app-icon><span>إنشاء اختبار</span>
-        </a>
+
+      <!-- LEFT SIDE: Illustration -->
+      <div class="hidden md:flex w-[42%] relative items-center justify-center select-none z-10">
+        <div class="relative w-full max-w-[360px] h-[260px] flex items-center justify-center">
+          <img src="/assets/images/dashboard-heroes/teacher-hero.png" class="w-full h-full object-contain teacher-hero-image" alt="المعلم">
+          
+          <!-- Floating academic icons around teacher -->
+          <span class="absolute top-[8%] right-[8%] text-white/15 animate-float-icon-1"><app-icon name="book-open" [size]="24"></app-icon></span>
+          <span class="absolute bottom-[18%] right-[12%] text-white/12 animate-float-icon-2"><app-icon name="clipboard" [size]="20"></app-icon></span>
+          <span class="absolute top-[12%] left-[8%] text-white/15 animate-float-icon-3"><app-icon name="chart" [size]="22"></app-icon></span>
+          <span class="absolute bottom-[22%] left-[12%] text-white/12 animate-float-icon-4"><app-icon name="users" [size]="22"></app-icon></span>
+        </div>
       </div>
     </div>
-    <div class="teacher-hero__visual" aria-hidden="true">
-      <span class="hero-visual-ring"></span>
-      <span class="hero-visual-icon"><app-icon name="academic-cap" [size]="39"></app-icon></span>
-    </div>
-  </section>
+
+  </header>
+
 
   <section class="teacher-stats-grid" aria-label="إحصائيات لوحة المدرس">
     <article class="teacher-stat pending">

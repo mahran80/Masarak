@@ -9,6 +9,13 @@
 
   <!-- Top Corner Toggles (COMPACT) -->
   <div class="ml-auth-toggles-corner">
+    <!-- Back to Landing Page Icon Button -->
+    <a routerLink="/" class="ml-home-btn" aria-label="Back to landing page" [title]="lang() === 'ar' ? 'العودة للرئيسية' : 'Back to Home'">
+      <span class="material-symbols-outlined">
+        home
+      </span>
+    </a>
+
     <!-- Globe Language Dropdown -->
     <div class="ml-lang-dropdown-wrapper">
       <button type="button" class="ml-globe-btn" (click)="showLangDropdown.set(!showLangDropdown())" aria-label="Language selection">
@@ -33,7 +40,7 @@
       
       <!-- LEFT SIDE: Hero Image -->
       <div class="ml-auth-hero-pane" [ngStyle]="{'background-image': 'url(/assets/images/' + (mode === 'Parent' ? 'parent_register.jpg' : 'student_register.jpg') + ')'}">
-        <div class="ml-hero-overlay"></div>
+        <div class="ml-hero-overlay" [style.background]="mode === 'Parent' ? 'linear-gradient(180deg, rgba(37,99,235,.15), rgba(20,24,40,.55))' : ''"></div>
         <div class="ml-hero-text-overlay" style="top: auto; bottom: 0; padding: 40px 24px; text-align: start;">
           <h1 class="ml-hero-title" style="font-size: 24px; margin-bottom: 12px; font-weight: 800; line-height: 1.4;">{{ mode === 'Parent' ? t().heroHeadlineParent : t().heroHeadlineStudent }}</h1>
           <p class="ml-hero-desc" style="font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.85); line-height: 1.6; max-width: none; margin: 0;">{{ mode === 'Parent' ? t().heroSubheadlineParent : t().heroSubheadlineStudent }}</p>

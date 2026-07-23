@@ -146,139 +146,62 @@ const EN = {
   template: `
     <div class="space-y-8 md:space-y-12 animate-fade-in relative z-10 pb-24 w-full" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
       
-      <!-- 2. Premium Hero Section -->
-      <div class="relative overflow-hidden rounded-[28px] border border-blue-50/80 dark:border-slate-800/80 bg-gradient-to-br from-[#EFF6FF] to-[#F4F1FF] dark:from-[#0B172A] dark:to-[#111E33] p-8 md:p-10 lg:p-12 shadow-[0_12px_32px_rgba(37,99,235,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)]">
-        <!-- Background Decorative Blur Shapes -->
-        <div class="absolute -top-24 -right-24 w-72 h-72 bg-blue-400/10 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-400/10 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <!-- 2. Premium Static Hero Section -->
+      <div class="parent-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none" style="min-height: 320px;">
         
-        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <!-- Text Content -->
-          <div class="flex-1 space-y-6 w-full text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+        <!-- Premium Gradient Background & Ambient Elements -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+        
+        <!-- Floating particles and 3D icons -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+          <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+          <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
+          <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
+          <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 w-full px-8 md:px-12 py-8 flex-1">
+          <!-- Text Content (Right side in RTL, Left side in LTR) -->
+          <div class="flex-1 space-y-4 w-full text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
             <!-- User Info Badge & Date -->
             <div class="flex flex-wrap items-center gap-3 justify-start">
-              <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm text-xs font-bold text-slate-800 dark:text-slate-200">
-                <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/12 dark:bg-white/8 backdrop-blur-md rounded-full border border-white/18 text-[11px] font-extrabold text-white shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                 <span>{{ t().ROLE_LABEL }}</span>
               </div>
-              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 bg-white/40 dark:bg-slate-800/40 px-3 py-1 rounded-lg border border-slate-100/50 dark:border-slate-700/50">
-                <app-icon name="calendar" size="14" class="text-blue-600 dark:text-blue-400"></app-icon>
+              <span class="text-[11px] font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+                <app-icon name="calendar" size="14" class="text-white"></app-icon>
                 {{ todayDate }}
               </span>
             </div>
 
             <!-- Welcome Title -->
             <div class="space-y-2">
-              <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                {{ t().WELCOME_BACK }} <span class="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-violet-400">{{ parentFullName }}</span>
+              <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
+                {{ t().WELCOME_BACK }} {{ parentFullName }}
               </h1>
-              <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed">
+              <p class="text-xs md:text-sm text-white/85 max-w-xl leading-relaxed font-medium">
                 {{ t().HERO_SUBTITLE }}
               </p>
             </div>
 
-            <!-- Carousel Slides (Inside Hero) -->
-            <div class="relative min-h-[95px] pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-              @if (activeSlide() === 0) {
-                <div class="animate-fade-in space-y-2">
-                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">{{ t().HERO_SLIDE_1_TITLE }}</h2>
-                  <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-lg">{{ t().HERO_SLIDE_1_DESC }}</p>
-                </div>
-              } @else if (activeSlide() === 1) {
-                <div class="animate-fade-in space-y-2">
-                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">{{ t().HERO_SLIDE_2_TITLE }}</h2>
-                  <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-lg">{{ t().HERO_SLIDE_2_DESC }}</p>
-                </div>
-              } @else if (activeSlide() === 2) {
-                <div class="animate-fade-in space-y-2">
-                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">{{ t().HERO_SLIDE_3_TITLE }}</h2>
-                  <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-lg">{{ t().HERO_SLIDE_3_DESC }}</p>
-                </div>
-              } @else if (activeSlide() === 3) {
-                <div class="animate-fade-in space-y-2">
-                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">{{ t().HERO_SLIDE_4_TITLE }}</h2>
-                  <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-lg">{{ t().HERO_SLIDE_4_DESC }}</p>
-                </div>
-              } @else if (activeSlide() === 4) {
-                <div class="animate-fade-in space-y-2">
-                  <h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100">{{ t().HERO_SLIDE_5_TITLE }}</h2>
-                  <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-lg">{{ t().HERO_SLIDE_5_DESC }}</p>
-                </div>
-              }
-            </div>
-
-            <!-- Dots Indicator & Actions -->
-            <div class="flex items-center justify-between gap-4 pt-4">
-              <div class="flex items-center gap-1.5">
-                @for (idx of [0, 1, 2, 3, 4]; track idx) {
-                  <button 
-                    (click)="setSlide(idx)" 
-                    class="h-1.5 rounded-full transition-all duration-300 focus:outline-none"
-                    [class.w-6]="activeSlide() === idx" [class.bg-blue-600]="activeSlide() === idx" [class.dark:bg-blue-500]="activeSlide() === idx"
-                    [class.w-1.5]="activeSlide() !== idx" [class.bg-slate-300]="activeSlide() !== idx" [class.dark:bg-slate-700]="activeSlide() !== idx"
-                    [attr.aria-label]="'Slide ' + (idx + 1)"
-                  ></button>
-                }
-              </div>
-
-              <a routerLink="/add-student" class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-[0_4px_14px_rgba(37,99,235,0.2)] hover:-translate-y-0.5">
+            <!-- CTA Actions -->
+            <div class="flex flex-wrap items-center gap-4 pt-2 justify-start">
+              <a routerLink="/add-student" class="px-6 py-2.5 bg-white hover:bg-slate-50 text-blue-700 rounded-2xl text-xs font-black transition-all duration-300 shadow-[0_10px_25px_rgba(255,255,255,0.15)] hover:-translate-y-1 flex items-center gap-2">
                 <app-icon name="plus" size="16"></app-icon>
                 <span>{{ t().ADD_STUDENT }}</span>
               </a>
             </div>
           </div>
 
-          <!-- Illustration / Image Section -->
-          <div class="hidden md:flex w-[35%] relative overflow-hidden items-center justify-center select-none">
-            <div class="relative w-full aspect-square max-w-[220px] p-4 flex items-center justify-center bg-white/20 dark:bg-slate-800/20 backdrop-blur-md rounded-[22px] border border-white/40 dark:border-slate-700/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_8px_24px_rgba(37,99,235,0.04)]">
-              <!-- Inline SVG Illustration -->
-              <svg viewBox="0 0 200 200" class="w-full h-full object-contain drop-shadow-[0_8px_20px_rgba(79,70,229,0.12)] animate-float-illustration" aria-hidden="true">
-                <defs>
-                  <linearGradient id="svgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#2563EB" />
-                    <stop offset="50%" stop-color="#4F46E5" />
-                    <stop offset="100%" stop-color="#7C3AED" />
-                  </linearGradient>
-                  <filter id="svgGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="4" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
-
-                <circle cx="100" cy="100" r="80" fill="url(#svgGrad)" opacity="0.04" />
-                <circle cx="100" cy="100" r="65" fill="none" stroke="url(#svgGrad)" stroke-width="1.2" stroke-dasharray="3 5" opacity="0.2" />
-
-                <!-- Book Base -->
-                <path d="M45,135 C70,130 95,138 100,140 C105,138 130,130 155,135 L155,80 C130,75 105,83 100,85 C95,83 70,75 45,80 Z" fill="#FFFFFF" class="dark:fill-slate-800" stroke="url(#svgGrad)" stroke-width="2.5" />
-                <path d="M45,135 C70,130 95,138 100,140 L100,85 C95,83 70,75 45,80 Z" fill="#F8FAFC" class="dark:fill-slate-700/50" stroke="url(#svgGrad)" stroke-width="1" />
-
-                <!-- Graduation Cap -->
-                <g transform="translate(10, -5)">
-                  <polygon points="90,45 125,55 90,65 55,55" fill="url(#svgGrad)" filter="url(#svgGlow)" opacity="0.75" />
-                  <polygon points="90,45 125,55 90,65 55,55" fill="url(#svgGrad)" />
-                  <path d="M70,59 L70,70 C70,75 110,75 110,70 L110,59" fill="#1E293B" class="dark:fill-slate-900" stroke="url(#svgGrad)" stroke-width="1.5" />
-                  <path d="M90,55 L120,62 L120,78" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" />
-                  <circle cx="120" cy="78" r="2.5" fill="#F59E0B" />
-                </g>
-
-                <!-- Floating sparkles -->
-                <path d="M148,45 L150,51 L156,53 L150,55 L148,61 L146,55 L140,53 L146,51 Z" fill="#F59E0B" />
-                <path d="M50,110 L51,114 L55,115 L51,116 L50,120 L49,116 L45,115 L49,114 Z" fill="#7C3AED" opacity="0.7" />
-                
-                <!-- Trophy -->
-                <g transform="translate(138, 92)" opacity="0.9">
-                  <rect x="6" y="16" width="8" height="3" rx="1" fill="#F59E0B" />
-                  <path d="M3,4 L17,4 L15,12 C14,14 6,14 5,12 Z" fill="#F59E0B" />
-                  <path d="M2,6 C1,6 1,9 3,9 M18,6 C19,6 19,9 17,9" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" />
-                </g>
-
-                <!-- Dashboard Chart -->
-                <g transform="translate(32, 45)" opacity="0.85">
-                  <rect x="2" y="2" width="22" height="15" rx="2" fill="#F8FAFC" class="dark:fill-slate-800" stroke="#2563EB" stroke-width="2" />
-                  <line x1="0" y1="17" x2="26" y2="17" stroke="#2563EB" stroke-width="2" />
-                  <path d="M6,12 L10,8 L14,10 L18,6" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" />
-                </g>
-              </svg>
+          <!-- Illustration Section -->
+          <div class="hidden md:flex w-[45%] relative items-center justify-center select-none z-10">
+            <div class="relative w-full max-w-[420px] h-[270px] flex items-center justify-center">
+              <img 
+                src="/assets/images/dashboard-heroes/parent-hero.png" 
+                class="parent-character-art select-none pointer-events-none" 
+                alt="ولي أمر">
             </div>
           </div>
         </div>
@@ -668,21 +591,29 @@ const EN = {
   `,
   styles: [`
     .stats-card {
-      transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    }
+    :root[data-theme='dark'] .stats-card {
+      border-color: rgba(148, 163, 184, 0.12) !important;
+      background: #111E33 !important;
     }
     .stats-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08) !important;
+      transform: translateY(-5px);
+      box-shadow: 0 20px 38px -10px rgba(15, 23, 42, 0.06), 0 10px 20px -8px rgba(15, 23, 42, 0.04) !important;
     }
-    .stats-card-blue:hover { border-color: rgba(37, 99, 235, 0.6) !important; }
-    .stats-card-purple:hover { border-color: rgba(124, 58, 237, 0.6) !important; }
-    .stats-card-green:hover { border-color: rgba(16, 185, 129, 0.6) !important; }
+    :root[data-theme='dark'] .stats-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+    .stats-card-blue:hover { border-color: rgba(37, 99, 235, 0.4) !important; }
+    .stats-card-purple:hover { border-color: rgba(124, 58, 237, 0.4) !important; }
+    .stats-card-green:hover { border-color: rgba(16, 185, 129, 0.4) !important; }
     
     .stats-card:hover .stats-card-icon-container {
-      transform: scale(1.08);
+      transform: scale(1.08) translateY(-2px);
     }
     .stats-card-icon-container {
-      transition: transform 250ms ease;
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     .student-card {
@@ -704,16 +635,27 @@ const EN = {
       transform: translateY(0) scale(0.97);
     }
 
+    .parent-character-art {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      mix-blend-mode: screen;
+      filter: saturate(1.1) contrast(1.05) drop-shadow(0 12px 24px rgba(9, 20, 98, 0.2));
+      mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0) 78%) !important;
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0) 78%) !important;
+      animation: floatIllustration 6s ease-in-out infinite;
+    }
+
     @keyframes floatIllustration {
       0%, 100% {
-        transform: translateY(0);
+        transform: translateY(0) rotate(0deg);
       }
       50% {
-        transform: translateY(-4px);
+        transform: translateY(-6px) rotate(1deg);
       }
     }
     .animate-float-illustration {
-      animation: floatIllustration 5s ease-in-out infinite;
+      animation: floatIllustration 6s ease-in-out infinite;
     }
   `]
 })
@@ -753,10 +695,6 @@ export class ParentDashboardComponent implements OnInit, OnDestroy {
     
     // Auto-cycle the hero carousel slide every 8 seconds
     if (typeof window !== 'undefined') {
-      this.intervalId = setInterval(() => {
-        this.activeSlide.update(idx => (idx + 1) % 5);
-      }, 8000);
-
       // Detect language from HTML dir attribute reactively
       const savedLang = localStorage.getItem('lang') as 'ar' | 'en';
       if (savedLang) {

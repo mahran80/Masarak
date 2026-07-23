@@ -2,9 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 import { StudentAttendanceSummary } from '../../models';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-student-attendance-summary',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './attendance-summary.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

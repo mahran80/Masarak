@@ -1,0 +1,166 @@
+// Global Animations & Keyframes
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floating-blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(20px, -30px) scale(1.08);
+  }
+  66% {
+    transform: translate(-15px, 15px) scale(0.96);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+// Background blurred blobs
+.pointer-events-none {
+  div {
+    animation: floating-blob 14s ease-in-out infinite;
+    
+    &:nth-child(2) {
+      animation-delay: 3s;
+      animation-duration: 16s;
+    }
+    
+    &:nth-child(3) {
+      animation-delay: 5s;
+      animation-duration: 18s;
+    }
+  }
+}
+
+// Premium Shadow definitions
+.shadow-premium {
+  box-shadow: 
+    0 20px 48px -10px rgba(37, 99, 235, 0.22),
+    0 8px 22px -6px rgba(15, 23, 42, 0.12),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+// Launcher button sizing configurations
+.launcher-btn {
+  width: 68px;
+  height: 68px;
+  box-shadow: 0 8px 36px rgba(37, 99, 235, 0.35);
+  
+  @media (max-width: 768px) {
+    width: 60px;
+    height: 60px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+// Scrollbars controls
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.18) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(99, 102, 241, 0.2);
+    border-radius: 10px;
+    
+    &:hover {
+      background-color: rgba(99, 102, 241, 0.35);
+    }
+  }
+}
+
+// Typography spacing & line heights
+h3, h4, h5 {
+  font-family: var(--font-arabic), sans-serif;
+}
+
+// Tablet styles
+@media (max-width: 768px) {
+  .fixed.bottom-24 {
+    width: 390px;
+    height: 600px;
+    right: 16px;
+    bottom: 92px;
+  }
+}
+
+// Mobile bottom-sheet layout
+@media (max-width: 480px) {
+  .fixed.bottom-24 {
+    width: 100% !important;
+    height: 85vh !important;
+    max-height: 85vh !important;
+    max-width: 100% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    border-radius: 28px 28px 0 0 !important;
+    border-bottom-width: 0 !important;
+    margin: 0 !important;
+    
+    &.animate-slide-up {
+      animation: mobile-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  }
+  
+  .fixed.bottom-6 {
+    bottom: 16px !important;
+    right: 16px !important;
+  }
+}
+
+@keyframes mobile-slide-up {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

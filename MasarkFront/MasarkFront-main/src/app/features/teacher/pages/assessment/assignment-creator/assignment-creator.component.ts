@@ -5,16 +5,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule, DatePipe } from '@angular/common';
 import { environment } from '../../../../../../environments/environment';
 import { TeacherAssessmentService } from '../../../services/teacher-assessment.service';
 import { TeacherLessonsService } from '../../../services/teacher-lessons.service';
 import { CreateAssignmentRequest } from '../../../models/teacher-assessment.model';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-assignment-creator',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, MatDatepickerModule, MatNativeDateModule, DatePipe, CommonModule],
   templateUrl: './assignment-creator.component.html',
   styleUrl: './assignment-creator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,10 +30,11 @@ export class AssignmentCreatorComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly lessonsService = inject(TeacherLessonsService);
 
+  readonly minDate = new Date();
+
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
   
-  // Added to store the teaching assignments
   readonly teachingAssignments = signal<any[]>([]);
   readonly lessons = signal<any[]>([]);
 
@@ -42,7 +46,8 @@ export class AssignmentCreatorComponent implements OnInit {
       lessonId: [''],
       title: ['', [Validators.required, Validators.maxLength(255)]],
       instructions: [''],
-      dueDate: ['', [Validators.required]],
+      dueDateDate: ['', [Validators.required]],
+      dueDateTime: ['', [Validators.required]],
       maxScore: [100, [Validators.required, Validators.min(0), Validators.max(1000)]],
     });
 
@@ -59,7 +64,6 @@ export class AssignmentCreatorComponent implements OnInit {
         }
       });
 
-    // Fetch active assignments
     this.http.get<any[]>(`${environment.apiUrl}/teacher/assignments`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -82,11 +86,18 @@ export class AssignmentCreatorComponent implements OnInit {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+    const dateVal = new Date(this.assignmentForm.value.dueDateDate);
+    const timeStr = this.assignmentForm.value.dueDateTime;
+    if (timeStr) {
+      const [hours, minutes] = timeStr.split(':');
+      dateVal.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    }
+
     const request: CreateAssignmentRequest = {
       ...this.assignmentForm.value,
       teachingAssignmentId: Number(this.assignmentForm.value.teachingAssignmentId),
       lessonId: this.assignmentForm.value.lessonId ? Number(this.assignmentForm.value.lessonId) : undefined,
-      dueDate: new Date(this.assignmentForm.value.dueDate).toISOString(),
+      dueDate: dateVal.toISOString(),
     };
 
     this.assessmentService.createAssignment(request)

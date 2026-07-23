@@ -5,17 +5,23 @@ import { FormsModule } from '@angular/forms';
 import { AcademicApiService } from '../../../../core/services/academic-api-service';
 import { AdminSessionService, AdminSessionDto, AdminScheduleSessionRequest } from '../../services/admin-session.service';
 import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/components/weekly-calendar/weekly-calendar.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-admin-schedule',
   standalone: true,
-  imports: [IconComponent, CommonModule, FormsModule, DatePipe, WeeklyCalendarComponent],
+  imports: [IconComponent, CommonModule, FormsModule, DatePipe, WeeklyCalendarComponent, MatDatepickerModule, MatNativeDateModule, MatInputModule, MatFormFieldModule],
   templateUrl: './admin-schedule.component.html',
   styleUrl: './admin-schedule.component.css',
 })
 export class AdminScheduleComponent implements OnInit {
   private readonly academicApi = inject(AcademicApiService);
   private readonly sessionApi = inject(AdminSessionService);
+
+  readonly minDate = new Date();
 
   grades = signal<any[]>([]);
   classes = signal<any[]>([]);
