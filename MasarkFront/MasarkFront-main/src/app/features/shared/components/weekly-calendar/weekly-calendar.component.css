@@ -670,3 +670,86 @@
 /* Refined unified schedule: seven visible day tabs + a focused daily timeline. */
 .wc-agenda-mode .wc-header-row{grid-template-columns:repeat(7,minmax(104px,1fr));overflow:hidden}.wc-agenda-mode .wc-day-header{min-height:106px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px}.wc-agenda-mode .wc-day-header:hover{background:rgba(53,98,238,.06)}.wc-selected-day-summary{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:20px 18px 0;padding:16px 18px;border:1px solid #dde7fb;border-radius:16px;background:linear-gradient(115deg,#f5f8ff 0%,#fbfaff 58%,#f0fbf8 100%)}.wc-selected-day-date{display:flex;align-items:center;gap:11px}.wc-selected-day-date span{display:grid;min-width:47px;height:47px;place-items:center;padding:0 8px;border-radius:14px;background:linear-gradient(135deg,#2766ee,#7047e8);color:#fff;font-size:10px;font-weight:900;box-shadow:0 8px 18px rgba(58,87,225,.2)}.wc-selected-day-date b{color:#192842;font-size:17px;font-weight:950}.wc-selected-day-summary>div:last-child{text-align:left}.wc-selected-day-summary strong,.wc-selected-day-summary small{display:block}.wc-selected-day-summary strong{color:#315fe7;font-size:15px;font-weight:950}.wc-selected-day-summary small{margin-top:3px;color:#7d8da5;font-size:10px;font-weight:700}.wc-agenda-mode .wc-body-row{position:relative;padding:18px}.wc-agenda-mode .wc-day-cell.is-selected{grid-template-columns:1fr;gap:12px;position:relative;padding-inline-start:30px}.wc-agenda-mode .wc-day-cell.is-selected::before{content:"";position:absolute;inset-block:17px;inset-inline-start:9px;width:2px;border-radius:9px;background:linear-gradient(#4d70f1,#8f6aea 62%,#9de0d0)}.wc-agenda-mode .wc-lesson-card{position:relative;overflow:visible;border:1px solid #e0e8f6;background:linear-gradient(135deg,#fff,#fbfcff);box-shadow:0 10px 24px rgba(37,67,118,.06)}.wc-agenda-mode .wc-lesson-card::before{content:"";position:absolute;inset-inline-start:-26px;inset-block-start:26px;width:12px;height:12px;border:3px solid #fff;border-radius:50%;background:#5c64e9;box-shadow:0 0 0 4px #e6eaff}.wc-agenda-mode .wc-lesson-card:hover{transform:translateY(-2px) translateX(-2px);border-color:#b9caf9;box-shadow:0 15px 32px rgba(44,75,144,.12)}.wc-agenda-mode .wc-card-inner{padding:17px 19px;gap:10px}.wc-agenda-mode .wc-card-title{font-size:15px}.wc-agenda-mode .wc-card-row{font-size:12px}.wc-agenda-mode .wc-card-time-row{max-width:280px;margin-top:3px;background:#f5f8ff}.wc-agenda-mode .wc-card-actions{padding:10px 19px 15px}.wc-agenda-mode .wc-btn{width:auto;min-width:148px;align-self:flex-start}.wc-agenda-mode .wc-empty-day{border:1px dashed #cad8fa;background:linear-gradient(135deg,#f9fbff,#fff);overflow:hidden}.wc-empty-illustration{width:115px;height:115px;object-fit:contain;mix-blend-mode:multiply}.wc-empty-day .wc-empty-title{margin-top:2px;color:#405279;font-size:15px}.wc-empty-day .wc-empty-desc{font-size:11px}.wc-day-count{letter-spacing:0}.wc-agenda-mode .wc-day-header.is-selected::after{content:"";position:absolute;inset-inline:20px;inset-block-end:0;height:3px;border-radius:99px;background:linear-gradient(90deg,#2866ee,#7747ec)}:root[data-theme='dark'] .wc-selected-day-summary{border-color:rgba(121,153,207,.25);background:linear-gradient(120deg,#142746,#1b2147 58%,#123a42)}:root[data-theme='dark'] .wc-selected-day-date b{color:#edf3ff}:root[data-theme='dark'] .wc-selected-day-summary small{color:#aebed5}:root[data-theme='dark'] .wc-agenda-mode .wc-lesson-card{border-color:#2c4265;background:linear-gradient(135deg,#12223b,#142642)}:root[data-theme='dark'] .wc-agenda-mode .wc-lesson-card::before{border-color:#111e33;box-shadow:0 0 0 4px #253b66}:root[data-theme='dark'] .wc-agenda-mode .wc-card-time-row{background:#172c4b}:root[data-theme='dark'] .wc-agenda-mode .wc-empty-day{border-color:#355178;background:linear-gradient(135deg,#13233d,#112138)}
 @media(max-width:760px){.wc-agenda-mode .wc-header-row{overflow-x:auto}.wc-agenda-mode .wc-day-header{min-height:92px}.wc-selected-day-summary{margin:12px 12px 0;padding:13px}.wc-selected-day-date b{font-size:14px}.wc-agenda-mode .wc-day-cell.is-selected{padding-inline-start:25px}.wc-agenda-mode .wc-card-inner{padding:15px}.wc-agenda-mode .wc-card-actions{padding:9px 15px 13px}.wc-agenda-mode .wc-btn{width:100%;align-self:stretch}.wc-empty-illustration{width:92px;height:92px}}
+
+/* =========================================================================
+   STUDENT DASHBOARD OVERRIDES 
+   ========================================================================= */
+
+/* Clean, native-looking, no "div inside div" */
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-scroll { overflow: hidden; border: 0; background: transparent; box-shadow: none; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-header-row { min-height: auto; gap: 8px; padding: 0 0 16px; border: 0; background: transparent; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header { width: 100%; min-height: 86px; padding: 12px 8px; border: 1px solid #E2E8F0; border-radius: 16px; background: #FFFFFF; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02); }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header:hover { transform: translateY(-2px); border-color: #CBD5E1; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header.is-selected { border-color: #2563EB; background: #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header.is-selected::after { display: none; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header.is-selected .wc-day-name,
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header.is-selected .wc-day-date { color: #FFFFFF; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-header.is-selected .wc-day-count { background: rgba(255, 255, 255, 0.2); color: #FFFFFF; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-body-row { margin: 0; padding: 16px 8px; border: 0; background: transparent; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-cell { border: none; padding: 0; gap: 16px; background: transparent !important; }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card { border-radius: 16px; border: 1px solid #E2E8F0; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(15, 23, 42, 0.02); transform: translateY(0); transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1); }
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card:hover { transform: translateY(-4px); border-color: #CBD5E1; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04); }
+
+/* Beautiful Premium Card Layout */
+:host-context(.student-schedule-page) .wc-card-inner { padding: 24px 20px !important; gap: 12px !important; }
+:host-context(.student-schedule-page) .wc-card-title { font-size: 18px !important; font-weight: 800 !important; color: #0F172A !important; margin-bottom: 4px; }
+:host-context(.student-schedule-page) .wc-card-row { display: inline-flex !important; align-items: center; background: #F8FAFC; padding: 6px 12px; border-radius: 8px; border: 1px solid #E2E8F0; margin-inline-end: 8px; margin-bottom: 4px; gap: 8px !important; font-size: 13px !important; font-weight: 700 !important; width: auto !important; }
+:host-context(.student-schedule-page) .wc-card-dot { width: 8px !important; height: 8px !important; }
+:host-context(.student-schedule-page) .wc-card-time-row { margin-top: 8px !important; background: transparent !important; border: none !important; border-top: 1px dashed #CBD5E1 !important; border-radius: 0 !important; padding: 16px 4px 0 !important; justify-content: flex-start !important; gap: 20px !important; }
+:host-context(.student-schedule-page) .wc-card-time-text { font-size: 15px !important; color: #0F172A !important; }
+:host-context(.student-schedule-page) .wc-card-duration-text { font-size: 13px !important; color: #475569 !important; background: #F1F5F9 !important; padding: 4px 12px !important; border-radius: 999px !important; font-weight: 700 !important; }
+
+/* Student Agenda Footer Overrides */
+.wc-student-agenda { margin: 0 !important; padding: 24px 32px !important; border: none !important; border-top: 1px solid #E2E8F0 !important; border-radius: 0 !important; background: #F8FAFC !important; box-shadow: none !important; }
+.wc-agenda-heading { padding-bottom: 20px !important; border-bottom: 1px dashed #CBD5E1 !important; }
+.wc-agenda-heading span { color: #64748B !important; font-size: 13px !important; font-weight: 800 !important; }
+.wc-agenda-heading h2 { margin: 4px 0 0 !important; color: #0F172A !important; font-size: 20px !important; font-weight: 900 !important; }
+.wc-agenda-heading > b { background: #DBEAFE !important; color: #1D4ED8 !important; font-size: 12px !important; font-weight: 800 !important; }
+.wc-agenda-list { display: flex !important; flex-direction: column !important; gap: 8px !important; margin-top: 16px !important; }
+.wc-agenda-item { display: flex !important; align-items: center !important; gap: 16px !important; min-height: 72px !important; padding: 12px 16px !important; border-radius: 12px !important; background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02) !important; transition: all .2s ease !important; grid-template-columns: none !important; }
+.wc-agenda-item:hover { transform: translateX(-4px) !important; border-color: #CBD5E1 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important; background: #FFFFFF !important; }
+.wc-agenda-item time { min-width: 80px !important; color: #334155 !important; font-size: 14px !important; font-weight: 800 !important; text-align: left !important; }
+.wc-agenda-line { width: 12px !important; height: 12px !important; flex-shrink: 0 !important; border: 3px solid #2563EB !important; border-radius: 50% !important; background: #fff !important; box-shadow: 0 0 0 4px #DBEAFE !important; }
+.wc-agenda-copy { flex: 1 !important; display: flex !important; flex-direction: column !important; gap: 4px !important; }
+.wc-agenda-copy strong { color: #0F172A !important; font-size: 15px !important; font-weight: 800 !important; }
+.wc-agenda-copy span { color: #64748B !important; font-size: 13px !important; font-weight: 700 !important; }
+.wc-agenda-duration { padding: 6px 12px !important; border-radius: 999px !important; background: #F1F5F9 !important; color: #475569 !important; font-size: 12px !important; font-weight: 800 !important; }
+.wc-agenda-join { min-height: 38px !important; padding: 0 16px !important; border-radius: 8px !important; background: #2563EB !important; font-size: 13px !important; }
+.wc-agenda-join:hover { background: #1D4ED8 !important; }
+.wc-agenda-empty { display: flex !important; align-items: center !important; justify-content: center !important; min-height: 120px !important; border: 2px dashed #E2E8F0 !important; border-radius: 12px !important; }
+
+
+/* HORIZONTAL GRID OVERRIDES FOR STUDENT */
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-cell.is-selected {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+  gap: 20px !important;
+  padding-inline-start: 0 !important;
+}
+
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-day-cell.is-selected::before {
+  display: none !important; /* Hide timeline vertical line */
+}
+
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card::before {
+  display: none !important; /* Hide timeline dot */
+}
+
+/* Ensure the card takes full width of its grid cell */
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card {
+  width: 100% !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* SOFT GRADIENT BACKGROUND FOR STUDENT LESSON CARDS */
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+}
+
+:host-context(.student-schedule-page) .wc-agenda-mode .wc-lesson-card:hover {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+}
+

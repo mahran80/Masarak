@@ -22,6 +22,8 @@ interface DayColumn {
   sessions: CalendarSession[];
 }
 
+import { ViewEncapsulation } from '@angular/core';
+
 @Component({
   selector: 'app-weekly-calendar',
   standalone: true,
@@ -29,6 +31,7 @@ interface DayColumn {
   templateUrl: './weekly-calendar.component.html',
   styleUrl: './weekly-calendar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class WeeklyCalendarComponent implements OnChanges {
   @Input() weekStart!: Date;
@@ -67,11 +70,13 @@ export class WeeklyCalendarComponent implements OnChanges {
     today.setHours(0, 0, 0, 0);
 
     const weekColumns: DayColumn[] = [];
-    
-    // Create 7 days starting from weekStart
+    // Create 6 working days starting from weekStart
     for (let i = 0; i < 7; i++) {
       const date = new Date(this.weekStart);
       date.setDate(date.getDate() + i);
+
+      const dayNum = date.getDay();
+      if (dayNum === 5) continue; // Skip Friday (5) only
       
       const isToday = date.getTime() === today.getTime();
       const dayName = this.dayNamesAr[date.getDay()];

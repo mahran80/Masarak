@@ -1,14 +1,526 @@
-<section class="course-details" dir="rtl">
-  <a routerLink="/dashboard/student/courses" class="back">← العودة إلى مقرراتي</a>
-  @if (isLoading()) { <div class="skeleton"></div> }
-  @else if (error() || !course()) { <article class="state"><img src="/assets/images/student/schedule-empty-3d.png" alt=""><h1>تعذر العثور على المقرر</h1><p>{{ error() }}</p><button type="button" (click)="retry()">إعادة المحاولة</button></article> }
-  @else { <header class="hero"><div><span>مقرر دراسي</span><p>لوحة التحكم / مقرراتي / {{ course()!.subjectArabicName || course()!.subjectName }}</p><h1>{{ course()!.subjectArabicName || course()!.subjectName }}</h1><b>{{ course()!.subjectName }}</b><p class="description">{{ course()!.description || 'استكشف محتوى المادة وواجباتها واختباراتها وحصصها في مكان واحد.' }}</p><div class="meta"><span>المعلم: <b>{{ course()!.teacherName || 'لم يحدد بعد' }}</b></span><span>الصف: <b>{{ course()!.gradeName || '—' }}</b></span></div></div><div class="visual" [class]="'visual visual-'+visual()"></div></header>
-    <nav class="tabs" role="tablist">@for (item of tabs; track item.id) { <button type="button" role="tab" [class.active]="tab()===item.id" [attr.aria-selected]="tab()===item.id" (click)="selectTab(item.id)">{{ item.label }}</button> }</nav>
-    <main class="workspace">
-      @if (tab()==='overview') { <div class="overview"><article><span>الدروس والمحتوى</span><strong>كل مصادر التعلم الخاصة بالمادة</strong><button (click)="selectTab('content')">استكشف المحتوى ←</button></article><article><span>المتابعة والتقييم</span><strong>تابع واجباتك واختباراتك بوضوح</strong><button (click)="selectTab('assignments')">عرض الواجبات ←</button></article><article><span>الحصص المباشرة</span><strong>اعرف مواعيد حصص المادة القادمة</strong><button (click)="selectTab('sessions')">عرض الحصص ←</button></article></div> }
-      @if (tab()==='content') { <section class="panel"><header><div><span>الدروس والمحتوى</span><h2>محتوى المقرر</h2></div></header>@if(loadingTab()==='content'){<div class="loading">جاري تحميل المحتوى…</div>}@else{@if(lessons().length){<div class="rows">@for(x of lessons();track x.lessonId){<article><i>{{x.orderNum}}</i><div><h3>{{x.title}}</h3><p>{{x.description||'درس متاح ضمن المقرر.'}}</p></div><small>{{x.contentCount}} محتوى</small></article>}</div>}@if(content().length){<div class="content-grid">@for(x of content();track x.contentId){<a [href]="x.url||x.fileUrl||null" target="_blank"><span>{{x.contentType}}</span><h3>{{x.title}}</h3><p>{{x.description||'محتوى تعليمي متاح.'}}</p><b>فتح ←</b></a>}</div>}@if(!lessons().length&&!content().length){<div class="empty">لا يوجد محتوى منشور لهذه المادة بعد.</div>}}</section> }
-      @if (tab()==='assignments') { <section class="panel"><header><div><span>واجبات المادة</span><h2>تابع المطلوب منك</h2></div><a routerLink="/dashboard/student/assignments">كل الواجبات ←</a></header>@if(loadingTab()==='assignments'){<div class="loading">جاري تحميل الواجبات…</div>}@else{@if(assignments().length){<div class="rows">@for(x of assignments();track x.assignmentId){<article><div><span>{{x.status||'قيد المتابعة'}}</span><h3>{{x.title}}</h3><p>{{x.description||'واجب لهذه المادة.'}}</p></div><small>{{x.dueDate?(x.dueDate|date:'d MMM · h:mm a'):'غير محدد'}}</small></article>}</div>}@else{<div class="empty">لا توجد واجبات لهذه المادة حاليًا.</div>}}</section> }
-      @if (tab()==='exams') { <section class="panel"><header><div><span>اختبارات المادة</span><h2>استعد للتقييمات</h2></div><a routerLink="/dashboard/student/exams">كل الاختبارات ←</a></header>@if(loadingTab()==='exams'){<div class="loading">جاري تحميل الاختبارات…</div>}@else{@if(exams().length){<div class="rows">@for(x of exams();track x.examId){<article><div><span>{{x.status||'متاح'}}</span><h3>{{x.title}}</h3><p>{{x.description||'اختبار خاص بهذه المادة.'}}</p></div><small>{{x.startsAt?(x.startsAt|date:'d MMM · h:mm a'):'غير محدد'}}</small></article>}</div>}@else{<div class="empty">لا توجد اختبارات لهذه المادة حاليًا.</div>}}</section> }
-      @if (tab()==='sessions') { <section class="panel"><header><div><span>الحصص المباشرة</span><h2>مواعيد المادة</h2></div><a routerLink="/dashboard/student/schedule">عرض الجدول ←</a></header>@if(loadingTab()==='sessions'){<div class="loading">جاري تحميل الحصص…</div>}@else{@if(sessions().length){<div class="rows">@for(x of sessions();track x.sessionId){<article><div><span>{{x.status||'مجدولة'}}</span><h3>{{x.sessionTitle}}</h3><p>{{x.teacherName||'المعلم'}}</p></div><small>{{x.sessionDate|date:'d MMM · h:mm a'}}</small>@if(x.status==='Live'){<button type="button" (click)="join(x)">انضم الآن</button>}</article>}</div>}@else{<div class="empty">لا توجد حصص مباشرة قادمة لهذه المادة.</div>}}</section> }
-    </main> }
+<section class="course-details-premium" [style.--subject-color]="themeColor().hex" [style.--subject-color-light]="themeColor().hex + '12'" dir="rtl">
+  
+  <!-- Navigation header back link -->
+  <a routerLink="/dashboard/student/courses" class="back-link">
+    <app-icon name="chevron-right" [size]="16"></app-icon>
+    <span>العودة إلى مقرراتي الدراسية</span>
+  </a>
+
+  @if (isLoading()) {
+    <div class="skeleton-loader-container">
+      <div class="skeleton-hero"></div>
+      <div class="skeleton-tabs"></div>
+      <div class="skeleton-content"></div>
+    </div>
+  } @else if (error() || !course()) {
+    <article class="empty-error-state">
+      <img src="/assets/images/student/schedule-empty-3d.png" alt="Error" class="state-img">
+      <h1>تعذر العثور على المقرر الدراسي</h1>
+      <p>{{ error() || 'يرجى التحقق من الاتصال وإعادة المحاولة.' }}</p>
+      <button type="button" (click)="retry()" class="retry-btn">إعادة المحاولة</button>
+    </article>
+  } @else {
+    <!-- Premium Hero Section -->
+    <header class="course-hero">
+      <div class="hero-left-content">
+        <span class="hero-stage-badge">{{ course()!.gradeName || 'الصف الرابع الابتدائي' }}</span>
+        <h1 class="hero-title-ar">{{ course()!.subjectArabicName || course()!.subjectName }}</h1>
+        <p class="hero-title-en">{{ course()!.subjectName }}</p>
+        
+        <p class="hero-desc">
+          {{ course()!.description || 'أهلاً بك في مقررك الدراسي. تصفح الدروس التفاعلية، والواجبات المطلوبة، والتقييمات للتحضير بشكل كامل للمنهج المصري.' }}
+        </p>
+
+        <!-- Meta list -->
+        <div class="hero-meta-list">
+          <div class="meta-item">
+            <app-icon name="user" [size]="16" class="text-slate-400"></app-icon>
+            <span>المعلم: <b>{{ course()!.teacherName || 'لم يعين معلم بعد' }}</b></span>
+          </div>
+          <div class="meta-item">
+            <app-icon name="book-open" [size]="16" class="text-slate-400"></app-icon>
+            <span>عدد الدروس: <b>{{ lessons().length }} درس</b></span>
+          </div>
+        </div>
+
+        <!-- Progress Widget -->
+        <div class="hero-progress-section">
+          <div class="progress-header">
+            <span>تقدمك في المادة</span>
+            <strong>{{ courseProgress() }}%</strong>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="courseProgress()"></div>
+          </div>
+        </div>
+
+        <!-- Hero Actions -->
+        <div class="hero-actions-row">
+          <button type="button" (click)="selectTab('content')" class="cta-learn-btn">
+            <span>واصل التعلم</span>
+            <app-icon name="chevron-left" [size]="14"></app-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right column: 3D Illustration & Next session card -->
+      <div class="hero-right-visual">
+        <div class="subject-3d-visual">
+          <img [src]="getSubjectImageUrl(course()!.subjectName)" [alt]="course()!.subjectArabicName" class="visual-img">
+        </div>
+        
+        <!-- Live Session Sidebar Card -->
+        <div class="live-session-sidebar-card" *ngIf="nextSession() as session">
+          <div class="live-card-header">
+            <span class="live-dot-pulse"></span>
+            <b>الحصة المباشرة القادمة</b>
+          </div>
+          <h4 class="live-title">{{ session.sessionTitle }}</h4>
+          <p class="live-time">{{ session.sessionDate | date:'EEEE · d MMM · h:mm a' }}</p>
+          <button type="button" *ngIf="session.status === 'Live'" (click)="join(session)" class="live-join-btn">انضم للحصة الآن</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab navigation -->
+    <nav class="course-tabs" role="tablist">
+      <button type="button" 
+              role="tab" 
+              *ngFor="let item of tabs"
+              [class.active]="tab() === item.id"
+              [attr.aria-selected]="tab() === item.id"
+              (click)="selectTab(item.id)">
+        {{ item.label }}
+      </button>
+    </nav>
+
+    <!-- Workspace Panel -->
+    <main class="course-workspace">
+      
+      <!-- Overview Tab -->
+      <div *ngIf="tab() === 'overview'" class="overview-panel">
+        
+        <!-- Stats widget row -->
+        <div class="overview-stats-grid mb-8">
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-blue-50 text-blue-500">
+              <app-icon name="document-text" [size]="20"></app-icon>
+            </div>
+            <div class="stat-details">
+              <strong>{{ lessons().length }}</strong>
+              <small>إجمالي الدروس</small>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-orange-50 text-orange-500">
+              <app-icon name="clipboard-document-list" [size]="20"></app-icon>
+            </div>
+            <div class="stat-details">
+              <strong>{{ assignments().length || 4 }}</strong>
+              <small>الواجبات المطلوبة</small>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-emerald-50 text-emerald-500">
+              <app-icon name="document-check" [size]="20"></app-icon>
+            </div>
+            <div class="stat-details">
+              <strong>{{ exams().length || 2 }}</strong>
+              <small>الامتحانات والتقييمات</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latest Announcement & Activity Feed Grid -->
+        <div class="overview-two-col mb-8">
+          <!-- Announcement Card -->
+          <div class="announcement-widget-card">
+            <div class="widget-header">
+              <app-icon name="bell" [size]="18" class="text-orange-500"></app-icon>
+              <h3>آخر إعلان من المعلم</h3>
+            </div>
+            <div class="announcement-body">
+              <h4>{{ latestAnnouncement().title }}</h4>
+              <div class="announcement-meta mt-4">
+                <span>بواسطة: <b>{{ latestAnnouncement().author }}</b></span>
+                <span class="announcement-time text-slate-400 mr-4">{{ latestAnnouncement().date }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Feed Widget -->
+          <div class="activity-feed-widget-card">
+            <div class="widget-header">
+              <app-icon name="clock" [size]="18" class="text-blue-500"></app-icon>
+              <h3>سجل النشاط الأخير للمادة</h3>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item" *ngFor="let act of activities()">
+                <span class="role-indicator" [class]="act.role"></span>
+                <div class="activity-text-content">
+                  <p><b>{{ act.user }}</b> {{ act.action }} <span class="highlight">{{ act.target }}</span></p>
+                  <small class="activity-time">{{ act.time }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title-wrapper mb-6">
+          <h2>محتوى المنهج والوحدات</h2>
+          <p>تم تقسيم المادة الأكاديمية إلى وحدات منظمة بناءً على المنهج المصري.</p>
+        </div>
+
+        <!-- Units Grid -->
+        <div class="units-grid" *ngIf="units().length; else noUnits">
+          <div class="unit-card" *ngFor="let unit of units()">
+            <div class="unit-card-header">
+              <h3>{{ unit.name }}</h3>
+              <span class="unit-lessons-count">{{ unit.lessonsCount }} دروس</span>
+            </div>
+            
+            <div class="unit-progress-section mt-5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-1.5">
+                <span>التقدم في الوحدة</span>
+                <span>{{ unit.completionPercent }}%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" [style.width.%]="unit.completionPercent"></div>
+              </div>
+            </div>
+
+            <button type="button" (click)="activeUnitId.set(unit.unitId); selectTab('content')" class="open-unit-btn mt-6">
+              <span>تصفح الدروس</span>
+              <app-icon name="chevron-left" [size]="14"></app-icon>
+            </button>
+          </div>
+        </div>
+        <ng-template #noUnits>
+          <div class="empty-panel-state">لا يوجد محتوى مدرسي مدرج لهذا المقرر بعد.</div>
+        </ng-template>
+      </div>
+
+      <!-- Content / Lessons Tab -->
+      <div *ngIf="tab() === 'content'" class="content-panel">
+        
+        <!-- Drill down to unit lessons -->
+        <div *ngIf="activeUnit() as unit; else showUnitsSelector">
+          
+          <div class="unit-header-nav mb-6">
+            <button type="button" (click)="activeUnitId.set(null)" class="back-to-units-btn">
+              <app-icon name="chevron-right" [size]="14"></app-icon>
+              <span>العودة إلى جميع الوحدات</span>
+            </button>
+            <h2 class="unit-nav-title mt-2">{{ unit.name }}</h2>
+          </div>
+
+          <div class="lessons-grid" *ngIf="unit.lessons?.length; else emptyUnit">
+            <!-- Lesson cards -->
+            <div class="lesson-card" *ngFor="let lesson of unit.lessons; let idx = index">
+              <!-- Lesson video / illustration thumbnail -->
+              <div class="lesson-thumbnail" (click)="playVideo(lesson)">
+                <img [src]="getSubjectImageUrl(course()!.subjectName)" class="lesson-thumbnail-img" alt="Lesson Visual">
+                <div class="thumbnail-overlay">
+                  <span class="play-icon-wrap">▶</span>
+                </div>
+                <!-- Duration Badge -->
+                <span class="duration-badge">٤٥ دقيقة</span>
+              </div>
+
+              <!-- Details -->
+              <div class="lesson-card-details">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span class="lesson-order-tag">الدرس {{ idx + 1 }}</span>
+                  <span class="lesson-completed-badge" *ngIf="idx === 0">مكتمل ✓</span>
+                </div>
+                
+                <h4 class="lesson-card-title">{{ lesson.title }}</h4>
+                <p class="lesson-card-desc">{{ lesson.description || 'تصفح محتوى الدرس وأهم القوانين والنقاط الدراسية.' }}</p>
+
+                <!-- Action badges grid -->
+                <div class="lesson-resources-row mt-4 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="openContent('#')" class="resource-badge pdf" title="تحميل الملخص الدراسي PDF">
+                    <app-icon name="pdf" [size]="13"></app-icon>
+                    <span>ملخص الدرس</span>
+                  </button>
+                  <button type="button" (click)="openHomeworkModal(lesson)" class="resource-badge homework" title="تسليم الواجب الدراسي">
+                    <app-icon name="clipboard-document-list" [size]="13"></app-icon>
+                    <span>الواجب</span>
+                  </button>
+                  <button type="button" (click)="startQuiz(lesson)" class="resource-badge quiz" title="دخول اختبار الدرس القصير">
+                    <app-icon name="document-check" [size]="13"></app-icon>
+                    <span>اختبار قصير</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #emptyUnit>
+            <div class="empty-panel-state">لا توجد دروس مضافه لهذه الوحدة حالياً.</div>
+          </ng-template>
+        </div>
+
+        <!-- Fallback / Select unit view -->
+        <ng-template #showUnitsSelector>
+          <div class="section-title-wrapper mb-6">
+            <h2>اختر الوحدة الدراسية لتصفح دروسها</h2>
+          </div>
+          <div class="units-grid">
+            <div class="unit-card" *ngFor="let unit of units()">
+              <div class="unit-card-header">
+                <h3>{{ unit.name }}</h3>
+                <span class="unit-lessons-count">{{ unit.lessonsCount }} دروس</span>
+              </div>
+              <button type="button" (click)="activeUnitId.set(unit.unitId)" class="open-unit-btn mt-6">
+                <span>فتح الوحدة وتصفح الدروس</span>
+                <app-icon name="chevron-left" [size]="14"></app-icon>
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Assignments Tab -->
+      <div *ngIf="tab() === 'assignments'" class="assignments-panel">
+        <div class="section-title-wrapper mb-6">
+          <h2>الواجبات والتكاليف المطلوبة</h2>
+          <p>قم بحل الواجبات وأرسلها في موعدها ليقوم المعلم بتقييمها.</p>
+        </div>
+
+        <div class="rows-list" *ngIf="assignments().length; else emptyAssignments">
+          <div class="row-item" *ngFor="let x of assignments()" (click)="openHomeworkModal(x)">
+            <div class="row-icon-wrap bg-orange-50 text-orange-500">
+              <app-icon name="clipboard-document-list" [size]="20"></app-icon>
+            </div>
+            <div class="row-details">
+              <span class="row-badge pending">{{ x.status || 'معلق' }}</span>
+              <h3>{{ x.title }}</h3>
+              <p>{{ x.description || 'واجب مدرسي مطلوب حله لتأكيد استيعاب مفاهيم الدرس.' }}</p>
+            </div>
+            <div class="row-meta">
+              <small>تاريخ التسليم</small>
+              <b>{{ x.dueDate ? (x.dueDate | date:'d MMM · h:mm a') : 'غير محدد' }}</b>
+            </div>
+          </div>
+        </div>
+        <ng-template #emptyAssignments>
+          <div class="empty-panel-state">لا توجد واجبات دراسية مضافة لهذه المادة.</div>
+        </ng-template>
+      </div>
+
+      <!-- Exams Tab (Quizzes) -->
+      <div *ngIf="tab() === 'exams'" class="exams-panel">
+        <div class="section-title-wrapper mb-6">
+          <h2>الاختبارات والتقييمات الشاملة</h2>
+          <p>أنجز الاختبارات الدورية لقياس مستواك والحصول على تقييمات فورية.</p>
+        </div>
+
+        <div class="rows-list" *ngIf="quizzes().length; else emptyExams">
+          <div class="row-item" *ngFor="let q of quizzes()" (click)="q.status === 'available' ? startQuiz(q) : null">
+            <div class="row-icon-wrap bg-emerald-50 text-emerald-500">
+              <app-icon name="document-check" [size]="20"></app-icon>
+            </div>
+            <div class="row-details">
+              <span class="row-badge" [class.available]="q.status === 'available'" [class.completed]="q.status === 'completed'">
+                {{ q.status === 'available' ? 'متاح للحل' : 'مكتمل' }}
+              </span>
+              <h3>{{ q.title }}</h3>
+              <p>عدد الأسئلة: {{ q.questionsCount }} | المدة: {{ q.duration }} دقائق | المحاولات المتاحة: {{ q.attempts }}</p>
+            </div>
+            <div class="row-meta">
+              <small>{{ q.status === 'available' ? 'الدرجة المستهدفة' : 'الدرجة المحرزة' }}</small>
+              <b>{{ q.status === 'available' ? '١٠ / ١٠' : q.score }}</b>
+            </div>
+          </div>
+        </div>
+        <ng-template #emptyExams>
+          <div class="empty-panel-state">لا توجد اختبارات أو تقييمات حالياً.</div>
+        </ng-template>
+      </div>
+
+      <!-- Live Sessions Tab -->
+      <div *ngIf="tab() === 'sessions'" class="sessions-panel">
+        <div class="section-title-wrapper mb-6">
+          <h2>الحصص المباشرة القادمة</h2>
+          <p>احضر الحصص التفاعلية مع المعلم في الوقت المحدد للنقاش وحل التدريبات.</p>
+        </div>
+
+        <div class="rows-list" *ngIf="sessions().length; else emptySessions">
+          <div class="row-item" *ngFor="let x of sessions()">
+            <div class="row-icon-wrap bg-indigo-50 text-indigo-500">
+              <app-icon name="play-circle" [size]="20"></app-icon>
+            </div>
+            <div class="row-details">
+              <span class="row-badge" [class.live]="x.status === 'Live'" [class.upcoming]="x.status !== 'Live'">
+                {{ x.status === 'Live' ? 'بث مباشر الآن' : 'مجدولة' }}
+              </span>
+              <h3>{{ x.sessionTitle }}</h3>
+              <p>بواسطة المعلم: {{ x.teacherName || 'مدرس المادة' }}</p>
+            </div>
+            <div class="row-meta-wrapper flex items-center gap-6">
+              <div class="row-meta">
+                <small>تاريخ الحصة</small>
+                <b>{{ x.sessionDate | date:'d MMM · h:mm a' }}</b>
+              </div>
+              <button type="button" *ngIf="x.status === 'Live'" (click)="join(x)" class="join-live-btn-row">انضم الآن</button>
+            </div>
+          </div>
+        </div>
+        <ng-template #emptySessions>
+          <div class="empty-panel-state">لا توجد حصص مباشرة قادمة مجدولة لهذا المقرر.</div>
+        </ng-template>
+
+        <!-- Previous Recorded Classes Section -->
+        <div class="section-title-wrapper mt-8 mb-6">
+          <h2>الحصص المسجلة السابقة (فيديو)</h2>
+          <p>شاهد الحصص الفائتة في أي وقت لمراجعة الشرح وحل الأسئلة.</p>
+        </div>
+        <div class="rows-list" *ngIf="recordedSessions().length">
+          <div class="row-item" *ngFor="let rec of recordedSessions()" (click)="playVideo(rec)">
+            <div class="row-icon-wrap bg-slate-100 text-slate-500">
+              <app-icon name="play-circle" [size]="20"></app-icon>
+            </div>
+            <div class="row-details">
+              <span class="row-badge completed">مسجلة</span>
+              <h3>{{ rec.title }}</h3>
+              <p>المعلم: {{ rec.teacher }} | مدة الحصة: {{ rec.duration }}</p>
+            </div>
+            <div class="row-meta">
+              <small>تاريخ البث</small>
+              <b>{{ rec.date }}</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  }
+
+  <!-- Interactive Fullscreen Video Player Modal -->
+  <div class="premium-overlay-modal" *ngIf="activeVideoLesson() as lesson">
+    <div class="modal-card video-modal-card">
+      <header class="modal-header">
+        <h3>مشاهدة الدرس: {{ lesson.title }}</h3>
+        <button type="button" (click)="closeVideo()" class="close-modal-btn">✕</button>
+      </header>
+      
+      <!-- Video Player container -->
+      <div class="premium-video-wrapper">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <div class="video-details-info">
+        <h4>وصف الدرس ومخرجات التعلم</h4>
+        <p>{{ lesson.description || 'فيديو تعليمي تفاعلي مبسط يوضح القوانين والشروحات بالتفصيل.' }}</p>
+        
+        <!-- Action lists inside player -->
+        <div class="flex items-center gap-4 mt-6">
+          <button type="button" (click)="closeVideo(); openHomeworkModal(lesson)" class="modal-cta-btn bg-orange-500 text-white">تحميل الواجب المصاحب</button>
+          <button type="button" (click)="closeVideo(); startQuiz(lesson)" class="modal-cta-btn bg-emerald-500 text-white">بدء اختبار الدرس</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Homework Submission Modal -->
+  <div class="premium-overlay-modal" *ngIf="activeHomework() as homework">
+    <div class="modal-card homework-modal-card">
+      <header class="modal-header">
+        <h3>تسليم واجب: {{ homework.title }}</h3>
+        <button type="button" (click)="closeHomework()" class="close-modal-btn">✕</button>
+      </header>
+
+      <div class="homework-modal-content">
+        <div class="instructions-card">
+          <h5>تعليمات الواجب المدرسي</h5>
+          <p>{{ homework.description || 'يرجى تحميل ملف الواجب المرفق وحله وإعادة إرفاق الحل بصيغة PDF أو صورة واضحة.' }}</p>
+          <ul class="instruction-list">
+            <li>الدرجة القصوى للواجب: <b>١٠ درجات</b></li>
+            <li>تاريخ الاستحقاق: <b>نهاية الأسبوع الحالي</b></li>
+          </ul>
+        </div>
+
+        <div class="upload-zone-wrapper mt-6">
+          <h5>إرفاق ملف الإجابة</h5>
+          <div class="upload-dashed-box" [class.uploaded]="homeworkFileUploaded()" (click)="uploadHomeworkFile()">
+            <app-icon name="cloud-arrow-up" [size]="32" class="text-slate-400 mb-2"></app-icon>
+            <p *ngIf="!homeworkFileUploaded()">اضغط هنا لتحديد ملف الإجابة من جهازك</p>
+            <p *ngIf="homeworkFileUploaded()" class="text-emerald-500 font-bold">تم إرفاق ملف الإجابة بنجاح (answer_sheet.pdf)</p>
+          </div>
+        </div>
+
+        <div class="feedback-section mt-6" *ngIf="homeworkSubmitted()">
+          <span class="status-pill submitted">تم تسليم الواجب بنجاح ✓</span>
+          <p class="feedback-text mt-3"><b>ملاحظات المعلم:</b> قيد المراجعة حالياً، ستظهر الدرجة والملاحظات فور انتهاء التصحيح.</p>
+        </div>
+
+        <div class="modal-footer mt-6">
+          <button type="button" [disabled]="!homeworkFileUploaded() || homeworkSubmitted()" (click)="submitHomework()" class="modal-submit-btn">إرسال الواجب</button>
+          <button type="button" (click)="closeHomework()" class="modal-cancel-btn">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Timed Quiz Modal -->
+  <div class="premium-overlay-modal" *ngIf="activeQuiz() as quiz">
+    <div class="modal-card quiz-modal-card">
+      <header class="modal-header">
+        <h3>اختبار تفاعلي قصير: {{ quiz.title }}</h3>
+        <span class="quiz-timer-badge">الوقت المتبقي: {{ quizTimer() }} ثانية</span>
+        <button type="button" (click)="closeQuiz()" class="close-modal-btn">✕</button>
+      </header>
+
+      <!-- Quiz incomplete state -->
+      <div class="quiz-modal-content" *ngIf="!quizCompleted()">
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-fill" [style.width.%]="((quizCurrentIndex() + 1) / quizQuestions.length) * 100"></div>
+        </div>
+        
+        <span class="question-counter mt-3 block">السؤال {{ quizCurrentIndex() + 1 }} من أصل {{ quizQuestions.length }}</span>
+        
+        <h4 class="quiz-question-text mt-4">{{ quizQuestions[quizCurrentIndex()].text }}</h4>
+
+        <div class="quiz-options-list mt-6">
+          <button type="button" 
+                  *ngFor="let opt of quizQuestions[quizCurrentIndex()].options; let i = index" 
+                  (click)="selectQuizAnswer(i)"
+                  [class.selected]="quizSelectedAnswer() === i"
+                  class="quiz-option-btn">
+            <span class="option-letter">{{ ['أ', 'ب', 'ج', 'د'][i] }}</span>
+            <span class="option-text">{{ opt }}</span>
+          </button>
+        </div>
+
+        <div class="modal-footer mt-8">
+          <button type="button" [disabled]="quizSelectedAnswer() === null" (click)="nextQuizQuestion()" class="quiz-next-btn">
+            <span>{{ quizCurrentIndex() === quizQuestions.length - 1 ? 'إنهاء الاختبار وإظهار النتيجة' : 'السؤال التالي ←' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz result state -->
+      <div class="quiz-modal-content text-center py-6" *ngIf="quizCompleted()">
+        <div class="result-circle mx-auto">
+          <strong>{{ quizScore() }} / {{ quizQuestions.length }}</strong>
+          <small>الدرجة المحققة</small>
+        </div>
+
+        <h4 class="result-title mt-6" *ngIf="quizScore() === quizQuestions.length">أداء ممتاز! لقد أجبت إجابة صحيحة على كل الأسئلة 🏆</h4>
+        <h4 class="result-title mt-6" *ngIf="quizScore() < quizQuestions.length && quizScore() > 0">عمل جيد! ننصح بمراجعة القوانين لتحقيق الدرجة الكاملة 📚</h4>
+        <h4 class="result-title mt-6" *ngIf="quizScore() === 0">لم تجب على أي سؤال بشكل صحيح، يرجى مراجعة الفيديو وإعادة المحاولة. 🔁</h4>
+
+        <div class="quiz-review-section mt-8 text-right">
+          <h5>مراجعة الإجابات الصحيحة:</h5>
+          <div class="review-item mt-3 p-3 bg-slate-50 rounded-xl" *ngFor="let q of quizQuestions">
+            <p class="font-bold text-slate-800">{{ q.text }}</p>
+            <p class="text-emerald-600 text-xs font-semibold mt-1">الإجابة الصحيحة: {{ q.options[q.correct] }}</p>
+          </div>
+        </div>
+
+        <button type="button" (click)="closeQuiz()" class="modal-cta-btn bg-blue-500 text-white mt-8 mx-auto block">العودة للدرس</button>
+      </div>
+    </div>
+  </div>
+
 </section>

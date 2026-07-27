@@ -23,6 +23,7 @@ import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/compon
   standalone: true,
   imports: [WeeklyCalendarComponent, FormsModule],
   templateUrl: './schedule.component.html',
+  styleUrl: './schedule.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentSchedulePageComponent implements OnInit {
@@ -62,6 +63,8 @@ export class StudentSchedulePageComponent implements OnInit {
 
   // Keep track of selected week start as string for select binding
   readonly selectedWeek = signal<string>(this.getCurrentWeekStr());
+  readonly isWeekPickerOpen = signal(false);
+  readonly selectedWeekLabel = computed(() => this.academicWeeks().find(w => w.value === this.selectedWeek())?.label ?? 'اختر الأسبوع');
 
   private toDateString(d: Date): string {
     const year = d.getFullYear();
@@ -86,6 +89,9 @@ export class StudentSchedulePageComponent implements OnInit {
     this.selectedWeek.set(event.target.value);
     this.loadSchedule();
   }
+
+  toggleWeekPicker(): void { this.isWeekPickerOpen.update(open => !open); }
+  selectWeek(value: string): void { this.selectedWeek.set(value); this.isWeekPickerOpen.set(false); this.loadSchedule(); }
 
   ngOnInit(): void {
     this.loadSchedule();

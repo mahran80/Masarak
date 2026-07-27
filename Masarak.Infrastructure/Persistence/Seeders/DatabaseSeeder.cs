@@ -150,13 +150,14 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
             var specializations = new[] { 
                 "Mathematics", "Science", "Arabic", "English", "History", 
-                "Geography", "Physics", "Chemistry", "Biology", "Computer Science" 
+                "Geography", "Physics", "Chemistry", "Biology", "Computer Science",
+                "Social Studies", "Religion", "Art", "Physical Education", "Philosophy", "Psychology"
             };
 
             var users = new List<User>();
             var teachers = new List<Teacher>();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < specializations.Length; i++)
             {
                 var spec = specializations[i];
                 var name = $"{spec} Teacher";
@@ -282,20 +283,32 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
         public static async Task SeedSubjectsAsync(Context db)
         {
-            if (await db.Subjects.CountAsync() > 100) return; // If plenty of subjects exist, skip
+            if (await db.Subjects.CountAsync() > 50) return; // If subjects exist, skip
             var grades = await db.Grades.OrderBy(g => g.Order).ToListAsync();
             if (!grades.Any()) return;
 
-            var specializations = new[] { 
-                ("Mathematics", "رياضيات", "MATH"), ("Science", "علوم", "SCI"), 
-                ("Arabic", "لغة عربية", "ARB"), ("English", "لغة إنجليزية", "ENG"), 
-                ("History", "تاريخ", "HIS"), ("Geography", "جغرافيا", "GEO"), 
-                ("Physics", "فيزياء", "PHY"), ("Chemistry", "كيمياء", "CHE"), 
-                ("Biology", "أحياء", "BIO"), ("Computer Science", "حاسب آلي", "CS") 
+            var categoriesList = new[] { 
+                ("Mathematics", "رياضيات", "MATH"), 
+                ("Science", "علوم", "SCI"), 
+                ("Arabic", "لغة عربية", "ARB"), 
+                ("English", "لغة إنجليزية", "ENG"), 
+                ("History", "تاريخ", "HIS"), 
+                ("Geography", "جغرافيا", "GEO"), 
+                ("Physics", "فيزياء", "PHY"), 
+                ("Chemistry", "كيمياء", "CHE"), 
+                ("Biology", "أحياء", "BIO"), 
+                ("Computer Science", "حاسب آلي", "CS"),
+                ("Social Studies", "دراسات اجتماعية", "SOC"),
+                ("Religion", "تربية دينية", "REL"),
+                ("Art", "تربية فنية", "ART"),
+                ("Physical Education", "تربية رياضية", "PE"),
+                ("Philosophy", "فلسفة", "PHI"),
+                ("Psychology", "علم نفس", "PSY"),
+                ("Geology", "جيولوجيا", "GEL")
             };
 
             // Ensure categories exist
-            foreach (var spec in specializations)
+            foreach (var spec in categoriesList)
             {
                 if (!await db.SubjectCategories.AnyAsync(c => c.Name == spec.Item1))
                 {
@@ -306,30 +319,60 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
             var categories = await db.SubjectCategories.ToListAsync();
 
-            // Update existing subjects to their correct categories if they are currently Uncategorized (Id=1)
-            var existingSubjects = await db.Subjects.ToListAsync();
-            foreach (var subject in existingSubjects)
-            {
-                var cat = categories.FirstOrDefault(c => subject.Name.StartsWith(c.Name));
-                if (cat != null) subject.SubjectCategoryId = cat.SubjectCategoryId;
-            }
-            await db.SaveChangesAsync();
-
             foreach (var grade in grades)
             {
-                foreach (var spec in specializations)
+                foreach (var spec in categoriesList)
                 {
-                    var catId = categories.First(c => c.Name == spec.Item1).SubjectCategoryId;
-                    var subjName = $"{spec.Item1} {grade.Order}";
-                    
-                    if (!await db.Subjects.AnyAsync(s => s.Name == subjName && s.GradeId == grade.GradeId))
+                    bool isAllowed = false;
+                    if (grade.Stage == GradeStage.Primary)
                     {
-                        db.Subjects.Add(Subject.Create(grade.GradeId, catId, subjName, spec.Item2, $"{spec.Item3}-{grade.Order}"));
+                        if (grade.Order >= 1 && grade.Order <= 3)
+                        {
+                            isAllowed = spec.Item1 == "Arabic" || spec.Item1 == "English" || 
+                                        spec.Item1 == "Mathematics" || spec.Item1 == "Religion" || 
+                                        spec.Item1 == "Art" || spec.Item1 == "Physical Education";
+                        }
+                        else // Grade 4-6
+                        {
+                            isAllowed = spec.Item1 == "Arabic" || spec.Item1 == "English" || 
+                                        spec.Item1 == "Mathematics" || spec.Item1 == "Science" || 
+                                        spec.Item1 == "Social Studies" || spec.Item1 == "Religion" || 
+                                        spec.Item1 == "Art" || spec.Item1 == "Computer Science" || 
+                                        spec.Item1 == "Physical Education";
+                        }
+                    }
+                    else if (grade.Stage == GradeStage.Preparatory)
+                    {
+                        isAllowed = spec.Item1 == "Arabic" || spec.Item1 == "English" || 
+                                    spec.Item1 == "Mathematics" || spec.Item1 == "Science" || 
+                                    spec.Item1 == "Social Studies" || spec.Item1 == "Religion" || 
+                                    spec.Item1 == "Computer Science" || spec.Item1 == "Physical Education";
+                    }
+                    else if (grade.Stage == GradeStage.Secondary)
+                    {
+                        isAllowed = spec.Item1 == "Arabic" || spec.Item1 == "English" || 
+                                    spec.Item1 == "Mathematics" || spec.Item1 == "Physics" || 
+                                    spec.Item1 == "Chemistry" || spec.Item1 == "Biology" || 
+                                    spec.Item1 == "History" || spec.Item1 == "Geography" || 
+                                    spec.Item1 == "Philosophy" || spec.Item1 == "Psychology" || 
+                                    spec.Item1 == "Geology" || spec.Item1 == "Religion" || 
+                                    spec.Item1 == "Computer Science" || spec.Item1 == "Physical Education";
+                    }
+
+                    if (isAllowed)
+                    {
+                        var catId = categories.First(c => c.Name == spec.Item1).SubjectCategoryId;
+                        var subjName = $"{spec.Item1} {grade.Order}";
+                        
+                        if (!await db.Subjects.AnyAsync(s => s.Name == subjName && s.GradeId == grade.GradeId))
+                        {
+                            db.Subjects.Add(Subject.Create(grade.GradeId, catId, subjName, spec.Item2, $"{spec.Item3}-{grade.Order}"));
+                        }
                     }
                 }
             }
             await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] Test subjects seeded for 10 categories across {grades.Count} grades.");
+            Console.WriteLine($"[Seeder] Test subjects seeded for Egyptian National Curriculum across {grades.Count} grades.");
         }
 
         public static async Task SeedClassesAsync(Context db)
@@ -514,7 +557,7 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
         public static async Task SeedParentDashboardDataAsync(Context db)
         {
-            var student = await db.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.FullName.Contains("Youssef"));
+            var student = await db.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.User.FullName.Contains("Student 1"));
             var subject = await db.Subjects.FirstOrDefaultAsync();
             var classObj = await db.Classes.FirstOrDefaultAsync();
             var assignment = await db.TeachingAssignments.FirstOrDefaultAsync(ta => ta.ClassId == classObj!.ClassId && ta.SubjectId == subject!.SubjectId);
@@ -581,7 +624,7 @@ namespace Masarak.Infrastructure.Persistence.Seeders
                 {
                     new { subjectName = subject.Name, avgExam = 45.0m, attendanceRate = 60.0m, note = "Average score: 45.0%" }
                 },
-                narrativeSummary = "Youssef has been struggling with attendance and exam scores recently. We recommend more practice.",
+                narrativeSummary = $"{student.User.FullName} has been struggling with attendance and exam scores recently. We recommend more practice.",
                 recommendedActions = new[] { "Review last 3 assignments", "Attend all future classes", "Practice regularly" },
                 generatedAt = DateTime.UtcNow
             };

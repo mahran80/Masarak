@@ -24,12 +24,6 @@
     </div>
 
     <!-- ═══════════════════════════════ Day Body ═══════════════════════════════════ -->
-    @if (days[selectedDayIndex]; as selectedDay) {
-      <div class="wc-selected-day-summary">
-        <div class="wc-selected-day-date"><span>{{ selectedDay.dayName }}</span><b>{{ selectedDay.date | date:'d MMMM' }}</b></div>
-        <div><strong>{{ selectedDay.sessions.length }} {{ selectedDay.sessions.length === 1 ? 'حصة' : 'حصص' }}</strong><small>ضمن جدول هذا الأسبوع</small></div>
-      </div>
-    }
 
     <div class="wc-body-row">
       @for (day of days; track day.date) {
@@ -184,8 +178,6 @@
 
     <!-- Bottom bar -->
     <div class="wc-bottom-border"></div>
-
-  </div>
 
   @if (role === 'student' && days[selectedDayIndex]; as selectedDay) {
     <section class="wc-student-agenda" aria-live="polite">

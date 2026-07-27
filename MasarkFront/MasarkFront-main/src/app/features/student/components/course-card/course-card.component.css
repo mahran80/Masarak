@@ -1,34 +1,44 @@
 :host {
   display: block;
-  height: 100%;
+  height: auto;
+  align-self: start;
 }
 
 .course-card-premium {
   position: relative;
-  height: 100%;
-  min-height: 440px;
-  padding: 22px;
+  height: auto;
+  padding: 20px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 24px;
+  border-radius: 22px;
   background: #FFFFFF;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: 
-    0 12px 34px -10px rgba(15, 23, 42, 0.04),
-    0 8px 20px -8px rgba(15, 23, 42, 0.02),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    0 4px 20px rgba(15, 23, 42, 0.015),
+    0 10px 30px -10px rgba(15, 23, 42, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   isolation: isolate;
 }
 
-/* Glowing border accent on hover */
+/* Top Accent Strip */
+.card-accent-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--subject-color);
+  z-index: 10;
+}
+
+/* Glowing Border */
 .card-glow-accent {
   position: absolute;
   inset: 0;
-  border-radius: 24px;
+  border-radius: 22px;
   padding: 1.5px;
-  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  background: linear-gradient(135deg, var(--subject-color), #4F8EF7);
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
@@ -41,10 +51,10 @@
 }
 
 .course-card-premium:hover {
-  transform: translateY(-8px) scale(1.01);
+  transform: translateY(-6px) scale(1.015);
   box-shadow: 
-    0 28px 48px -12px rgba(37, 99, 235, 0.12),
-    0 16px 32px -10px rgba(15, 23, 42, 0.06);
+    0 24px 40px -12px rgba(15, 23, 42, 0.08),
+    0 12px 24px -10px rgba(15, 23, 42, 0.04);
   border-color: transparent;
 }
 
@@ -53,178 +63,200 @@
 }
 
 .course-card-premium--selected {
-  border-color: #2563EB;
+  border-color: var(--subject-color);
   box-shadow: 
-    0 0 0 3px rgba(37, 99, 235, 0.12),
-    0 20px 40px rgba(37, 99, 235, 0.08);
+    0 0 0 3px var(--subject-color-light),
+    0 20px 40px -8px rgba(15, 23, 42, 0.05);
 }
 
-/* Illustration container occupies ~45-55% of card height */
+/* 3D Illustration Container */
 .card-illustration-container {
   width: 100%;
-  height: 185px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+  height: 140px;
+  border-radius: 16px;
+  background: var(--subject-color-light, #F8FAFC);
   overflow: hidden;
   position: relative;
-  margin-bottom: 20px;
-  transition: transform 0.35s ease;
-  border: 1px solid rgba(226, 232, 240, 0.5);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(226, 232, 240, 0.4);
 }
 
 .card-illustration-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.course-card-premium:hover .card-illustration-container {
-  transform: scale(1.015);
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 16px rgba(15, 23, 42, 0.08));
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .course-card-premium:hover .card-illustration-img {
-  transform: scale(1.05);
+  transform: translateY(-8px) scale(1.1);
 }
 
-/* Badges styling */
+/* Badges */
 .subject-badge {
   padding: 4px 10px;
   border-radius: 99px;
-  background: rgba(37, 99, 235, 0.06);
-  color: #2563EB;
+  background: var(--subject-color-light);
+  color: var(--subject-color);
   font-size: 10px;
-  font-weight: 850;
-  border: 1px solid rgba(37, 99, 235, 0.08);
+  font-weight: 900;
 }
 
-.grade-badge {
+.activity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 10px;
   border-radius: 99px;
   background: #F1F5F9;
-  color: #475569;
+  color: #64748B;
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 800;
 }
 
-/* Text Detail styles */
-.card-details-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--subject-color);
+  animation: pulse-glow 1.5s infinite ease-in-out;
 }
 
-.subject-name {
-  margin: 12px 0 0;
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+/* Titles */
+.subject-name-ar {
+  margin: 12px 0 2px;
   color: #0F172A;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 900;
-  line-height: 1.4;
   text-align: right;
-  word-wrap: break-word;
+  line-height: 1.3;
 }
 
-.teacher-info {
+.subject-name-en {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Meta Information Grid */
+.meta-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border-top: 1px dashed rgba(226, 232, 240, 0.8);
+  padding-top: 14px;
+}
+
+.meta-item {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.teacher-name {
-  color: #64748B;
+.meta-text {
   font-size: 11.5px;
+  color: #64748B;
   font-weight: 750;
-  max-width: 160px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
-/* Simulated Progress bar */
-.progress-bar-container {
-  height: 5px;
-  border-radius: 99px;
-  background: #F1F5F9;
-  overflow: hidden;
+.meta-text b {
+  color: #334155;
+  font-weight: 900;
+}
+
+/* CTA Button Styling */
+.card-cta-btn {
   width: 100%;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  background: linear-gradient(90deg, #2563EB, #7C3AED);
-  box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Action Button styling */
-.card-action-btn {
-  height: 44px;
-  padding-inline: 18px;
-  border-radius: 14px;
+  height: 42px;
+  padding-inline: 16px;
+  border-radius: 12px;
   background: #F8FAFC;
-  color: #1E293B;
+  color: #334155;
   border: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11.5px;
-  font-weight: 850;
+  font-size: 12px;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.course-card-premium:hover .card-action-btn {
-  background: linear-gradient(135deg, #2563EB, #4F46E5);
+/* Keep the action directly after course details instead of stretching cards
+   to the tallest item in the grid. */
+.card-footer {
+  margin-top: 16px !important;
+  padding-top: 0 !important;
+}
+
+.course-card-premium:hover .card-cta-btn {
+  background: var(--subject-color);
   color: #FFFFFF;
   border-color: transparent;
-  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 8px 20px -4px var(--subject-color-light);
 }
 
-.course-card-premium:hover .card-action-btn i {
-  color: #FFFFFF;
+.course-card-premium:hover .card-cta-btn .arrow-icon {
   transform: translateX(-4px);
 }
 
-/* Dark mode theme configurations */
-:root[data-theme='dark'] .course-card-premium {
+.arrow-icon {
+  transition: transform 0.25s ease;
+  font-weight: bold;
+}
+
+/* Dark Mode Theme overrides */
+:host-context(.dark) .course-card-premium {
   background: #111E33;
   border-color: rgba(148, 163, 184, 0.12);
   box-shadow: 
-    0 12px 30px -5px rgba(0, 0, 0, 0.3),
-    0 8px 16px -6px rgba(0, 0, 0, 0.2);
+    0 12px 30px -5px rgba(0, 0, 0, 0.2),
+    0 8px 16px -6px rgba(0, 0, 0, 0.15);
 }
 
-:root[data-theme='dark'] .card-illustration-container {
-  background: linear-gradient(180deg, #17263D 0%, #131F33 100%);
+:host-context(.dark) .card-illustration-container {
+  background: var(--subject-color-light, #17263D);
   border-color: rgba(148, 163, 184, 0.08);
 }
 
-:root[data-theme='dark'] .subject-name {
+:host-context(.dark) .subject-name-ar {
   color: #F8FAFC;
 }
 
-:root[data-theme='dark'] .grade-badge {
+:host-context(.dark) .activity-badge {
   background: #1A2B46;
   color: #94A3B8;
 }
 
-:root[data-theme='dark'] .subject-badge {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+:host-context(.dark) .meta-info-grid {
+  border-top-color: rgba(148, 163, 184, 0.1);
 }
 
-:root[data-theme='dark'] .teacher-name {
+:host-context(.dark) .meta-text {
   color: #94A3B8;
 }
 
-:root[data-theme='dark'] .progress-bar-container {
-  background: #1A2B46;
+:host-context(.dark) .meta-text b {
+  color: #E2E8F0;
 }
 
-:root[data-theme='dark'] .card-action-btn {
+:host-context(.dark) .card-cta-btn {
   background: #17263D;
   color: #E2E8F0;
   border-color: rgba(148, 163, 184, 0.1);

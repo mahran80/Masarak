@@ -341,6 +341,21 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    if (savedTheme) {
+      this.theme.set(savedTheme);
+      const body = document.body;
+      body.setAttribute('data-theme', savedTheme);
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      if (savedTheme === 'dark') {
+        body.classList.add('dark');
+        document.documentElement.classList.add('dark');
+      } else {
+        body.classList.remove('dark');
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
     if (!document.getElementById('masarak-landing-fonts')) {
       const link = document.createElement('link');
       link.id = 'masarak-landing-fonts';
@@ -394,9 +409,13 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.theme() === 'dark') {
         body.setAttribute('data-theme', 'dark');
         document.documentElement.setAttribute('data-theme', 'dark');
+        body.classList.add('dark');
+        document.documentElement.classList.add('dark');
       } else {
         body.setAttribute('data-theme', 'light');
         document.documentElement.setAttribute('data-theme', 'light');
+        body.classList.remove('dark');
+        document.documentElement.classList.remove('dark');
       }
     }
   }

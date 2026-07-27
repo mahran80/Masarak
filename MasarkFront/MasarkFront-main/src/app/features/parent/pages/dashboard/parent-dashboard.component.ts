@@ -146,62 +146,51 @@ const EN = {
   template: `
     <div class="space-y-8 md:space-y-12 animate-fade-in relative z-10 pb-24 w-full" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
       
-      <!-- 2. Premium Static Hero Section -->
-      <div class="parent-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none" style="min-height: 320px;">
+      <!-- 2. Premium Image Hero Section -->
+      <div class="parent-static-hero relative overflow-hidden rounded-[30px] shadow-lg flex flex-col justify-center select-none" style="min-height: 360px;">
         
-        <!-- Premium Gradient Background & Ambient Elements -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+        <!-- Background Image -->
+        <img src="/assets/images/parent_hero_bg.jpg" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[10s] hover:scale-105" alt="Hero Background">
         
-        <!-- Floating particles and 3D icons -->
-        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
-          <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-          <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-          <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
-          <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
-          <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
-        </div>
-
-        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 w-full px-8 md:px-12 py-8 flex-1">
-          <!-- Text Content (Right side in RTL, Left side in LTR) -->
-          <div class="flex-1 space-y-4 w-full text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+        <!-- Gradient Overlay for readability -->
+        <div class="absolute inset-0 z-0 bg-slate-900/40 dark:bg-slate-950/60 mix-blend-multiply"></div>
+        <div class="absolute inset-0 z-0" 
+             [class.bg-gradient-to-l]="lang() === 'ar'" 
+             [class.bg-gradient-to-r]="lang() === 'en'" 
+             class="from-blue-950/95 via-blue-900/80 to-transparent dark:from-slate-950/95 dark:via-slate-900/80 dark:to-transparent"></div>
+        
+        <div class="relative z-10 flex flex-col items-start justify-center w-full px-8 md:px-14 py-10 flex-1">
+          <!-- Text Content -->
+          <div class="max-w-2xl space-y-5 text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+            
             <!-- User Info Badge & Date -->
-            <div class="flex flex-wrap items-center gap-3 justify-start">
-              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/12 dark:bg-white/8 backdrop-blur-md rounded-full border border-white/18 text-[11px] font-extrabold text-white shadow-sm">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-[11px] font-extrabold text-white shadow-sm">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                 <span>{{ t().ROLE_LABEL }}</span>
               </div>
-              <span class="text-[11px] font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+              <span class="text-[11px] font-semibold text-white/90 flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/20 shadow-sm">
                 <app-icon name="calendar" size="14" class="text-white"></app-icon>
                 {{ todayDate }}
               </span>
             </div>
 
             <!-- Welcome Title -->
-            <div class="space-y-2">
-              <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
-                {{ t().WELCOME_BACK }} {{ parentFullName }}
+            <div class="space-y-3">
+              <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-lg">
+                {{ t().WELCOME_BACK }} <span class="text-blue-200">{{ parentFullName }}</span>
               </h1>
-              <p class="text-xs md:text-sm text-white/85 max-w-xl leading-relaxed font-medium">
+              <p class="text-sm md:text-base text-white/90 max-w-xl leading-relaxed font-semibold drop-shadow-md">
                 {{ t().HERO_SUBTITLE }}
               </p>
             </div>
 
             <!-- CTA Actions -->
-            <div class="flex flex-wrap items-center gap-4 pt-2 justify-start">
-              <a routerLink="/add-student" class="px-6 py-2.5 bg-white hover:bg-slate-50 text-blue-700 rounded-2xl text-xs font-black transition-all duration-300 shadow-[0_10px_25px_rgba(255,255,255,0.15)] hover:-translate-y-1 flex items-center gap-2">
-                <app-icon name="plus" size="16"></app-icon>
+            <div class="flex flex-wrap items-center gap-4 pt-4">
+              <a routerLink="/add-student" class="px-7 py-3 bg-white hover:bg-blue-50 text-blue-700 rounded-2xl text-sm font-black transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:-translate-y-1 flex items-center gap-2 border border-white/50">
+                <app-icon name="plus" size="18"></app-icon>
                 <span>{{ t().ADD_STUDENT }}</span>
               </a>
-            </div>
-          </div>
-
-          <!-- Illustration Section -->
-          <div class="hidden md:flex w-[45%] relative items-center justify-center select-none z-10">
-            <div class="relative w-full max-w-[420px] h-[270px] flex items-center justify-center">
-              <img 
-                src="/assets/images/dashboard-heroes/parent-hero.png" 
-                class="parent-character-art select-none pointer-events-none" 
-                alt="ولي أمر">
             </div>
           </div>
         </div>

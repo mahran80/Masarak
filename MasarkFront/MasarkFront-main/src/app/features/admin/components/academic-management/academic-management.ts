@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, OnDestroy, inject, signal, computed, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, HostListener, ViewEncapsulation } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AcademicApiService } from '../../../../core/services/academic-api-service';
@@ -11,6 +11,7 @@ import { AdminApiService } from '../../../../core/services/admin-api-service';
   imports: [IconComponent, CommonModule, FormsModule, DecimalPipe],
   templateUrl: './academic-management.html',
   styleUrl: './academic-management.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class AcademicManagementComponent implements OnInit, OnDestroy {
   private readonly api = inject(AcademicApiService);

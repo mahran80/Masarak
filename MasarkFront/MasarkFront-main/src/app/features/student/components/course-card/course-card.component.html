@@ -1,50 +1,51 @@
-<article class="course-card-premium" [class.course-card-premium--selected]="selected()" dir="rtl">
+<article class="course-card-premium" 
+         [style.--subject-color]="themeColor().hex"
+         [style.--subject-color-light]="themeColor().hex + '15'"
+         [class.course-card-premium--selected]="selected()" 
+         dir="rtl">
   
-  <!-- Glowing border accent -->
+  <!-- Top Accent Strip -->
+  <div class="card-accent-strip"></div>
+  
+  <!-- Glowing border on hover -->
   <div class="card-glow-accent"></div>
 
-  <!-- Subject 3D Illustration (occupies ~45-55% of card) -->
+  <!-- Large 3D Illustration -->
   <div class="card-illustration-container">
     <img [src]="imageUrl()" [alt]="course().subjectArabicName || course().subjectName" class="card-illustration-img">
   </div>
 
-  <!-- Content & Details -->
-  <div class="card-details-wrapper">
-    <div class="flex items-center justify-between mb-2">
-      <span class="subject-badge">مقرر دراسي</span>
-      <span class="grade-badge">{{ course().gradeName || 'المستوى الدراسي' }}</span>
-    </div>
-    
-    <h3 class="subject-name" [title]="course().subjectArabicName || course().subjectName">
-      {{ course().subjectArabicName || course().subjectName }}
-    </h3>
-    
-    <!-- Teacher Details -->
-    <div class="teacher-info flex items-center gap-2 mt-3 select-none">
-      <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center text-[10px] font-bold overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
-        {{ (course().teacherName || 'م').charAt(0) }}
-      </div>
-      <span class="teacher-name" [title]="course().teacherName">{{ course().teacherName || 'لم يعين معلم بعد' }}</span>
+  <!-- Content details -->
+  <div class="card-details">
+    <div class="flex items-center justify-between gap-2 mb-2.5">
+      <span class="subject-badge">{{ course().gradeName || 'الصف الرابع' }}</span>
+      <span class="activity-badge">
+        <span class="pulse-dot"></span>
+        {{ lastActivity() }}
+      </span>
     </div>
 
-    <!-- Simulated Progress Bar -->
-    <div class="progress-section mt-4 select-none">
-      <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5">
-        <span>تقدم المقرر</span>
-        <span>{{ progress() }}%</span>
+    <h3 class="subject-name-ar">{{ course().subjectArabicName || course().subjectName }}</h3>
+    <p class="subject-name-en">{{ course().subjectName }}</p>
+
+    <!-- Meta Information -->
+    <div class="meta-info-grid mt-4.5">
+      <div class="meta-item">
+        <app-icon name="document-text" [size]="16" class="text-slate-400/80 shrink-0"></app-icon>
+        <span class="meta-text"><b>{{ lessonsCount() }}</b> درس</span>
       </div>
-      <div class="progress-bar-container">
-        <div class="progress-bar-fill" [style.width.%]="progress()"></div>
+      <div class="meta-item">
+        <app-icon name="clipboard-document-list" [size]="16" class="text-slate-400/80 shrink-0"></app-icon>
+        <span class="meta-text"><b>{{ assignmentsCount() }}</b> واجبات</span>
       </div>
     </div>
   </div>
 
-  <!-- Card Action Footer -->
-  <div class="card-footer mt-auto pt-4">
-    <button type="button" (click)="viewDetails.emit(course())" class="card-action-btn w-full">
-      <span>{{ selected() ? 'المقرر محدد' : 'عرض تفاصيل المقرر' }}</span>
-      <i class="fa-solid fa-arrow-left text-xs transition-transform duration-200"></i>
+  <!-- CTA action -->
+  <div class="card-footer mt-auto pt-4.5">
+    <button type="button" (click)="viewDetails.emit(course())" class="card-cta-btn">
+      <span>ابدأ التعلم</span>
+      <span class="arrow-icon">←</span>
     </button>
   </div>
-
 </article>

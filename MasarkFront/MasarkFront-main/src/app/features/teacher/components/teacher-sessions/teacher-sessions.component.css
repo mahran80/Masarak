@@ -11,3 +11,72 @@ button:focus-visible,select:focus-visible{outline:3px solid rgba(37,99,235,.22);
 /* RTL grid order: the first DOM item is the classes panel on the right. */
 @media(min-width:1101px){.schedule-layout{grid-template-columns:250px minmax(0,1fr)}.schedule-layout.sidebar-closed{grid-template-columns:0 minmax(0,1fr)}}
 @media(min-width:781px) and (max-width:1100px){.schedule-layout{grid-template-columns:220px minmax(0,1fr)}.schedule-layout.sidebar-closed{grid-template-columns:0 minmax(0,1fr)}}
+
+/* =========================================================================
+   FIXING CONTRAST & DROPDOWN SIZE 
+   ========================================================================= */
+
+/* Darker page background so the white panels pop */
+.live-schedule-page {
+  background-color: #F1F5F9 !important;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+/* Stronger borders and shadows for the white panels */
+.classes-panel, .schedule-workspace, .schedule-controls {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Make the dropdown much smaller, like the student one */
+.schedule-controls {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 20px !important;
+}
+
+.week-control {
+  min-width: 200px !important;
+  flex: 0 0 auto !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.week-control label {
+  margin-bottom: 0 !important;
+  font-size: 13px !important;
+  color: #334155 !important;
+}
+
+.week-select-wrap select {
+  height: 38px !important;
+  padding-inline: 36px 30px !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+.week-select-wrap > span { inset-inline-start: 10px !important; color: #64748B !important; }
+.week-select-wrap > i { inset-inline-end: 10px !important; color: #64748B !important; }
+
+/* Stronger contrast for selected grade/class */
+.grade-button.is-active {
+  background: #EFF6FF !important;
+  border: 1px solid #BFDBFE !important;
+  color: #1D4ED8 !important;
+}
+.classes-list button.is-active {
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important;
+}
+
+.workspace-header {
+  border-bottom: 1px solid #CBD5E1 !important;
+  background: #F8FAFC !important;
+}
+

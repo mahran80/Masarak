@@ -23,10 +23,7 @@
 .ml-dashboard-bg {
   min-height: 100dvh;
   width: 100%;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(96,165,250,.12), transparent 28%),
-    radial-gradient(circle at 88% 12%, rgba(167,139,250,.10), transparent 26%),
-    linear-gradient(135deg, #F8FBFF 0%, #EEF4FF 55%, #F7F1FF 100%) !important;
+  background: linear-gradient(135deg, #E0F2FE 0%, #E0E7FF 50%, #F3E8FF 100%) !important;
   position: relative;
   overflow-x: hidden;
 }
@@ -230,7 +227,7 @@
   gap: 5px !important;
   flex: 1 1 auto !important;
   min-height: 0 !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
@@ -278,14 +275,14 @@
 
 /* Inactive Nav Links - Styling */
 nav a:not(.sidebar-active-link):not(.ml-sidebar-active) {
-  color: #64748B !important;
+  color: var(--text-secondary) !important;
   background: transparent !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
-  background: rgba(79, 123, 255, 0.08) !important;
-  color: #2563EB !important;
+  background: rgba(79, 142, 247, 0.06) !important;
+  color: var(--primary) !important;
   transform: translateX(-3px);
 }
 
@@ -295,24 +292,24 @@ nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
 
 nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover app-icon,
 nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover svg {
-  color: #2563EB !important;
+  color: var(--primary) !important;
 }
 
 :root[data-theme='dark'] nav a:not(.sidebar-active-link):not(.ml-sidebar-active) {
-  color: #94A3B8 !important;
+  color: var(--text-secondary) !important;
 }
 
 :root[data-theme='dark'] nav a:not(.sidebar-active-link):not(.ml-sidebar-active):hover {
-  background: rgba(79, 123, 255, 0.12) !important;
-  color: #60A5FA !important;
+  background: rgba(96, 165, 250, 0.06) !important;
+  color: var(--primary) !important;
 }
 
 /* Active Nav Links */
 nav a.sidebar-active-link,
 nav a.ml-sidebar-active {
-  background: linear-gradient(135deg, #2563EB 0%, #4F7BFF 45%, #7C3AED 100%) !important;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25) !important;
+  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.16) !important;
   transform: translateY(-1px);
 }
 

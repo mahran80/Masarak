@@ -35,12 +35,14 @@ export interface AdminUser {
 }
 
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-user-management',
   imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class UserManagement implements OnInit {
   private readonly router = inject(Router);

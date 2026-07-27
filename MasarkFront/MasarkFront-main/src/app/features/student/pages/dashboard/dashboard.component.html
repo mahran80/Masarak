@@ -1,32 +1,20 @@
 <section class="student-dashboard" dir="rtl">
-  <header class="student-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none" style="min-height: 320px;">
+  <header class="student-hero-slider relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-between select-none mb-4" style="min-height: 310px;">
     
-    <!-- Premium Gradient Background & Ambient Elements -->
-    <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
+    <!-- Premium Gradient Background Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-[#0284c7] via-[#2563eb] to-[#7c3aed] dark:from-[#083344] dark:via-[#1e1b4b] dark:to-[#4c1d95]"></div>
     
     <!-- Floating particles and 3D icons -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
       <!-- Glow spots -->
-      <div class="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+      <div class="absolute -top-16 -right-12 w-56 h-56 bg-white/10 rounded-full blur-3xl animate-pulse-slow"></div>
+      <div class="absolute -bottom-20 -left-16 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
       
       <!-- Sparkles / Stars -->
       <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
       <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
       <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
       <div class="absolute top-[15%] left-[50%] w-1.5 h-1.5 bg-purple-200 rounded-full opacity-70 animate-sparkle-4"></div>
-      
-      <!-- Floating AI, Book, Globe, Atom, Pencil SVGs -->
-      <!-- AI Sparkle Icon -->
-      <svg class="absolute top-[12%] left-[18%] w-8 h-8 text-white/20 animate-float-icon-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <!-- Book Icon -->
-      <svg class="absolute bottom-[16%] left-[30%] w-7 h-7 text-white/15 animate-float-icon-2" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-      <!-- Globe Icon -->
-      <svg class="absolute top-[28%] left-[8%] w-8 h-8 text-white/12 animate-float-icon-3" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"/></svg>
-      <!-- Atom Icon -->
-      <svg class="absolute top-[18%] right-[42%] w-9 h-9 text-white/14 animate-float-icon-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="3" ry="9" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="3" ry="9" transform="rotate(90 12 12)"/><ellipse cx="12" cy="12" rx="3" ry="9" transform="rotate(150 12 12)"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
-      <!-- Pencil Icon -->
-      <svg class="absolute bottom-[22%] right-[48%] w-7 h-7 text-white/15 animate-float-icon-1" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
     </div>
 
     @if (isLoading()) {
@@ -36,48 +24,100 @@
     } @else {
       <!-- Hero Content -->
       <div class="relative z-10 px-8 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-8 w-full flex-1">
-        <!-- RIGHT SIDE: Text Content -->
-        <div class="flex-1 space-y-4 text-right">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[11px] font-extrabold backdrop-blur-md border border-white/10 mb-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            لوحة الطالب
-          </span>
-          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
-            مرحبًا بك في مسارك التعليمي، {{ user()?.fullName?.split(' ')?.at(0) }}
-          </h1>
-          <p class="text-white/85 text-xs md:text-sm font-semibold leading-relaxed max-w-xl">
-            تابع دروسك ومواعيدك ومستواك الدراسي من مكان واحد وبخطوات بسيطة.
-          </p>
+        
+        <!-- Slide 0: Female Student Companion -->
+        @if (activeSlide() === 0) {
+          <!-- RIGHT SIDE: Text Content -->
+          <div class="w-full md:max-w-[55%] space-y-5 text-right animate-fade-in z-20">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
+              مرحباً {{ user()?.fullName?.split(' ')?.at(0) || 'سارة' }}،<br>
+              جاهزة نبدأ يوم دراسي جديد؟
+            </h1>
+            <p class="text-white/85 text-xs md:text-sm font-semibold leading-relaxed max-w-xl">
+              تابعي دروسك، والواجبات، واستعدي لمستوى أعلى.
+            </p>
 
-          <div class="flex flex-wrap gap-4 justify-start pt-2">
-            <a routerLink="courses" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm shadow-md">
-              <span>استكشف مقرراتي</span>
-              <span aria-hidden="true" class="mr-1.5">←</span>
-            </a>
-            <button type="button" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm backdrop-blur-md" [disabled]="isLoading()" (click)="loadDashboard()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 ml-2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7h-5V2M4 17h5v5m10.5-9A8 8 0 0 0 6 6.5L4 9m16 6-2 2.5A8 8 0 0 1 4.5 11"/>
-              </svg>
-              {{ isLoading() ? 'جارٍ التحديث...' : 'تحديث البيانات' }}
-            </button>
+            <div class="flex flex-wrap gap-4 justify-start pt-2">
+              <a routerLink="courses" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm shadow-md">
+                <span>متابعة الدروس</span>
+              </a>
+              <a routerLink="schedule" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm backdrop-blur-md">
+                <span>جدول اليوم</span>
+              </a>
+            </div>
           </div>
-        </div>
 
-        <!-- LEFT SIDE: Illustration -->
-        <div class="hidden md:flex w-[45%] relative items-center justify-center select-none z-10">
-          <div class="relative w-full max-w-[420px] h-[270px] flex items-center justify-center">
-            <img [src]="'/assets/images/dashboard-heroes/' + (detectedGender() === 'female' ? 'student-female-hero.png' : 'student-male-hero.png')" class="w-full h-full object-contain student-hero-image" alt="الطالب">
+          <!-- LEFT SIDE: Illustration -->
+          <div class="hidden md:block absolute bottom-0 left-0 h-full w-[45%] pointer-events-none z-10 animate-fade-in overflow-hidden">
+            <!-- Glow spots behind image -->
+            <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-cyan-400/25 rounded-full blur-[80px] z-0"></div>
+            <div class="absolute top-10 left-20 w-48 h-48 bg-purple-400/20 rounded-full blur-[60px] z-0"></div>
+            
+            <img src="/assets/images/dashboard-heroes/student-female-hero.png" class="student-hero-image relative z-10" alt="طالبة مسارك">
           </div>
-        </div>
+        }
+
+        <!-- Slide 1: Male Student Companion -->
+        @if (activeSlide() === 1) {
+          <!-- RIGHT SIDE: Text Content -->
+          <div class="w-full md:max-w-[55%] space-y-5 text-right animate-fade-in z-20">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
+              مرحباً {{ user()?.fullName?.split(' ')?.at(0) || 'أحمد' }}،<br>
+              جاهز نبدأ يوم دراسي جديد؟
+            </h1>
+            <p class="text-white/85 text-xs md:text-sm font-semibold leading-relaxed max-w-xl">
+              تابع دروسك، والواجبات، واستعد لمستوى أعلى.
+            </p>
+
+            <div class="flex flex-wrap gap-4 justify-start pt-2">
+              <a routerLink="courses" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm shadow-md">
+                <span>متابعة الدروس</span>
+              </a>
+              <a routerLink="schedule" class="inline-flex items-center justify-center px-6 py-2.5 rounded-2xl bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm backdrop-blur-md">
+                <span>جدول اليوم</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- LEFT SIDE: Illustration -->
+          <div class="hidden md:block absolute bottom-0 left-0 h-full w-[45%] pointer-events-none z-10 animate-fade-in overflow-hidden">
+            <!-- Glow spots behind image -->
+            <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-cyan-400/25 rounded-full blur-[80px] z-0"></div>
+            <div class="absolute top-10 left-20 w-48 h-48 bg-purple-400/20 rounded-full blur-[60px] z-0"></div>
+            
+            <img src="/assets/images/dashboard-heroes/student-male-hero.png" class="student-hero-image relative z-10" alt="طالب مسارك">
+          </div>
+        }
+
       </div>
     }
   </header>
 
   <nav class="student-quick-links" aria-label="الوصول السريع">
-    <a routerLink="courses"><span class="quick-icon quick-icon-blue">▣</span><span><b>مقرراتي</b><small>واصل التعلّم</small></span></a>
-    <a routerLink="assignments"><span class="quick-icon quick-icon-orange">✓</span><span><b>الواجبات</b><small>تابع المطلوب</small></span></a>
-    <a routerLink="exams"><span class="quick-icon quick-icon-purple">✎</span><span><b>الاختبارات</b><small>استعد واختبر نفسك</small></span></a>
-    <a routerLink="schedule"><span class="quick-icon quick-icon-green">◷</span><span><b>جدولي</b><small>مواعيدك القادمة</small></span></a>
+    <a routerLink="courses">
+      <span class="quick-icon quick-icon-blue flex items-center justify-center shrink-0">
+        <app-icon name="book" [size]="18"></app-icon>
+      </span>
+      <span><b>مقرراتي</b><small>واصل التعلّم</small></span>
+    </a>
+    <a routerLink="assignments">
+      <span class="quick-icon quick-icon-orange flex items-center justify-center shrink-0">
+        <app-icon name="clipboard-document-list" [size]="18"></app-icon>
+      </span>
+      <span><b>الواجبات</b><small>تابع المطلوب</small></span>
+    </a>
+    <a routerLink="exams">
+      <span class="quick-icon quick-icon-purple flex items-center justify-center shrink-0">
+        <app-icon name="document-check" [size]="18"></app-icon>
+      </span>
+      <span><b>الاختبارات</b><small>استعد واختبر نفسك</small></span>
+    </a>
+    <a routerLink="schedule">
+      <span class="quick-icon quick-icon-green flex items-center justify-center shrink-0">
+        <app-icon name="calendar" [size]="18"></app-icon>
+      </span>
+      <span><b>جدولي</b><small>مواعيدك القادمة</small></span>
+    </a>
   </nav>
 
   @if (isLoading()) {
@@ -125,7 +165,10 @@
             }
           </div>
         } @else {
-          <div class="compact-empty"><span>◷</span><div><b>لا توجد حصص قادمة</b><p>استمتع بوقتك، سنعرض مواعيدك الجديدة هنا.</p></div></div>
+          <div class="compact-empty">
+            <span class="flex items-center justify-center text-slate-400 shrink-0"><app-icon name="clock" [size]="22"></app-icon></span>
+            <div><b>لا توجد حصص قادمة</b><p>استمتع بوقتك، سنعرض مواعيدك الجديدة هنا.</p></div>
+          </div>
         }
       </section>
       <app-student-attendance-summary [summary]="dashboard.attendance" />
@@ -138,7 +181,10 @@
           @for (course of recentCourses(); track course.subjectId) { <app-student-course-card [course]="course" /> }
         </div>
       } @else {
-        <div class="compact-empty"><span>▣</span><div><b>لا توجد مقررات مسندة بعد</b><p>ستظهر مقررات فصلك هنا بمجرد إضافتها.</p></div></div>
+        <div class="compact-empty">
+          <span class="flex items-center justify-center text-slate-400 shrink-0"><app-icon name="book" [size]="22"></app-icon></span>
+          <div><b>لا توجد مقررات مسندة بعد</b><p>ستظهر مقررات فصلك هنا بمجرد إضافتها.</p></div>
+        </div>
       }
     </section>
   }

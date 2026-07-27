@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminApiService } from '../../../../core/services/admin-api-service';
@@ -12,6 +12,7 @@ import { ClassPerformanceReportDto } from '../../../../models/academic.model';
   imports: [IconComponent, CommonModule, FormsModule],
   templateUrl: './admin-performance.html',
   styleUrl: './admin-performance.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class AdminPerformanceComponent implements OnInit {
   private readonly adminApi = inject(AdminApiService);

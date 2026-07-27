@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 import { StudentCourseCardComponent } from '../../components/course-card/course-card.component';
 import { StudentCourse, StudentEntityId } from '../../models';
@@ -17,7 +18,7 @@ import { StudentService } from '../../services/student.service';
 @Component({
   selector: 'app-student-courses-page',
   standalone: true,
-  imports: [RouterLink, StudentCourseCardComponent],
+  imports: [RouterLink, StudentCourseCardComponent, IconComponent],
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

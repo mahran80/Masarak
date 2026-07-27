@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { AdminApiService, SystemHealthDto } from '../../../../core/services/admin-api-service';
@@ -9,7 +9,8 @@ import { AdminApiService, SystemHealthDto } from '../../../../core/services/admi
   imports: [NgFor, NgIf, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './system-health.component.html',
-  styleUrl: './system-health.component.scss'
+  styleUrl: './system-health.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class SystemHealthComponent implements OnInit {
   private readonly adminApi = inject(AdminApiService);

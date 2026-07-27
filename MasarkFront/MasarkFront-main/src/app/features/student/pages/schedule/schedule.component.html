@@ -1,27 +1,27 @@
 <section class="student-page student-schedule-page p-6 bg-slate-50 min-h-screen text-slate-900" dir="rtl">
-  <header class="mb-8">
+  <header class="schedule-hero mb-8">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p class="text-sm font-semibold text-[#4F8CD4]">الجدول الدراسي</p>
-        <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">حصص صفي</h1>
+        <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">الجدول الدراسي</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-950 dark:text-white sm:text-3xl">حصص صفي</h1>
       </div>
       
-      <div class="flex items-center gap-4 bg-white rounded-xl shadow-sm border border-slate-100 p-1.5">
-        <select
-          [ngModel]="selectedWeek()"
-          (change)="onWeekChange($event)"
-          class="bg-transparent text-sm font-bold text-slate-700 min-w-[140px] text-center focus:outline-none cursor-pointer px-2 py-1"
-          dir="rtl"
-        >
-          @for (week of academicWeeks(); track week.value) {
-            <option [value]="week.value">{{ week.label }}</option>
-          }
-        </select>
+      <div class="schedule-week-picker relative">
+        <button type="button" class="schedule-week-trigger" (click)="toggleWeekPicker()">
+          <span>{{ selectedWeekLabel() }}</span><span class="schedule-week-chevron">⌄</span>
+        </button>
+        @if (isWeekPickerOpen()) {
+          <div class="schedule-week-menu">
+            @for (week of academicWeeks(); track week.value) {
+              <button type="button" [class.is-selected]="selectedWeek() === week.value" (click)="selectWeek(week.value)">{{ week.label }}</button>
+            }
+          </div>
+        }
       </div>
 
       <button
         type="button"
-        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#4F8CD4] px-6 text-sm font-bold text-white transition hover:bg-[#3d6ca3] shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+        class="schedule-refresh inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-bold text-white transition shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
         [disabled]="isLoading()"
         (click)="loadSchedule()"
       >

@@ -126,7 +126,8 @@ h3, h4, h5 {
   .fixed.bottom-24 {
     width: 390px;
     height: 600px;
-    right: 16px;
+    left: 16px;
+    right: auto;
     bottom: 92px;
   }
 }
@@ -152,7 +153,21 @@ h3, h4, h5 {
   
   .fixed.bottom-6 {
     bottom: 16px !important;
-    right: 16px !important;
+    left: 16px !important;
+    right: auto !important;
+    transform: none !important;
+  }
+}
+
+// Interactive idle launcher button that hides 50% off-screen on the left
+.launcher-idle {
+  transform: translateX(-40px);
+  opacity: 0.6;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
+  
+  &:hover {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -162,5 +177,62 @@ h3, h4, h5 {
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+/* Sidebar positioning support for AI assistant launcher & chat window */
+@media (min-width: 769px) {
+  body:has(aside) {
+    .fixed.bottom-6.left-6 {
+      left: auto !important;
+      right: 24px !important;
+    }
+    .launcher-idle {
+      transform: translateX(40px);
+      &:hover {
+        transform: translateX(0);
+      }
+    }
+    .fixed.bottom-24.left-6 {
+      left: auto !important;
+      right: 24px !important;
+    }
+  }
+}
+
+/* Premium Chat Window Glassmorphism Overrides */
+.fixed.bottom-24.left-6 {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 24px 64px -12px rgba(99, 102, 241, 0.16),
+    0 8px 24px -8px rgba(15, 23, 42, 0.06),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme='dark'] .fixed.bottom-24.left-6 {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 
+    0 24px 64px -12px rgba(0, 0, 0, 0.45),
+    0 8px 24px -8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Suggested chips and scroll optimization */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Hover transitions for quick action buttons inside AI welcome screen */
+.text-center .grid button {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08) !important;
   }
 }

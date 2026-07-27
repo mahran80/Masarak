@@ -152,12 +152,19 @@ BEGIN
     ('Physics',         N'فيزياء', 1),
     ('Chemistry',       N'كيمياء', 1),
     ('Biology',         N'أحياء', 1),
-    ('Computer Science',N'حاسب آلي', 1);
+    ('Computer Science',N'حاسب آلي', 1),
+    ('Social Studies',  N'دراسات اجتماعية', 1),
+    ('Religion',        N'تربية دينية', 1),
+    ('Art',             N'تربية فنية', 1),
+    ('Physical Education', N'تربية رياضية', 1),
+    ('Philosophy',      N'فلسفة', 1),
+    ('Psychology',      N'علم نفس', 1),
+    ('Geology',         N'جيولوجيا', 1);
     PRINT '[Seeder] Subject categories seeded.';
 END
 
 -- ==============================================================
--- 7.  SUBJECTS  (10 subjects × 12 grades = 120 subjects)
+-- 7.  SUBJECTS
 -- ==============================================================
 DECLARE @catMath INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Mathematics');
 DECLARE @catArb  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Arabic');
@@ -169,6 +176,13 @@ DECLARE @catPhy  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE N
 DECLARE @catChe  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Chemistry');
 DECLARE @catBio  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Biology');
 DECLARE @catCS   INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Computer Science');
+DECLARE @catSoc  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Social Studies');
+DECLARE @catRel  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Religion');
+DECLARE @catArt  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Art');
+DECLARE @catPE   INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Physical Education');
+DECLARE @catPhi  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Philosophy');
+DECLARE @catPsy  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Psychology');
+DECLARE @catGel  INT = (SELECT SubjectCategoryId FROM subject_categories WHERE Name = 'Geology');
 
 -- Loop across all grades and seed subjects
 DECLARE @gradeId INT, @gradeOrder INT;
@@ -180,33 +194,104 @@ FETCH NEXT FROM gradeCur INTO @gradeId, @gradeOrder;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catMath)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catMath, 'Mathematics ' + CAST(@gradeOrder AS VARCHAR), N'رياضيات', 'MATH-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الرياضيات للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catArb)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catArb, 'Arabic ' + CAST(@gradeOrder AS VARCHAR), N'لغة عربية', 'ARB-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة العربية للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catEng)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catEng, 'English ' + CAST(@gradeOrder AS VARCHAR), N'لغة إنجليزية', 'ENG-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة الإنجليزية للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catSci)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catSci, 'Science ' + CAST(@gradeOrder AS VARCHAR), N'علوم', 'SCI-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر العلوم للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catHis)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catHis, 'History ' + CAST(@gradeOrder AS VARCHAR), N'تاريخ', 'HIS-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التاريخ للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catGeo)
-        INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-        VALUES (@gradeId, @catGeo, 'Geography ' + CAST(@gradeOrder AS VARCHAR), N'جغرافيا', 'GEO-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الجغرافيا للصف ' + CAST(@gradeOrder AS NVARCHAR));
-
-    -- Physics, Chemistry, Biology, CS only for grades 7-12
-    IF @gradeOrder >= 7
+    -- Primary School (Grades 1-6)
+    IF @gradeOrder >= 1 AND @gradeOrder <= 6
     BEGIN
+        -- Arabic, English, Math, Religion, Art, PE for all Primary
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catArb)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catArb, 'Arabic ' + CAST(@gradeOrder AS VARCHAR), N'لغة عربية', 'ARB-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة العربية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catEng)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catEng, 'English ' + CAST(@gradeOrder AS VARCHAR), N'لغة إنجليزية', 'ENG-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة الإنجليزية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catMath)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catMath, 'Mathematics ' + CAST(@gradeOrder AS VARCHAR), N'رياضيات', 'MATH-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الرياضيات للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catRel)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catRel, 'Religion ' + CAST(@gradeOrder AS VARCHAR), N'تربية دينية', 'REL-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التربية الدينية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catArt)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catArt, 'Art ' + CAST(@gradeOrder AS VARCHAR), N'تربية فنية', 'ART-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التربية الفنية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catPE)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catPE, 'Physical Education ' + CAST(@gradeOrder AS VARCHAR), N'تربية رياضية', 'PE-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التربية الرياضية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        -- Science, Social Studies, ICT only for Grade 4+
+        IF @gradeOrder >= 4
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catSci)
+                INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+                VALUES (@gradeId, @catSci, 'Science ' + CAST(@gradeOrder AS VARCHAR), N'علوم', 'SCI-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر العلوم للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+            IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catSoc)
+                INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+                VALUES (@gradeId, @catSoc, 'Social Studies ' + CAST(@gradeOrder AS VARCHAR), N'دراسات اجتماعية', 'SOC-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الدراسات الاجتماعية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+            IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catCS)
+                INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+                VALUES (@gradeId, @catCS, 'Digital Skills ' + CAST(@gradeOrder AS VARCHAR), N'المهارات الرقمية', 'CS-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر المهارات الرقمية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+        END
+    END
+
+    -- Preparatory School (Grades 7-9)
+    IF @gradeOrder >= 7 AND @gradeOrder <= 9
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catArb)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catArb, 'Arabic ' + CAST(@gradeOrder AS VARCHAR), N'لغة عربية', 'ARB-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة العربية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catEng)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catEng, 'English ' + CAST(@gradeOrder AS VARCHAR), N'لغة إنجليزية', 'ENG-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة الإنجليزية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catMath)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catMath, 'Mathematics ' + CAST(@gradeOrder AS VARCHAR), N'رياضيات', 'MATH-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الرياضيات للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catSci)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catSci, 'Science ' + CAST(@gradeOrder AS VARCHAR), N'علوم', 'SCI-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر العلوم للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catSoc)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catSoc, 'Social Studies ' + CAST(@gradeOrder AS VARCHAR), N'دراسات اجتماعية', 'SOC-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الدراسات الاجتماعية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catRel)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catRel, 'Religion ' + CAST(@gradeOrder AS VARCHAR), N'تربية دينية', 'REL-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التربية الدينية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catCS)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catCS, 'Computer Science ' + CAST(@gradeOrder AS VARCHAR), N'حاسب آلي', 'CS-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الحاسب الآلي للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catPE)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catPE, 'Physical Education ' + CAST(@gradeOrder AS VARCHAR), N'تربية رياضية', 'PE-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التربية الرياضية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+    END
+
+    -- Secondary School (Grade 10+)
+    IF @gradeOrder >= 10
+    BEGIN
+        -- Core
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catArb)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catArb, 'Arabic ' + CAST(@gradeOrder AS VARCHAR), N'لغة عربية', 'ARB-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة العربية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catEng)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catEng, 'English ' + CAST(@gradeOrder AS VARCHAR), N'لغة إنجليزية', 'ENG-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر اللغة الإنجليزية للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catMath)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catMath, 'Mathematics ' + CAST(@gradeOrder AS VARCHAR), N'رياضيات', 'MATH-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الرياضيات للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        -- Science Track
         IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catPhy)
             INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
             VALUES (@gradeId, @catPhy, 'Physics ' + CAST(@gradeOrder AS VARCHAR), N'فيزياء', 'PHY-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الفيزياء للصف ' + CAST(@gradeOrder AS NVARCHAR));
@@ -219,9 +304,26 @@ BEGIN
             INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
             VALUES (@gradeId, @catBio, 'Biology ' + CAST(@gradeOrder AS VARCHAR), N'أحياء', 'BIO-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الأحياء للصف ' + CAST(@gradeOrder AS NVARCHAR));
 
-        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catCS)
+        -- Arts Track
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catHis)
             INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
-            VALUES (@gradeId, @catCS, 'Computer Science ' + CAST(@gradeOrder AS VARCHAR), N'حاسب آلي', 'CS-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الحاسب الآلي للصف ' + CAST(@gradeOrder AS NVARCHAR));
+            VALUES (@gradeId, @catHis, 'History ' + CAST(@gradeOrder AS VARCHAR), N'تاريخ', 'HIS-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر التاريخ للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catGeo)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catGeo, 'Geography ' + CAST(@gradeOrder AS VARCHAR), N'جغرافيا', 'GEO-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الجغرافيا للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catPhi)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catPhi, 'Philosophy ' + CAST(@gradeOrder AS VARCHAR), N'فلسفة', 'PHI-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الفلسفة للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catPsy)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catPsy, 'Psychology ' + CAST(@gradeOrder AS VARCHAR), N'علم نفس', 'PSY-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر علم النفس للصف ' + CAST(@gradeOrder AS NVARCHAR));
+
+        IF NOT EXISTS (SELECT 1 FROM subjects WHERE GradeId = @gradeId AND SubjectCategoryId = @catGel)
+            INSERT INTO subjects (GradeId, SubjectCategoryId, Name, NameAr, Code, IsActive, Description)
+            VALUES (@gradeId, @catGel, 'Geology ' + CAST(@gradeOrder AS VARCHAR), N'جيولوجيا', 'GEL-' + CAST(@gradeOrder AS VARCHAR), 1, N'مقرر الجيولوجيا للصف ' + CAST(@gradeOrder AS NVARCHAR));
     END
 
     FETCH NEXT FROM gradeCur INTO @gradeId, @gradeOrder;

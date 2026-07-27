@@ -1,4 +1,4 @@
-@import '@angular/material/prebuilt-themes/azure-blue.css';
+﻿@import '@angular/material/prebuilt-themes/azure-blue.css';
 @tailwind base;
 
 @tailwind components;
@@ -75,7 +75,7 @@
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ─── Z-Index System ──────────────────────────────────────── */
+  /* â”€â”€â”€ Z-Index System â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   --z-base:          1;
   --z-dropdown:    500;
   --z-header:      100;
@@ -1749,19 +1749,19 @@ body[dir="ltr"], [dir="ltr"] {
 }
 
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MASARAK GLOBAL MODAL SYSTEM
    Single source of truth for all dialogs, overlays, and forms.
    Applied globally so position:fixed z-index always covers
    Navbar (z-[100]) and Sidebar (z-[110]).
-   ═══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* body lock — added/removed by TypeScript */
+/* body lock â€” added/removed by TypeScript */
 body.modal-open {
   overflow: hidden;
 }
 
-/* ─── Keyframes ──────────────────────────────────────────────── */
+/* â”€â”€â”€ Keyframes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes academicOverlayIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -1811,10 +1811,10 @@ body.modal-open {
   }
 }
 
-/* ─── Overlay ─────────────────────────────────────────────────
+/* â”€â”€â”€ Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    MUST be position:fixed + inset:0 to start from pixel 0,0
    z-index MUST be above Navbar(100) and Sidebar(110).
-   ─────────────────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-overlay {
   position: fixed;
   top: 0;
@@ -1827,8 +1827,8 @@ body.modal-open {
   justify-content: center;
   padding: 20px;
   background: rgba(7, 17, 31, 0.66);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   animation: academicOverlayIn 200ms ease forwards;
 }
 
@@ -1846,11 +1846,11 @@ body[data-theme='dark'] .masarak-overlay {
   z-index: var(--z-confirm, 9020);
 }
 
-/* ─── Dialog sizes ────────────────────────────────────────── */
+/* â”€â”€â”€ Dialog sizes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-dialog {
   position: relative;
   z-index: var(--z-modal-dialog, 9010);
-  width: min(100%, 560px);      /* medium — default */
+  width: min(100%, 560px);      /* medium â€” default */
   max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
@@ -1885,7 +1885,7 @@ body[data-theme='dark'] .masarak-dialog {
 .masarak-dialog--lg   { width: min(100%, 760px); }
 .masarak-dialog--xl   { width: min(100%, 1000px); }
 
-/* ─── Header ──────────────────────────────────────────────── */
+/* â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-modal-header {
   flex: 0 0 auto;
   display: flex;
@@ -1983,7 +1983,7 @@ body[data-theme='dark'] .masarak-modal-close:hover {
   color: #FCA5A5;
 }
 
-/* ─── Body ────────────────────────────────────────────────── */
+/* â”€â”€â”€ Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-modal-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -2009,7 +2009,7 @@ body[data-theme='dark'] .masarak-modal-close:hover {
   border-radius: 99px;
 }
 
-/* ─── Footer ──────────────────────────────────────────────── */
+/* â”€â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-modal-footer {
   flex: 0 0 auto;
   display: flex;
@@ -2027,7 +2027,7 @@ body[data-theme='dark'] .masarak-modal-footer {
   background-color: #0D1829;
 }
 
-/* ─── Form Controls ───────────────────────────────────────── */
+/* â”€â”€â”€ Form Controls â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-form-field {
   display: flex;
   flex-direction: column;
@@ -2209,7 +2209,7 @@ input[type="time"]:focus {
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
 }
 
-/* ─── Toggle Row ──────────────────────────────────────────── */
+/* â”€â”€â”€ Toggle Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-toggle-row {
   display: flex;
   align-items: center;
@@ -2315,7 +2315,7 @@ body[data-theme='dark'] .masarak-switch__track {
   transform: translateX(20px);
 }
 
-/* ─── Buttons ─────────────────────────────────────────────── */
+/* â”€â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .masarak-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -2416,13 +2416,13 @@ body[data-theme='dark'] .masarak-btn-secondary:hover {
   transform: translateY(0) scale(0.98);
 }
 
-/* ─── Mobile Bottom Sheet ─────────────────────────────────── */
+/* â”€â”€â”€ Mobile Bottom Sheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 600px) {
   .masarak-overlay {
     padding: 0;
     align-items: flex-end;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
   }
 
   .masarak-dialog {
@@ -2447,7 +2447,7 @@ body[data-theme='dark'] .masarak-btn-secondary:hover {
 }
 
 /* ===========================================================================
-   MASARAK DESIGN SYSTEM — PHASE 1: FOUNDATIONS
+   MASARAK DESIGN SYSTEM â€” PHASE 1: FOUNDATIONS
    Shared, semantic tokens only. Components opt in progressively so existing
    templates, bindings, and feature behavior remain unchanged.
    ========================================================================== */
@@ -2684,7 +2684,7 @@ small {
 :root[data-theme='dark'] .ui-badge--info { color: #7dd3fc; }
 :root[data-theme='dark'] .ui-badge--purple { color: #c4b5fd; }
 
-/* Student area — shared visual shell (presentation only). */
+/* Student area â€” shared visual shell (presentation only). */
 .student-page { color: var(--text-primary); }
 .student-page > header { position:relative; min-height:128px; padding:26px 28px; border:1px solid #dbe7ff; border-radius:var(--radius-hero); background:radial-gradient(circle at 10% 25%,rgba(167,139,250,.22),transparent 29%),linear-gradient(125deg,#eef5ff 0%,#f7f5ff 58%,#eef4ff 100%); box-shadow:var(--shadow-card); overflow:hidden; }
 .student-page > header::before { content:''; position:absolute; inset:0 0 0 auto; width:min(42%,310px); background:linear-gradient(90deg,transparent,rgba(255,255,255,.68)); pointer-events:none; }
@@ -2815,7 +2815,7 @@ textarea { font-family:var(--font-arabic); }
 }
 
 .admin-topbar header { padding-inline:22px !important; }
-.admin-topbar a span { font-size:21px !important; letter-spacing:-.03em; }
+.admin-topbar a[routerLink="/"] span { font-size:21px !important; letter-spacing:-.03em; }
 .admin-topbar button,.admin-topbar > header > div > div { transition:transform .2s ease,background-color .2s ease; }
 .admin-topbar button:hover { transform:translateY(-1px); }
 
@@ -2846,8 +2846,237 @@ app-student-course-card .course-card { min-height:326px; padding:20px; }
 app-student-course-card .course-card header { align-items:flex-start; }
 app-student-course-card .course-symbol { width:88px; height:88px; border-radius:23px; box-shadow:0 12px 24px rgba(49,74,146,.14); }
 app-student-course-card .course-copy { margin-top:11px; }
+
+/* =========================================================================
+   MASARAK â€” GLOBAL TEACHER & STUDENT OVERRIDES 
+   ========================================================================= */
+
+/* Hide scrollbar for sidebar nav but allow scrolling */
+.sidebar-nav-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.sidebar-nav-scroll::-webkit-scrollbar { display: none; }
+
+/* 1. GLOBALLY UNIFIED CALENDAR CARD DESIGN (SQUARE TICKETS) - FOR ALL */
+.wc-agenda-mode .wc-day-cell.is-selected { display: grid !important; grid-template-columns: repeat(auto-fill, 300px) !important; justify-content: start !important; gap: 20px !important; }
+.wc-agenda-mode .wc-day-cell.is-selected::before { display: none !important; }
+.wc-agenda-mode .wc-lesson-card::before { display: none !important; }
+.wc-agenda-mode .wc-lesson-card { width: 100% !important; margin: 0 !important; display: flex !important; flex-direction: column !important; background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important; border-radius: 16px !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(15, 23, 42, 0.02) !important; transform: translateY(0) !important; transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important; }
+.wc-agenda-mode .wc-lesson-card:hover { transform: translateY(-4px) !important; border-color: #CBD5E1 !important; background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04) !important; }
+.wc-card-inner { padding: 24px 20px !important; gap: 12px !important; }
+.wc-card-title { font-size: 18px !important; font-weight: 800 !important; color: #0F172A !important; margin-bottom: 4px !important; }
+.wc-card-row { display: inline-flex !important; align-items: center !important; align-self: flex-start !important; background: #F8FAFC !important; padding: 6px 12px !important; border-radius: 8px !important; border: 1px solid #E2E8F0 !important; margin-inline-end: 8px !important; margin-bottom: 4px !important; gap: 8px !important; font-size: 13px !important; font-weight: 700 !important; width: auto !important; }
+.wc-card-dot { width: 8px !important; height: 8px !important; }
+.wc-card-time-row { margin-top: 8px !important; background: transparent !important; border: none !important; border-top: 1px dashed #CBD5E1 !important; border-radius: 0 !important; padding: 16px 4px 0 !important; justify-content: flex-start !important; gap: 20px !important; display: flex !important; align-items: center !important; }
+.wc-card-time-text { font-size: 15px !important; color: #0F172A !important; }
+.wc-card-duration-text { font-size: 13px !important; color: #475569 !important; background: #F1F5F9 !important; padding: 4px 12px !important; border-radius: 999px !important; font-weight: 700 !important; }
+
+/* GLOBALLY HIGHLIGHT SELECTED DAY IN BLUE FOR EVERYONE */
+.wc-agenda-mode .wc-day-header.is-selected { border-color: #2563EB !important; background: #2563EB !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important; }
+.wc-agenda-mode .wc-day-header.is-selected::after { display: none !important; }
+.wc-agenda-mode .wc-day-header.is-selected .wc-day-name,
+.wc-agenda-mode .wc-day-header.is-selected .wc-day-date { color: #FFFFFF !important; }
+.wc-agenda-mode .wc-day-header.is-selected .wc-day-count { background: rgba(255, 255, 255, 0.2) !important; color: #FFFFFF !important; }
+
+
+/* 2. STUDENT-SPECIFIC LAYOUT CLEANUPS (ONLY FOR STUDENT) */
+.student-schedule-page .wc-student-agenda { margin: 0 !important; padding: 24px 32px !important; border: none !important; border-top: 1px solid #E2E8F0 !important; border-radius: 0 !important; background: #F8FAFC !important; box-shadow: none !important; }
+.student-schedule-page .wc-agenda-mode .wc-scroll { overflow: hidden !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.student-schedule-page .wc-agenda-mode .wc-header-row { min-height: auto !important; gap: 8px !important; padding: 0 0 16px !important; border: 0 !important; background: transparent !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header { width: 100% !important; min-height: 86px !important; padding: 12px 8px !important; border: 1px solid #E2E8F0 !important; border-radius: 16px !important; background: #FFFFFF !important; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02) !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header:hover { transform: translateY(-2px) !important; border-color: #CBD5E1 !important; background: #FFFFFF !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header.is-selected { border-color: #2563EB !important; background: #2563EB !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header.is-selected::after { display: none !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header.is-selected .wc-day-name,
+.student-schedule-page .wc-agenda-mode .wc-day-header.is-selected .wc-day-date { color: #FFFFFF !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-header.is-selected .wc-day-count { background: rgba(255, 255, 255, 0.2) !important; color: #FFFFFF !important; }
+.student-schedule-page .wc-agenda-mode .wc-body-row { margin: 0 !important; padding: 16px 8px !important; border: 0 !important; background: transparent !important; }
+.student-schedule-page .wc-agenda-mode .wc-day-cell { border: none !important; padding: 0 !important; background: transparent !important; }
+
+
+/* 3. TEACHER DASHBOARD FIXES (CONTRAST & DROPDOWN) */
+.live-schedule-page { background-color: #F1F5F9 !important; }
+.live-schedule-page .classes-panel, .live-schedule-page .schedule-workspace, .live-schedule-page .schedule-controls {
+  background: #FFFFFF !important; border: 1px solid #CBD5E1 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+.live-schedule-page .schedule-controls { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 20px !important; }
+.live-schedule-page .week-control { min-width: 200px !important; flex: 0 0 auto !important; display: flex; align-items: center; gap: 12px; }
+.live-schedule-page .week-control label { margin-bottom: 0 !important; font-size: 13px !important; color: #334155 !important; }
+.live-schedule-page .week-select-wrap select { height: 38px !important; padding-inline: 36px 30px !important; font-size: 13px !important; border-radius: 8px !important; border: 1px solid #CBD5E1 !important; }
+.live-schedule-page .week-select-wrap > span { inset-inline-start: 10px !important; color: #64748B !important; }
+.live-schedule-page .week-select-wrap > i { inset-inline-end: 10px !important; color: #64748B !important; }
+.live-schedule-page .grade-button.is-active { background: #EFF6FF !important; border: 1px solid #BFDBFE !important; color: #1D4ED8 !important; }
+.live-schedule-page .classes-list button.is-active { background: #2563EB !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3) !important; }
+.live-schedule-page .workspace-header { border-bottom: 1px solid #CBD5E1 !important; background: #F8FAFC !important; }
+
+/* =========================================================================
+   PROFILE POPOVER FIX (COMPACT & PROFESSIONAL)
+   ========================================================================= */
+.premium-profile-popover {
+  width: 260px !important;
+  padding: 16px 14px !important;
+}
+.premium-profile-popover h4 {
+  font-size: 14px !important;
+  margin-bottom: 2px !important;
+  line-height: 1.2 !important;
+  color: #0F172A !important;
+}
+.premium-profile-popover p {
+  font-size: 11px !important;
+  color: #64748B !important;
+  margin-bottom: 10px !important;
+}
+.premium-profile-popover a, 
+.premium-profile-popover button {
+  padding: 8px 12px !important;
+  min-height: 40px !important;
+  margin-bottom: 2px !important;
+}
+.premium-profile-popover span {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+.premium-profile-popover .w-14 {
+  width: 46px !important;
+  height: 46px !important;
+}
+
 app-student-course-card .course-copy h3 { font-size:17px; }
 app-student-course-card .course-card header > span { margin-top:4px; }
+
+/* =========================================================================
+   AUTH PAGES GLOBAL STYLES & BACKGROUND
+   ========================================================================= */
+.ml-auth-bg {
+  position: relative;
+  background: #F8FAFC url('/assets/images/masarak_auth_bg.jpg') no-repeat center center fixed !important;
+  background-size: cover !important;
+}
+
+/* Subtle overlay to make text/forms readable over the image, with a light glassmorphism blur */
+.ml-auth-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(248, 250, 252, 0.4) !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  z-index: 0;
+}
+:root[data-theme='dark'] .ml-auth-bg::before {
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* Top corner toggles fixed (Language, Theme, Home) */
+.ml-auth-toggles-corner {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 50;
+}
+[dir="rtl"] .ml-auth-toggles-corner {
+  right: auto;
+  left: 24px;
+}
+
+.ml-auth-toggles-corner a,
+.ml-auth-toggles-corner button {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #475569 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+:root[data-theme='dark'] .ml-auth-toggles-corner a,
+:root[data-theme='dark'] .ml-auth-toggles-corner button {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #CBD5E1 !important;
+}
+
+.ml-auth-toggles-corner a:hover,
+.ml-auth-toggles-corner button:hover {
+  transform: translateY(-2px) !important;
+  background: #F1F5F9 !important;
+}
+:root[data-theme='dark'] .ml-auth-toggles-corner a:hover,
+:root[data-theme='dark'] .ml-auth-toggles-corner button:hover {
+  background: #334155 !important;
+}
+
+.ml-lang-dropdown-wrapper {
+  position: relative;
+}
+.ml-lang-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+  padding: 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  min-width: 120px !important;
+}
+[dir="rtl"] .ml-lang-dropdown-menu {
+  right: auto;
+  left: 0;
+}
+:root[data-theme='dark'] .ml-lang-dropdown-menu {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+.ml-lang-dropdown-menu .ml-dropdown-item {
+  width: 100% !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  justify-content: flex-start !important;
+  padding: 0 12px !important;
+  box-shadow: none !important;
+  text-align: right !important;
+}
+[dir="ltr"] .ml-lang-dropdown-menu .ml-dropdown-item {
+  text-align: left !important;
+}
+.ml-lang-dropdown-menu .ml-dropdown-item:hover {
+  background: #F1F5F9 !important;
+}
+.ml-lang-dropdown-menu .ml-dropdown-item.is-active {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+}
+:root[data-theme='dark'] .ml-lang-dropdown-menu .ml-dropdown-item.is-active {
+  background: #1e3a8a !important;
+  color: #60A5FA !important;
+}
+
+/* Auth Container Size FIX */
+.ml-auth-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
 
 :root[data-theme='dark'] .ml-dashboard-bg {
   background:
@@ -2874,10 +3103,10 @@ app-student-course-card .course-card header > span { margin-top:4px; }
   app-student-course-card .course-symbol { width:76px; height:76px; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Phase 1A — additive design-system primitives.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Phase 1A â€” additive design-system primitives.
    These are opt-in `ds-*` classes; legacy page styles remain untouched.
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 :root {
   --ds-primary: #2563eb;
   --ds-primary-hover: #1d4ed8;
@@ -3042,7 +3271,7 @@ body[data-theme='dark'],
 @keyframes ds-float { 50% { transform: translateY(-5px); } }
 @media (prefers-reduced-motion: reduce) { .ds-reveal,.ds-float { animation: none; } .ds-card--interactive,.ds-button { transition: none; } }
 
-/* Phase 2 — student dashboard/profile visual layer, intentionally data-agnostic. */
+/* Phase 2 â€” student dashboard/profile visual layer, intentionally data-agnostic. */
 .student-page { font-size:15px; }
 .student-dashboard { gap:24px; }
 .student-dashboard .dashboard-hero h1 { font-size:clamp(30px,3vw,34px); font-weight:800; }
@@ -3069,9 +3298,9 @@ body[data-theme='dark'],
 @media(max-width:1100px){.profile-layout{grid-template-columns:1fr !important}.profile-main-card,.profile-summary{order:initial}.profile-summary{grid-template-columns:repeat(2,minmax(0,1fr));display:grid;gap:18px}.profile-summary article{margin:0!important}}
 @media(max-width:640px){.student-dashboard .dashboard-panel{padding:18px}.profile-main-card{padding:18px!important}.profile-hero{margin:-18px -18px 20px;padding:24px 18px}.profile-page .profile-main-card dl,.profile-summary{grid-template-columns:1fr}.profile-page-header button{width:100%}}
 
-/* ═══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MASARAK PREMIUM DATEPICKER THEME
-   ═══════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Global Datepicker Font */
 .mat-datepicker-content,
@@ -3212,3 +3441,164 @@ body[data-theme='dark'],
 .mdc-line-ripple {
   display: none !important;
 }
+
+
+
+/* =========================================================================
+   ULTIMATE MASARAK AUTH BACKGROUND & FIXES
+   ========================================================================= */
+html body .ml-auth-bg {
+  background: url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed, linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #f0fdf4 100%) !important;
+  position: relative !important;
+}
+
+html body .ml-auth-bg::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  /* Glassmorphism dark/light overlay to make the image beautiful */
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+:root[data-theme='dark'] html body .ml-auth-bg::before {
+  background: rgba(15, 23, 42, 0.75) !important;
+}
+
+/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them strictly in the corner, fixed */
+html body .ml-auth-toggles-corner {
+  position: fixed !important;
+  top: 24px !important;
+  right: 24px !important;
+  z-index: 9999 !important;
+}
+[dir="rtl"] html body .ml-auth-toggles-corner {
+  right: auto !important;
+  left: 24px !important;
+}
+
+/* 3. FIX FORM SPACING - Prevent overlap with toggles */
+html body .ml-auth-wrapper {
+  z-index: 10 !important;
+  position: relative !important;
+  padding-top: 90px !important; /* Space for the toggles */
+  padding-bottom: 40px !important;
+  margin: 0 auto !important;
+}
+
+/* =========================================================================
+   ULTIMATE MASARAK AUTH BACKGROUND & FIXES V2
+   ========================================================================= */
+html body .ml-auth-bg {
+  /* Using both the image and a fallback gradient in case the image path is broken */
+  background: url('/assets/images/masarak_auth_bg.jpg') left bottom/cover no-repeat fixed, linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #f0fdf4 100%) !important;
+  position: relative !important;
+}
+
+html body .ml-auth-bg::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(248, 250, 252, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+:root[data-theme='dark'] html body .ml-auth-bg::before {
+  background: rgba(15, 23, 42, 0.75) !important;
+}
+
+/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them strictly in the corner, fixed */
+html body .ml-auth-toggles-corner {
+  position: fixed !important;
+  top: 16px !important;  /* Higher */
+  left: 24px !important; /* Force to LEFT for both Arabic and English to satisfy the request */
+  right: auto !important;
+  z-index: 9999 !important;
+}
+
+/* 3. FIX FORM SPACING - Prevent overlap with toggles */
+html body .ml-auth-wrapper {
+  z-index: 10 !important;
+  position: relative !important;
+  padding-top: 120px !important; /* Extra space to ensure form is well below the toggles */
+  padding-bottom: 40px !important;
+  margin: 0 auto !important;
+}
+
+/* =========================================================================
+   ULTIMATE MASARAK AUTH BACKGROUND & FIXES V3
+   ========================================================================= */
+html body .ml-auth-bg {
+  /* Using a beautiful Linear Gradient + The Image with correct relative path */
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #dbeafe 100%), url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed !important;
+  background-blend-mode: overlay !important;
+  position: relative !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important; /* Small space from all edges on small screens */
+  box-sizing: border-box !important;
+}
+
+html body .ml-auth-bg::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+:root[data-theme='dark'] html body .ml-auth-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%), url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed !important;
+  background-blend-mode: overlay !important;
+}
+
+:root[data-theme='dark'] html body .ml-auth-bg::before {
+  background: rgba(15, 23, 42, 0.4) !important;
+}
+
+/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them on the left, but slightly higher */
+html body .ml-auth-toggles-corner {
+  position: fixed !important;
+  top: 16px !important;  
+  left: 24px !important; /* Always on the left */
+  right: auto !important;
+  z-index: 9999 !important;
+}
+
+/* 3. FIX FORM SPACING - Centered with breathing room */
+html body .ml-auth-wrapper {
+  z-index: 10 !important;
+  position: relative !important;
+  margin: 0 auto !important;
+  padding: 0 !important; /* Remove the huge padding that pushed it down */
+  width: 100% !important;
+  max-width: 1000px !important;
+  margin-top: 40px !important; /* Just a tiny push down to avoid toggles on very small screens */
+}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,7 +8,8 @@ import { AuthApiService } from '../../../core/services/auth-api-service';
   selector: 'app-forgot-password',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './forgot-password-component.html'
+  templateUrl: './forgot-password-component.html',
+  styleUrl: './forgot-password-component.css'
 })
 export class ForgotPasswordComponent {
   private fb = inject(FormBuilder);

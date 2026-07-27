@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../shared/components/icon/icon.component';
-import { Component, DestroyRef, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, OnDestroy, inject, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,6 +33,7 @@ interface RecentActivity {
   imports: [IconComponent, CommonModule, RouterLink],
   templateUrl: './teacher.html',
   styleUrl: './teacher.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class TeacherComponent implements OnInit, OnDestroy {
   private readonly assessmentService = inject(TeacherAssessmentService);

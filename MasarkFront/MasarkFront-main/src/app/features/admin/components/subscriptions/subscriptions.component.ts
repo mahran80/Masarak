@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { DecimalPipe, NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
@@ -10,7 +10,8 @@ import { AdminApiService } from '../../../../core/services/admin-api-service';
   imports: [NgFor, NgIf, FormsModule, IconComponent, DecimalPipe, DatePipe],
   templateUrl: './subscriptions.component.html',
   styleUrl: './subscriptions.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class AdminSubscriptionsComponent implements OnInit {
 

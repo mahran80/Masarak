@@ -74,6 +74,23 @@ export class StudentExamsPageComponent implements OnInit {
     return firstGroup && firstExam ? { subject: firstGroup.subject, exam: firstExam } : null;
   });
 
+  getSubjectImageUrl(subjectName: string): string {
+    const name = (subjectName || '').toLowerCase();
+    if (name.includes('math') || name.includes('رياضيات')) return '/assets/images/student/subject-mathematics-3d.png';
+    if (name.includes('physic') || name.includes('فيزياء')) return '/assets/images/student/subject-physics-3d.jpg';
+    if (name.includes('chem') || name.includes('كيمياء')) return '/assets/images/student/subject-chemistry-3d.jpg';
+    if (name.includes('biolog') || name.includes('أحياء') || name.includes('احياء')) return '/assets/images/student/subject-biology-3d.jpg';
+    if (name.includes('sci') || name.includes('علوم')) return '/assets/images/student/subject-science-3d.png';
+    if (name.includes('comp') || name.includes('حاسب') || name.includes('برمجة') || name.includes('computer')) return '/assets/images/student/subject-computing-3d.png';
+    if (name.includes('arab') || name.includes('عربي') || name.includes('عربية')) return '/assets/images/student/subject-arabic-3d.png';
+    if (name.includes('eng') || name.includes('انجليزي') || name.includes('إنجليزية')) return '/assets/images/student/subject-english-3d.png';
+    if (name.includes('hist') || name.includes('تاريخ')) return '/assets/images/student/subject-history-3d.jpg';
+    if (name.includes('geo') || name.includes('جغرافيا')) return '/assets/images/student/subject-geography-3d.jpg';
+    if (name.includes('islam') || name.includes('إسلامي') || name.includes('دين')) return '/assets/images/student/subject-islamic-3d.jpg';
+    if (name.includes('fren') || name.includes('فرنسي')) return '/assets/images/student/subject-french-3d.jpg';
+    return '/assets/images/student/subject-science-3d.png';
+  }
+
   ngOnInit(): void {
     this.loadExams();
   }

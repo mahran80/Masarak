@@ -91,6 +91,20 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     return this.isOnboarding || this.isLiveSession;
   }
 
+  get isFemale(): boolean {
+    const name = (this.userName()?.fullName ?? '').toLowerCase();
+    const femaleKeywords = ['sara', 'سارة', 'fatma', 'فاطمة', 'mariam', 'مريم', 'sandy', 'ساندي', 'nour', 'نور', 'farida', 'فريدة', 'salma', 'سلمى', 'habiba', 'حبيبة', 'jana', 'جنى', 'yasmine', 'ياسمين', 'nada', 'ندى', 'malak', 'ملك', 'menna', 'منة', 'aya', 'آية', 'alaa', 'آلاء'];
+    return femaleKeywords.some(keyword => name.includes(keyword));
+  }
+
+  get hasValidAvatar(): boolean {
+    const url = this.userName()?.avatarUrl;
+    if (!url) return false;
+    const lower = url.trim().toLowerCase();
+    if (lower === 'avatar' || lower === 'default' || lower === 'null' || lower === 'undefined' || lower === '') return false;
+    return url.startsWith('http') || url.startsWith('/') || url.startsWith('assets/') || url.includes('.');
+  }
+
   toggleSidebar(event?: Event): void {
     if (event) {
       event.stopPropagation();
@@ -148,6 +162,13 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
       localStorage.setItem('theme', next);
       document.documentElement.setAttribute('data-theme', next);
       document.body.setAttribute('data-theme', next);
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+      }
     }
   }
 
@@ -167,6 +188,13 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
         this.theme.set(savedTheme);
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
+        }
       }
     }
 

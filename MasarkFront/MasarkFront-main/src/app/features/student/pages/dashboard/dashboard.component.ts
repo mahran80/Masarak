@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  OnDestroy,
   computed,
   inject,
   signal,
@@ -34,13 +35,48 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudentDashboardPageComponent implements OnInit {
+export class StudentDashboardPageComponent implements OnInit, OnDestroy {
   private readonly studentService = inject(StudentService);
   private readonly authStateService = inject(AuthStateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
   readonly user = this.authStateService.user;
+  
+  // Hero Slider State
+  readonly activeSlide = signal<number>(0);
+  private slideInterval: any;
+
+  ngOnDestroy(): void {
+    this.stopAutoSlide();
+  }
+
+  startAutoSlide(): void {
+    this.stopAutoSlide();
+    this.slideInterval = setInterval(() => {
+      this.nextSlide();
+    }, 6000);
+  }
+
+  stopAutoSlide(): void {
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+    }
+  }
+
+  setSlide(idx: number): void {
+    this.activeSlide.set(idx);
+    this.startAutoSlide(); // Reset timer
+  }
+
+  nextSlide(): void {
+    this.activeSlide.update(curr => (curr + 1) % 2);
+  }
+
+  prevSlide(): void {
+    this.activeSlide.update(curr => (curr - 1 + 2) % 2);
+  }
+
   readonly detectedGender = computed<'male' | 'female'>(() => {
     const name = this.user()?.fullName ?? '';
     if (!name) return 'male';

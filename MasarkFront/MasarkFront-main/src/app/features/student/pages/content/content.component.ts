@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,8 +19,9 @@ import { StudentService } from '../../services/student.service';
 @Component({
   selector: 'app-student-content-page',
   standalone: true,
-  imports: [IconComponent, DatePipe],
+  imports: [CommonModule, IconComponent, DatePipe],
   templateUrl: './content.component.html',
+  styleUrl: './content.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentContentPageComponent implements OnInit {
@@ -29,6 +30,7 @@ export class StudentContentPageComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly groups = signal<StudentContentGroup[]>([]);
+  readonly selectedSubjectId = signal<any | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly errorMessage = signal<string | null>(null);
 
@@ -39,6 +41,11 @@ export class StudentContentPageComponent implements OnInit {
   readonly totalItems = computed(() =>
     this.groups().reduce((total, group) => total + group.items.length, 0),
   );
+
+  readonly activeGroup = computed(() => {
+    const id = this.selectedSubjectId();
+    return this.groups().find(g => g.subject.subjectId === id) || null;
+  });
 
   ngOnInit(): void {
     this.loadContent();
@@ -54,6 +61,7 @@ export class StudentContentPageComponent implements OnInit {
       .subscribe({
         next: (groups) => {
           this.groups.set(groups);
+          this.selectedSubjectId.set(null);
           this.isLoading.set(false);
         },
         error: (error: unknown) => {
@@ -62,6 +70,10 @@ export class StudentContentPageComponent implements OnInit {
           this.isLoading.set(false);
         },
       });
+  }
+
+  selectSubject(id: any): void {
+    this.selectedSubjectId.set(id);
   }
 
   openResource(item: StudentContentItem): void {
@@ -103,6 +115,23 @@ export class StudentContentPageComponent implements OnInit {
 
   contentTypeLabel(item: StudentContentItem): string {
     return item.contentType || 'Resource';
+  }
+
+  getSubjectImageUrl(subjectName: string): string {
+    const name = (subjectName || '').toLowerCase();
+    if (name.includes('math') || name.includes('رياضيات')) return '/assets/images/student/subject-mathematics-3d.png';
+    if (name.includes('physic') || name.includes('فيزياء')) return '/assets/images/student/subject-physics-3d.jpg';
+    if (name.includes('chem') || name.includes('كيمياء')) return '/assets/images/student/subject-chemistry-3d.jpg';
+    if (name.includes('biolog') || name.includes('أحياء') || name.includes('احياء')) return '/assets/images/student/subject-biology-3d.jpg';
+    if (name.includes('sci') || name.includes('علوم')) return '/assets/images/student/subject-science-3d.png';
+    if (name.includes('comp') || name.includes('حاسب') || name.includes('برمجة') || name.includes('computer')) return '/assets/images/student/subject-computing-3d.png';
+    if (name.includes('arab') || name.includes('عربي') || name.includes('عربية')) return '/assets/images/student/subject-arabic-3d.png';
+    if (name.includes('eng') || name.includes('انجليزي') || name.includes('إنجليزية')) return '/assets/images/student/subject-english-3d.png';
+    if (name.includes('hist') || name.includes('تاريخ')) return '/assets/images/student/subject-history-3d.jpg';
+    if (name.includes('geo') || name.includes('جغرافيا')) return '/assets/images/student/subject-geography-3d.jpg';
+    if (name.includes('islam') || name.includes('إسلامي') || name.includes('دين')) return '/assets/images/student/subject-islamic-3d.jpg';
+    if (name.includes('fren') || name.includes('فرنسي')) return '/assets/images/student/subject-french-3d.jpg';
+    return '/assets/images/student/subject-science-3d.png';
   }
 
   countByType(group: StudentContentGroup, type: 'pdf' | 'video' | 'resource'): number {

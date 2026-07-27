@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, ViewEncapsulation } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -10,7 +10,8 @@ import { AdminApiService } from '../../../../core/services/admin-api-service';
   imports: [NgFor, NgIf, DatePipe, IconComponent, ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './content.component.html',
-  styleUrl: './content.component.scss'
+  styleUrl: './content.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class AdminContentComponent implements OnInit {
   private readonly adminApi = inject(AdminApiService);

@@ -104,6 +104,7 @@ const EN = {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './signup.html',
+  styleUrl: './signup.css',
 })
 export class Signup implements OnInit {
   private fb = inject(FormBuilder);
@@ -205,6 +206,13 @@ export class Signup implements OnInit {
         this.theme.set(savedTheme);
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.body.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.body.classList.remove('dark');
+        }
       }
     }
 
@@ -258,6 +266,13 @@ export class Signup implements OnInit {
       localStorage.setItem('theme', next);
       document.documentElement.setAttribute('data-theme', next);
       document.body.setAttribute('data-theme', next);
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+      }
     }
   }
 

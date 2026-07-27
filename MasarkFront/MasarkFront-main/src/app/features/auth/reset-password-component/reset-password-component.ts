@@ -15,6 +15,7 @@ import { AuthApiService } from '../../../core/services/auth-api-service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password-component.html',
+  styleUrl: './reset-password-component.css'
 })
 export class ResetPasswordComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -122,3 +123,4 @@ export class ResetPasswordComponent implements OnInit {
       });
   }
 }
+

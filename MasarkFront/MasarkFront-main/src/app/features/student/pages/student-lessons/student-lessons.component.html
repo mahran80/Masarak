@@ -1,138 +1,181 @@
 <div class="student-page student-lessons-page p-4 sm:p-6 max-w-full" dir="rtl">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">دروسي</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">تصفح المحتوى والاختبارات حسب الدروس</p>
+  
+  <!-- Header Row -->
+  <header class="lessons-hero mb-8">
+    <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white">الدروس والوحدات</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">اختر المادة لتصفح المناهج والدروس التفاعلية في كروت منظمة</p>
+  </header>
+
+  <!-- Grid of Subjects (Premium Dashboard Selector style) -->
+  <div class="subjects-selector grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mb-10">
+    <button type="button"
+            *ngFor="let subject of subjects" 
+            (click)="selectSubject(subject)"
+            class="lesson-subject-card bg-white dark:bg-slate-800 rounded-[22px] border p-5 shadow-[0_4px_20px_rgba(15,23,42,0.01)] hover:shadow-[0_12px_28px_rgba(37,99,235,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer min-h-[148px] group relative overflow-hidden"
+            [class.border-blue-500]="selectedSubjectId === subject.subjectId"
+            [class.ring-2]="selectedSubjectId === subject.subjectId"
+            [class.ring-blue-100]="selectedSubjectId === subject.subjectId"
+            [class.border-slate-200/80]="selectedSubjectId !== subject.subjectId"
+            [class.dark:border-slate-700]="selectedSubjectId !== subject.subjectId">
+      
+      <!-- Subtle active background decoration -->
+      <div *ngIf="selectedSubjectId === subject.subjectId" 
+           class="absolute inset-0 bg-blue-50/10 dark:bg-blue-900/10 pointer-events-none"></div>
+      
+      <!-- 3D Subject Illustration -->
+      <div class="subject-illustration w-16 h-16 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100/70 dark:border-slate-800 flex items-center justify-center shrink-0 mb-3.5 group-hover:scale-105 transition-transform duration-300 relative z-10">
+        <img [src]="getSubjectImageUrl(subject.subjectName)" class="w-full h-full object-contain" [alt]="subject.subjectName">
+      </div>
+      
+      <!-- Text labels -->
+      <span class="subject-title text-sm font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors relative z-10">{{ subject.subjectArabicName || subject.subjectName }}</span>
+      <span class="subject-caption text-[9px] font-black text-slate-400 uppercase tracking-wider mt-1 relative z-10">{{ subject.subjectName }}</span>
+    </button>
   </div>
 
-  <!-- Select Subject -->
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
-    <label for="subject-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اختر المادة</label>
-    <select id="subject-select"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors"
-            (change)="onSelectSubject($event)">
-      <option value="">-- اختر --</option>
-      <option *ngFor="let subject of subjects" [value]="subject.subjectId">
-        {{ subject.subjectName }}
-      </option>
-    </select>
+  <!-- State: No Subject Selected -->
+  <div *ngIf="!selectedSubjectId" class="lessons-empty-state text-center py-20 bg-white dark:bg-slate-800/50 rounded-[18px] border border-slate-200/80 dark:border-slate-800 shadow-[0_4px_20px_rgba(15,23,42,0.02)]">
+    <!-- Beautiful SVG illustration of stack of books -->
+    <svg class="mx-auto mb-5 h-20 w-20 text-blue-500/80 dark:text-blue-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+    </svg>
+    <h3 class="text-lg font-bold text-slate-850 dark:text-white mb-2">الرجاء اختيار مادة</h3>
+    <p class="text-sm text-slate-500">اختر مادة من القائمة العلوية لتصفح الوحدات والدروس الخاصة بها.</p>
   </div>
 
   <div *ngIf="selectedSubjectId">
-    <!-- Empty State -->
-    <div *ngIf="lessons.length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-      <div class="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-        <app-icon name="book-open" [size]="24"></app-icon>
-      </div>
-      <h3 class="text-base font-medium text-gray-900 dark:text-white mb-1">لا توجد دروس بعد</h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400">لم يقم المعلم بنشر أي دروس لهذه المادة حتى الآن.</p>
+    <!-- State: Empty Lessons -->
+    <div *ngIf="lessons.length === 0" class="text-center py-20 bg-white dark:bg-slate-800/50 rounded-[18px] border border-slate-200/80 dark:border-slate-800 shadow-[0_4px_20px_rgba(15,23,42,0.02)]">
+      <!-- Beautiful SVG illustration of search/empty state -->
+      <svg class="mx-auto mb-5 h-20 w-20 text-slate-350 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+      </svg>
+      <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">لا توجد دروس بعد</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400">لم يقم المعلم بنشر أي دروس لهذه المادة حتى الآن.</p>
     </div>
 
-    <!-- List -->
-    <div *ngIf="lessons.length > 0" class="space-y-3">
+    <!-- Lessons Grid List -->
+    <div *ngIf="lessons.length > 0" class="lessons-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div *ngFor="let lesson of lessons"
-           class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+           class="lesson-card bg-white dark:bg-slate-800 rounded-[18px] shadow-[0_4px_20px_rgba(15,23,42,0.02)] border border-slate-200/80 dark:border-slate-800 overflow-hidden hover:shadow-[0_12px_30px_rgba(15,23,42,0.05)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full">
         
-        <!-- Summary -->
-        <div class="px-4 py-3.5 sm:px-5 sm:py-4 flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-             (click)="toggleDetails(lesson.lessonId)"
-             role="button" tabindex="0" (keydown.enter)="toggleDetails(lesson.lessonId)"
-             [attr.aria-expanded]="expandedLessonId === lesson.lessonId"
-             [attr.aria-label]="'عرض تفاصيل درس ' + lesson.title">
-          <div class="flex-1 min-w-0">
-            <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate">{{ lesson.title }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">{{ lesson.description || 'لا يوجد وصف' }}</p>
-            <div class="flex gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-              <span class="inline-flex items-center gap-1" title="المحتوى">
-                <app-icon name="document-text" [size]="14" class="text-indigo-400"></app-icon> {{ lesson.contentCount }}
-              </span>
-              <span class="inline-flex items-center gap-1" title="الاختبارات">
-                <app-icon name="document-check" [size]="14" class="text-emerald-400"></app-icon> {{ lesson.examCount }}
-              </span>
-              <span class="inline-flex items-center gap-1" title="الواجبات">
-                <app-icon name="clipboard-document-list" [size]="14" class="text-orange-400"></app-icon> {{ lesson.assignmentCount }}
-              </span>
-            </div>
+        <!-- Card Content Area -->
+        <div class="lesson-card-content p-6 flex-1 flex flex-col text-right">
+          <!-- Lesson indicator & expand icon -->
+          <div class="flex items-center justify-between gap-3 mb-3.5">
+            <span class="inline-flex rounded-lg bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-black text-blue-600">درس</span>
+            <button type="button" 
+                    (click)="toggleDetails(lesson.lessonId)"
+                    class="text-slate-400 hover:text-slate-600 transition-colors shrink-0">
+              <app-icon [name]="expandedLessonId === lesson.lessonId ? 'chevron-up' : 'chevron-down'" [size]="18"></app-icon>
+            </button>
           </div>
-          <div class="text-gray-400 shrink-0">
-            <app-icon [name]="expandedLessonId === lesson.lessonId ? 'chevron-up' : 'chevron-down'" [size]="18"></app-icon>
+          
+          <h3 class="text-lg font-bold text-slate-800 dark:text-white line-clamp-2 leading-snug mb-2">{{ lesson.title }}</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed flex-1 mb-4">{{ lesson.description || 'لا يوجد وصف مضاف لهذا الدرس.' }}</p>
+          
+          <!-- Badges -->
+          <div class="lesson-metrics grid grid-cols-3 gap-2 mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400">
+            <span class="flex flex-col items-center gap-1 bg-slate-50 dark:bg-slate-900/40 p-2 rounded-lg font-bold">
+              <app-icon name="document-text" [size]="16" class="text-blue-500 shrink-0"></app-icon> {{ lesson.contentCount }} محتويات
+            </span>
+            <span class="flex flex-col items-center gap-1 bg-slate-50 dark:bg-slate-900/40 p-2 rounded-lg font-bold">
+              <app-icon name="document-check" [size]="16" class="text-emerald-500 shrink-0"></app-icon> {{ lesson.examCount }} اختبارات
+            </span>
+            <span class="flex flex-col items-center gap-1 bg-slate-50 dark:bg-slate-900/40 p-2 rounded-lg font-bold">
+              <app-icon name="clipboard-document-list" [size]="16" class="text-orange-500 shrink-0"></app-icon> {{ lesson.assignmentCount }} واجبات
+            </span>
           </div>
         </div>
 
-        <!-- Expanded Details -->
-        <div *ngIf="expandedLessonId === lesson.lessonId" class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-4 sm:px-5 sm:py-5">
-          <div *ngIf="!lessonDetails[lesson.lessonId]" class="flex items-center justify-center gap-2 py-6 text-gray-500">
-            <span class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
-            <span class="text-sm">جاري التحميل...</span>
+        <!-- Expanded Details Inside Card (Trello/Notion Drawer style) -->
+        <div *ngIf="expandedLessonId === lesson.lessonId" class="lesson-card-details bg-slate-50/50 dark:bg-slate-900/40 border-t border-slate-150 dark:border-slate-800 p-5 space-y-6">
+          <div *ngIf="!lessonDetails[lesson.lessonId]" class="flex items-center justify-center gap-2.5 py-4 text-slate-500">
+            <span class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+            <span class="text-xs font-bold">جاري تحميل التفاصيل...</span>
           </div>
-          <div *ngIf="lessonDetails[lesson.lessonId] as detail">
-            
+          
+          <div *ngIf="lessonDetails[lesson.lessonId] as detail" class="space-y-5">
             <!-- Content Items -->
-            <div class="mb-5">
-              <h4 class="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
-                <app-icon name="document-text" [size]="16"></app-icon> المحتوى التعليمي
+            <div>
+              <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+                <app-icon name="document-text" [size]="14"></app-icon> المحتوى التعليمي
               </h4>
-              <div *ngIf="detail.contentItems?.length; else noContent" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.contentItems?.length; else noContent" class="space-y-2">
                 <div *ngFor="let item of detail.contentItems" 
                      (click)="openContent(item.resourceUrl)"
-                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-indigo-300 transition-colors flex items-center gap-3"
-                     role="button" tabindex="0" (keydown.enter)="openContent(item.resourceUrl)"
-                     [attr.aria-label]="'فتح ' + item.title">
-                  <div class="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 shrink-0">
-                    <app-icon *ngIf="item.type === 'Video'" name="play-circle" [size]="20"></app-icon>
-                    <app-icon *ngIf="item.type === 'PDF'" name="pdf" [size]="20"></app-icon>
-                    <app-icon *ngIf="item.type === 'Link'" name="link" [size]="20"></app-icon>
-                    <app-icon *ngIf="!['Video','PDF','Link'].includes(item.type)" name="doc" [size]="20"></app-icon>
+                     class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700 shadow-sm cursor-pointer hover:border-blue-350 transition-all duration-200 flex items-center gap-3"
+                     role="button" tabindex="0" (keydown.enter)="openContent(item.resourceUrl)">
+                  <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 shrink-0">
+                    <app-icon *ngIf="item.type === 'Video'" name="play-circle" [size]="18"></app-icon>
+                    <app-icon *ngIf="item.type === 'PDF'" name="pdf" [size]="18"></app-icon>
+                    <app-icon *ngIf="item.type === 'Link'" name="link" [size]="18"></app-icon>
+                    <app-icon *ngIf="!['Video','PDF','Link'].includes(item.type)" name="doc" [size]="18"></app-icon>
                   </div>
-                  <div class="min-w-0">
-                    <h5 class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{{ item.title }}</h5>
-                    <p class="text-xs text-gray-500 mt-0.5">{{ item.type }}</p>
+                  <div class="min-w-0 flex-1 text-right">
+                    <h5 class="text-xs font-bold text-slate-800 dark:text-slate-250 truncate">{{ item.title }}</h5>
+                    <p class="text-[10px] font-semibold text-slate-450 uppercase mt-0.5">{{ item.type }}</p>
                   </div>
                 </div>
               </div>
-              <ng-template #noContent><p class="text-sm text-gray-500">لا يوجد محتوى</p></ng-template>
+              <ng-template #noContent>
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-xl text-center text-xs text-slate-400 border border-dashed border-slate-200">لا يوجد محتوى.</div>
+              </ng-template>
             </div>
 
             <!-- Exams -->
-            <div class="mb-5">
-              <h4 class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-3 flex items-center gap-2">
-                <app-icon name="document-check" [size]="16"></app-icon> الاختبارات
+            <div>
+              <h4 class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+                <app-icon name="document-check" [size]="14"></app-icon> الاختبارات
               </h4>
-              <div *ngIf="detail.exams?.length; else noExams" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.exams?.length; else noExams" class="space-y-2">
                 <div *ngFor="let item of detail.exams" 
-                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
-                  <h5 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
-                  <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-gray-500">
-                      <app-icon name="clock" [size]="12"></app-icon> {{ item.durationMinutes }} دقيقة
+                     class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700 shadow-sm flex flex-col justify-between text-right">
+                  <h5 class="text-xs font-bold text-slate-850 dark:text-slate-200 mb-1.5 leading-relaxed">{{ item.title }}</h5>
+                  <div class="flex items-center justify-between mt-2 border-t border-slate-50 dark:border-slate-750 pt-2">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500">
+                      <app-icon name="clock" [size]="12" class="text-slate-400"></app-icon> {{ item.durationMinutes }} دقيقة
                     </span>
-                    <a [href]="'/dashboard/student/exams'" class="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">الانتقال للاختبارات</a>
+                    <a [href]="'/dashboard/student/exams'" class="text-[10px] font-black text-emerald-600 hover:text-emerald-700">دخول ←</a>
                   </div>
                 </div>
               </div>
-              <ng-template #noExams><p class="text-sm text-gray-500">لا توجد اختبارات</p></ng-template>
+              <ng-template #noExams>
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-xl text-center text-xs text-slate-400 border border-dashed border-slate-200">لا توجد اختبارات.</div>
+              </ng-template>
             </div>
 
             <!-- Assignments -->
             <div>
-              <h4 class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-3 flex items-center gap-2">
-                <app-icon name="clipboard-document-list" [size]="16"></app-icon> الواجبات
+              <h4 class="text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+                <app-icon name="clipboard-document-list" [size]="14"></app-icon> الواجبات المطلوبة
               </h4>
-              <div *ngIf="detail.assignments?.length; else noAssig" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.assignments?.length; else noAssig" class="space-y-2">
                 <div *ngFor="let item of detail.assignments" 
-                     class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
-                  <h5 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
-                  <div class="flex items-center justify-between mt-2">
-                    <span class="inline-flex items-center gap-1 text-xs text-gray-500">
-                      <app-icon name="calendar" [size]="12"></app-icon> {{ item.dueDate | date:'mediumDate' }}
+                     class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700 shadow-sm flex flex-col justify-between text-right">
+                  <h5 class="text-xs font-bold text-slate-850 dark:text-slate-200 mb-1.5 leading-relaxed">{{ item.title }}</h5>
+                  <div class="flex items-center justify-between mt-2 border-t border-slate-50 dark:border-slate-750 pt-2">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500">
+                      <app-icon name="calendar" [size]="12" class="text-slate-400"></app-icon> تاريخ التسليم: {{ item.dueDate | date:'mediumDate' }}
                     </span>
-                    <a [href]="'/dashboard/student/assignments'" class="text-xs font-medium text-orange-600 hover:text-orange-700 transition-colors">الانتقال للواجبات</a>
+                    <a [href]="'/dashboard/student/assignments'" class="text-[10px] font-black text-orange-600 hover:text-orange-700">تسليم ←</a>
                   </div>
                 </div>
               </div>
-              <ng-template #noAssig><p class="text-sm text-gray-500">لا توجد واجبات</p></ng-template>
+              <ng-template #noAssig>
+                <div class="bg-white dark:bg-slate-800 p-3 rounded-xl text-center text-xs text-slate-400 border border-dashed border-slate-200">لا توجد واجبات.</div>
+              </ng-template>
             </div>
-
           </div>
+        </div>
+
+        <!-- Action / Toggle button at bottom -->
+        <div class="lesson-card-actions px-6 pb-6 pt-2">
+          <button type="button" 
+                  (click)="toggleDetails(lesson.lessonId)"
+                  class="lesson-details-toggle w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200/60 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors shadow-sm cursor-pointer">
+            <span>{{ expandedLessonId === lesson.lessonId ? 'إغلاق تفاصيل الدرس' : 'عرض محتويات وتفاصيل الدرس' }}</span>
+          </button>
         </div>
       </div>
     </div>

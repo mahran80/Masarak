@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../shared/components/icon/icon.component';
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminApiService } from '../../../core/services/admin-api-service';
 
@@ -22,6 +22,7 @@ interface DashboardData {
   imports: [IconComponent, CommonModule],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class AdminComponent implements OnInit, OnDestroy {
   private readonly adminApi = inject(AdminApiService);

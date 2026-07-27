@@ -9,6 +9,8 @@ import { Router, RouterModule } from '@angular/router';
 import { WeeklyCalendarComponent, CalendarSession } from '../../../shared/components/weekly-calendar/weekly-calendar.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
+import { ViewEncapsulation } from '@angular/core';
+
 @Component({
   selector: 'app-teacher-sessions',
   standalone: true,
@@ -16,6 +18,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
   templateUrl: './teacher-sessions.component.html',
   styleUrl: './teacher-sessions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class TeacherSessionsComponent implements OnInit {
   private readonly sessionService = inject(TeacherSessionService);

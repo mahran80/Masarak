@@ -1,50 +1,38 @@
 <div class="teacher-dashboard-container" dir="rtl">
   <!-- Premium Static Teacher Hero Section -->
-  <header class="teacher-static-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none mb-6" style="min-height: 360px;">
+  <header class="teacher-static-hero teacher-hero relative overflow-hidden rounded-[30px] shadow-[0_20px_50px_rgba(37,99,235,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col justify-center select-none mb-6 group/hero" style="min-height: 360px;">
     
-    <!-- Premium Gradient Background & Ambient Elements -->
-    <div class="absolute inset-0 bg-gradient-to-br from-[#1E40AF] via-[#3B82F6] to-[#7C3AED] dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#4C1D95]"></div>
-    
-    <!-- Floating particles and 3D icons -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
-      <!-- Glow spots -->
-      <div class="absolute -top-32 -right-32 w-[400px] h-[400px] bg-white/12 rounded-full blur-[100px] animate-pulse-slow"></div>
-      <div class="absolute -bottom-32 -left-32 w-[350px] h-[350px] bg-purple-400/20 rounded-full blur-[90px] animate-pulse-slow"></div>
-      
-      <!-- Sparkles / Stars -->
-      <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-sparkle-1"></div>
-      <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40 animate-sparkle-2"></div>
-      <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50 animate-sparkle-3"></div>
-      <div class="absolute top-[15%] left-[50%] w-1.5 h-1.5 bg-purple-200 rounded-full opacity-70 animate-sparkle-4"></div>
-      
-      <!-- Floating decorative stars -->
-      <svg class="absolute top-[12%] left-[45%] w-6 h-6 text-white/10 animate-float-slow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
-      <svg class="absolute bottom-[15%] right-[40%] w-5 h-5 text-white/8 animate-float-slower" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5 2.3-7.2-6-4.6h7.6L12 2z"/></svg>
+    <!-- Full Background Image -->
+    <div class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0 bg-[#1E40AF]">
+      <img src="/assets/images/dashboard-heroes/teacher-hero.png" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/hero:scale-105" alt="المعلم">
     </div>
+    
+    <!-- Premium Gradient Overlay for Text Readability -->
+    <div class="absolute inset-0 bg-gradient-to-l from-blue-900/90 via-blue-800/60 to-transparent dark:from-slate-950/95 dark:via-slate-900/80 dark:to-transparent z-0"></div>
 
-    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 w-full px-8 md:px-12 py-8 flex-1">
-      <!-- RIGHT SIDE: Text Content -->
-      <div class="flex-1 space-y-5 w-full text-right">
+    <div class="relative z-10 flex flex-col items-center md:items-start justify-center gap-8 w-full px-8 md:px-12 py-8 h-full">
+      <!-- Text Content -->
+      <div class="space-y-5 w-full text-right max-w-2xl">
         <!-- Badge & Meta -->
         <div class="flex flex-wrap items-center gap-3 justify-start">
           <div class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/12 dark:bg-white/8 backdrop-blur-md rounded-full border border-white/18 text-xs font-black text-white shadow-sm">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             <span>لوحة المدرس</span>
           </div>
-          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18 backdrop-blur-md">
             <app-icon name="calendar" size="14" class="text-white"></app-icon>
             {{ today }}
           </span>
-          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18">
+          <span class="text-xs font-semibold text-white/90 flex items-center gap-1.5 bg-white/12 px-3 py-1.5 rounded-full border border-white/18 backdrop-blur-md">
             <app-icon name="clock" size="14" class="text-white"></app-icon>
             لديك {{ sessions().length }} حصص اليوم
           </span>
         </div>
         <div class="space-y-3 pt-1">
-          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight drop-shadow-md">
             مرحباً بك أستاذي،
           </h1>
-          <p class="text-sm md:text-base text-white/90 max-w-xl leading-relaxed font-semibold">
+          <p class="text-sm md:text-base text-white/90 max-w-xl leading-relaxed font-semibold drop-shadow">
             تابع حصصك، أنشئ الواجبات والاختبارات، وراقب تقدم طلابك بسهولة ويسر.
           </p>
         </div>
@@ -55,23 +43,8 @@
             <app-icon name="calendar" [size]="16" class="ml-2"></app-icon>
             جدول الحصص
           </a>
-          <a routerLink="assignments" class="inline-flex items-center justify-center px-6 py-3 rounded-2xl border border-white/40 text-white hover:bg-white/10 hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm">
+          <a routerLink="assignments" class="inline-flex items-center justify-center px-6 py-3 rounded-2xl border border-white/40 text-white hover:bg-white/20 backdrop-blur-sm hover:scale-[1.02] active:scale-95 transition-all duration-200 font-extrabold text-sm">
             <app-icon name="clipboard" [size]="16" class="ml-2"></app-icon>
-            الواجبات والمهام
-          </a>
-        </div>
-      </div>
-
-      <!-- LEFT SIDE: Illustration -->
-      <div class="hidden md:flex w-[42%] relative items-center justify-center select-none z-10">
-        <div class="relative w-full max-w-[360px] h-[260px] flex items-center justify-center">
-          <img src="/assets/images/dashboard-heroes/teacher-hero.png" class="w-full h-full object-contain teacher-hero-image" alt="المعلم">
-          
-          <!-- Floating academic icons around teacher -->
-          <span class="absolute top-[8%] right-[8%] text-white/15 animate-float-icon-1"><app-icon name="book-open" [size]="24"></app-icon></span>
-          <span class="absolute bottom-[18%] right-[12%] text-white/12 animate-float-icon-2"><app-icon name="clipboard" [size]="20"></app-icon></span>
-          <span class="absolute top-[12%] left-[8%] text-white/15 animate-float-icon-3"><app-icon name="chart" [size]="22"></app-icon></span>
-          <span class="absolute bottom-[22%] left-[12%] text-white/12 animate-float-icon-4"><app-icon name="users" [size]="22"></app-icon></span>
         </div>
       </div>
     </div>
@@ -79,22 +52,22 @@
   </header>
 
 
-  <section class="teacher-stats-grid" aria-label="إحصائيات لوحة المدرس">
+  <section class="teacher-stats-grid" aria-label="Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ù„ÙˆØ­Ø© Ø§Ù„Ù…Ø¯Ø±Ø³">
     <article class="teacher-stat pending">
       <span class="teacher-stat__icon"><app-icon name="clipboard" [size]="20"></app-icon></span>
-      <div><p>التصحيح المعلّق</p><strong>{{ isLoadingStats() ? '...' : pendingGradingCount() }}</strong><small>أعمال تحتاج إلى مراجعتك</small></div>
+      <div><p>Ø§Ù„ØªØµØ­ÙŠØ­ Ø§Ù„Ù…Ø¹Ù„Ù‘Ù‚</p><strong>{{ isLoadingStats() ? '...' : pendingGradingCount() }}</strong><small>Ø£Ø¹Ù…Ø§Ù„ ØªØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ù…Ø±Ø§Ø¬Ø¹ØªÙƒ</small></div>
     </article>
     <article class="teacher-stat students">
       <span class="teacher-stat__icon"><app-icon name="users" [size]="20"></app-icon></span>
-      <div><p>إجمالي الطلاب</p><strong>{{ stats()?.totalStudents ?? '...' }}</strong><small>طلابك المسجلون حاليًا</small></div>
+      <div><p>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø§Ø¨</p><strong>{{ stats()?.totalStudents ?? '...' }}</strong><small>Ø·Ù„Ø§Ø¨Ùƒ Ø§Ù„Ù…Ø³Ø¬Ù„ÙˆÙ† Ø­Ø§Ù„ÙŠÙ‹Ø§</small></div>
     </article>
     <article class="teacher-stat courses">
       <span class="teacher-stat__icon"><app-icon name="book-open" [size]="20"></app-icon></span>
-      <div><p>المقررات النشطة</p><strong>{{ stats()?.activeCourses ?? '...' }}</strong><small>المقررات المتاحة للتدريس</small></div>
+      <div><p>Ø§Ù„Ù…Ù‚Ø±Ø±Ø§Øª Ø§Ù„Ù†Ø´Ø·Ø©</p><strong>{{ stats()?.activeCourses ?? '...' }}</strong><small>Ø§Ù„Ù…Ù‚Ø±Ø±Ø§Øª Ø§Ù„Ù…ØªØ§Ø­Ø© Ù„Ù„ØªØ¯Ø±ÙŠØ³</small></div>
     </article>
     <article class="teacher-stat performance">
       <span class="teacher-stat__icon"><app-icon name="trend-up" [size]="20"></app-icon></span>
-      <div><p>متوسط الأداء</p><strong>{{ stats()?.averagePerformance ?? '...' }}٪</strong><small>متوسط أداء الطلاب</small></div>
+      <div><p>Ù…ØªÙˆØ³Ø· Ø§Ù„Ø£Ø¯Ø§Ø¡</p><strong>{{ stats()?.averagePerformance ?? '...' }}Ùª</strong><small>Ù…ØªÙˆØ³Ø· Ø£Ø¯Ø§Ø¡ Ø§Ù„Ø·Ù„Ø§Ø¨</small></div>
     </article>
   </section>
 
@@ -103,14 +76,14 @@
       <header class="dashboard-card-header">
         <div class="dashboard-card-title">
           <span><app-icon name="calendar" [size]="18"></app-icon></span>
-          <div><h2>جدول اليوم</h2><p>{{ today }}</p></div>
+          <div><h2>Ø¬Ø¯ÙˆÙ„ Ø§Ù„ÙŠÙˆÙ…</h2><p>{{ today }}</p></div>
         </div>
-        <span class="dashboard-count-badge">{{ sessions().length }} حصص</span>
+        <span class="dashboard-count-badge">{{ sessions().length }} Ø­ØµØµ</span>
       </header>
 
       <div class="schedule-content">
         @if (isLoadingSessions()) {
-          <div class="schedule-loading" aria-label="جاري تحميل الحصص">
+          <div class="schedule-loading" aria-label="Ø¬Ø§Ø±ÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø­ØµØµ">
             @for (item of [1,2,3]; track item) {
               <div class="lesson-skeleton"><i></i><span><b></b><small></small></span></div>
             }
@@ -119,9 +92,9 @@
           <div class="schedule-empty">
             <span class="schedule-empty__glow"></span>
             <span class="schedule-empty__icon"><app-icon name="calendar" [size]="34"></app-icon></span>
-            <h3>لا توجد حصص متبقية اليوم</h3>
-            <p>يمكنك استثمار الوقت في مراجعة الواجبات أو تجهيز الاختبارات القادمة.</p>
-            <a routerLink="/dashboard/teacher/courses"><app-icon name="book-open" [size]="15"></app-icon>عرض المقررات</a>
+            <h3>Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­ØµØµ Ù…ØªØ¨Ù‚ÙŠØ© Ø§Ù„ÙŠÙˆÙ…</h3>
+            <p>ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ø³ØªØ«Ù…Ø§Ø± Ø§Ù„ÙˆÙ‚Øª ÙÙŠ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø§Ù„ÙˆØ§Ø¬Ø¨Ø§Øª Ø£Ùˆ ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø§Ø®ØªØ¨Ø§Ø±Ø§Øª Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©.</p>
+            <a routerLink="/dashboard/teacher/courses"><app-icon name="book-open" [size]="15"></app-icon>Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù‚Ø±Ø±Ø§Øª</a>
           </div>
         } @else {
           <div class="lessons-list">
@@ -137,7 +110,7 @@
                     @if (s.status === 'live') { <i></i> }{{ sessionStatusLabel(s.status) }}
                   </span>
                   @if (s.status === 'live') {
-                    <button type="button" (click)="onSessionClick(s)">ابدأ الجلسة</button>
+                    <button type="button" (click)="onSessionClick(s)">Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¬Ù„Ø³Ø©</button>
                   }
                 </div>
               </article>
@@ -149,35 +122,35 @@
 
     <aside class="teacher-insights">
       <section class="insight-card attendance-card">
-        <header><span><app-icon name="chart" [size]="17"></app-icon></span><div><h2>ملخص الحضور</h2><p>نظرة عامة على حضور الطلاب</p></div></header>
+        <header><span><app-icon name="chart" [size]="17"></app-icon></span><div><h2>Ù…Ù„Ø®Øµ Ø§Ù„Ø­Ø¶ÙˆØ±</h2><p>Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø© Ø¹Ù„Ù‰ Ø­Ø¶ÙˆØ± Ø§Ù„Ø·Ù„Ø§Ø¨</p></div></header>
         <div class="attendance-content">
-          <div class="attendance-ring" role="img" aria-label="نسبة الحضور 92 بالمائة">
+          <div class="attendance-ring" role="img" aria-label="Ù†Ø³Ø¨Ø© Ø§Ù„Ø­Ø¶ÙˆØ± 92 Ø¨Ø§Ù„Ù…Ø§Ø¦Ø©">
             <svg viewBox="0 0 96 96"><circle class="ring-track" cx="48" cy="48" r="36"></circle><circle class="ring-value" cx="48" cy="48" r="36"></circle></svg>
-            <span><b>٩٢٪</b><small>حضور</small></span>
+            <span><b>Ù©Ù¢Ùª</b><small>Ø­Ø¶ÙˆØ±</small></span>
           </div>
           <div class="attendance-legend">
-            <div><i class="present"></i><span>حضور</span><b>١١٤</b></div>
-            <div><i class="absent"></i><span>غائب</span><b>٥</b></div>
-            <div><i class="late"></i><span>متأخر</span><b>٣</b></div>
+            <div><i class="present"></i><span>Ø­Ø¶ÙˆØ±</span><b>Ù¡Ù¡Ù¤</b></div>
+            <div><i class="absent"></i><span>ØºØ§Ø¦Ø¨</span><b>Ù¥</b></div>
+            <div><i class="late"></i><span>Ù…ØªØ£Ø®Ø±</span><b>Ù£</b></div>
           </div>
         </div>
       </section>
 
       <section class="insight-card grading-card" [class.is-clear]="pendingGradingCount() === 0">
-        <header><span><app-icon [name]="pendingGradingCount() === 0 ? 'check-circle' : 'clipboard-document-list'" [size]="18"></app-icon></span><div><h2>التصحيح المعلّق</h2><p>واجبات واختبارات بانتظار التصحيح</p></div></header>
+        <header><span><app-icon [name]="pendingGradingCount() === 0 ? 'check-circle' : 'clipboard-document-list'" [size]="18"></app-icon></span><div><h2>Ø§Ù„ØªØµØ­ÙŠØ­ Ø§Ù„Ù…Ø¹Ù„Ù‘Ù‚</h2><p>ÙˆØ§Ø¬Ø¨Ø§Øª ÙˆØ§Ø®ØªØ¨Ø§Ø±Ø§Øª Ø¨Ø§Ù†ØªØ¸Ø§Ø± Ø§Ù„ØªØµØ­ÙŠØ­</p></div></header>
         <div class="grading-summary">
           <strong>{{ isLoadingStats() ? '...' : pendingGradingCount() }}</strong>
-          <p>{{ pendingGradingCount() === 0 ? 'لا توجد أعمال معلقة حاليًا.' : 'عملًا يحتاج إلى المراجعة والتقييم.' }}</p>
+          <p>{{ pendingGradingCount() === 0 ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ø¹Ù…Ø§Ù„ Ù…Ø¹Ù„Ù‚Ø© Ø­Ø§Ù„ÙŠÙ‹Ø§.' : 'Ø¹Ù…Ù„Ù‹Ø§ ÙŠØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø© ÙˆØ§Ù„ØªÙ‚ÙŠÙŠÙ….' }}</p>
         </div>
         <div class="grading-progress" [class.has-work]="pendingGradingCount() > 0"><span></span></div>
-        <a routerLink="/dashboard/teacher/assessment/grading">عرض لوحة التصحيح<app-icon name="chevron-left" [size]="13"></app-icon></a>
+        <a routerLink="/dashboard/teacher/assessment/grading">Ø¹Ø±Ø¶ Ù„ÙˆØ­Ø© Ø§Ù„ØªØµØ­ÙŠØ­<app-icon name="chevron-left" [size]="13"></app-icon></a>
       </section>
 
       <section class="insight-card activities-card">
-        <header><span><app-icon name="bell" [size]="17"></app-icon></span><div><h2>الإشعارات الحديثة</h2><p>آخر التحديثات على أنشطتك</p></div></header>
+        <header><span><app-icon name="bell" [size]="17"></app-icon></span><div><h2>Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ø­Ø¯ÙŠØ«Ø©</h2><p>Ø¢Ø®Ø± Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ø¹Ù„Ù‰ Ø£Ù†Ø´Ø·ØªÙƒ</p></div></header>
         <div class="activity-feed">
           @if (activities().length === 0) {
-            <div class="activity-empty"><app-icon name="check-circle" [size]="22"></app-icon><span>لا توجد إشعارات حديثة</span></div>
+            <div class="activity-empty"><app-icon name="check-circle" [size]="22"></app-icon><span>Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø­Ø¯ÙŠØ«Ø©</span></div>
           } @else {
             @for (a of activities().slice(0, 4); track $index) {
               <article class="activity-feed__item">
@@ -191,3 +164,4 @@
     </aside>
   </div>
 </div>
+

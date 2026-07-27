@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { DecimalPipe, NgFor } from '@angular/common';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { AiAnalyticsService } from '../../../../core/services/ai-analytics.service';
@@ -11,7 +11,8 @@ import { inject, ChangeDetectorRef } from '@angular/core';
   imports: [NgFor, IconComponent, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './analytics.component.html',
-  styleUrl: './analytics.component.scss'
+  styleUrl: './analytics.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 
 export class AdminAnalyticsComponent {
