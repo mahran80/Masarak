@@ -75,6 +75,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {
+        path: 'plans',
+        loadComponent: () =>
+          import('./features/subscription/pages/plans/plans.component').then(
+            (m) => m.PlansPageComponent,
+          ),
+      },
+      {
+        path: 'my-subscription',
+        loadComponent: () =>
+          import('./features/subscription/pages/my-subscription/my-subscription.component').then(
+            (m) => m.MySubscriptionPageComponent,
+          ),
+      },
+      {
         path: 'change-password',
         loadComponent: () =>
           import('./features/auth/change-password-component/change-password-component').then(
@@ -158,18 +172,14 @@ export const routes: Routes = [
 
   {
     path: 'plans',
-    loadComponent: () =>
-      import('./features/subscription/pages/plans/plans.component').then(
-        (m) => m.PlansPageComponent,
-      ),
+    redirectTo: 'dashboard/plans',
+    pathMatch: 'full',
   },
 
   {
     path: 'my-subscription',
-    loadComponent: () =>
-      import('./features/subscription/pages/my-subscription/my-subscription.component').then(
-        (m) => m.MySubscriptionPageComponent,
-      ),
+    redirectTo: 'dashboard/my-subscription',
+    pathMatch: 'full',
   },
 
   {
