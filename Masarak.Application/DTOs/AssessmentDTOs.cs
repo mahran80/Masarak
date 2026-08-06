@@ -7,8 +7,11 @@ namespace Masarak.Application.DTOs
     // Teacher - Assignment DTOs
     // ═══════════════════════════════════════════════════════════════════════════
     public record AssignmentDto(
-        int AssignmentId, string Title, DateTime DueDate, decimal MaxScore, 
-        AssignmentStatus Status, string SubjectName, string ClassName, int SubmissionCount);
+        int AssignmentId, string Title, DateTime DueDate, decimal MaxScore,
+        AssignmentStatus Status, string SubjectName, string ClassName, int SubmissionCount,
+        SubmissionStatus? StudentSubmissionStatus = null,
+        decimal? StudentScore = null,
+        DateTime? StudentSubmittedAt = null);
 
     public record SubmissionDetailDto(
         int SubmissionId, int StudentId, string StudentName, SubmissionStatus Status, 

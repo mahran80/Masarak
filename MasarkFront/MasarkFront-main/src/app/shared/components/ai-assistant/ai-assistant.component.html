@@ -33,7 +33,7 @@
   <!-- Assistant Chat Window -->
   <div 
     *ngIf="isOpen()"
-    class="fixed bottom-24 left-6 w-[430px] h-[700px] max-w-[calc(100vw-32px)] max-h-[calc(100vh-120px)] rounded-[28px] shadow-lg border border-slate-200/50 dark:border-slate-800/80 bg-[#F8FAFC]/95 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col z-[8000] overflow-hidden transition-all duration-300 animate-slide-up origin-bottom-left"
+    class="fixed bottom-24 left-6 w-[430px] h-[700px] max-w-[calc(100vw-32px)] max-h-[calc(100vh-120px)] rounded-[28px] shadow-lg border border-slate-200/50 dark:border-slate-800/80 bg-[#F8FAFC]/95 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col z-[8000] overflow-hidden transition-all duration-300 animate-slide-up origin-bottom-left" style="left: 24px !important; right: auto !important;"
     [ngClass]="{
       'h-16 w-80 rounded-t-2xl rounded-b-none border-b-0 overflow-hidden bottom-0 left-6': isMinimized()
     }"

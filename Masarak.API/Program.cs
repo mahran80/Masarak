@@ -130,6 +130,8 @@ using (var scope = app.Services.CreateScope())
     await DatabaseSeeder.SeedTestStudentsAsync(db, pwd);
     await DatabaseSeeder.SeedSubscriptionsAsync(db);
     await DatabaseSeeder.SeedStudentEnrollmentsAsync(db);
+    await DatabaseSeeder.SeedDemoLearningDataAsync(db);
+    await DatabaseSeeder.SeedCompleteStudentParentDataAsync(db);
     await DatabaseSeeder.SeedParentDashboardDataAsync(db);
 }
     
@@ -145,7 +147,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<Masarak.API.Extensions.GlobalExceptionMiddleware>();
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
@@ -156,6 +158,10 @@ app.MapControllers();
 app.MapHub<Masarak.API.Hubs.ChatHub>("/hubs/chat"); // Phase 4: SignalR ChatHub
 app.MapHub<Masarak.API.Hubs.NotificationHub>("/hubs/notifications"); // Phase 6: SignalR NotificationHub
 app.MapHub<Masarak.API.Hubs.LiveSessionHub>("/hubs/live-session"); // Phase 2: SignalR LiveSessionHub
+
+// SPA fallback: serve Angular's index.html for any unmatched routes
+app.MapFallbackToFile("index.html");
+
 app.Run();
 
 public partial class Program { }

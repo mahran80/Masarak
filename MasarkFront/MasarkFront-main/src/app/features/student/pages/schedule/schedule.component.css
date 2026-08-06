@@ -1,11 +1,11 @@
 :host { display:block; }
 .student-schedule-page {
   width: min(100%, 1280px);
-  min-height: 100vh;
+  min-height: 100%;
   margin-inline: auto;
-  padding: 24px !important;
-  color: #0F172A;
-  background: #F8FAFC !important;
+  padding: 16px 20px !important;
+  color: inherit;
+  background: transparent !important;
   font-family: inherit;
 }
 

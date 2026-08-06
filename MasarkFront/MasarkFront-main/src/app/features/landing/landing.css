@@ -3,18 +3,18 @@
    ========================================================================== */
 :host {
   display: block;
-  --primary: #3B82F6;
-  --secondary: #60A5FA;
-  --accent: #8B5CF6;
-  --accent-purple: #8B5CF6;
-  --success: #22C55E;
+  --primary: #4F8EF7;
+  --secondary: #6EC6FF;
+  --accent: #7A5AF8;
+  --accent-purple: #7A5AF8;
+  --success: #10B981;
   --warning: #F59E0B;
   --danger: #EF4444;
   
   --surface: #FFFFFF;
   --surface-alt: #F8FAFC;
-  --background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 35%, #eef5ff 70%, #f9f7ff 100%);
-  --outline: #E8EEF8;
+  --background: linear-gradient(180deg, #F7FAFF 0%, #FFFFFF 45%, #F8F6FF 100%);
+  --outline: #EEF4FF;
   --outline-strong: #D3E1F5;
   
   --text-main: #0F172A;

@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   StudentAssignment,
   StudentAssignmentGroup,
+  StudentAssignmentSubmission,
   StudentEntityId,
   SubmitAssignmentRequest,
 } from '../../models';
@@ -153,8 +154,9 @@ export class StudentAssignmentsPageComponent implements OnInit {
       .submitAssignment(selected.assignment.assignmentId, request)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (submission) => {
           this.isSubmitting.set(false);
+          this.applySubmission(submission);
           this.actionMessage.set('Assignment submitted successfully.');
           this.answerText.set('');
           this.selectedFile.set(null);
@@ -198,5 +200,21 @@ export class StudentAssignmentsPageComponent implements OnInit {
     }
 
     return null;
+  }
+
+  private applySubmission(submission: StudentAssignmentSubmission): void {
+    this.groups.update((groups) => groups.map((group) => ({
+      ...group,
+      assignments: group.assignments.map((assignment) =>
+        String(assignment.assignmentId) === String(submission.assignmentId)
+          ? {
+              ...assignment,
+              status: submission.status,
+              score: submission.score ?? undefined,
+              submittedAt: submission.submittedAt,
+            }
+          : assignment,
+      ),
+    })));
   }
 }

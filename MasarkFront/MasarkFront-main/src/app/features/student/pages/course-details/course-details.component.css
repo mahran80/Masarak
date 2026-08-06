@@ -3,17 +3,11 @@
 }
 
 .course-details-premium {
-  padding: 24px;
-  margin-top: 20px;
-  background-color: #F8FAFC;
-  background-image: 
-    radial-gradient(circle at 100% 0%, rgba(79, 142, 247, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(108, 99, 255, 0.08) 0%, transparent 45%);
-  background-size: 100% 100%;
-  min-height: 100vh;
+  padding: 16px 20px;
+  background-color: transparent;
+  min-height: 100%;
   position: relative;
-  color: #1E293B;
-  border-radius: 24px;
+  color: inherit;
 }
 
 /* Back Link */

@@ -1,4 +1,4 @@
-﻿@import '@angular/material/prebuilt-themes/azure-blue.css';
+@import '@angular/material/prebuilt-themes/azure-blue.css';
 @tailwind base;
 
 @tailwind components;
@@ -9,29 +9,29 @@
 
 :root {
 
-  --primary: #2563EB;
+  --primary: #4F8EF7;
 
-  --primary-hover: #1D4ED8;
+  --primary-hover: #3b7be5;
 
-  --primary-light: #F4F1FF;
+  --primary-light: #EEF4FF;
 
-  --secondary: #4F7BFF;
+  --secondary: #6EC6FF;
 
-  --accent: #7C3AED;
+  --accent: #7A5AF8;
 
-  --accent-purple: #7C3AED;
+  --accent-purple: #7A5AF8;
 
   
 
   /* Premium Gradients */
 
-  --gradient-primary: linear-gradient(135deg, #2563EB 0%, #4F7BFF 45%, #7C3AED 100%);
+  --gradient-primary: linear-gradient(135deg, #4F8EF7 0%, #6EC6FF 45%, #7A5AF8 100%);
 
-  --gradient-hover: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #6D28D9 100%);
+  --gradient-hover: linear-gradient(135deg, #3b7be5 0%, #4F8EF7 50%, #6847e6 100%);
 
   
 
-  --success: #22C55E;
+  --success: #10B981;
 
   --warning: #F59E0B;
 
@@ -39,19 +39,22 @@
 
   --surface: #FFFFFF;
 
-  --surface-muted: #F7F9FF;
+  --surface-muted: #F8FAFC;
 
-  --surface-border: #E8EEF9;
+  --surface-border: #EEF4FF;
 
-  --background-gradient: linear-gradient(135deg, #F8FBFF 0%, #EEF4FF 55%, #F7F1FF 100%);
+  --background-gradient: linear-gradient(180deg, #F7FAFF 0%, #FFFFFF 45%, #F8F6FF 100%);
 
-  --font-arabic: 'Cairo', 'Noto Sans Arabic', 'Tajawal', sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Cairo', 'Noto Sans Arabic', sans-serif;
 
   --font-english: 'Inter', sans-serif;
 
-  --admin-topbar-top: 16px;
-  --admin-topbar-height: 64px;
-  --admin-layout-gap: 20px;
+  --admin-topbar-top: 12px;
+  --admin-topbar-height: 60px;
+  --navbar-top: 12px;
+  --navbar-height: 60px;
+  --navbar-gap: 24px;
+  --layout-top-offset: calc(var(--navbar-top) + var(--navbar-height) + var(--navbar-gap));
 
   --radius-sm: 8px;
 
@@ -86,6 +89,16 @@
   --z-confirm:       9020;
   --z-toast:         9100;
 
+}
+
+/* Global Reusable Layout Offset System */
+.layout-body {
+  padding-top: var(--layout-top-offset) !important;
+}
+
+.page-content {
+  width: 100%;
+  min-height: calc(100vh - var(--layout-top-offset));
 }
 
 
@@ -532,7 +545,7 @@ body[dir="ltr"], [dir="ltr"] {
 
 .ml-btn-premium {
 
-  background: linear-gradient(90deg, #3B82F6 0%, #5B6EF5 50%, #8B5CF6 100%) !important;
+  background: linear-gradient(135deg, #4F8EF7 0%, #6EC6FF 45%, #7A5AF8 100%) !important;
 
   color: #ffffff !important;
 
@@ -645,6 +658,15 @@ body[dir="ltr"], [dir="ltr"] {
    FLOATING GLASSMOPRHIC NAVBAR
 
    ========================================================================== */
+
+/* GLOBAL NAVBAR CONTENT OVERLAP PREVENTION */
+[id] {
+  scroll-margin-top: 100px !important;
+}
+
+html {
+  scroll-padding-top: 100px !important;
+}
 
 .ml-navbar-container {
 
@@ -2880,7 +2902,7 @@ app-student-course-card .course-copy { margin-top:11px; }
 /* 2. STUDENT-SPECIFIC LAYOUT CLEANUPS (ONLY FOR STUDENT) */
 .student-schedule-page .wc-student-agenda { margin: 0 !important; padding: 24px 32px !important; border: none !important; border-top: 1px solid #E2E8F0 !important; border-radius: 0 !important; background: #F8FAFC !important; box-shadow: none !important; }
 .student-schedule-page .wc-agenda-mode .wc-scroll { overflow: hidden !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
-.student-schedule-page .wc-agenda-mode .wc-header-row { min-height: auto !important; gap: 8px !important; padding: 0 0 16px !important; border: 0 !important; background: transparent !important; }
+.student-schedule-page .wc-agenda-mode .wc-header-row { min-height: auto !important; gap: 8px !important; padding: 18px 0 16px !important; border: 0 !important; background: transparent !important; }
 .student-schedule-page .wc-agenda-mode .wc-day-header { width: 100% !important; min-height: 86px !important; padding: 12px 8px !important; border: 1px solid #E2E8F0 !important; border-radius: 16px !important; background: #FFFFFF !important; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02) !important; }
 .student-schedule-page .wc-agenda-mode .wc-day-header:hover { transform: translateY(-2px) !important; border-color: #CBD5E1 !important; background: #FFFFFF !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important; }
 .student-schedule-page .wc-agenda-mode .wc-day-header.is-selected { border-color: #2563EB !important; background: #2563EB !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important; }
@@ -3250,6 +3272,138 @@ body[data-theme='dark'],
 
 .ds-textarea { min-height: 120px; padding-block: var(--ds-space-3); resize: vertical; }
 .ds-input::placeholder,
+.ds-textarea::placeholder {  --ds-danger: #ef4444;
+  --ds-danger-soft: #fef2f2;
+  --ds-info: #38bdf8;
+  --ds-page: #f6f9ff;
+  --ds-surface: #ffffff;
+  --ds-surface-soft: #f8fafc;
+  --ds-surface-raised: #ffffff;
+  --ds-border: #e2e8f0;
+  --ds-border-strong: #cbd5e1;
+  --ds-text: #0f172a;
+  --ds-text-muted: #64748b;
+  --ds-text-subtle: #94a3b8;
+  --ds-focus: rgba(37, 99, 235, .18);
+  --ds-gradient-primary: linear-gradient(135deg, #2563eb 0%, #4f46e5 55%, #7c3aed 100%);
+
+  --ds-font-title: clamp(1.75rem, 2.8vw, 2.25rem);
+  --ds-font-section: clamp(1.25rem, 1.7vw, 1.5rem);
+  --ds-font-card: 1rem;
+  --ds-font-body: .875rem;
+  --ds-font-meta: .75rem;
+  --ds-leading-tight: 1.3;
+  --ds-leading-normal: 1.55;
+  --ds-leading-relaxed: 1.75;
+
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+  --ds-space-10: 40px;
+  --ds-space-12: 48px;
+
+  --ds-radius-sm: 10px;
+  --ds-radius-md: 14px;
+  --ds-radius-lg: 20px;
+  --ds-radius-xl: 28px;
+  --ds-shadow-sm: 0 2px 8px rgba(15, 23, 42, .05);
+  --ds-shadow-card: 0 12px 30px rgba(29, 54, 103, .08);
+  --ds-shadow-card-hover: 0 18px 38px rgba(30, 65, 137, .13);
+  --ds-transition: 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+:root[data-theme='dark'],
+body[data-theme='dark'],
+.dark {
+  --ds-page: #07111f;
+  --ds-surface: #0f1b2d;
+  --ds-surface-soft: #13233a;
+  --ds-surface-raised: #152742;
+  --ds-border: rgba(148, 163, 184, .20);
+  --ds-border-strong: rgba(148, 163, 184, .34);
+  --ds-text: #eef4ff;
+  --ds-text-muted: #afbed3;
+  --ds-text-subtle: #7e91ad;
+  --ds-primary-soft: rgba(37, 99, 235, .18);
+  --ds-accent-soft: rgba(124, 58, 237, .18);
+  --ds-success-soft: rgba(16, 185, 129, .15);
+  --ds-warning-soft: rgba(245, 158, 11, .14);
+  --ds-danger-soft: rgba(239, 68, 68, .14);
+  --ds-shadow-sm: 0 4px 12px rgba(0, 0, 0, .20);
+  --ds-shadow-card: 0 16px 34px rgba(0, 0, 0, .24);
+  --ds-shadow-card-hover: 0 22px 44px rgba(0, 0, 0, .32);
+}
+
+.ds-page { color: var(--ds-text); background: var(--ds-page); }
+.ds-title { color: var(--ds-text); font-size: var(--ds-font-title); font-weight: 900; line-height: var(--ds-leading-tight); }
+.ds-section-title { color: var(--ds-text); font-size: var(--ds-font-section); font-weight: 850; line-height: var(--ds-leading-tight); }
+.ds-card-title { color: var(--ds-text); font-size: var(--ds-font-card); font-weight: 800; line-height: var(--ds-leading-normal); }
+.ds-body { color: var(--ds-text-muted); font-size: var(--ds-font-body); line-height: var(--ds-leading-relaxed); }
+.ds-meta { color: var(--ds-text-subtle); font-size: var(--ds-font-meta); font-weight: 700; line-height: var(--ds-leading-normal); }
+
+.ds-card {
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-card);
+}
+
+.ds-card--padded { padding: var(--ds-space-6); }
+.ds-card--interactive { transition: transform var(--ds-transition), box-shadow var(--ds-transition), border-color var(--ds-transition); }
+.ds-card--interactive:hover { transform: translateY(-2px); border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-card-hover); }
+
+.ds-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  padding: 0 var(--ds-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-sm);
+  font: inherit;
+  font-size: var(--ds-font-body);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform var(--ds-transition), background-color var(--ds-transition), box-shadow var(--ds-transition), border-color var(--ds-transition);
+}
+
+.ds-button:active { transform: translateY(1px); }
+.ds-button:focus-visible,
+.ds-input:focus-visible,
+.ds-select:focus-visible,
+.ds-textarea:focus-visible { outline: 0; box-shadow: 0 0 0 4px var(--ds-focus); }
+.ds-button--primary { color: #fff; background: var(--ds-gradient-primary); box-shadow: 0 10px 20px rgba(57, 74, 221, .20); }
+.ds-button--primary:hover { filter: brightness(1.04); box-shadow: 0 13px 24px rgba(57, 74, 221, .26); }
+.ds-button--secondary { color: var(--ds-primary); border-color: rgba(37, 99, 235, .22); background: var(--ds-primary-soft); }
+.ds-button--secondary:hover { border-color: rgba(37, 99, 235, .42); }
+.ds-button--ghost { color: var(--ds-text-muted); border-color: var(--ds-border); background: var(--ds-surface); }
+.ds-button--ghost:hover { color: var(--ds-primary); background: var(--ds-primary-soft); }
+.ds-button:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.ds-input,
+.ds-select,
+.ds-textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--ds-space-3);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: var(--ds-font-body);
+  line-height: var(--ds-leading-normal);
+  transition: border-color var(--ds-transition), box-shadow var(--ds-transition), background-color var(--ds-transition);
+}
+
+.ds-textarea { min-height: 120px; padding-block: var(--ds-space-3); resize: vertical; }
+.ds-input::placeholder,
 .ds-textarea::placeholder { color: var(--ds-text-subtle); }
 .ds-input:hover,
 .ds-select:hover,
@@ -3264,31 +3418,6 @@ body[data-theme='dark'],
 .ds-badge--warning { color: #b45309; background: var(--ds-warning-soft); }
 .ds-badge--danger { color: #b91c1c; background: var(--ds-danger-soft); }
 .ds-badge--info { color: #0369a1; background: rgba(56, 189, 248, .13); }
-
-.ds-reveal { animation: ds-reveal 320ms ease both; }
-.ds-float { animation: ds-float 4.5s ease-in-out infinite; }
-@keyframes ds-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes ds-float { 50% { transform: translateY(-5px); } }
-@media (prefers-reduced-motion: reduce) { .ds-reveal,.ds-float { animation: none; } .ds-card--interactive,.ds-button { transition: none; } }
-
-/* Phase 2 â€” student dashboard/profile visual layer, intentionally data-agnostic. */
-.student-page { font-size:15px; }
-.student-dashboard { gap:24px; }
-.student-dashboard .dashboard-hero h1 { font-size:clamp(30px,3vw,34px); font-weight:800; }
-.student-dashboard .panel-heading h2 { font-size:clamp(20px,2vw,22px); font-weight:800; }
-.student-dashboard .panel-heading span,.student-dashboard .compact-empty p { font-size:13px; font-weight:600; }
-.student-dashboard .dashboard-panel { padding:22px; border-radius:20px; box-shadow:0 10px 28px rgba(15,23,42,.045); }
-.student-dashboard .courses-grid { gap:18px; }
-
-.profile-page { color:var(--ds-text,#172033); }
-.profile-page-header { padding:4px 2px; }
-.profile-page-header h1 { font-size:clamp(28px,3vw,32px) !important; font-weight:800 !important; }
-.profile-layout { grid-template-columns:280px minmax(0,1fr) !important; align-items:start; gap:24px !important; }
-.profile-main-card { order:2; border-radius:20px !important; padding:24px !important; overflow:hidden; }
-.profile-summary { order:1; }
-.profile-hero { min-height:132px; margin:-24px -24px 24px; padding:28px 28px 26px; color:#fff; background:linear-gradient(135deg,#2563eb,#5865ef 58%,#7c3aed); position:relative; overflow:hidden; }
-.profile-hero::after { content:''; position:absolute; inset-inline-end:-44px; inset-block-start:-64px; width:190px; height:190px; border-radius:50%; background:rgba(255,255,255,.12); }
-.profile-hero > * { position:relative; z-index:1; }
 .profile-page .profile-main-card dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:22px !important; }
 .profile-page .profile-main-card dl > div { min-height:92px; padding:16px !important; border-radius:14px !important; background:var(--ds-surface-soft,#f8faff) !important; }
 .profile-summary article { min-height:0 !important; padding:20px !important; border-radius:18px !important; }
@@ -3297,10 +3426,6 @@ body[data-theme='dark'],
 :root[data-theme='dark'] .profile-page .profile-main-card dl > div { background:#15243b !important; }
 @media(max-width:1100px){.profile-layout{grid-template-columns:1fr !important}.profile-main-card,.profile-summary{order:initial}.profile-summary{grid-template-columns:repeat(2,minmax(0,1fr));display:grid;gap:18px}.profile-summary article{margin:0!important}}
 @media(max-width:640px){.student-dashboard .dashboard-panel{padding:18px}.profile-main-card{padding:18px!important}.profile-hero{margin:-18px -18px 20px;padding:24px 18px}.profile-page .profile-main-card dl,.profile-summary{grid-template-columns:1fr}.profile-page-header button{width:100%}}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   MASARAK PREMIUM DATEPICKER THEME
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Global Datepicker Font */
 .mat-datepicker-content,
@@ -3316,279 +3441,265 @@ body[data-theme='dark'],
   overflow: hidden !important;
 }
 
-:root[data-theme='dark'] .mat-datepicker-content {
-  background: #111E33 !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.1) !important;
-}
+.ml-dashboard-bg::after { display:none; }
 
-:root[data-theme='dark'] .mat-calendar-table-header th {
-  color: #94A3B8 !important;
-}
-
-:root[data-theme='dark'] .mat-calendar-body-cell-content {
-  color: #E2E8F0 !important;
-}
-
-:root[data-theme='dark'] .mat-calendar-body-label {
-  color: #CBD5E1 !important;
-}
-
-/* Disabled Dates - Soft Red (Global) */
-.mat-calendar-body-disabled > .mat-calendar-body-cell-content {
-  background-color: rgba(239, 68, 68, 0.08) !important;
-  color: #DC2626 !important;
-  cursor: not-allowed !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
-}
-:root[data-theme='dark'] .mat-calendar-body-disabled > .mat-calendar-body-cell-content {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  color: #FCA5A5 !important;
-}
-
-/* Future / Selectable Dates (Only for Scheduling Pickers) - Soft Green */
-.masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):not(.mat-calendar-body-selected):not(.mat-calendar-body-active) > .mat-calendar-body-cell-content {
-  background-color: rgba(16, 185, 129, 0.08) !important;
-  color: #047857 !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-:root[data-theme='dark'] .masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):not(.mat-calendar-body-selected):not(.mat-calendar-body-active) > .mat-calendar-body-cell-content {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: #34D399 !important;
-}
-
-/* Hover effects for selectable dates (Only for Scheduling Pickers) */
-.masarak-scheduling-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover > .mat-calendar-body-cell-content {
-  transform: scale(1.03) !important;
-  background-color: rgba(16, 185, 129, 0.2) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
-}
-
-/* Today Date Outline - Primary Blue */
-.mat-calendar-body-today:not(.mat-calendar-body-selected) {
-  border: none !important;
-}
-.mat-calendar-body-today:not(.mat-calendar-body-selected) > .mat-calendar-body-cell-content {
-  box-shadow: inset 0 0 0 2px #3B82F6 !important;
-  background-color: transparent !important;
-  color: #3B82F6 !important;
-}
-:root[data-theme='dark'] .mat-calendar-body-today:not(.mat-calendar-body-selected) > .mat-calendar-body-cell-content {
-  box-shadow: inset 0 0 0 2px #60A5FA !important;
-  color: #60A5FA !important;
-}
-
-/* Selected Date - Primary Gradient */
-.mat-calendar-body-selected {
-  background-color: transparent !important;
-}
-.mat-calendar-body-selected > .mat-calendar-body-cell-content {
-  background: linear-gradient(135deg, #2563EB, #8B5CF6) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.2) !important;
-  border-radius: 50% !important;
-  transform: scale(1.05) !important;
-}
-
-/* Clean up Material Default Buttons */
-.mat-calendar-controls {
-  margin: 12px 12px 0 !important;
-}
-.mat-calendar-previous-button, .mat-calendar-next-button {
-  background: rgba(241, 245, 249, 0.8) !important;
-  border-radius: 12px !important;
-  transition: all 0.2s ease !important;
-}
-.mat-calendar-previous-button:hover, .mat-calendar-next-button:hover {
-  background: #E2E8F0 !important;
-  transform: translateY(-2px) !important;
-}
-:root[data-theme='dark'] .mat-calendar-previous-button, :root[data-theme='dark'] .mat-calendar-next-button {
-  background: rgba(30, 41, 59, 0.8) !important;
-  color: #F8FAFC !important;
-}
-:root[data-theme='dark'] .mat-calendar-previous-button:hover, :root[data-theme='dark'] .mat-calendar-next-button:hover {
-  background: #334155 !important;
-}
-
-/* Field Container Styling (form-field) to match existing Masarak forms */
-.mat-mdc-form-field-subscript-wrapper {
-  display: none !important;
-}
-.mat-mdc-text-field-wrapper {
-  background-color: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
-  border-radius: 14px !important;
-  padding: 0 16px !important;
-  transition: all 0.2s ease !important;
-}
-.mat-mdc-form-field-focus-overlay {
-  background-color: transparent !important;
-}
-:root[data-theme='dark'] .mat-mdc-text-field-wrapper {
-  background-color: #1E293B !important;
-  border-color: #334155 !important;
-}
-.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
-  background-color: #FFFFFF !important;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
-}
-:root[data-theme='dark'] .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
-  background-color: #0F172A !important;
-  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1) !important;
-}
-.mdc-line-ripple {
-  display: none !important;
-}
-
-
-
-/* =========================================================================
-   ULTIMATE MASARAK AUTH BACKGROUND & FIXES
-   ========================================================================= */
-html body .ml-auth-bg {
-  background: url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed, linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #f0fdf4 100%) !important;
-  position: relative !important;
-}
-
-html body .ml-auth-bg::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  /* Glassmorphism dark/light overlay to make the image beautiful */
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-:root[data-theme='dark'] html body .ml-auth-bg::before {
-  background: rgba(15, 23, 42, 0.75) !important;
-}
-
-/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them strictly in the corner, fixed */
-html body .ml-auth-toggles-corner {
-  position: fixed !important;
-  top: 24px !important;
-  right: 24px !important;
-  z-index: 9999 !important;
-}
-[dir="rtl"] html body .ml-auth-toggles-corner {
-  right: auto !important;
-  left: 24px !important;
-}
-
-/* 3. FIX FORM SPACING - Prevent overlap with toggles */
-html body .ml-auth-wrapper {
-  z-index: 10 !important;
-  position: relative !important;
-  padding-top: 90px !important; /* Space for the toggles */
-  padding-bottom: 40px !important;
-  margin: 0 auto !important;
+@media (max-width:640px) {
+  app-student-course-card .course-symbol { width:76px; height:76px; }
 }
 
 /* =========================================================================
-   ULTIMATE MASARAK AUTH BACKGROUND & FIXES V2
+   ZERO-SCROLL CENTERED MASARAK AUTH PAGE & COMPACT CARD
    ========================================================================= */
 html body .ml-auth-bg {
-  /* Using both the image and a fallback gradient in case the image path is broken */
-  background: url('/assets/images/masarak_auth_bg.jpg') left bottom/cover no-repeat fixed, linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #f0fdf4 100%) !important;
-  position: relative !important;
-}
-
-html body .ml-auth-bg::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: rgba(248, 250, 252, 0.4) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-:root[data-theme='dark'] html body .ml-auth-bg::before {
-  background: rgba(15, 23, 42, 0.75) !important;
-}
-
-/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them strictly in the corner, fixed */
-html body .ml-auth-toggles-corner {
-  position: fixed !important;
-  top: 16px !important;  /* Higher */
-  left: 24px !important; /* Force to LEFT for both Arabic and English to satisfy the request */
-  right: auto !important;
-  z-index: 9999 !important;
-}
-
-/* 3. FIX FORM SPACING - Prevent overlap with toggles */
-html body .ml-auth-wrapper {
-  z-index: 10 !important;
-  position: relative !important;
-  padding-top: 120px !important; /* Extra space to ensure form is well below the toggles */
-  padding-bottom: 40px !important;
-  margin: 0 auto !important;
-}
-
-/* =========================================================================
-   ULTIMATE MASARAK AUTH BACKGROUND & FIXES V3
-   ========================================================================= */
-html body .ml-auth-bg {
-  /* Using a beautiful Linear Gradient + The Image with correct relative path */
-  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #dbeafe 100%), url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed !important;
-  background-blend-mode: overlay !important;
-  position: relative !important;
-  min-height: 100vh !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  width: 100vw !important;
+  overflow: hidden !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 24px !important; /* Small space from all edges on small screens */
+  padding: 20px 24px !important;
   box-sizing: border-box !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background-image: linear-gradient(135deg, rgba(235, 243, 255, 0.45) 0%, rgba(240, 245, 255, 0.55) 50%, rgba(230, 240, 255, 0.45) 100%), url('/assets/images/auth_main_bg.jpg') !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
 }
 
 html body .ml-auth-bg::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(0px) !important;
-  -webkit-backdrop-filter: blur(0px) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
+  display: none !important;
 }
 
 :root[data-theme='dark'] html body .ml-auth-bg {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%), url('/assets/images/masarak_final_bg.jpg') left bottom/cover no-repeat fixed !important;
-  background-blend-mode: overlay !important;
+  background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.88) 100%), url('/assets/images/auth_main_bg.jpg') !important;
 }
 
-:root[data-theme='dark'] html body .ml-auth-bg::before {
-  background: rgba(15, 23, 42, 0.4) !important;
+/* Ambient Soft School Blobs */
+html body .ml-auth-blob {
+  position: absolute !important;
+  border-radius: 50% !important;
+  filter: blur(70px) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  opacity: 0.65 !important;
 }
 
-/* 2. FIX TOGGLES (Dark Mode, Home, Lang) - Keep them on the left, but slightly higher */
+html body .ml-auth-blob-1 {
+  top: -10% !important;
+  right: -5% !important;
+  width: 520px !important;
+  height: 520px !important;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.35) 0%, rgba(147, 197, 253, 0) 70%) !important;
+}
+
+html body .ml-auth-blob-2 {
+  bottom: -10% !important;
+  left: -5% !important;
+  width: 560px !important;
+  height: 560px !important;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(196, 181, 253, 0) 70%) !important;
+}
+
+/* FLOATING TOP TOGGLES (Dark Mode, Home, Lang) - ALWAYS TOP-LEFT OUTSIDE FORM CARD */
 html body .ml-auth-toggles-corner {
   position: fixed !important;
-  top: 16px !important;  
-  left: 24px !important; /* Always on the left */
+  top: 20px !important;
+  left: 24px !important;
   right: auto !important;
-  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  z-index: 99999 !important;
 }
 
-/* 3. FIX FORM SPACING - Centered with breathing room */
+[dir="rtl"] html body .ml-auth-toggles-corner {
+  left: 24px !important;
+  right: auto !important;
+}
+
+html body .ml-globe-btn, 
+html body .ml-theme-icon-btn, 
+html body .ml-home-btn {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+  color: #475569 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+html body .ml-globe-btn:hover, 
+html body .ml-theme-icon-btn:hover, 
+html body .ml-home-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12) !important;
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+}
+
+:root[data-theme='dark'] html body .ml-globe-btn, 
+:root[data-theme='dark'] html body .ml-theme-icon-btn, 
+:root[data-theme='dark'] html body .ml-home-btn {
+  background: rgba(30, 41, 59, 0.90) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #cbd5e1 !important;
+}
+
+html body .ml-globe-btn .material-symbols-outlined, 
+html body .ml-theme-icon-btn .material-symbols-outlined, 
+html body .ml-home-btn .material-symbols-outlined {
+  font-size: 20px !important;
+}
+
+/* FORM WRAPPER - PERFECTLY CENTERED WITH CLEAR SPACING TO REVEAL 3D BOOKS BG */
 html body .ml-auth-wrapper {
   z-index: 10 !important;
   position: relative !important;
   margin: 0 auto !important;
-  padding: 0 !important; /* Remove the huge padding that pushed it down */
+  padding: 0 !important;
+  margin-top: 16px !important;
   width: 100% !important;
-  max-width: 1000px !important;
-  margin-top: 40px !important; /* Just a tiny push down to avoid toggles on very small screens */
+  max-width: 1040px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html body .ml-auth-card-container {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  width: 100% !important;
+  max-height: calc(100vh - 44px) !important;
+  min-height: 560px !important;
+  border-radius: 28px !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12) !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+}
+
+:root[data-theme='dark'] html body .ml-auth-card-container {
+  background: #0f172a !important;
+}
+
+html body .ml-auth-form-pane {
+  padding: 32px 42px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+html body .ml-auth-form-pane .ml-auth-brand-row {
+  margin-bottom: 18px !important;
+}
+
+html body .ml-auth-form-pane .ml-auth-header {
+  margin-bottom: 18px !important;
+}
+
+html body .ml-auth-form-pane .ml-auth-field {
+  margin-bottom: 12px !important;
+}
+
+html body .ml-auth-form-pane .ml-floating-input {
+  height: 48px !important;
+  padding: 12px 16px 4px !important;
+  padding-inline-start: 42px !important;
+  font-size: 14px !important;
+}
+
+html body .ml-auth-hero-pane {
+  position: relative !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  padding: 36px 32px !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   GLOBAL DARK MODE CARD & COMPONENT OVERRIDES
+   ========================================================================== */
+html.dark .ml-stat-card,
+html.dark .ml-schedule-card,
+html.dark article,
+html.dark .schedule-table-wrap,
+html.dark .courses-hero,
+html.dark .dashboard-panel,
+html.dark .content-subject-card,
+html.dark .content-item-card,
+[data-theme='dark'] .ml-stat-card,
+[data-theme='dark'] .ml-schedule-card,
+[data-theme='dark'] article,
+[data-theme='dark'] .schedule-table-wrap,
+[data-theme='dark'] .courses-hero,
+[data-theme='dark'] .dashboard-panel,
+[data-theme='dark'] .content-subject-card,
+[data-theme='dark'] .content-item-card {
+  background-color: #1E293B !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Text elements inside cards in Dark Mode */
+html.dark .ml-stat-card h2,
+html.dark .ml-stat-card strong,
+html.dark .ml-schedule-card h3,
+html.dark article h2,
+html.dark article h3,
+html.dark article dt,
+html.dark article dd,
+[data-theme='dark'] .ml-stat-card h2,
+[data-theme='dark'] .ml-stat-card strong,
+[data-theme='dark'] .ml-schedule-card h3,
+[data-theme='dark'] article h2,
+[data-theme='dark'] article h3,
+[data-theme='dark'] article dt,
+[data-theme='dark'] article dd {
+  color: #F8FAFC !important;
+}
+
+html.dark .ml-stat-card p,
+html.dark .ml-schedule-card p,
+html.dark article p,
+[data-theme='dark'] .ml-stat-card p,
+[data-theme='dark'] .ml-schedule-card p,
+[data-theme='dark'] article p {
+  color: #94A3B8 !important;
+}
+
+/* Light slate badges & inner pill backgrounds in Dark Mode */
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-150,
+[data-theme='dark'] .bg-slate-50,
+[data-theme='dark'] .bg-slate-100,
+[data-theme='dark'] .bg-slate-150 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+  color: #CBD5E1 !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
+}
+
+html.dark .bg-white,
+[data-theme='dark'] .bg-white {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
 }
 
 
@@ -3602,3 +3713,78 @@ html body .ml-auth-wrapper {
 
 
 
+
+
+
+
+/* Keep scrolling available everywhere without showing native scrollbars. */
+*,
+*::before,
+*::after {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Dashboard content uses this class with a more specific scrollbar style. */
+.custom-scrollbar,
+.custom-scrollbar:hover {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+.custom-scrollbar:hover::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Sidebar navigation remains scrollable; only its native scrollbar is hidden. */
+.sidebar-nav-scroll {
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+/* Every routed dashboard page starts from the shared layout baseline. */
+.admin-layout-content > .page-content > .custom-scrollbar > * > :first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-block-start: 0 !important;
+  padding-block-start: 0 !important;
+}
+/* Exams: keep one sticky scroll owner instead of nesting a sticky card inside a sticky aside. */
+@media (min-width:1280px) {
+  .student-exams-page .exam-details-column {
+    position: sticky;
+    top: 12px;
+    align-self: start;
+    max-height: calc(100dvh - 108px);
+    padding-inline-end: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .student-exams-page .exam-details-card {
+    position: static;
+  }
+}
+
+@media (max-width:1279px) {
+  .student-exams-page .exam-details-column {
+    position: static;
+    max-height: none;
+    padding-inline-end: 0;
+    overflow: visible;
+  }
+}

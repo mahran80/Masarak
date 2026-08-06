@@ -5,7 +5,7 @@ import { RouterLink, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TeacherAssessmentService } from '../services/teacher-assessment.service';
 import { TeacherSessionService, SessionDto } from '../services/teacher-session.service';
-import { TeacherDashboardService } from '../services/teacher-dashboard.service';
+import { TeacherDashboardService, TeacherDashboardStats } from '../services/teacher-dashboard.service';
 
 interface Session {
   id: number;
@@ -52,12 +52,13 @@ export class TeacherComponent implements OnInit, OnDestroy {
   readonly pendingGradingCount = signal<number>(0);
   readonly isLoadingStats = signal(true);
   readonly isLoadingSessions = signal(true);
+  readonly isLoadingActivities = signal(true);
 
   readonly sessions = signal<Session[]>([]);
 
   readonly activities = signal<RecentActivity[]>([]);
 
-  readonly stats = signal<any>(null);
+  readonly stats = signal<TeacherDashboardStats | null>(null);
 
   // Hero Slider State
   readonly activeSlide = signal<number>(0);
@@ -116,9 +117,14 @@ export class TeacherComponent implements OnInit, OnDestroy {
             icon: a.icon,
             text: a.title,
             time: a.time,
-            type: 'submission', // Generic fallback
+            type: a.type,
             color: a.color
           })));
+          this.isLoadingActivities.set(false);
+        },
+        error: () => {
+          this.activities.set([]);
+          this.isLoadingActivities.set(false);
         }
       });
 
@@ -163,6 +169,11 @@ export class TeacherComponent implements OnInit, OnDestroy {
           this.isLoadingSessions.set(false);
         }
       });
+  }
+
+  attendanceDashOffset(): number {
+    const rate = Math.min(100, Math.max(0, this.stats()?.attendanceRate ?? 0));
+    return 226.2 * (1 - rate / 100);
   }
 
   sessionStatusLabel(status: Session['status']): string {

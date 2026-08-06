@@ -30,33 +30,82 @@ namespace Masarak.API.Controllers
             var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, ct);
             if (teacher == null) return Forbid();
 
-            var assignments = await _context.TeachingAssignments
-                .Where(ta => ta.TeacherId == teacher.TeacherId)
+            var teachingAssignments = await _context.TeachingAssignments
+                .Where(ta => ta.TeacherId == teacher.TeacherId && ta.IsActive)
+                .Select(ta => new { ta.AssignmentId, ta.ClassId, ta.SubjectId })
                 .ToListAsync(ct);
 
-            var classIds = assignments.Select(ta => ta.ClassId).Distinct().ToList();
-            
-            var totalStudents = await _context.StudentClasses
-                .Where(sc => classIds.Contains(sc.ClassId))
-                .CountAsync(ct);
+            var assignmentIds = teachingAssignments.Select(ta => ta.AssignmentId).ToList();
+            var classIds = teachingAssignments.Select(ta => ta.ClassId).Distinct().ToList();
+            var subjectIds = teachingAssignments.Select(ta => ta.SubjectId).Distinct().ToList();
 
-            var assignmentsIds = assignments.Select(ta => ta.AssignmentId).ToList();
+            var totalStudents = classIds.Count == 0
+                ? 0
+                : await _context.StudentClasses
+                    .Where(sc => sc.IsActive && classIds.Contains(sc.ClassId))
+                    .Select(sc => sc.StudentId)
+                    .Distinct()
+                    .CountAsync(ct);
 
-            var pendingGrading = await _context.Submissions
-                .Where(s => assignmentsIds.Contains(s.AssignmentId) && s.Status == Domain.Enums.SubmissionStatus.Submitted)
-                .CountAsync(ct);
+            var pendingSubmissions = assignmentIds.Count == 0
+                ? 0
+                : await _context.Submissions.CountAsync(s =>
+                    assignmentIds.Contains(s.Assignment.AssignmentRef) &&
+                    s.Status == Masarak.Domain.Enums.SubmissionStatus.Submitted, ct);
 
-            var avgPerformance = 85.5m; // Ideally calculated from StudentExams and Submissions
+            var pendingExamAnswers = assignmentIds.Count == 0
+                ? 0
+                : await _context.StudentExams.CountAsync(se =>
+                    assignmentIds.Contains(se.Exam.AssignmentId) && se.HasPendingManualGrading, ct);
+
+            var performanceRows = classIds.Count == 0 || subjectIds.Count == 0
+                ? new List<decimal>()
+                : await _context.StudentPerformances
+                    .Where(p => p.ClassId.HasValue && classIds.Contains(p.ClassId.Value) && subjectIds.Contains(p.SubjectId))
+                    .Select(p => p.FinalGrade ?? ((p.AvgExam + p.AvgAssignment + p.AttendanceRate) / 3m))
+                    .ToListAsync(ct);
+            var averagePerformance = performanceRows.Count == 0 ? 0m : Math.Round(performanceRows.Average(), 1);
+
+            var attendanceRows = assignmentIds.Count == 0
+                ? new List<Masarak.Domain.Enums.AttendanceStatus>()
+                : await _context.Attendances
+                    .Where(a => assignmentIds.Contains(a.Session.AssignmentId) && a.RecordedAt >= DateTime.UtcNow.AddDays(-30))
+                    .Select(a => a.Status)
+                    .ToListAsync(ct);
+            var present = attendanceRows.Count(s => s == Masarak.Domain.Enums.AttendanceStatus.Present);
+            var absent = attendanceRows.Count(s => s == Masarak.Domain.Enums.AttendanceStatus.Absent);
+            var excused = attendanceRows.Count(s => s == Masarak.Domain.Enums.AttendanceStatus.Excused);
+            var attendanceRate = attendanceRows.Count == 0
+                ? 0m
+                : Math.Round((decimal)present / attendanceRows.Count * 100m, 1);
+
+            var publishedAssignments = assignmentIds.Count == 0
+                ? 0
+                : await _context.Assignments.CountAsync(a =>
+                    assignmentIds.Contains(a.AssignmentRef) &&
+                    a.Status == Masarak.Domain.Enums.AssignmentStatus.Published, ct);
+            var publishedExams = assignmentIds.Count == 0
+                ? 0
+                : await _context.Exams.CountAsync(e =>
+                    assignmentIds.Contains(e.AssignmentId) &&
+                    e.Status == Masarak.Domain.Enums.ExamStatus.Published, ct);
 
             return Ok(new TeacherDashboardStatsDto
             {
                 TotalStudents = totalStudents,
-                ActiveCourses = assignments.Count,
-                AssignmentsToGrade = pendingGrading,
-                AveragePerformance = avgPerformance
+                ActiveCourses = subjectIds.Count,
+                ActiveClasses = classIds.Count,
+                AssignmentsToGrade = pendingSubmissions + pendingExamAnswers,
+                PublishedAssignments = publishedAssignments,
+                PublishedExams = publishedExams,
+                AveragePerformance = averagePerformance,
+                AttendancePresent = present,
+                AttendanceAbsent = absent,
+                AttendanceExcused = excused,
+                TotalAttendanceRecords = attendanceRows.Count,
+                AttendanceRate = attendanceRate
             });
         }
-
         [HttpGet("activities")]
         public async Task<IActionResult> GetActivities(CancellationToken ct)
         {
@@ -64,16 +113,74 @@ namespace Masarak.API.Controllers
             var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, ct);
             if (teacher == null) return Forbid();
 
-            var activities = new List<TeacherActivityDto>
-            {
-                new TeacherActivityDto { Title = "تم تسليم واجب جديد", Time = "منذ 10 دقائق", Icon = "📝", Color = "bg-blue-100 text-blue-600" },
-                new TeacherActivityDto { Title = "رسالة جديدة من ولي أمر", Time = "منذ ساعة", Icon = "💬", Color = "bg-emerald-100 text-emerald-600" },
-                new TeacherActivityDto { Title = "تم تقييم اختبار الرياضيات", Time = "امس", Icon = "✅", Color = "bg-amber-100 text-amber-600" }
-            };
+            var assignmentIds = await _context.TeachingAssignments
+                .Where(ta => ta.TeacherId == teacher.TeacherId && ta.IsActive)
+                .Select(ta => ta.AssignmentId)
+                .ToListAsync(ct);
+            if (assignmentIds.Count == 0) return Ok(Array.Empty<TeacherActivityDto>());
 
-            return Ok(activities);
+            var submissions = await _context.Submissions
+                .Where(s => assignmentIds.Contains(s.Assignment.AssignmentRef))
+                .OrderByDescending(s => s.SubmittedAt)
+                .Take(6)
+                .Select(s => new
+                {
+                    s.SubmittedAt,
+                    StudentName = s.Student.User.FullName,
+                    AssignmentTitle = s.Assignment.Title,
+                    s.Status
+                })
+                .ToListAsync(ct);
+
+            var sessions = await _context.Sessions
+                .Where(s => assignmentIds.Contains(s.AssignmentId) && s.ScheduledAt >= DateTime.UtcNow.AddDays(-7))
+                .OrderByDescending(s => s.ScheduledAt)
+                .Take(4)
+                .Select(s => new { s.Title, s.ScheduledAt, s.Status })
+                .ToListAsync(ct);
+
+            var activities = new List<TeacherActivityDto>();
+            activities.AddRange(submissions.Select(s => new TeacherActivityDto
+            {
+                Title = s.Status == Masarak.Domain.Enums.SubmissionStatus.Graded
+                    ? $"تم تصحيح واجب {s.AssignmentTitle} للطالب {s.StudentName}"
+                    : $"سلّم {s.StudentName} واجب {s.AssignmentTitle}",
+                Time = FormatRelativeTime(s.SubmittedAt),
+                OccurredAt = s.SubmittedAt,
+                Type = s.Status == Masarak.Domain.Enums.SubmissionStatus.Graded ? "graded" : "submission",
+                Icon = s.Status == Masarak.Domain.Enums.SubmissionStatus.Graded ? "check-circle" : "clipboard-document",
+                Color = s.Status == Masarak.Domain.Enums.SubmissionStatus.Graded
+                    ? "bg-emerald-100 text-emerald-600"
+                    : "bg-blue-100 text-blue-600"
+            }));
+            activities.AddRange(sessions.Select(s => new TeacherActivityDto
+            {
+                Title = s.Status == Masarak.Domain.Enums.SessionStatus.Completed
+                    ? $"اكتملت حصة {s.Title}"
+                    : $"حصة قادمة: {s.Title}",
+                Time = FormatRelativeTime(s.ScheduledAt),
+                OccurredAt = s.ScheduledAt,
+                Type = "session",
+                Icon = "calendar",
+                Color = "bg-violet-100 text-violet-600"
+            }));
+
+            return Ok(activities
+                .OrderByDescending(a => a.OccurredAt)
+                .Take(8));
         }
 
+        private static string FormatRelativeTime(DateTime value)
+        {
+            var utcValue = value.Kind == DateTimeKind.Utc ? value : value.ToUniversalTime();
+            var difference = DateTime.UtcNow - utcValue;
+            if (difference.TotalMinutes < -1) return $"خلال {Math.Ceiling(-difference.TotalHours)} ساعة";
+            if (difference.TotalMinutes < 1) return "الآن";
+            if (difference.TotalMinutes < 60) return $"منذ {(int)difference.TotalMinutes} دقيقة";
+            if (difference.TotalHours < 24) return $"منذ {(int)difference.TotalHours} ساعة";
+            if (difference.TotalDays < 7) return $"منذ {(int)difference.TotalDays} يوم";
+            return value.ToString("yyyy/MM/dd");
+        }
         [HttpGet("charts/performance")]
         public async Task<IActionResult> GetPerformanceChart(CancellationToken ct)
         {

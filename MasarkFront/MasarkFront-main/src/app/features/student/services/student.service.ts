@@ -101,6 +101,9 @@ interface AssignmentDto {
   dueDate?: string;
   maxScore?: number;
   status?: string;
+  studentSubmissionStatus?: string | null;
+  studentScore?: number | null;
+  studentSubmittedAt?: string | null;
   subjectName?: string | null;
   className?: string | null;
   submissionCount?: number;
@@ -615,7 +618,9 @@ export class StudentService {
       title: item.title ?? 'Untitled assignment',
       dueDate: item.dueDate,
       maxScore: item.maxScore,
-      status: item.status,
+      status: item.studentSubmissionStatus ?? item.status ?? 'Pending',
+      score: item.studentScore ?? undefined,
+      submittedAt: item.studentSubmittedAt ?? undefined,
       description: item.className ? `Class: ${item.className}` : undefined,
     };
   }

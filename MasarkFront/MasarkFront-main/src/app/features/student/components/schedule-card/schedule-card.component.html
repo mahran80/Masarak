@@ -1,40 +1,40 @@
-<article class="ml-schedule-card relative overflow-hidden rounded-[18px] border border-slate-200/80 bg-white p-5 text-right shadow-[0_4px_20px_rgba(15,23,42,0.02)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full" dir="rtl">
+<article class="ml-schedule-card relative overflow-hidden rounded-[18px] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/90 p-5 text-right shadow-[0_4px_20px_rgba(15,23,42,0.02)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full" dir="rtl">
   
   <div>
     <!-- Top Row: Subject Indicator & Status Chip -->
     <div class="flex items-center justify-between gap-3 mb-4">
       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold whitespace-nowrap shrink-0" 
             [ngClass]="{
-              'bg-blue-50 text-blue-600': session().status === 'Live',
-              'bg-slate-50 text-slate-600': session().status !== 'Live'
+              'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400': session().status === 'Live',
+              'bg-slate-50 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300': session().status !== 'Live'
             }">
         <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{'bg-blue-500 animate-ping': session().status === 'Live', 'bg-slate-400': session().status !== 'Live'}"></span>
         {{ session().status === 'Live' ? 'مباشر الآن' : 'مجدولة' }}
       </span>
       
       @if (session().subjectName) {
-        <span class="text-xs font-black text-slate-500 bg-slate-50 px-2.5 py-1 rounded-xl whitespace-nowrap truncate max-w-[130px]" [title]="session().subjectName">
+        <span class="text-xs font-black text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/60 px-2.5 py-1 rounded-xl whitespace-nowrap truncate max-w-[130px]" [title]="session().subjectName">
           {{ session().subjectName }}
         </span>
       }
     </div>
 
     <!-- Title -->
-    <h3 class="text-base font-black text-slate-800 leading-snug mb-4 line-clamp-2">{{ session().sessionTitle }}</h3>
+    <h3 class="text-base font-black text-slate-800 dark:text-white leading-snug mb-4 line-clamp-2">{{ session().sessionTitle }}</h3>
 
     <!-- Session details grid -->
     <div class="space-y-3">
       <!-- Date -->
-      <div class="flex items-center gap-3 text-xs text-slate-600 justify-start">
-        <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+      <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 justify-start">
+        <div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
           <app-icon name="calendar" [size]="14"></app-icon>
         </div>
         <span class="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">{{ session().sessionDate | date: 'EEEE، d MMMM' }}</span>
       </div>
 
       <!-- Time -->
-      <div class="flex items-center gap-3 text-xs text-slate-600 justify-start">
-        <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+      <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 justify-start">
+        <div class="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
           <app-icon name="clock" [size]="14"></app-icon>
         </div>
         <span class="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap" dir="ltr">{{ session().sessionDate | date: 'shortTime' }} ({{ formatDuration(session().duration) }})</span>
@@ -42,8 +42,8 @@
 
       <!-- Teacher -->
       @if (session().teacherName) {
-        <div class="flex items-center gap-3 text-xs text-slate-600 justify-start">
-          <div class="w-7 h-7 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 overflow-hidden font-extrabold text-[10px]">
+        <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 justify-start">
+          <div class="w-7 h-7 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 overflow-hidden font-extrabold text-[10px]">
             {{ session().teacherName?.charAt(0) }}
           </div>
           <span class="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">{{ session().teacherName }}</span>
@@ -66,7 +66,7 @@
 
     <button
       type="button"
-      class="w-full inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/20 text-slate-600 hover:text-blue-600 font-extrabold text-xs active:scale-95 transition-all duration-200"
+      class="w-full inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50/20 dark:hover:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white font-extrabold text-xs active:scale-95 transition-all duration-200"
       (click)="viewDetails.emit(session())"
     >
       <span>عرض التفاصيل</span>

@@ -89,8 +89,8 @@ export const STUDENT_ROUTES: Routes = [
   },
   {
     path: 'subscription',
-    redirectTo: 'profile',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('../pages/subscription/subscription.component').then((m) => m.StudentSubscriptionPageComponent),
   },
   {
     path: 'insights',

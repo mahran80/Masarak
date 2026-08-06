@@ -5,17 +5,12 @@
 .courses-page {
   display: grid;
   gap: 28px;
-  padding: 24px;
-  background-color: #F8FAFC;
-  background-image: 
-    radial-gradient(circle at 100% 0%, rgba(79, 142, 247, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(108, 99, 255, 0.07) 0%, transparent 45%);
-  background-size: 100% 100%;
-  min-height: 100vh;
+  padding: 16px 20px;
+  background-color: transparent;
+  min-height: 100%;
   position: relative;
-  color: #1E293B;
-  border-radius: 24px;
-  overflow: hidden;
+  color: inherit;
+  overflow: visible;
 }
 
 /* Hero Section */
@@ -325,7 +320,8 @@
 }
 
 /* Dark Mode Theme configurations */
-:host-context(.dark) .courses-page {
+:host-context(.dark) .courses-page,
+:host-context([data-theme='dark']) .courses-page {
   background-color: #0B132B;
   background-image: 
     radial-gradient(circle at 100% 0%, rgba(79, 142, 247, 0.08) 0%, transparent 45%),
@@ -335,7 +331,10 @@
 
 :host-context(.dark) .courses-hero,
 :host-context(.dark) .courses-state,
-:host-context(.dark) .course-skeleton {
+:host-context(.dark) .course-skeleton,
+:host-context([data-theme='dark']) .courses-hero,
+:host-context([data-theme='dark']) .courses-state,
+:host-context([data-theme='dark']) .course-skeleton {
   background: #111E33;
   border-color: rgba(148, 163, 184, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
@@ -343,27 +342,34 @@
 
 :host-context(.dark) .courses-hero h1,
 :host-context(.dark) .courses-section-heading h2,
-:host-context(.dark) .courses-state h2 {
+:host-context(.dark) .courses-state h2,
+:host-context([data-theme='dark']) .courses-hero h1,
+:host-context([data-theme='dark']) .courses-section-heading h2,
+:host-context([data-theme='dark']) .courses-state h2 {
   color: #F8FAFC;
 }
 
-:host-context(.dark) .hero-stat {
+:host-context(.dark) .hero-stat,
+:host-context([data-theme='dark']) .hero-stat {
   background: #17263D;
   border-color: rgba(148, 163, 184, 0.1);
 }
 
-:host-context(.dark) .refresh-courses {
+:host-context(.dark) .refresh-courses,
+:host-context([data-theme='dark']) .refresh-courses {
   background: #17263D;
   color: #94A3B8;
   border-color: rgba(148, 163, 184, 0.1);
 }
 
-:host-context(.dark) .refresh-courses:hover {
+:host-context(.dark) .refresh-courses:hover,
+:host-context([data-theme='dark']) .refresh-courses:hover {
   background: #1A2B46;
   color: #E2E8F0;
 }
 
-:host-context(.dark) .state-icon {
+:host-context(.dark) .state-icon,
+:host-context([data-theme='dark']) .state-icon {
   background: rgba(59, 130, 246, 0.12);
   color: #60A5FA;
 }

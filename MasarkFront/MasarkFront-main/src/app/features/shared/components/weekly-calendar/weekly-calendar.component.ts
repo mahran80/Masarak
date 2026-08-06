@@ -70,13 +70,12 @@ export class WeeklyCalendarComponent implements OnChanges {
     today.setHours(0, 0, 0, 0);
 
     const weekColumns: DayColumn[] = [];
-    // Create 6 working days starting from weekStart
+    // Friday is a non-school day, so the visible schedule has six working days.
     for (let i = 0; i < 7; i++) {
       const date = new Date(this.weekStart);
       date.setDate(date.getDate() + i);
-
       const dayNum = date.getDay();
-      if (dayNum === 5) continue; // Skip Friday (5) only
+      if (dayNum === 5) continue;
       
       const isToday = date.getTime() === today.getTime();
       const dayName = this.dayNamesAr[date.getDay()];

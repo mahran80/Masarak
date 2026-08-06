@@ -6,13 +6,23 @@ import { environment } from '../../../../environments/environment';
 export interface TeacherDashboardStats {
   totalStudents: number;
   activeCourses: number;
+  activeClasses: number;
   assignmentsToGrade: number;
+  publishedAssignments: number;
+  publishedExams: number;
   averagePerformance: number;
+  attendancePresent: number;
+  attendanceAbsent: number;
+  attendanceExcused: number;
+  totalAttendanceRecords: number;
+  attendanceRate: number;
 }
 
 export interface TeacherActivity {
   title: string;
   time: string;
+  occurredAt: string;
+  type: string;
   icon: string;
   color: string;
 }

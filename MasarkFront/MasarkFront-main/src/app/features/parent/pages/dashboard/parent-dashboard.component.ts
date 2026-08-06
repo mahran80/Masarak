@@ -147,21 +147,23 @@ const EN = {
     <div class="space-y-8 md:space-y-12 animate-fade-in relative z-10 pb-24 w-full" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
       
       <!-- 2. Premium Image Hero Section -->
-      <div class="parent-static-hero relative overflow-hidden rounded-[30px] shadow-lg flex flex-col justify-center select-none" style="min-height: 360px;">
+      <div class="parent-static-hero flex flex-col justify-center select-none">
         
-        <!-- Background Image -->
-        <img src="/assets/images/parent_hero_bg.jpg" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-[10s] hover:scale-105" alt="Hero Background">
+        <!-- Floating particles and glow spots -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <div class="absolute -top-16 -right-12 w-56 h-56 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div class="absolute -bottom-20 -left-16 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div class="absolute top-10 left-[20%] w-1.5 h-1.5 bg-white rounded-full opacity-60"></div>
+          <div class="absolute top-[30%] right-[30%] w-2 h-2 bg-white rounded-full opacity-40"></div>
+          <div class="absolute bottom-[20%] left-[45%] w-2 h-2 bg-white rounded-full opacity-50"></div>
+          <div class="absolute top-[15%] left-[50%] w-1.5 h-1.5 bg-purple-200 rounded-full opacity-70"></div>
+        </div>
         
-        <!-- Gradient Overlay for readability -->
-        <div class="absolute inset-0 z-0 bg-slate-900/40 dark:bg-slate-950/60 mix-blend-multiply"></div>
-        <div class="absolute inset-0 z-0" 
-             [class.bg-gradient-to-l]="lang() === 'ar'" 
-             [class.bg-gradient-to-r]="lang() === 'en'" 
-             class="from-blue-950/95 via-blue-900/80 to-transparent dark:from-slate-950/95 dark:via-slate-900/80 dark:to-transparent"></div>
-        
-        <div class="relative z-10 flex flex-col items-start justify-center w-full px-8 md:px-14 py-10 flex-1">
-          <!-- Text Content -->
-          <div class="max-w-2xl space-y-5 text-right" [class.text-left]="lang() === 'en'" [class.text-right]="lang() === 'ar'">
+        <!-- Main Content Wrapper -->
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 w-full px-8 md:px-14 py-8 h-full">
+          
+          <!-- Text Content (Right side in RTL, Left side in LTR) -->
+          <div class="w-full md:max-w-[55%] space-y-5" [style.textAlign]="lang() === 'ar' ? 'right' : 'left'">
             
             <!-- User Info Badge & Date -->
             <div class="flex flex-wrap items-center gap-3">
@@ -175,10 +177,10 @@ const EN = {
               </span>
             </div>
 
-            <!-- Welcome Title -->
+            <!-- Welcome Title & Subtitle -->
             <div class="space-y-3">
               <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-lg">
-                {{ t().WELCOME_BACK }} <span class="text-blue-200">{{ parentFullName }}</span>
+                {{ t().WELCOME_BACK }} <span class="text-blue-100">{{ parentFullName }}</span>
               </h1>
               <p class="text-sm md:text-base text-white/90 max-w-xl leading-relaxed font-semibold drop-shadow-md">
                 {{ t().HERO_SUBTITLE }}
@@ -186,13 +188,31 @@ const EN = {
             </div>
 
             <!-- CTA Actions -->
-            <div class="flex flex-wrap items-center gap-4 pt-4">
-              <a routerLink="/add-student" class="px-7 py-3 bg-white hover:bg-blue-50 text-blue-700 rounded-2xl text-sm font-black transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:-translate-y-1 flex items-center gap-2 border border-white/50">
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+              <a routerLink="/add-student" class="px-7 py-3 bg-white hover:bg-blue-50 text-blue-700 rounded-2xl text-sm font-black transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 flex items-center gap-2 border border-white/50">
                 <app-icon name="plus" size="18"></app-icon>
                 <span>{{ t().ADD_STUDENT }}</span>
               </a>
             </div>
           </div>
+
+          <!-- Hero Illustration Image (Father & Son) -->
+          <div class="parent-hero-img-wrap"
+               [style.left]="lang() === 'ar' ? '0' : 'auto'"
+               [style.right]="lang() === 'en' ? '0' : 'auto'">
+            <!-- Glow spots behind illustration image -->
+            <div class="absolute -bottom-10 w-72 h-72 bg-cyan-400/25 rounded-full blur-[80px] z-0"
+                 [style.left]="lang() === 'ar' ? '-2.5rem' : 'auto'"
+                 [style.right]="lang() === 'en' ? '-2.5rem' : 'auto'"></div>
+            <div class="absolute top-10 w-48 h-48 bg-purple-400/20 rounded-full blur-[60px] z-0"
+                 [style.left]="lang() === 'ar' ? '5rem' : 'auto'"
+                 [style.right]="lang() === 'en' ? '5rem' : 'auto'"></div>
+            
+            <img src="/assets/images/dashboard-heroes/parent-hero.png" 
+                 [style.objectPosition]="lang() === 'ar' ? 'bottom left' : 'bottom right'"
+                 alt="ولي الأمر والطالب">
+          </div>
+
         </div>
       </div>
 
@@ -576,9 +596,56 @@ const EN = {
           </a>
         </div>
       }
-    </div>
-  `,
+    </div>`,
   styles: [`
+    :host { display: block; }
+    
+    .parent-static-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px !important;
+      min-height: 340px !important;
+      background: linear-gradient(105deg, #0284c7 0%, #2563eb 45%, #7c3aed 100%) !important;
+      box-shadow: 0 20px 50px rgba(37, 99, 235, 0.18) !important;
+    }
+
+    :host-context(.dark) .parent-static-hero,
+    .dark .parent-static-hero {
+      background: linear-gradient(135deg, #083344 0%, #1e1b4b 50%, #4c1d95 100%) !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    .parent-hero-img-wrap {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .parent-hero-img-wrap {
+        display: block !important;
+        position: absolute;
+        bottom: 0;
+        height: 100%;
+        width: 45%;
+        pointer-events: none;
+        z-index: 10;
+        overflow: hidden;
+      }
+    }
+
+    .parent-hero-img-wrap img {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.25));
+      transition: transform 0.7s ease-out;
+    }
+
+    .parent-hero-img-wrap img:hover {
+      transform: scale(1.05);
+    }
+
     .stats-card {
       transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid rgba(226, 232, 240, 0.8) !important;
@@ -622,29 +689,6 @@ const EN = {
     }
     .quick-action-card:active {
       transform: translateY(0) scale(0.97);
-    }
-
-    .parent-character-art {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      mix-blend-mode: screen;
-      filter: saturate(1.1) contrast(1.05) drop-shadow(0 12px 24px rgba(9, 20, 98, 0.2));
-      mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0) 78%) !important;
-      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 35%, rgba(0, 0, 0, 0) 78%) !important;
-      animation: floatIllustration 6s ease-in-out infinite;
-    }
-
-    @keyframes floatIllustration {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-6px) rotate(1deg);
-      }
-    }
-    .animate-float-illustration {
-      animation: floatIllustration 6s ease-in-out infinite;
     }
   `]
 })

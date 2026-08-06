@@ -1,13 +1,10 @@
-<div class="ml-auth-bg overflow-hidden h-screen max-h-screen" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
+<div class="ml-auth-bg" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
   
-  <!-- Subtle Grid Overlay -->
-  
-
   <!-- Ambient Blurred Blobs -->
   <div class="ml-auth-blob ml-auth-blob-1"></div>
   <div class="ml-auth-blob ml-auth-blob-2"></div>
 
-  <!-- Top Corner Toggles (COMPACT) -->
+  <!-- Top Corner Toggles (FIXED TOP-LEFT OUTSIDE FORM) -->
   <div class="ml-auth-toggles-corner">
     <!-- Back to Landing Page Icon Button -->
     <a routerLink="/" class="ml-home-btn" aria-label="Back to landing page" [title]="lang() === 'ar' ? 'العودة للرئيسية' : 'Back to Home'">
@@ -39,7 +36,7 @@
     <div class="ml-auth-card-container">
       
       <!-- LEFT SIDE: Hero Image -->
-      <div class="ml-auth-hero-pane" [ngStyle]="{'background-image': 'url(/assets/images/' + (mode === 'Parent' ? 'parent_register.jpg' : 'student_register.jpg') + ')'}">
+      <div class="ml-auth-hero-pane" [class.parent-register-hero]="mode === 'Parent'" [ngStyle]="{'background-image': 'url(/assets/images/' + (mode === 'Parent' ? 'parent_register.jpg' : 'student_register.jpg') + ')'}">
         <div class="ml-hero-overlay" [style.background]="mode === 'Parent' ? 'linear-gradient(180deg, rgba(37,99,235,.15), rgba(20,24,40,.55))' : ''"></div>
         <div class="ml-hero-text-overlay" style="top: auto; bottom: 0; padding: 40px 24px; text-align: start;">
           <h1 class="ml-hero-title" style="font-size: 24px; margin-bottom: 12px; font-weight: 800; line-height: 1.4;">{{ mode === 'Parent' ? t().heroHeadlineParent : t().heroHeadlineStudent }}</h1>
@@ -51,7 +48,7 @@
       <!-- Register Form Side -->
       <div class="ml-auth-form-pane" *ngIf="!isSuccess">
         <!-- Top Brand Logo & Toggle Route link -->
-        <div class="ml-auth-brand-row" style="margin-bottom: 24px;">
+        <div class="ml-auth-brand-row" style="margin-bottom: 20px;">
           <a routerLink="/" class="ml-auth-brand-logo">
             <div class="ml-auth-logo-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
@@ -68,7 +65,7 @@
         </div>
 
         <!-- Header Text -->
-        <div class="ml-auth-header" style="margin-bottom: 20px;">
+        <div class="ml-auth-header" style="margin-bottom: 18px;">
           <h2 class="ml-auth-title" style="font-size: 20px; font-weight: 800;">
             {{ mode === 'Parent' ? t().titleParent : t().titleStudent }}
           </h2>
@@ -318,14 +315,14 @@
             type="submit"
             [disabled]="authState.isLoading() || isSuccess"
             class="ml-btn ml-btn-primary w-full shadow-md ripple"
-            style="margin-top: 12px; height: 50px; border-radius: 14px; font-size: 14px;"
+            style="margin-top: 12px; height: 48px; border-radius: 14px; font-size: 14px;"
           >
             {{ mode === 'Parent' ? t().submitButton : (lang() === 'ar' ? 'ربط حساب طفلك الآن' : 'Link Child Account Now') }}
           </button>
         </form>
 
         <!-- Footer Link (Parent only) -->
-        <div class="ml-auth-footer" *ngIf="mode === 'Parent'" style="margin-top: 20px; font-size: 11.5px; display: flex; justify-content: center; align-items: center; gap: 6px; text-align: center; width: 100%;">
+        <div class="ml-auth-footer" *ngIf="mode === 'Parent'" style="margin-top: 18px; font-size: 11.5px; display: flex; justify-content: center; align-items: center; gap: 6px; text-align: center; width: 100%;">
           <span style="color: var(--text-variant);">{{ t().haveAccount }}</span>
           <a routerLink="/auth/login" class="ml-auth-helper-link" style="color: #2563EB; font-weight: 800; text-decoration: none;">
             {{ t().loginLink }}
@@ -355,6 +352,4 @@
     </div>
   </div>
 
-  </div>
-
-
+</div>

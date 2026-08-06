@@ -71,18 +71,18 @@
 
 // Launcher button sizing configurations
 .launcher-btn {
-  width: 68px;
-  height: 68px;
+  width: 46px;
+  height: 46px;
   box-shadow: 0 8px 36px rgba(37, 99, 235, 0.35);
   
   @media (max-width: 768px) {
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
   }
   
   @media (max-width: 480px) {
-    width: 56px;
-    height: 56px;
+    width: 42px;
+    height: 42px;
   }
 }
 
@@ -161,8 +161,8 @@ h3, h4, h5 {
 
 // Interactive idle launcher button that hides 50% off-screen on the left
 .launcher-idle {
-  transform: translateX(-40px);
-  opacity: 0.6;
+  transform: translateX(-44px);
+  opacity: 0.85;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
   
   &:hover {
@@ -180,25 +180,6 @@ h3, h4, h5 {
   }
 }
 
-/* Sidebar positioning support for AI assistant launcher & chat window */
-@media (min-width: 769px) {
-  body:has(aside) {
-    .fixed.bottom-6.left-6 {
-      left: auto !important;
-      right: 24px !important;
-    }
-    .launcher-idle {
-      transform: translateX(40px);
-      &:hover {
-        transform: translateX(0);
-      }
-    }
-    .fixed.bottom-24.left-6 {
-      left: auto !important;
-      right: 24px !important;
-    }
-  }
-}
 
 /* Premium Chat Window Glassmorphism Overrides */
 .fixed.bottom-24.left-6 {

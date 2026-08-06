@@ -181,13 +181,7 @@
           <!-- Avatar Container -->
           <div class="relative group mb-3">
             <div class="w-[92px] h-[92px] rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-md bg-slate-50 dark:bg-slate-850 relative z-10 flex items-center justify-center">
-              @if (profile()?.avatarUrl) {
-                <img [src]="profile()?.avatarUrl" (error)="onAvatarError($event)" class="w-full h-full object-cover" [alt]="profile()?.fullName">
-              } @else {
-                <div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-2xl font-black">
-                  {{ getInitials() }}
-                </div>
-              }
+              <img [src]="displayAvatarUrl()" (error)="onAvatarError($event)" class="w-full h-full object-cover" [alt]="profile()?.fullName">
             </div>
 
             <!-- Upload Overlay -->

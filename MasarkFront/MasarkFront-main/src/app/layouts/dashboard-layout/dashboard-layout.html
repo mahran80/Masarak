@@ -8,17 +8,17 @@
 
   <!-- Top Navigation Bar -->
   @if (!isOnboarding) {
-  <div class="admin-topbar fixed top-2 md:top-3 inset-x-4 md:inset-x-8 h-[55px] md:h-[59px] bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-[#E8ECF8]/80 dark:border-slate-800/65 rounded-full z-[1000] shadow-md transition-all flex items-center" (click)="$event.stopPropagation()">
+  <div class="admin-topbar fixed top-3 inset-x-4 md:inset-x-8 h-[60px] bg-white/75 dark:bg-slate-900/75 backdrop-blur-md border border-[#E8ECF8]/80 dark:border-slate-800/65 rounded-full z-[1000] shadow-md transition-all flex items-center" (click)="$event.stopPropagation()">
     <header class="w-full px-5 md:px-6 flex items-center justify-between h-full">
       <!-- Right/Left: Logo & Sidebar Toggle -->
       <div class="flex items-center gap-4 relative z-10">
         <!-- Sidebar Toggle -->
         <button
           (click)="toggleSidebar($event)"
-          class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all focus:outline-none shrink-0"
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all focus:outline-none shrink-0"
           title="تبديل القائمة الجانبية"
         >
-          <app-icon name="bars-3" [size]="18"></app-icon>
+          <app-icon name="bars-3" [size]="16"></app-icon>
         </button>
 
         <!-- Logo -->
@@ -63,11 +63,7 @@
             class="flex items-center gap-2 focus:outline-none hover:opacity-85 transition-opacity"
           >
             <div class="w-9 h-9 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shadow-[0_2px_8px_-2px_rgba(37,99,235,0.2)]">
-              @if (hasValidAvatar) {
-                <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
-              } @else {
-                <img [src]="isFemale ? '/assets/images/dashboard-heroes/student-female-hero.png?v=3' : '/assets/images/dashboard-heroes/student-male-hero.png'" class="w-full h-full object-cover" alt="Avatar" />
-              }
+              <img [src]="displayAvatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
             </div>
           </button>
 
@@ -79,11 +75,7 @@
                 <!-- Compact Avatar -->
                 <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-md flex items-center justify-center shrink-0 overflow-hidden mb-2">
                   <div class="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 p-0.5">
-                    @if (hasValidAvatar) {
-                      <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover rounded-full" (error)="onAvatarError($event)" alt="Avatar" />
-                    } @else {
-                      <img [src]="isFemale ? '/assets/images/dashboard-heroes/student-female-hero.png?v=3' : '/assets/images/dashboard-heroes/student-male-hero.png'" class="w-full h-full object-cover rounded-full bg-slate-50 dark:bg-slate-800" alt="Avatar" />
-                    }
+                    <img [src]="displayAvatarUrl" class="w-full h-full object-cover rounded-full bg-slate-50 dark:bg-slate-800" (error)="onAvatarError($event)" alt="Avatar" />
                   </div>
                 </div>
                 <!-- Details -->
@@ -175,38 +167,45 @@
   }
 
   <!-- Sidebar + Main Content Layout -->
-  <div class="flex flex-1 p-4 pt-[74px] md:pt-[86px] gap-4 overflow-hidden relative">
+  <div class="layout-body admin-layout-content flex flex-1 p-4 md:p-6 gap-6 overflow-hidden relative" style="padding-top: calc(var(--navbar-top) + var(--navbar-height) + 12px) !important;">
     <!-- Sidebar Navigation -->
     @if (!isOnboarding) {
     <aside
-      class="bg-surface/80 dark:bg-surface-muted/80 backdrop-blur-md flex flex-col sidebar-transition shrink-0 z-40 rounded-2xl overflow-hidden"
+      class="bg-surface/80 dark:bg-surface-muted/80 backdrop-blur-md flex flex-col sidebar-transition shrink-0 z-40 rounded-2xl overflow-hidden h-full min-h-0"
       [class.w-[230px]]="!isSidebarCollapsed()"
       [class.w-20]="isSidebarCollapsed()"
       (click)="$event.stopPropagation()"
     >
       <!-- Sidebar Header Profile Card -->
-      <div class="p-3 flex items-center gap-3 overflow-hidden whitespace-nowrap relative group/profile bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100/80 dark:border-slate-800/40 rounded-[18px] mx-2 mt-3 mb-2 shadow-sm" [class.p-2]="isSidebarCollapsed()">
-        <div class="w-[40px] h-[40px] rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 p-0.5 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
-          <div class="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900 p-0.5">
-            @if (userName()?.avatarUrl) {
-              <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover rounded-full" (error)="onAvatarError($event)" alt="Avatar" />
-            } @else {
-              <div class="w-full h-full rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 font-bold text-xs flex items-center justify-center">
-                {{ userInitials }}
-              </div>
-            }
+      <div
+        class="sidebar-user-card flex items-center overflow-hidden relative mx-2 mt-3 mb-2"
+        [class.sidebar-user-card--collapsed]="isSidebarCollapsed()"
+        [class.justify-center]="isSidebarCollapsed()"
+        [title]="isSidebarCollapsed() ? (userName()?.fullName ?? 'User') : ''"
+      >
+        <div class="sidebar-user-avatar shrink-0">
+          <img [src]="displayAvatarUrl" (error)="onAvatarError($event)" [alt]="userName()?.fullName ?? 'Avatar'" />
+        </div>
+
+        @if (!isSidebarCollapsed()) {
+          <div class="sidebar-user-details flex-1 min-w-0">
+            <h4
+              class="sidebar-user-name"
+              dir="auto"
+              [title]="userName()?.fullName ?? 'User'"
+            >
+              {{ userName()?.fullName ?? 'User' }}
+            </h4>
+            <div class="sidebar-user-role" dir="rtl">
+              <span class="sidebar-user-role-dot" aria-hidden="true"></span>
+              <span>{{ roleLabel(userRole()) }}</span>
+            </div>
           </div>
-        </div>
-        <div class="transition-all duration-300 flex-1 min-w-0" [class.opacity-0]="isSidebarCollapsed()" [class.hidden]="isSidebarCollapsed()">
-          <h4 class="font-black text-slate-800 dark:text-slate-200 text-[13px] truncate leading-tight">{{ userName()?.fullName ?? 'User' }}</h4>
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-[9px] font-extrabold text-blue-600 dark:text-blue-400 mt-1">
-            {{ roleLabel(userRole()) }}
-          </span>
-        </div>
+        }
       </div>
 
       <!-- Navigation links scroll area -->
-      <nav class="flex-1 min-h-0 p-3 space-y-6 overflow-y-auto sidebar-nav-scroll pb-10">
+      <nav class="flex-1 min-h-0 p-3 space-y-6 overflow-y-auto sidebar-nav-scroll pb-10" style="overflow-y: auto !important; min-height: 0;">
         <!-- ── STUDENT ROLE LINKS ── -->
         @if (userRole() === 'Student') {
           <!-- Group 1: الرئيسية -->
@@ -526,8 +525,8 @@
     }
 
     <!-- Main Content Panel -->
-    <main class="flex-1 bg-transparent border-0 shadow-none overflow-hidden relative transition-all duration-300">
-      <div class="absolute inset-0 overflow-y-auto custom-scrollbar p-4 md:p-6 lg:p-8">
+    <main class="page-content flex-1 bg-transparent border-0 shadow-none overflow-hidden relative transition-all duration-300">
+      <div class="absolute inset-0 overflow-y-auto custom-scrollbar p-1 sm:p-2 md:p-3">
         <router-outlet></router-outlet>
       </div>
     </main>

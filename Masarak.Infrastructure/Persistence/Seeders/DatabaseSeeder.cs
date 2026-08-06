@@ -422,8 +422,10 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
         public static async Task SeedSubscriptionsAsync(Context db)
         {
-            if (await db.Subscriptions.AnyAsync()) return;
-            var students = await db.Students.Include(s => s.User).ToListAsync();
+            var subscribedUserIds = await db.Subscriptions.Select(s => s.UserId).Distinct().ToListAsync();
+            var students = await db.Students.Include(s => s.User)
+                .Where(s => !subscribedUserIds.Contains(s.UserId))
+                .ToListAsync();
             var plans = await db.Plans.ToListAsync();
             var monthlyPlan = plans.FirstOrDefault(p => p.Type == Masarak.Domain.Enums.PlanType.Monthly);
             var perSubjectPlan = plans.FirstOrDefault(p => p.Type == Masarak.Domain.Enums.PlanType.PerSubject);
@@ -481,8 +483,14 @@ namespace Masarak.Infrastructure.Persistence.Seeders
 
         public static async Task SeedStudentEnrollmentsAsync(Context db)
         {
-            if (await db.StudentClasses.AnyAsync()) return;
-            var students = await db.Students.ToListAsync();
+            var enrolledStudentIds = await db.StudentClasses
+                .Where(sc => sc.IsActive)
+                .Select(sc => sc.StudentId)
+                .Distinct()
+                .ToListAsync();
+            var students = await db.Students
+                .Where(s => !enrolledStudentIds.Contains(s.StudentId))
+                .ToListAsync();
             var classes = await db.Classes.ToListAsync();
             var grades = await db.Grades.ToListAsync();
 
@@ -504,9 +512,12 @@ namespace Masarak.Infrastructure.Persistence.Seeders
                     enrollments.Add(sc);
                 }
             }
-            db.StudentClasses.AddRange(enrollments);
-            await db.SaveChangesAsync();
-            Console.WriteLine($"[Seeder] {enrollments.Count} student enrollments seeded (divided into classes).");
+            if (enrollments.Count > 0)
+            {
+                db.StudentClasses.AddRange(enrollments);
+                await db.SaveChangesAsync();
+            }
+            Console.WriteLine($"[Seeder] {enrollments.Count} missing student enrollments seeded.");
         }
         /// <summary>
         /// Phase 5: Seeds default AI prompt templates for weakness analysis, parent reports, and teaching suggestions.
@@ -636,5 +647,400 @@ namespace Masarak.Infrastructure.Persistence.Seeders
             await db.SaveChangesAsync();
             Console.WriteLine("[Seeder] Parent Dashboard data seeded (Attendance, Alerts, Parent Report).");
         }
-    }
+
+
+        /// <summary>
+        /// Adds a coherent, repeatable demo learning journey for every active class:
+        /// published lessons and homework, submitted/graded work, past attendance,
+        /// and upcoming sessions for the weekly schedule. Each record is keyed by a
+        /// stable demo title so it is safe to run on every application startup.
+        /// </summary>
+        public static async Task SeedDemoLearningDataAsync(Context db)
+        {
+            const string lessonTitle = "Demo learning plan";
+            const string practiceTitle = "Weekly practice";
+            const string reviewTitle = "Unit review";
+            const string completedSessionTitle = "Lesson review session";
+            const string upcomingSessionTitle = "Live practice session";
+
+            var year = DateTime.UtcNow.Year;
+            var teachingAssignments = await db.TeachingAssignments
+                .Include(ta => ta.Subject)
+                .Where(ta => ta.IsActive && ta.AcademicYear == year)
+                .ToListAsync();
+            if (teachingAssignments.Count == 0) return;
+
+            var activeEnrollments = await db.StudentClasses
+                .Where(sc => sc.IsActive && sc.AcademicYear == year)
+                .ToListAsync();
+            var students = await db.Students.ToDictionaryAsync(s => s.StudentId, s => s.UserId);
+            var weekStart = DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek + (int)DayOfWeek.Monday);
+
+            foreach (var teachingAssignment in teachingAssignments)
+            {
+                var classAssignmentIndex = teachingAssignments
+                    .Where(ta => ta.ClassId == teachingAssignment.ClassId)
+                    .OrderBy(ta => ta.AssignmentId)
+                    .ToList()
+                    .FindIndex(ta => ta.AssignmentId == teachingAssignment.AssignmentId);
+                var scheduledAt = weekStart.AddDays(1 + classAssignmentIndex % 5).AddHours(9 + (classAssignmentIndex / 5) * 2);
+                var lesson = await db.Lessons.FirstOrDefaultAsync(l =>
+                    l.TeachingAssignmentId == teachingAssignment.AssignmentId && l.Title == lessonTitle);
+                if (lesson == null)
+                {
+                    lesson = Lesson.Create(teachingAssignment.AssignmentId, lessonTitle,
+                        "A published demo lesson used by the seeded assignments and sessions.", 1);
+                    lesson.Publish();
+                    db.Lessons.Add(lesson);
+                    await db.SaveChangesAsync();
+                }
+
+                var subjectName = teachingAssignment.Subject.NameAr ?? teachingAssignment.Subject.Name;
+                var practice = await db.Assignments.FirstOrDefaultAsync(a =>
+                    a.AssignmentRef == teachingAssignment.AssignmentId && a.Title == practiceTitle);
+                if (practice == null)
+                {
+                    practice = Assignment.Create(teachingAssignment.AssignmentId, lesson.LessonId, practiceTitle,
+                        $"Complete the weekly {subjectName} practice and submit your written answer.",
+                        DateTime.UtcNow.AddDays(3), 20m);
+                    practice.Description = $"Open practice for {subjectName}.";
+                    practice.Publish();
+                    db.Assignments.Add(practice);
+                }
+
+                var review = await db.Assignments.FirstOrDefaultAsync(a =>
+                    a.AssignmentRef == teachingAssignment.AssignmentId && a.Title == reviewTitle);
+                if (review == null)
+                {
+                    review = Assignment.Create(teachingAssignment.AssignmentId, lesson.LessonId, reviewTitle,
+                        "Review the lesson, solve the questions, and explain your final answer.",
+                        DateTime.UtcNow.AddDays(-4), 20m);
+                    review.Description = $"Completed review for {subjectName}; submissions are ready for teacher marking.";
+                    review.Publish();
+                    db.Assignments.Add(review);
+                }
+
+                if (!await db.Sessions.AnyAsync(s => s.AssignmentId == teachingAssignment.AssignmentId && s.Title == completedSessionTitle))
+                {
+                    var completed = Session.Schedule(teachingAssignment.AssignmentId, teachingAssignment.ClassId,
+                        completedSessionTitle, $"Revision and questions for {subjectName}.",
+                        scheduledAt.AddDays(-7), 60, "https://meet.jit.si/masarak-demo-session");
+                    completed.Complete();
+                    db.Sessions.Add(completed);
+                }
+
+                if (!await db.Sessions.AnyAsync(s => s.AssignmentId == teachingAssignment.AssignmentId && s.Title == upcomingSessionTitle))
+                {
+                    db.Sessions.Add(Session.Schedule(teachingAssignment.AssignmentId, teachingAssignment.ClassId,
+                        upcomingSessionTitle, $"Live guided practice for {subjectName}.",
+                        scheduledAt, 60, "https://meet.jit.si/masarak-demo-session"));
+                }
+
+                await db.SaveChangesAsync();
+
+                var enrolledStudents = activeEnrollments
+                    .Where(sc => sc.ClassId == teachingAssignment.ClassId)
+                    .Select(sc => sc.StudentId)
+                    .Where(students.ContainsKey)
+                    .ToList();
+                var completedSession = await db.Sessions.FirstAsync(s =>
+                    s.AssignmentId == teachingAssignment.AssignmentId && s.Title == completedSessionTitle);
+
+                for (var index = 0; index < enrolledStudents.Count; index++)
+                {
+                    var studentId = enrolledStudents[index];
+                    var studentUserId = students[studentId];
+
+                    if (!await db.Submissions.AnyAsync(s => s.AssignmentId == review.AssignmentId && s.StudentId == studentId))
+                    {
+                        var submission = Submission.Create(review.AssignmentId, studentId,
+                            "Demo answer: I completed the required steps and checked my result.", null, null);
+                        submission.SubmittedAt = DateTime.UtcNow.AddDays(-2);
+                        if (index % 3 == 0)
+                        {
+                            submission.Grade(16m + (index % 4), "Good work. Review the final step once more.");
+                            submission.GradedAt = DateTime.UtcNow.AddDays(-1);
+                        }
+                        db.Submissions.Add(submission);
+                    }
+
+                    if (!await db.Attendances.AnyAsync(a => a.SessionId == completedSession.SessionId && a.StudentUserId == studentUserId))
+                    {
+                        db.Attendances.Add(index % 5 == 4
+                            ? Attendance.RecordAbsent(completedSession.SessionId, studentUserId)
+                            : Attendance.RecordPresent(completedSession.SessionId, studentUserId,
+                                completedSession.ScheduledAt.AddMinutes(5 + index)));
+                    }
+                }
+
+                await db.SaveChangesAsync();
+            }
+
+            Console.WriteLine("[Seeder] Demo learning data verified: lessons, assignments, submissions, sessions, and attendance.");
+        }
+
+        /// <summary>
+        /// Completes the demo experience for every student and linked parent.
+        /// Adds published/open exams, historical grades, content, performance,
+        /// alerts, reports, notifications, and starter community messages.
+        /// All records use stable keys and are safe to verify on every startup.
+        /// </summary>
+        public static async Task SeedCompleteStudentParentDataAsync(Context db)
+        {
+            const string openExamTitle = "Demo open assessment";
+            const string historyExamTitle = "Demo completed assessment";
+            const string videoTitle = "Demo lesson video";
+            const string notesTitle = "Demo revision notes";
+
+            var year = DateTime.UtcNow.Year;
+            var academicYear = year.ToString();
+            var assignments = await db.TeachingAssignments
+                .Include(ta => ta.Subject)
+                .Where(ta => ta.IsActive && ta.AcademicYear == year)
+                .ToListAsync();
+            if (assignments.Count == 0) return;
+
+            var enrollments = await db.StudentClasses
+                .Where(sc => sc.IsActive && sc.AcademicYear == year)
+                .ToListAsync();
+            var students = await db.Students.Include(s => s.User).ToDictionaryAsync(s => s.StudentId);
+
+            foreach (var assignment in assignments)
+            {
+                var lesson = await db.Lessons
+                    .OrderBy(l => l.OrderNum)
+                    .FirstOrDefaultAsync(l => l.TeachingAssignmentId == assignment.AssignmentId);
+                if (lesson == null) continue;
+
+                if (!await db.ContentItems.AnyAsync(c =>
+                    c.TeachingAssignmentId == assignment.AssignmentId && c.Title == videoTitle))
+                {
+                    db.ContentItems.Add(ContentItem.CreateUrlBased(
+                        assignment.AssignmentId, null, lesson.LessonId,
+                        ContentType.Video, ContentSourceType.YouTubeUrl,
+                        videoTitle,
+                        $"A guided introduction to {assignment.Subject.Name}.",
+                        "https://www.youtube.com/watch?v=ysz5S6PUM-U"));
+                }
+
+                if (!await db.ContentItems.AnyAsync(c =>
+                    c.TeachingAssignmentId == assignment.AssignmentId && c.Title == notesTitle))
+                {
+                    db.ContentItems.Add(ContentItem.CreateUrlBased(
+                        assignment.AssignmentId, null, lesson.LessonId,
+                        ContentType.Notes, ContentSourceType.YouTubeUrl,
+                        notesTitle,
+                        $"Key ideas and revision checklist for {assignment.Subject.Name}.",
+                        "https://www.youtube.com/watch?v=ysz5S6PUM-U"));
+                }
+
+                var openExam = await db.Exams.Include(e => e.Questions).FirstOrDefaultAsync(e =>
+                    e.AssignmentId == assignment.AssignmentId && e.Title == openExamTitle);
+                if (openExam == null)
+                {
+                    openExam = Exam.Create(
+                        assignment.AssignmentId, lesson.LessonId, openExamTitle,
+                        $"Answer the short {assignment.Subject.Name} assessment.",
+                        DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(14), 20);
+                    AddDemoQuestions(openExam, assignment.SubjectId);
+                    openExam.RecalculateTotalMarks();
+                    db.Exams.Add(openExam);
+                }
+
+                var completedExam = await db.Exams.Include(e => e.Questions).FirstOrDefaultAsync(e =>
+                    e.AssignmentId == assignment.AssignmentId && e.Title == historyExamTitle);
+                if (completedExam == null)
+                {
+                    completedExam = Exam.Create(
+                        assignment.AssignmentId, lesson.LessonId, historyExamTitle,
+                        $"A completed assessment used in {assignment.Subject.Name} progress reports.",
+                        DateTime.UtcNow.AddDays(-21), DateTime.UtcNow.AddDays(-20), 20);
+                    AddDemoQuestions(completedExam, assignment.SubjectId);
+                    completedExam.RecalculateTotalMarks();
+                    completedExam.Close();
+                    db.Exams.Add(completedExam);
+                }
+
+                await db.SaveChangesAsync();
+
+                var classStudentIds = enrollments
+                    .Where(sc => sc.ClassId == assignment.ClassId)
+                    .Select(sc => sc.StudentId)
+                    .Where(students.ContainsKey)
+                    .ToList();
+
+                for (var index = 0; index < classStudentIds.Count; index++)
+                {
+                    var student = students[classStudentIds[index]];
+                    var score = 6m + (index % 5);
+                    var percentage = score * 10m;
+
+                    if (!await db.StudentExams.AnyAsync(se =>
+                        se.StudentId == student.StudentId && se.ExamId == completedExam.ExamId))
+                    {
+                        db.StudentExams.Add(new StudentExam
+                        {
+                            ExamId = completedExam.ExamId,
+                            StudentId = student.StudentId,
+                            StartedAt = DateTime.Now.AddDays(-20).AddMinutes(-20),
+                            SubmittedAt = DateTime.Now.AddDays(-20),
+                            ExpiresAt = DateTime.Now.AddDays(-20),
+                            Status = StudentExamStatus.Graded,
+                            TotalAutoScore = score,
+                            TotalManualScore = 0,
+                            FinalScore = score,
+                            TotalScore = score,
+                            HasPendingManualGrading = false
+                        });
+                    }
+
+                    var performance = await db.StudentPerformances.FirstOrDefaultAsync(p =>
+                        p.StudentId == student.StudentId &&
+                        p.SubjectId == assignment.SubjectId &&
+                        p.AcademicYear == academicYear);
+                    if (performance == null)
+                    {
+                        performance = new StudentPerformance
+                        {
+                            StudentId = student.StudentId,
+                            SubjectId = assignment.SubjectId,
+                            ClassId = assignment.ClassId,
+                            AcademicYear = academicYear
+                        };
+                        db.StudentPerformances.Add(performance);
+                    }
+
+                    performance.AvgExam = percentage;
+                    performance.AvgAssignment = 72m + (index % 5) * 4m;
+                    performance.AttendanceRate = index % 5 == 4 ? 70m : 90m + (index % 3) * 3m;
+                    performance.FinalGrade =
+                        (performance.AvgExam + performance.AvgAssignment + performance.AttendanceRate) / 3m;
+                    performance.GradeLetter = performance.FinalGrade >= 90 ? "A" :
+                        performance.FinalGrade >= 80 ? "B+" :
+                        performance.FinalGrade >= 70 ? "B" : "C";
+                    performance.Remarks = "Steady progress with clear next steps for revision.";
+                    performance.TotalExamsTaken = 1;
+                    performance.TotalAssignmentsSubmitted = 1;
+                    performance.TotalAssignmentsPending = 1;
+                    performance.UpdatedAt = DateTime.UtcNow;
+
+                    if (!await db.Notifications.AnyAsync(n =>
+                        n.UserId == student.UserId && n.Type == NotificationType.ExamOpening &&
+                        n.Title == "New demo assessment"))
+                    {
+                        db.Notifications.Add(Notification.Create(
+                            student.UserId, NotificationType.ExamOpening,
+                            "New demo assessment",
+                            $"A new {assignment.Subject.Name} assessment is ready.",
+                            "/dashboard/student/exams"));
+                    }
+                }
+
+                await db.SaveChangesAsync();
+            }
+
+            var linkedStudents = await db.ParentStudents.ToListAsync();
+            var parents = await db.Parents.ToDictionaryAsync(p => p.ParentId, p => p.UserId);
+            foreach (var link in linkedStudents.Where(l => students.ContainsKey(l.StudentId)))
+            {
+                var student = students[link.StudentId];
+                var subjectId = await db.StudentPerformances
+                    .Where(p => p.StudentId == student.StudentId && p.AcademicYear == academicYear)
+                    .Select(p => (int?)p.SubjectId)
+                    .FirstOrDefaultAsync();
+
+                if (subjectId.HasValue && !await db.PerformanceAlerts.AnyAsync(a =>
+                    a.StudentUserId == student.UserId && a.SubjectId == subjectId &&
+                    a.AlertType == AlertType.MissedAssignments && !a.IsResolved))
+                {
+                    db.PerformanceAlerts.Add(PerformanceAlert.Create(
+                        student.UserId, subjectId, AlertType.MissedAssignments,
+                        "One practice activity is still pending this week.", 1m, 0m));
+                }
+
+                if (!await db.AiRecommendations.AnyAsync(r =>
+                    r.StudentUserId == student.UserId && r.Type == RecommendationType.ParentReport && r.IsActive))
+                {
+                    var payload = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        studentName = student.User.FullName,
+                        reportMonth = DateTime.UtcNow.ToString("yyyy-MM"),
+                        overallScore = 82m,
+                        attendanceRate = 91m,
+                        subjectSummaries = new[]
+                        {
+                            new { subjectName = "Core subjects", avgExam = 80m, attendanceRate = 91m, note = "Good progress this month." }
+                        },
+                        narrativeSummary = $"{student.User.FullName} is making consistent progress. Continue the weekly practice and revision plan.",
+                        recommendedActions = new[] { "Complete pending practice", "Review lesson notes", "Prepare for the open assessment" },
+                        generatedAt = DateTime.UtcNow
+                    });
+                    db.AiRecommendations.Add(AiRecommendation.Create(
+                        student.UserId, null, RecommendationType.ParentReport,
+                        payload, "seeded-demo", 0, 0, 24 * 365));
+                }
+
+                if (parents.TryGetValue(link.ParentId, out var parentUserId) &&
+                    !await db.Notifications.AnyAsync(n =>
+                        n.UserId == parentUserId && n.Type == NotificationType.MonthlyReportReady &&
+                        n.Title == "Student report is ready"))
+                {
+                    db.Notifications.Add(Notification.Create(
+                        parentUserId, NotificationType.MonthlyReportReady,
+                        "Student report is ready",
+                        $"The latest progress report for {student.User.FullName} is available.",
+                        $"/dashboard/parent/reports/{student.StudentId}"));
+                }
+            }
+
+            await db.SaveChangesAsync();
+
+            var gradeRooms = await db.ChatRooms
+                .Where(r => r.RoomType == ChatRoomType.GradeCommunity && r.GradeId != null)
+                .ToListAsync();
+            foreach (var room in gradeRooms)
+            {
+                var sender = students.Values.FirstOrDefault(s => s.GradeId == room.GradeId);
+                if (sender != null && !await db.ChatMessages.AnyAsync(m =>
+                    m.ChatRoomId == room.ChatRoomId && m.Content == "Welcome to the Masarak study community."))
+                {
+                    db.ChatMessages.Add(ChatMessage.Create(
+                        room.ChatRoomId, sender.UserId,
+                        "Welcome to the Masarak study community."));
+                }
+            }
+
+            await db.SaveChangesAsync();
+            Console.WriteLine("[Seeder] Complete student and parent demo data verified.");
+        }
+
+        private static void AddDemoQuestions(Exam exam, int subjectId)
+        {
+            var firstQuestion = new Question
+            {
+                SubjectId = subjectId,
+                Type = QuestionType.MCQ,
+                QuestionText = "Choose the correct answer for this lesson review.",
+                CorrectAns = "A",
+                Marks = 5m,
+                Difficulty = DifficultyLevel.Easy,
+                OrderNum = 1
+            };
+            firstQuestion.Options.Add(new QuestionOption { Label = 'A', Text = "The first option" });
+            firstQuestion.Options.Add(new QuestionOption { Label = 'B', Text = "The second option" });
+            firstQuestion.Options.Add(new QuestionOption { Label = 'C', Text = "The third option" });
+            firstQuestion.Options.Add(new QuestionOption { Label = 'D', Text = "The fourth option" });
+
+            exam.Questions.Add(firstQuestion);
+            exam.Questions.Add(new Question
+            {
+                SubjectId = subjectId,
+                Type = QuestionType.TrueFalse,
+                QuestionText = "The main concept in this lesson can be applied in practice.",
+                CorrectAns = "True",
+                Marks = 5m,
+                Difficulty = DifficultyLevel.Medium,
+                OrderNum = 2
+            });
+        }    }
 }

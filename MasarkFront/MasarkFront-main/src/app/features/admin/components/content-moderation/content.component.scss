@@ -1,1 +1,80 @@
-/* Replaced with Tailwind classes */
+/* ==========================================================================
+   CONTENT MANAGEMENT SAAS DASHBOARD STYLES
+   ========================================================================== */
+
+.ml-content-moderation-page {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+
+  /* Card row transitions */
+  .content-card-row {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.25s ease;
+  }
+
+  .content-card-row:hover {
+    border-color: rgba(79, 142, 247, 0.35) !important;
+  }
+
+  /* Stat widget animations */
+  .stat-widget-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Custom Animations */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleUp {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-scale-up {
+    animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.25s ease both;
+  }
+}
+
+/* Dark Mode explicit overrides */
+:host-context(.dark) .ml-content-moderation-page,
+:host-context([data-theme='dark']) .ml-content-moderation-page {
+  color: #F8FAFC !important;
+
+  .content-card-row {
+    background-color: rgba(30, 41, 59, 0.85) !important;
+    border-color: rgba(148, 163, 184, 0.14) !important;
+  }
+
+  .content-card-row:hover {
+    border-color: rgba(79, 142, 247, 0.4) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+  }
+}

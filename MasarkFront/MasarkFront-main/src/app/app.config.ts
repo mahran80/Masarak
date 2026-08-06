@@ -1,5 +1,5 @@
 import { ApplicationConfig, APP_INITIALIZER, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { routes } from './app.routes';
 import { ChatSignalRService } from './core/services/signalr';
@@ -8,11 +8,11 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { NotificationHubService } from './core/services/notification-hub.service';
+import { CustomTitleStrategy } from './core/services/custom-title-strategy';
 
-// ميثود لتشغيل الخدمة عند بدء التطبيق
 export function initializeSignalR(signalrService: ChatSignalRService) {
   return () => {
-    // بمجرد عمل الحقل، الـ Constructor الخاص بالخدمة سيعمل ويبدأ الاتصال
+    // Service initialization
   };
 }
 
@@ -28,7 +28,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
-
+    {
+      provide: TitleStrategy,
+      useClass: CustomTitleStrategy,
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeSignalR,

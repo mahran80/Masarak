@@ -19,33 +19,33 @@
 
     <!-- Stats Cards Row (Adds dashboard value and visual interest) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4.5 border border-slate-200/80 dark:border-slate-700 shadow-[0_4px_20px_rgba(15,23,42,0.01)] flex items-center gap-4 text-right">
+      <div class="min-h-[84px] rounded-2xl border border-blue-100/80 bg-gradient-to-l from-white to-blue-50/70 p-4 shadow-[0_8px_24px_rgba(37,99,235,0.06)] flex items-center justify-between text-right transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-200 hover:to-blue-100/80 hover:shadow-[0_14px_30px_rgba(37,99,235,0.14)] dark:border-slate-700 dark:from-slate-800 dark:to-blue-950/20">
         <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-550 flex items-center justify-center shrink-0">
           <app-icon name="clipboard-document-list" [size]="22"></app-icon>
         </div>
-        <div>
+        <div class="flex flex-col items-end gap-0.5">
           <span class="text-xs font-bold text-slate-400">إجمالي الواجبات</span>
-          <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">{{ totalAssignments() }}</h3>
+          <h3 class="text-3xl leading-none font-black text-slate-800 dark:text-white">{{ totalAssignments() }}</h3>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4.5 border border-slate-200/80 dark:border-slate-700 shadow-[0_4px_20px_rgba(15,23,42,0.01)] flex items-center gap-4 text-right">
+      <div class="min-h-[84px] rounded-2xl border border-emerald-100/80 bg-gradient-to-l from-white to-emerald-50/70 p-4 shadow-[0_8px_24px_rgba(16,185,129,0.06)] flex items-center justify-between text-right transition-all duration-300 ease-out hover:-translate-y-1 hover:border-emerald-200 hover:to-emerald-100/80 hover:shadow-[0_14px_30px_rgba(16,185,129,0.14)] dark:border-slate-700 dark:from-slate-800 dark:to-emerald-950/20">
         <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-550 flex items-center justify-center shrink-0">
           <app-icon name="document-check" [size]="22"></app-icon>
         </div>
-        <div>
+        <div class="flex flex-col items-end gap-0.5">
           <span class="text-xs font-bold text-slate-400">الواجبات المسلّمة</span>
-          <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">{{ completedAssignmentsCount() }}</h3>
+          <h3 class="text-3xl leading-none font-black text-slate-800 dark:text-white">{{ completedAssignmentsCount() }}</h3>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4.5 border border-slate-200/80 dark:border-slate-700 shadow-[0_4px_20px_rgba(15,23,42,0.01)] flex items-center gap-4 text-right">
+      <div class="min-h-[84px] rounded-2xl border border-orange-100/80 bg-gradient-to-l from-white to-orange-50/70 p-4 shadow-[0_8px_24px_rgba(249,115,22,0.06)] flex items-center justify-between text-right transition-all duration-300 ease-out hover:-translate-y-1 hover:border-orange-200 hover:to-orange-100/80 hover:shadow-[0_14px_30px_rgba(249,115,22,0.14)] dark:border-slate-700 dark:from-slate-800 dark:to-orange-950/20">
         <div class="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-550 flex items-center justify-center shrink-0">
           <app-icon name="clock" [size]="22"></app-icon>
         </div>
-        <div>
+        <div class="flex flex-col items-end gap-0.5">
           <span class="text-xs font-bold text-slate-400">قيد الانتظار</span>
-          <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-0.5">{{ pendingAssignmentsCount() }}</h3>
+          <h3 class="text-3xl leading-none font-black text-slate-800 dark:text-white">{{ pendingAssignmentsCount() }}</h3>
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@
                   <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center shrink-0">
                     <img [src]="getSubjectImageUrl(group.subject.subjectName)" class="w-full h-full object-contain" [alt]="group.subject.subjectName">
                   </div>
-                  <div>
+                  <div class="flex flex-col justify-center translate-y-2">
                     <h2 class="text-base font-bold text-slate-800 dark:text-white">{{ group.subject.subjectArabicName || group.subject.subjectName }}</h2>
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-wide mt-0.5">{{ group.subject.subjectName }}</p>
                   </div>
@@ -88,26 +88,25 @@
                 </span>
               </div>
 
-              <div class="grid grid-cols-1 gap-3.5">
+              <div class="mt-3 grid grid-cols-1 gap-3.5">
                 @for (assignment of group.assignments; track assignment.assignmentId) {
                   <button
                     type="button"
-                    class="w-full rounded-xl border p-4.5 text-right transition-all duration-300 hover:border-blue-300 hover:bg-blue-50/10 cursor-pointer bg-white dark:bg-slate-800"
+                    class="w-full min-h-[96px] rounded-2xl border border-slate-200 bg-gradient-to-bl from-white to-slate-50/80 p-4 text-right shadow-[0_6px_20px_rgba(15,23,42,0.035)] cursor-pointer dark:border-slate-700 dark:from-slate-800 dark:to-slate-900"
                     [class.border-blue-500]="selectedAssignment()?.assignment?.assignmentId === assignment.assignmentId"
                     [class.bg-blue-55/10]="selectedAssignment()?.assignment?.assignmentId === assignment.assignmentId"
                     [class.border-slate-200]="selectedAssignment()?.assignment?.assignmentId !== assignment.assignmentId"
                     [class.dark:border-slate-700]="selectedAssignment()?.assignment?.assignmentId !== assignment.assignmentId"
                     (click)="selectAssignment(assignment)"
                   >
-                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                      <div class="min-w-0">
-                        <h3 class="font-bold text-slate-800 dark:text-white text-sm">{{ assignment.title }}</h3>
+                    <div class="flex min-h-[64px] w-full flex-row items-center justify-between gap-4">
+                      <div class="min-w-0 text-right">
+                        <h3 class="text-base font-extrabold text-slate-800 dark:text-white">{{ assignment.title }}</h3>
                         @if (assignment.description) {
                           <p class="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{{ assignment.description }}</p>
                         }
                       </div>
-                      
-                      <span class="w-fit rounded-full px-3 py-1 text-[10px] font-black shrink-0 ring-1"
+                      <span class="w-fit shrink-0 rounded-full px-3 py-1 text-[10px] font-black ring-1"
                             [class.bg-emerald-50]="assignment.status === 'Submitted' || assignment.status === 'Graded'"
                             [class.text-emerald-600]="assignment.status === 'Submitted' || assignment.status === 'Graded'"
                             [class.ring-emerald-100]="assignment.status === 'Submitted' || assignment.status === 'Graded'"
@@ -126,13 +125,13 @@
       </div>
 
       <!-- Details Panel -->
-      <aside class="rounded-[18px] border border-slate-200/80 bg-white dark:bg-slate-800 p-5 text-right shadow-[0_4px_20px_rgba(15,23,42,0.02)] sticky top-32">
+      <aside class="sticky top-0 self-start rounded-[18px] border border-slate-200/80 bg-white dark:bg-slate-800 p-3.5 text-right shadow-[0_4px_20px_rgba(15,23,42,0.02)]">
         <h2 class="text-base font-bold text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-3 flex items-center gap-2">
           <app-icon name="document-text" [size]="16" class="text-blue-500"></app-icon> تفاصيل الواجب
         </h2>
 
         @if (selectedAssignment(); as selected) {
-          <div class="mt-5 space-y-4">
+          <div class="mt-3 space-y-2">
             <div>
               <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider">{{ selected.subject.subjectArabicName || selected.subject.subjectName }}</span>
               <h3 class="mt-1 text-base font-bold text-slate-850 dark:text-white leading-snug">{{ selected.assignment.title }}</h3>
@@ -141,14 +140,14 @@
               }
             </div>
 
-            <dl class="grid gap-3 text-xs">
+            <dl class="grid grid-cols-2 gap-2 text-xs">
               @if (selected.assignment.dueDate) {
-                <div class="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3">
+                <div class="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-2.5 text-center">
                   <dt class="font-bold text-slate-400">تاريخ التسليم الأقصى</dt>
                   <dd class="mt-1 font-bold text-slate-700 dark:text-slate-300">{{ selected.assignment.dueDate | date: 'EEEE، d MMMM y' }}</dd>
                 </div>
               }
-              <div class="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3">
+              <div class="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-2.5 text-center">
                 <dt class="font-bold text-slate-400">الدرجة القصوى</dt>
                 <dd class="mt-1 font-extrabold text-slate-800 dark:text-white">{{ selected.assignment.maxScore ?? 0 }}</dd>
               </div>
@@ -161,26 +160,29 @@
             </dl>
 
             @if (selected.assignment.status === 'Submitted' || selected.assignment.status === 'Graded') {
-              <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50/30 p-5 text-center text-xs font-bold text-blue-650 dark:bg-blue-900/10 dark:text-blue-400 flex flex-col items-center gap-2">
-                <app-icon name="document-check" [size]="20" class="text-blue-500"></app-icon>
+              <div class="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 text-center text-xs font-bold text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400 flex flex-col items-center gap-1.5 shadow-sm">
+                <app-icon name="document-check" [size]="20" class="text-emerald-500"></app-icon>
                 <span>لقد قمت بتسليم هذا الواجب بالفعل.</span>
               </div>
+                @if (selected.assignment.submittedAt) {
+                  <span class="text-[10px] font-semibold text-emerald-600/75 dark:text-emerald-400/75">Submitted: {{ selected.assignment.submittedAt | date: 'd MMMM, h:mm a' }}</span>
+                }
             } @else {
-              <label class="grid gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label class="grid gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                 إجابتك
                 <textarea
-                  class="min-h-32 rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-700 p-3 text-xs font-normal text-slate-800 dark:text-slate-200 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  class="h-24 resize-none rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-700 p-2.5 text-xs font-normal text-slate-800 dark:text-slate-200 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                   placeholder="اكتب إجابتك هنا..."
                   [value]="answerText()"
                   (input)="answerText.set(readTextAreaValue($event))"
                 ></textarea>
               </label>
   
-              <label class="grid gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <label class="grid gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                 مرفق الإجابة (إن وجد)
                 <input
                   type="file"
-                  class="min-h-10 rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-700 px-3 py-1.5 text-xs font-normal text-slate-800 dark:text-slate-200 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-blue-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  class="min-h-9 rounded-xl border border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-700 px-2.5 py-1 text-xs font-normal text-slate-800 dark:text-slate-200 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-blue-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                   (change)="selectedFile.set(readFileValue($event))"
                 />
               </label>
@@ -191,7 +193,7 @@
   
               <button
                 type="button"
-                class="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/10 active:scale-95 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                class="inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/10 active:scale-95 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                 [disabled]="isSubmitting()"
                 (click)="submitSelectedAssignment()"
               >

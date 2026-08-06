@@ -62,7 +62,7 @@ const EN = {
   standalone: true,
   imports: [IconComponent, CommonModule, FormsModule],
   template: `
-    <div class="teachers-page-container space-y-4 px-4 py-6" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
+    <div class="teachers-page-container space-y-4 py-4" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'">
       
       <!-- Teachers Hero Header -->
       <div class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-slate-900/60 dark:to-slate-800/40 border border-blue-100/80 dark:border-slate-800/80 rounded-3xl p-5 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
@@ -341,8 +341,8 @@ const EN = {
   `,
   styles: [`
     .teachers-page-container {
-      width: min(calc(100% - 32px), 1440px);
-      margin-inline: auto;
+      width: 100%;
+      margin-inline: 0;
     }
 
     .teachers-toolbar {

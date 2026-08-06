@@ -6,6 +6,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationHubService } from '../../core/services/notification-hub.service';
 import { IconComponent } from '../../shared/components/icon/icon.component';
+import { getRoleAvatarUrl } from '../../shared/utils/role-avatar';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -103,6 +104,12 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
     const lower = url.trim().toLowerCase();
     if (lower === 'avatar' || lower === 'default' || lower === 'null' || lower === 'undefined' || lower === '') return false;
     return url.startsWith('http') || url.startsWith('/') || url.startsWith('assets/') || url.includes('.');
+  }
+
+  get displayAvatarUrl(): string {
+    return this.hasValidAvatar
+      ? this.userName()!.avatarUrl!
+      : getRoleAvatarUrl(this.userRole(), this.userName()?.fullName);
   }
 
   toggleSidebar(event?: Event): void {
@@ -209,8 +216,8 @@ export class DashboardLayoutComponent implements OnInit, OnDestroy {
   }
 
   onAvatarError(event: any): void {
-    // Fallback vector avatar if the image fails to load
-    event.target.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+    event.target.onerror = null;
+    event.target.src = getRoleAvatarUrl(this.userRole(), this.userName()?.fullName);
   }
 
   logout(): void {

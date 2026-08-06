@@ -597,9 +597,26 @@ namespace Masarak.Infrastructure.Services
             var studentClass = await _context.StudentClasses.FirstOrDefaultAsync(sc => sc.StudentId == studentId && sc.IsActive, ct);
             if (studentClass == null) return Enumerable.Empty<AssignmentDto>();
 
-            var assignments = await _assignmentRepo.GetPublishedForClassAsync(studentClass.ClassId, subjectId, ct);
-            return assignments.Select(MapToAssignmentDto);
+            var assignments = (await _assignmentRepo.GetPublishedForClassAsync(studentClass.ClassId, subjectId, ct)).ToList();
+            if (assignments.Count == 0) return Enumerable.Empty<AssignmentDto>();
+
+            var assignmentIds = assignments.Select(a => a.AssignmentId).ToList();
+            var submissions = await _context.Submissions
+                .Where(s => s.StudentId == studentId && assignmentIds.Contains(s.AssignmentId))
+                .ToDictionaryAsync(s => s.AssignmentId, ct);
+
+            return assignments.Select(assignment =>
+            {
+                submissions.TryGetValue(assignment.AssignmentId, out var submission);
+                return MapToAssignmentDto(assignment) with
+                {
+                    StudentSubmissionStatus = submission?.Status,
+                    StudentScore = submission?.Score,
+                    StudentSubmittedAt = submission?.SubmittedAt
+                };
+            });
         }
+
 
         public async Task<SubmissionDto> SubmitAssignmentAsync(int studentUserId, int assignmentId, string? textContent, Stream? fileStream, string? fileName, string? contentType, CancellationToken ct = default)
         {
