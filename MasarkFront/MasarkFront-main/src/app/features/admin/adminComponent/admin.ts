@@ -1,6 +1,7 @@
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AdminApiService } from '../../../core/services/admin-api-service';
 
 interface Activity {
@@ -19,7 +20,7 @@ interface DashboardData {
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [IconComponent, CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })

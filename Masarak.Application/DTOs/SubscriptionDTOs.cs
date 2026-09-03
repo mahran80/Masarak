@@ -31,6 +31,30 @@ namespace Masarak.Application.DTOs
         bool HasLiveClass
     );
 
+    public record CreatePlanRequest
+    {
+        public string Name { get; init; } = null!;
+        public string? Description { get; init; }
+        public PlanType Type { get; init; }
+        public decimal Price { get; init; }
+        public string Currency { get; init; } = "EGP";
+        public int DurationDays { get; init; } = 30;
+        public int MaxSubjects { get; init; }
+        public bool HasAi { get; init; }
+        public bool HasLiveClass { get; init; }
+    }
+
+    public record UpdatePlanRequest
+    {
+        public string Name { get; init; } = null!;
+        public string? Description { get; init; }
+        public decimal Price { get; init; }
+        public int DurationDays { get; init; }
+        public int MaxSubjects { get; init; }
+        public bool HasAi { get; init; }
+        public bool HasLiveClass { get; init; }
+    }
+
     public record ParentStudentLinkDto(
         int LinkId,
         int ParentUserId,

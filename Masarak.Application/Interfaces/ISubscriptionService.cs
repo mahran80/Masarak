@@ -26,6 +26,9 @@ namespace Masarak.Application.Interfaces
 
         // ── Plans ────────────────────────────────────────────────────────────
         Task<IEnumerable<PlanDto>> GetAllPlansAsync(CancellationToken ct = default);
+        Task<PlanDto> CreatePlanAsync(CreatePlanRequest request, CancellationToken ct = default);
+        Task<PlanDto> UpdatePlanAsync(int planId, UpdatePlanRequest request, CancellationToken ct = default);
+        Task DeletePlanAsync(int planId, CancellationToken ct = default);
 
         // ── Parent-Student Linking ───────────────────────────────────────────
         Task<ParentStudentLinkDto> LinkParentToStudentAsync(int parentUserId, string studentLinkageCode, CancellationToken ct = default);

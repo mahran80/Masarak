@@ -1,8 +1,16 @@
 <section class="space-y-6 text-slate-900" dir="rtl">
   <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-    <div class="text-right">
-      <p class="text-sm font-semibold text-sky-700">Content Library</p>
-      <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">PDFs, Videos and Resources</h1>
+    <div class="text-right flex flex-col gap-2">
+      <div>
+        <button (click)="goBack()" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-700">
+          <app-icon name="arrow-right" [size]="16"></app-icon>
+          العودة للخلف
+        </button>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-sky-700">Content Library</p>
+        <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">PDFs, Videos and Resources</h1>
+      </div>
     </div>
 
     <button

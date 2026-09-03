@@ -97,54 +97,6 @@ namespace Masarak.API.Controllers
         };
     }
 
-    // ─── Teacher Controller (Phase 1 placeholders — academic endpoints moved to SessionTeacherController) ──
-    [ApiController]
-    [Route("api/teacher")]
-    [Authorize(Policy = AppPolicies.TeacherOnly)]
-    [Produces("application/json")]
-    public class TeacherController : ControllerBase
-    {
-        // Admins and Teachers can both grade
-        [HttpPost("grade/{submissionId}")]
-        [Authorize(Policy = AppPolicies.AdminOrTeacher)]
-        public IActionResult GradeSubmission(int submissionId, [FromBody] decimal score) =>
-            Ok(new { message = $"Submission {submissionId} graded with {score}.", user = GetUserInfo() });
-
-        private object GetUserInfo() => new
-        {
-            UserId = User.FindFirstValue("userid"),
-            Email = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email),
-            Role = User.FindFirstValue("role")
-        };
-    }
-
-    // ─── Student Controller ───────────────────────────────────────────────────────
-    [ApiController]
-    [Route("api/student")]
-    [Authorize(Policy = AppPolicies.StudentOnly)]
-    [Produces("application/json")]
-    public class StudentController : ControllerBase
-    {
-
-        [HttpGet("grades")]
-        public IActionResult GetMyGrades() =>
-            Ok(new { message = "My grades — Student only.", user = GetUserInfo() });
-
-        [HttpPost("assignments/{id}/submit")]
-        public IActionResult SubmitAssignment(int id) =>
-            Ok(new { message = $"Assignment {id} submitted — Student only.", user = GetUserInfo() });
-
-        [HttpGet("exams")]
-        public IActionResult GetUpcomingExams() =>
-            Ok(new { message = "Upcoming exams — Student only.", user = GetUserInfo() });
-
-        private object GetUserInfo() => new
-        {
-            UserId = User.FindFirstValue("userid"),
-            Email = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email),
-            Role = User.FindFirstValue("role")
-        };
-    }
 
     // ─── Parent Controller ────────────────────────────────────────────────────────
     [ApiController]
@@ -264,35 +216,4 @@ namespace Masarak.API.Controllers
         };
     }
 
-    // ─── Mixed Access Controller ──────────────────────────────────────────────────
-    [ApiController]
-    [Route("api/shared")]
-    [Authorize]
-    [Produces("application/json")]
-    public class SharedController : ControllerBase
-    {
-        // Students and Parents can both view a student's progress
-        [HttpGet("progress/{studentId}")]
-        [Authorize(Policy = AppPolicies.StudentOrParent)]
-        public IActionResult GetProgress(int studentId) =>
-            Ok(new { message = $"Progress for student {studentId} — Student or Parent.", user = GetUserInfo() });
-
-        // Admins and Teachers can view analytics
-        [HttpGet("analytics")]
-        [Authorize(Policy = AppPolicies.AdminOrTeacher)]
-        public IActionResult GetAnalytics() =>
-            Ok(new { message = "Analytics dashboard — Admin or Teacher.", user = GetUserInfo() });
-
-        // Any authenticated user can get their notifications
-        [HttpGet("notifications")]
-        public IActionResult GetNotifications() =>
-            Ok(new { message = "Notifications — any authenticated user.", user = GetUserInfo() });
-
-        private object GetUserInfo() => new
-        {
-            UserId = User.FindFirstValue("userid"),
-            Email = User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email),
-            Role = User.FindFirstValue("role")
-        };
-    }
 }

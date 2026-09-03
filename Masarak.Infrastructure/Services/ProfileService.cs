@@ -119,6 +119,7 @@ namespace Masarak.Infrastructure.Services
             var user = await _db.Users
                 .Include(u => u.Teacher)
                 .Include(u => u.Parent)
+                .Include(u => u.Student)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
@@ -138,6 +139,11 @@ namespace Masarak.Infrastructure.Services
                 user.Parent.Bio = request.Bio;
                 user.Parent.Headline = request.Headline;
             }
+            else if (role == AppRoles.Student && user.Student != null)
+            {
+                user.Student.Bio = request.Bio;
+                user.Student.Headline = request.Headline;
+            }
 
             await _db.SaveChangesAsync();
             return new MessageResponse { Success = true, Message = "Profile updated successfully." };
@@ -149,8 +155,6 @@ namespace Masarak.Infrastructure.Services
             if (user == null)
                 return new MessageResponse { Success = false, Message = "User not found." };
 
-            if (user.Role?.Name == AppRoles.Student)
-                return new MessageResponse { Success = false, Message = "Students cannot upload avatars." };
 
             if (fileStream == null || contentLength == 0)
                 return new MessageResponse { Success = false, Message = "File is empty." };

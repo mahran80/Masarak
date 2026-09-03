@@ -12,19 +12,8 @@
       </a>
 
       <!-- Explore Dropdown Removed and merged to User Profile -->
-
-      <!-- Search Bar -->
-      <div class="hidden lg:block relative w-64 xl:w-96">
-        <input
-          type="text"
-          placeholder="ما الذي تريد تعلمه؟"
-          class="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-300 rounded-full focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm transition-all"
-        />
-        <span class="absolute right-3 top-2.5 text-slate-400">
-          <app-icon name="search" [size]="18"></app-icon>
-        </span>
-      </div>
     </div>
+
 
     <!-- Left side: Notification & User Menu -->
     <div class="flex items-center gap-4">
@@ -153,6 +142,9 @@
               </a>
               <a routerLink="admin/subscriptions" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                 <app-icon name="credit-card" [size]="18"></app-icon> إدارة الاشتراكات
+              </a>
+              <a routerLink="admin/plans" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+                <app-icon name="clipboard-document-list" [size]="18"></app-icon> إدارة الخطط
               </a>
               <div class="border-t border-slate-100 pt-2 mt-2">
                 <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">الذكاء الاصطناعي</p>

@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../../shared/components/breadcrumb/breadcrumb.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +10,7 @@ import { ExamGradingReview, PendingAnswer } from '../../../models/teacher-assess
 @Component({
   selector: 'app-exam-grader',
   standalone: true,
-  imports: [IconComponent, ReactiveFormsModule],
+  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule],
   templateUrl: './exam-grader.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

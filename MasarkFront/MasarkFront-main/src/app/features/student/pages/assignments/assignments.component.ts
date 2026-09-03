@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -27,7 +28,7 @@ interface SelectedAssignment {
 @Component({
   selector: 'app-student-assignments-page',
   standalone: true,
-  imports: [DatePipe],
+  imports: [BreadcrumbComponent, DatePipe],
   templateUrl: './assignments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -43,6 +44,16 @@ export class StudentAssignmentsPageComponent implements OnInit {
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
+
+  readonly currentPage = signal<number>(1);
+  readonly pageSize = signal<number>(5);
+
+  readonly paginatedGroups = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    return this.groups().slice(startIndex, startIndex + this.pageSize());
+  });
+
+  readonly totalPages = computed(() => Math.ceil(this.groups().length / this.pageSize()));
 
   readonly totalAssignments = computed(() =>
     this.groups().reduce((total, group) => total + group.assignments.length, 0),
@@ -96,6 +107,18 @@ export class StudentAssignmentsPageComponent implements OnInit {
           this.isLoading.set(false);
         },
       });
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+    }
   }
 
   selectAssignment(assignment: StudentAssignment): void {

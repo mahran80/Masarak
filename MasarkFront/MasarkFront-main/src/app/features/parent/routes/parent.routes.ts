@@ -31,6 +31,10 @@ export const PARENT_ROUTES: Routes = [
     loadComponent: () => import('../pages/attendance/parent-attendance.component').then(m => m.ParentAttendanceComponent)
   },
   {
+    path: 'schedule/:studentId',
+    loadComponent: () => import('../pages/parent-schedule/parent-schedule').then(m => m.ParentScheduleComponent)
+  },
+  {
     path: 'profile',
     loadComponent: () => import('../pages/profile/parent-profile.component').then(m => m.ParentProfileComponent)
   },

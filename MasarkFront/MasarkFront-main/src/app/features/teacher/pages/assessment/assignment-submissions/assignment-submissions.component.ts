@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../../shared/components/breadcrumb/breadcrumb.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { DatePipe, NgClass } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +10,7 @@ import { TeacherSubmissionDetail } from '../../../models/teacher-assessment.mode
 @Component({
   selector: 'app-assignment-submissions',
   standalone: true,
-  imports: [DatePipe, NgClass, ReactiveFormsModule],
+  imports: [BreadcrumbComponent, DatePipe, NgClass, ReactiveFormsModule],
   templateUrl: './assignment-submissions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

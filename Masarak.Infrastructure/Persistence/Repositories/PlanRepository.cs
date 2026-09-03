@@ -25,5 +25,24 @@ namespace Masarak.Infrastructure.Persistence.Repositories
                 .OrderBy(p => p.PriceMonthly)
                 .ToListAsync(ct);
         }
+
+        public async Task AddAsync(Plan plan, CancellationToken ct = default)
+        {
+            await _context.Plans.AddAsync(plan, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+
+        public async Task UpdateAsync(Plan plan, CancellationToken ct = default)
+        {
+            _context.Plans.Update(plan);
+            await _context.SaveChangesAsync(ct);
+        }
+
+        public async Task DeleteAsync(Plan plan, CancellationToken ct = default)
+        {
+            plan.IsActive = false; // Soft delete
+            _context.Plans.Update(plan);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }

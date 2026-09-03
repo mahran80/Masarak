@@ -67,5 +67,29 @@ namespace Masarak.API.Controllers
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
             catch (Exception ex) { return StatusCode(500, new { message = ex.Message }); }
         }
+
+        [HttpGet("children/{studentId}/schedule")]
+        public async Task<IActionResult> GetStudentSchedule(
+            int studentId,
+            [FromQuery] DateTime? weekStart,
+            [FromQuery] int? academicYear,
+            [FromServices] ISessionService sessionService,
+            [FromServices] IParentStudentLinkRepository linkRepository,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                if (!await linkRepository.LinkExistsAsync(GetUserId(), studentId, ct))
+                    return StatusCode(403, new { message = "You do not have permission to view this student's schedule." });
+
+                var year = academicYear ?? Masarak.Domain.ValueObjects.AcademicYear.Current().Year;
+                var start = weekStart ?? DateTime.UtcNow.Date.AddDays(-(int)DateTime.UtcNow.DayOfWeek + (int)DayOfWeek.Monday);
+                
+                var schedule = await sessionService.GetStudentScheduleAsync(studentId, year, start, ct);
+                return Ok(schedule);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (Exception ex) { return StatusCode(500, new { message = ex.Message }); }
+        }
     }
 }

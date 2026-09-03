@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../../shared/components/breadcrumb/breadcrumb.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,7 +14,7 @@ import { CreateAssignmentRequest } from '../../../models/teacher-assessment.mode
 @Component({
   selector: 'app-assignment-creator',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [BreadcrumbComponent, ReactiveFormsModule, RouterLink],
   templateUrl: './assignment-creator.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

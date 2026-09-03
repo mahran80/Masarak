@@ -314,6 +314,57 @@ namespace Masarak.Infrastructure.Services
                 p.DurationDays, p.MaxSubjects, p.HasAi, p.HasLiveClass));
         }
 
+        public async Task<PlanDto> CreatePlanAsync(CreatePlanRequest request, CancellationToken ct = default)
+        {
+            var plan = new Plan
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Type = request.Type,
+                PriceMonthly = request.Price,
+                Currency = request.Currency,
+                DurationDays = request.DurationDays,
+                MaxSubjects = request.MaxSubjects,
+                HasAi = request.HasAi,
+                HasLiveClass = request.HasLiveClass,
+                IsActive = true
+            };
+
+            await _planRepository.AddAsync(plan, ct);
+
+            return new PlanDto(
+                plan.PlanId, plan.Name, plan.Description, plan.Type, plan.PriceMonthly, plan.Currency,
+                plan.DurationDays, plan.MaxSubjects, plan.HasAi, plan.HasLiveClass);
+        }
+
+        public async Task<PlanDto> UpdatePlanAsync(int planId, UpdatePlanRequest request, CancellationToken ct = default)
+        {
+            var plan = await _planRepository.GetByIdAsync(planId, ct);
+            if (plan == null) throw new KeyNotFoundException("Plan not found");
+
+            plan.Name = request.Name;
+            plan.Description = request.Description;
+            plan.PriceMonthly = request.Price;
+            plan.DurationDays = request.DurationDays;
+            plan.MaxSubjects = request.MaxSubjects;
+            plan.HasAi = request.HasAi;
+            plan.HasLiveClass = request.HasLiveClass;
+
+            await _planRepository.UpdateAsync(plan, ct);
+
+            return new PlanDto(
+                plan.PlanId, plan.Name, plan.Description, plan.Type, plan.PriceMonthly, plan.Currency,
+                plan.DurationDays, plan.MaxSubjects, plan.HasAi, plan.HasLiveClass);
+        }
+
+        public async Task DeletePlanAsync(int planId, CancellationToken ct = default)
+        {
+            var plan = await _planRepository.GetByIdAsync(planId, ct);
+            if (plan == null) throw new KeyNotFoundException("Plan not found");
+
+            await _planRepository.DeleteAsync(plan, ct);
+        }
+
         public async Task<ParentStudentLinkDto> LinkParentToStudentAsync(int parentUserId, string studentLinkageCode, CancellationToken ct = default)
         {
             var studentUser = await _userRepository.GetByStudentLinkageCodeAsync(studentLinkageCode, ct);

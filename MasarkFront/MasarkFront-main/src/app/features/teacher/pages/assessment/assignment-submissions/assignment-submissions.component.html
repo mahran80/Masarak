@@ -1,4 +1,10 @@
 <div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  <app-breadcrumb [items]="[
+    { label: 'لوحة المدرس', route: '/dashboard/teacher' },
+    { label: 'التقييمات', route: '/dashboard/teacher/assessment/grading' },
+    { label: 'الواجبات', route: '/dashboard/teacher/assignments' },
+    { label: 'تسليمات الواجب' }
+  ]"></app-breadcrumb>
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
       <h1 class="text-2xl font-black text-slate-900">تسليمات الواجب</h1>

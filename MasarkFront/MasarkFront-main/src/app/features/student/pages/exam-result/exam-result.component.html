@@ -1,10 +1,15 @@
-<section class="space-y-6 text-slate-900" dir="rtl">
+<div class="space-y-6 text-slate-900" dir="rtl">
+  <app-breadcrumb [items]="[
+    { label: 'لوحة الطالب', route: '/dashboard/student' },
+    { label: 'الاختبارات', route: '/dashboard/student/exams' },
+    { label: 'نتيجة الاختبار' }
+  ]"></app-breadcrumb>
   <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <a routerLink="/dashboard/student/grades" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-700">
+      <button (click)="goBack()" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-700">
         <app-icon name="arrow-right" [size]="16"></app-icon>
-        العودة إلى الدرجات
-      </a>
+        العودة للخلف
+      </button>
       <h1 class="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">نتيجة الاختبار</h1>
     </div>
   </header>
@@ -87,4 +92,4 @@
       }
     </div>
   }
-</section>
+</div>

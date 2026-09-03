@@ -153,7 +153,7 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     const APP_ID = "1cd09ce2f89b49a8954996d4cc189a85"; 
 
     try {
-      await this.client.join(APP_ID, channel, token, uid);
+      await this.client.join(APP_ID, channel, token, Number(uid));
       
       this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
       this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
@@ -200,21 +200,28 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     try {
       if (this.isScreenSharing()) {
         // Stop screen share, revert to camera
-        await this.client.unpublish(this.localVideoTrack);
-        this.localVideoTrack.close();
+        if (this.localVideoTrack) {
+          await this.client.unpublish(this.localVideoTrack);
+          this.localVideoTrack.close();
+        }
         
-        this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-        await this.localVideoTrack.setMuted(this.isCameraOff());
-        await this.client.publish(this.localVideoTrack);
-        
-        // Re-play local player if it exists
-        setTimeout(() => {
-          const player = document.getElementById('local-player');
-          if (player) {
-            player.innerHTML = '';
-            this.localVideoTrack.play('local-player');
-          }
-        }, 0);
+        try {
+          this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+          await this.localVideoTrack.setMuted(this.isCameraOff());
+          await this.client.publish(this.localVideoTrack);
+          
+          // Re-play local player if it exists
+          setTimeout(() => {
+            const player = document.getElementById('local-player');
+            if (player) {
+              player.innerHTML = '';
+              this.localVideoTrack.play('local-player');
+            }
+          }, 0);
+        } catch (e) {
+          console.warn('Camera not available after stopping screen share:', e);
+          this.localVideoTrack = undefined as any;
+        }
         
         this.isScreenSharing.set(false);
       } else {
@@ -233,8 +240,10 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
         // createScreenVideoTrack can return an array or a single track depending on browser capabilities
         const trackToPublish = Array.isArray(screenTrack) ? screenTrack[0] : screenTrack;
         
-        await this.client.unpublish(this.localVideoTrack);
-        this.localVideoTrack.close();
+        if (this.localVideoTrack) {
+          await this.client.unpublish(this.localVideoTrack);
+          this.localVideoTrack.close();
+        }
         
         this.localVideoTrack = trackToPublish;
         await this.client.publish(this.localVideoTrack);

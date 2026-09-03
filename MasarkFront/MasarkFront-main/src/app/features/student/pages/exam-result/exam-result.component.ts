@@ -1,5 +1,6 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { StudentExamResult } from '../../models';
@@ -8,17 +9,22 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 @Component({
   selector: 'app-student-exam-result',
   standalone: true,
-  imports: [CommonModule, RouterLink, IconComponent],
+  imports: [BreadcrumbComponent, CommonModule, IconComponent],
   templateUrl: './exam-result.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentExamResultPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly studentService = inject(StudentService);
+  private readonly location = inject(Location);
 
   result = signal<StudentExamResult | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+
+  goBack() {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

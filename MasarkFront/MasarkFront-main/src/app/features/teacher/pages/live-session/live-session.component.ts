@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -8,7 +9,7 @@ import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-live-session',
   standalone: true,
-  imports: [RouterLink],
+  imports: [BreadcrumbComponent, RouterLink],
   templateUrl: './live-session.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

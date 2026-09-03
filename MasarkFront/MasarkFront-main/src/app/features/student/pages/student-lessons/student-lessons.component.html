@@ -1,7 +1,19 @@
 <div class="p-4 sm:p-6 max-w-full" dir="rtl">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">دروسي</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">تصفح المحتوى والاختبارات حسب الدروس</p>
+  <app-breadcrumb [items]="[
+    { label: 'لوحة الطالب', route: '/dashboard/student' },
+    { label: 'الدروس والمحتوى' }
+  ]"></app-breadcrumb>
+  <div class="mb-6 flex flex-col gap-2">
+    <div>
+      <button (click)="goBack()" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-700">
+        <app-icon name="arrow-right" [size]="16"></app-icon>
+        العودة للخلف
+      </button>
+    </div>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">دروسي</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">تصفح المحتوى والاختبارات حسب الدروس</p>
+    </div>
   </div>
 
   <!-- Select Subject -->

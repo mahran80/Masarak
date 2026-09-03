@@ -41,7 +41,7 @@ namespace Masarak.API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent}")]
+        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent},{AppRoles.Student}")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto request)
         {
             var response = await _profileService.UpdateProfileAsync(GetUserId(), GetUserRole(), request);
@@ -50,7 +50,7 @@ namespace Masarak.API.Controllers
         }
 
         [HttpPost("avatar")]
-        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent}")]
+        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent},{AppRoles.Student}")]
         public async Task<IActionResult> UploadAvatar(IFormFile file)
         {
             if (file == null || file.Length == 0) return BadRequest("File is empty.");
@@ -61,7 +61,7 @@ namespace Masarak.API.Controllers
         }
 
         [HttpDelete("avatar")]
-        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent}")]
+        [Authorize(Roles = $"{AppRoles.Teacher},{AppRoles.Parent},{AppRoles.Student}")]
         public async Task<IActionResult> RemoveAvatar()
         {
             var response = await _profileService.RemoveAvatarAsync(GetUserId());

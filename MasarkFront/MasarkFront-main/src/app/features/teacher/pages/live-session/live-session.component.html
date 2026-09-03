@@ -1,4 +1,11 @@
 <div class="h-[calc(100vh-80px)] w-full bg-slate-900 text-white font-sans flex flex-col" dir="rtl">
+  <div class="px-6 pt-4 pb-2">
+    <app-breadcrumb theme="dark" [items]="[
+      { label: 'لوحة المدرس', route: '/dashboard/teacher' },
+      { label: 'حصصي', route: '/dashboard/teacher/sessions' },
+      { label: 'جلسة مباشرة' }
+    ]"></app-breadcrumb>
+  </div>
 
   @if (isLoading()) {
     <div class="flex-1 flex items-center justify-center">

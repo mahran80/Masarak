@@ -1,5 +1,6 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { StudentLessonsService } from '../../services/student-lessons.service';
 import { Lesson, LessonDetail } from '../../../teacher/models/teacher-lessons.model';
 import { HttpClient } from '@angular/common/http';
@@ -9,18 +10,23 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
 @Component({
   selector: 'app-student-lessons',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [BreadcrumbComponent, CommonModule, IconComponent],
   templateUrl: './student-lessons.component.html',
 })
 export class StudentLessonsComponent implements OnInit {
   private lessonsService = inject(StudentLessonsService);
   private http = inject(HttpClient);
+  private location = inject(Location);
 
   subjects: any[] = [];
   selectedSubjectId: number | null = null;
   lessons: Lesson[] = [];
   lessonDetails: { [key: number]: LessonDetail } = {};
   expandedLessonId: number | null = null;
+
+  goBack() {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.loadSubjects();

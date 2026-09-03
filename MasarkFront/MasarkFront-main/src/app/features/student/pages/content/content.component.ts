@@ -1,5 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -27,6 +27,11 @@ export class StudentContentPageComponent implements OnInit {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly location = inject(Location);
+
+  goBack() {
+    this.location.back();
+  }
 
   readonly groups = signal<StudentContentGroup[]>([]);
   readonly isLoading = signal<boolean>(true);

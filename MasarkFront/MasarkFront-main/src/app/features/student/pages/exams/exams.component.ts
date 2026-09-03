@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -33,7 +34,7 @@ interface SelectedExam {
 @Component({
   selector: 'app-student-exams-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ScoreBadgeComponent, ExamTimerComponent, QuestionRendererComponent],
+  imports: [BreadcrumbComponent, DatePipe, DecimalPipe, ScoreBadgeComponent, ExamTimerComponent, QuestionRendererComponent],
   templateUrl: './exams.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,6 +51,16 @@ export class StudentExamsPageComponent implements OnInit {
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
+
+  readonly currentPage = signal<number>(1);
+  readonly pageSize = signal<number>(5);
+
+  readonly paginatedGroups = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.pageSize();
+    return this.groups().slice(startIndex, startIndex + this.pageSize());
+  });
+
+  readonly totalPages = computed(() => Math.ceil(this.groups().length / this.pageSize()));
 
   readonly totalExams = computed(() =>
     this.groups().reduce((total, group) => total + group.exams.length, 0),
@@ -101,6 +112,18 @@ export class StudentExamsPageComponent implements OnInit {
       });
   }
 
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
+
   selectExam(exam: StudentExam): void {
     this.selectedExamId.set(exam.examId);
     this.store.clearExam();
@@ -138,10 +161,14 @@ export class StudentExamsPageComponent implements OnInit {
     this.store.setAnswer(answer);
   }
 
-  submitActiveExam(): void {
+  submitActiveExam(force = false): void {
     const activeExam = this.store.exam();
 
     if (!activeExam || this.isSubmitting()) {
+      return;
+    }
+
+    if (!force && !confirm('هل أنت متأكد من رغبتك في تسليم الاختبار النهائي؟ لا يمكن التراجع عن هذه الخطوة.')) {
       return;
     }
 

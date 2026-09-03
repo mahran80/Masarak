@@ -1,4 +1,10 @@
 <div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  <app-breadcrumb [items]="[
+    { label: 'لوحة المدرس', route: '/dashboard/teacher' },
+    { label: 'التقييمات', route: '/dashboard/teacher/assessment/grading' },
+    { label: 'لوحة التصحيح', route: '/dashboard/teacher/assessment/grading' },
+    { label: 'تصحيح اختبار' }
+  ]"></app-breadcrumb>
   @if (isLoading()) {
     <div class="h-64 bg-white rounded-[24px] border border-slate-100 shadow-sm animate-pulse"></div>
   } @else if (errorMessage()) {

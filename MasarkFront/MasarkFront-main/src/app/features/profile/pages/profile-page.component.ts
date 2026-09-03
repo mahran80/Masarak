@@ -26,9 +26,16 @@ export class ProfilePageComponent implements OnInit {
   readonly profile = signal<UserProfileDto | null>(null);
 
   readonly userRole = this.authState.userRole;
-  readonly isReadOnly = computed(() => this.userRole() !== 'Teacher' && this.userRole() !== 'Parent');
+  readonly studentId = signal<number | null>(null);
   
-  studentId: number | null = null;
+  readonly isReadOnly = computed(() => {
+    // If viewing someone else's profile (studentId is set)
+    if (this.studentId() !== null) {
+      return this.userRole() !== 'Parent'; // Only parents can edit their children
+    }
+    // If viewing own profile, everyone can edit
+    return false;
+  });
 
   profileForm: FormGroup = this.fb.group({
     fullName: ['', [Validators.required, Validators.maxLength(150)]],
@@ -45,7 +52,7 @@ export class ProfilePageComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
-        this.studentId = parseInt(id, 10);
+        this.studentId.set(parseInt(id, 10));
       }
       this.loadProfile();
     });
@@ -53,8 +60,9 @@ export class ProfilePageComponent implements OnInit {
 
   loadProfile(): void {
     this.isLoading.set(true);
-    const request$ = this.studentId 
-      ? this.profileService.getStudentProfile(this.studentId)
+    const studentId = this.studentId();
+    const request$ = studentId 
+      ? this.profileService.getStudentProfile(studentId)
       : this.profileService.getProfile();
 
     request$.subscribe({
@@ -83,15 +91,16 @@ export class ProfilePageComponent implements OnInit {
     this.isSaving.set(true);
 
     const dto: UpdateProfileDto = this.profileForm.value;
+    const studentId = this.studentId();
     
-    const request$ = this.studentId
-      ? this.profileService.updateStudentProfile(this.studentId, dto)
+    const request$ = studentId
+      ? this.profileService.updateStudentProfile(studentId, dto)
       : this.profileService.updateProfile(dto);
 
     request$.subscribe({
       next: (res) => {
         this.toast.success(res.message || 'تم تحديث الحساب بنجاح');
-        if (!this.studentId) {
+        if (!studentId) {
           this.authState.updateProfileDetails(dto.fullName);
         }
         this.profile.update(p => p ? { ...p, fullName: dto.fullName, phone: dto.phone, country: dto.country, headline: dto.headline, bio: dto.bio } : null);
@@ -114,8 +123,9 @@ export class ProfilePageComponent implements OnInit {
       }
       this.isUploading.set(true);
 
-      const request$ = this.studentId
-        ? this.profileService.uploadStudentAvatar(this.studentId, file)
+      const studentId = this.studentId();
+      const request$ = studentId
+        ? this.profileService.uploadStudentAvatar(studentId, file)
         : this.profileService.uploadAvatar(file);
 
       request$.subscribe({
@@ -123,7 +133,7 @@ export class ProfilePageComponent implements OnInit {
           this.toast.success('تم تحديث الصورة الشخصية');
           const newUrl = res.message;
           this.profile.update(p => p ? { ...p, avatarUrl: newUrl } : null);
-          if (!this.studentId) {
+          if (!studentId) {
              this.authState.updateAvatar(newUrl);
           }
           this.isUploading.set(false);
@@ -140,15 +150,16 @@ export class ProfilePageComponent implements OnInit {
     if (this.isReadOnly()) return;
     this.isUploading.set(true);
 
-    const request$ = this.studentId
-      ? this.profileService.removeStudentAvatar(this.studentId)
+    const studentId = this.studentId();
+    const request$ = studentId
+      ? this.profileService.removeStudentAvatar(studentId)
       : this.profileService.removeAvatar();
 
     request$.subscribe({
       next: () => {
         this.toast.success('تم إزالة الصورة الشخصية');
         this.profile.update(p => p ? { ...p, avatarUrl: undefined } : null);
-        if (!this.studentId) {
+        if (!studentId) {
            this.authState.updateAvatar(null);
         }
         this.isUploading.set(false);

@@ -1,0 +1,112 @@
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  
+  <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <div>
+      <h2 class="text-xl font-black text-slate-800">إدارة خطط الاشتراك</h2>
+      <p class="text-sm text-slate-500 font-semibold mt-1">تعديل وإضافة خطط الاشتراك للطلاب</p>
+    </div>
+    <button (click)="openCreateModal()" class="h-10 px-6 bg-[#4F8CD4] text-white text-sm font-bold rounded-xl shadow-sm hover:bg-[#437ac0] transition-colors flex items-center gap-2">
+      <app-icon name="plus" [size]="16"></app-icon>
+      إضافة خطة
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="p-8 text-center text-slate-400">
+    جاري التحميل...
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6" *ngIf="!isLoading()">
+    <div *ngFor="let plan of plans()" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative flex flex-col justify-between">
+      <div>
+        <h3 class="text-lg font-black text-slate-800">{{ plan.name }}</h3>
+        <p class="text-xs text-slate-500 font-semibold mt-1">{{ plan.description || 'لا يوجد وصف' }}</p>
+        
+        <div class="mt-4 text-3xl font-black text-[#4F8CD4]">
+          {{ plan.price | number }} <span class="text-sm text-slate-400">{{ plan.currency }}</span>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <div class="flex items-center gap-2 text-sm text-slate-600 font-medium">
+            <app-icon name="calendar" [size]="16" class="text-slate-400"></app-icon>
+            {{ plan.durationDays }} يوماً
+          </div>
+          <div class="flex items-center gap-2 text-sm text-slate-600 font-medium">
+            <app-icon name="book-open" [size]="16" class="text-slate-400"></app-icon>
+            {{ plan.maxSubjects }} مادة
+          </div>
+          <div class="flex items-center gap-2 text-sm font-medium" [class.text-emerald-600]="plan.hasAi" [class.text-slate-400]="!plan.hasAi">
+            <app-icon [name]="plan.hasAi ? 'check-circle' : 'x-circle'" [size]="16"></app-icon>
+            مساعد الذكاء الاصطناعي
+          </div>
+          <div class="flex items-center gap-2 text-sm font-medium" [class.text-emerald-600]="plan.hasLiveClass" [class.text-slate-400]="!plan.hasLiveClass">
+            <app-icon [name]="plan.hasLiveClass ? 'check-circle' : 'x-circle'" [size]="16"></app-icon>
+            الفصول المباشرة
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+        <button (click)="openEditModal(plan)" class="p-2 text-slate-400 hover:text-sky-500 bg-slate-50 hover:bg-sky-50 rounded-lg transition-colors">
+          <app-icon name="pencil" [size]="18"></app-icon>
+        </button>
+        <button (click)="deletePlan(plan.planId)" class="p-2 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-lg transition-colors">
+          <app-icon name="trash" [size]="18"></app-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-black text-slate-800">{{ editingPlan() ? 'تعديل الخطة' : 'خطة جديدة' }}</h3>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600">
+          <app-icon name="x" [size]="20"></app-icon>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <label class="block text-xs font-bold text-slate-500 mb-1">اسم الخطة</label>
+            <input type="text" [(ngModel)]="formData.name" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold outline-none focus:border-sky-400 focus:bg-white transition-colors">
+          </div>
+          <div class="col-span-2">
+            <label class="block text-xs font-bold text-slate-500 mb-1">الوصف</label>
+            <input type="text" [(ngModel)]="formData.description" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold outline-none focus:border-sky-400 focus:bg-white transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">السعر (EGP)</label>
+            <input type="number" [(ngModel)]="formData.price" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold outline-none focus:border-sky-400 focus:bg-white transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">المدة (أيام)</label>
+            <input type="number" [(ngModel)]="formData.durationDays" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold outline-none focus:border-sky-400 focus:bg-white transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">عدد المواد</label>
+            <input type="number" [(ngModel)]="formData.maxSubjects" class="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold outline-none focus:border-sky-400 focus:bg-white transition-colors">
+          </div>
+        </div>
+        
+        <div class="flex gap-4 mt-4 pt-4 border-t border-slate-100">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="formData.hasAi" class="rounded text-[#4F8CD4] focus:ring-[#4F8CD4]">
+            <span class="text-sm font-semibold text-slate-700">ذكاء اصطناعي</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="formData.hasLiveClass" class="rounded text-[#4F8CD4] focus:ring-[#4F8CD4]">
+            <span class="text-sm font-semibold text-slate-700">فصول مباشرة</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+        <button (click)="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors">إلغاء</button>
+        <button (click)="savePlan()" class="px-6 py-2 bg-[#4F8CD4] hover:bg-[#437ac0] text-white text-sm font-bold rounded-xl shadow-sm transition-colors">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+</div>

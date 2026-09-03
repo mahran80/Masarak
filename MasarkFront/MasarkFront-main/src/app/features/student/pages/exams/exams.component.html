@@ -1,4 +1,8 @@
-<section class="space-y-6 text-slate-900" dir="rtl">
+<div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  <app-breadcrumb [items]="[
+    { label: 'لوحة الطالب', route: '/dashboard/student' },
+    { label: 'الاختبارات' }
+  ]"></app-breadcrumb>
   <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div class="text-right">
       <p class="text-sm font-semibold text-sky-700">التقييمات</p>
@@ -30,7 +34,7 @@
   } @else if (totalExams() > 0) {
     <div class="grid gap-6 xl:grid-cols-3">
       <div class="space-y-5 xl:col-span-2">
-        @for (group of groups(); track group.subject.subjectId) {
+        @for (group of paginatedGroups(); track group.subject.subjectId) {
           <article class="rounded-lg border border-slate-200 bg-white p-5 text-right shadow-sm">
             <div class="flex items-center justify-between gap-4">
               <div>
@@ -67,6 +71,31 @@
               }
             </div>
           </article>
+        }
+
+        <!-- Pagination Controls -->
+        @if (totalPages() > 1) {
+          <div class="flex items-center justify-between border-t border-slate-200 pt-5">
+            <button
+              type="button"
+              class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+              [disabled]="currentPage() === totalPages()"
+              (click)="nextPage()"
+            >
+              الصفحة التالية
+            </button>
+            <span class="text-sm font-medium text-slate-600">
+              صفحة {{ currentPage() }} من {{ totalPages() }}
+            </span>
+            <button
+              type="button"
+              class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+              [disabled]="currentPage() === 1"
+              (click)="prevPage()"
+            >
+              الصفحة السابقة
+            </button>
+          </div>
         }
       </div>
 
@@ -173,7 +202,7 @@
                 <app-exam-timer 
                   [durationSeconds]="active.secondsRemaining || (selectedExam()?.exam?.durationMinutes || 0) * 60"
                   [startTime]="active.startedAt"
-                  (timeUp)="submitActiveExam()">
+                  (timeUp)="submitActiveExam(true)">
                 </app-exam-timer>
               </div>
             </div>
@@ -327,4 +356,4 @@
       <p class="text-slate-500 font-bold text-lg">لا توجد اختبارات متاحة حالياً.</p>
     </article>
   }
-</section>
+</div>

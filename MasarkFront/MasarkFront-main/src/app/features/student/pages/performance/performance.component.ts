@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import {
   ChangeDetectionStrategy,
@@ -19,7 +20,7 @@ import { StudentService } from '../../services/student.service';
 @Component({
   selector: 'app-student-performance-page',
   standalone: true,
-  imports: [IconComponent, StudentPerformanceTableComponent, PerformanceChartComponent],
+  imports: [BreadcrumbComponent, IconComponent, StudentPerformanceTableComponent, PerformanceChartComponent],
   templateUrl: './performance.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

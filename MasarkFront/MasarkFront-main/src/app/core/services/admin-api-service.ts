@@ -104,6 +104,13 @@ export class AdminApiService {
     return this.http.get<any>(`${this.base}/performance/classes/${classId}/subjects/${subjectId}`, { params });
   }
 
+  // --- Plans Management ---
+
+  /** GET /api/plans */
+  getPlans(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/plans`);
+  }
+
   // --- Phase 6 Endpoints ---
 
   /** GET /api/admin/users/{id} */
@@ -144,5 +151,20 @@ export class AdminApiService {
   /** GET /api/admin/system/subscriptions-dashboard */
   getSubscriptionsDashboard(): Observable<any> {
     return this.http.get<any>(`${this.base}/system/subscriptions-dashboard`);
+  }
+
+  /** POST /api/plans */
+  createPlan(planData: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/plans`, planData);
+  }
+
+  /** PUT /api/plans/{id} */
+  updatePlan(planId: number, planData: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/plans/${planId}`, planData);
+  }
+
+  /** DELETE /api/plans/{id} */
+  deletePlan(planId: number): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/plans/${planId}`);
   }
 }

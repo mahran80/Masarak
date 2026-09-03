@@ -114,7 +114,7 @@ namespace Masarak.API.Controllers
             // Note: In a real app, verify the student is allowed to join this session
             string channelName = id.ToString();
             string uid = GetUserId().ToString();
-            string token = _agoraTokenService.GenerateRtcToken(channelName, uid, "subscriber");
+            string token = _agoraTokenService.GenerateRtcToken(channelName, uid, "publisher");
             return Ok(new { token, channelName, uid });
         }
     }

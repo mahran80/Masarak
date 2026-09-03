@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -8,9 +9,15 @@ import { StudentInsightDto, TeachingSuggestionDto } from '../../../../models/ai-
 @Component({
   selector: 'app-student-insight',
   standalone: true,
-  imports: [IconComponent, CommonModule, RouterLink],
+  imports: [BreadcrumbComponent, IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
+      <app-breadcrumb [items]="[
+        { label: 'لوحة المدرس', route: '/dashboard/teacher' },
+        { label: 'الطلاب', route: '/dashboard/teacher/students' },
+        { label: 'تفاصيل الطالب' }
+      ]"></app-breadcrumb>
+      
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

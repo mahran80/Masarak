@@ -28,15 +28,18 @@ export class ParentService {
 
   // --- API Methods ---
 
-  /** GET /api/parent/linked-students */
   fetchLinkedStudents(): Observable<LinkedStudentDto[]> {
     return this.http.get<LinkedStudentDto[]>(`${this.baseUrl}/linked-students`).pipe(
       tap(students => {
         this._linkedStudents.set(students);
-        // Automatically select the first student if none selected
-        if (students.length > 0 && !this._selectedStudentId()) {
-          this._selectedStudentId.set(students[0].studentUserId);
-        } else if (students.length === 0) {
+        
+        if (students.length > 0) {
+          // If no student is selected, or the currently selected student is not in the new list, select the first one
+          const isValidSelection = students.some(s => s.studentUserId === this._selectedStudentId());
+          if (!isValidSelection) {
+            this._selectedStudentId.set(students[0].studentUserId);
+          }
+        } else {
           this._selectedStudentId.set(null);
         }
       })
@@ -61,6 +64,15 @@ export class ParentService {
       params = params.set('academicYear', academicYear.toString());
     }
     return this.http.get<any[]>(`${this.baseUrl}/children/${studentId}/attendance`, { params });
+  }
+
+  /** GET /api/parent/children/{studentId}/schedule */
+  getChildSchedule(studentId: number, weekStart?: string): Observable<any> {
+    let params = new HttpParams();
+    if (weekStart) {
+      params = params.set('weekStart', weekStart);
+    }
+    return this.http.get<any>(`${this.baseUrl}/children/${studentId}/schedule`, { params });
   }
 
   /** POST /api/parent/children/{childId}/subscribe */

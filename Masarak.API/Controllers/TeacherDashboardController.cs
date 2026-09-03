@@ -40,21 +40,30 @@ namespace Masarak.API.Controllers
                 .Where(sc => classIds.Contains(sc.ClassId))
                 .CountAsync(ct);
 
-            var assignmentsIds = assignments.Select(ta => ta.AssignmentId).ToList();
-
+            // Count submissions pending grading for this teacher's teaching assignments
+            var taIds = assignments.Select(ta => ta.AssignmentId).ToList();
             var pendingGrading = await _context.Submissions
-                .Where(s => assignmentsIds.Contains(s.AssignmentId) && s.Status == Domain.Enums.SubmissionStatus.Submitted)
+                .Where(s => taIds.Contains(s.Assignment.AssignmentRef) && s.Status == Domain.Enums.SubmissionStatus.Submitted)
                 .CountAsync(ct);
 
-            var avgPerformance = 85.5m; // Ideally calculated from StudentExams and Submissions
+
+            // Compute real average performance from graded exams for this teacher's classes
+            var avgPerformance = await _context.StudentExams
+                .Where(se => taIds.Contains(se.Exam.AssignmentId)
+                    && se.FinalScore.HasValue && se.Exam.TotalMarks > 0)
+                .Select(se => (se.FinalScore!.Value / se.Exam.TotalMarks) * 100m)
+                .DefaultIfEmpty(0m)
+                .AverageAsync(ct);
+
 
             return Ok(new TeacherDashboardStatsDto
             {
                 TotalStudents = totalStudents,
                 ActiveCourses = assignments.Count,
                 AssignmentsToGrade = pendingGrading,
-                AveragePerformance = avgPerformance
+                AveragePerformance = Math.Round(avgPerformance, 1)
             });
+
         }
 
         [HttpGet("activities")]
@@ -63,15 +72,68 @@ namespace Masarak.API.Controllers
             var userId = GetUserId();
             var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, ct);
             if (teacher == null) return Forbid();
+            var taIds = await _context.TeachingAssignments
+                .Where(ta => ta.TeacherId == teacher.TeacherId)
+                .Select(ta => ta.AssignmentId)
+                .ToListAsync(ct);
 
-            var activities = new List<TeacherActivityDto>
+            var activities = new List<TeacherActivityDto>();
+
+            // Recent submissions for this teacher's teaching assignments
+            var recentSubmissions = await _context.Submissions
+                .Where(s => taIds.Contains(s.Assignment.AssignmentRef))
+                .OrderByDescending(s => s.SubmittedAt)
+                .Take(3)
+                .Select(s => new { s.Student.User.FullName, s.SubmittedAt, s.Assignment.Title })
+                .ToListAsync(ct);
+
+
+            foreach (var sub in recentSubmissions)
             {
-                new TeacherActivityDto { Title = "تم تسليم واجب جديد", Time = "منذ 10 دقائق", Icon = "📝", Color = "bg-blue-100 text-blue-600" },
-                new TeacherActivityDto { Title = "رسالة جديدة من ولي أمر", Time = "منذ ساعة", Icon = "💬", Color = "bg-emerald-100 text-emerald-600" },
-                new TeacherActivityDto { Title = "تم تقييم اختبار الرياضيات", Time = "امس", Icon = "✅", Color = "bg-amber-100 text-amber-600" }
-            };
+                var timeAgo = GetTimeAgo(sub.SubmittedAt);
+                activities.Add(new TeacherActivityDto
+                {
+                    Title = $"تسليم واجب \"{sub.Title}\" من {sub.FullName}",
+                    Time = timeAgo,
+                    Icon = "📝",
+                    Color = "bg-blue-100 text-blue-600"
+                });
+            }
+
+            // Recent completed sessions
+            var recentSessions = await _context.Sessions
+                .Where(s => taIds.Contains(s.AssignmentId) && s.Status == Domain.Enums.SessionStatus.Completed)
+                .OrderByDescending(s => s.ScheduledAt)
+                .Take(2)
+                .Select(s => new { s.Title, s.ScheduledAt })
+                .ToListAsync(ct);
+
+            foreach (var session in recentSessions)
+            {
+                var timeAgo = GetTimeAgo(session.ScheduledAt);
+                activities.Add(new TeacherActivityDto
+                {
+                    Title = $"تم إكمال حصة \"{session.Title}\"",
+                    Time = timeAgo,
+                    Icon = "✅",
+                    Color = "bg-emerald-100 text-emerald-600"
+                });
+            }
+
+            // If no activities found, show a helpful message
+            if (!activities.Any())
+            {
+                activities.Add(new TeacherActivityDto
+                {
+                    Title = "لا توجد أنشطة حديثة",
+                    Time = "الآن",
+                    Icon = "📋",
+                    Color = "bg-slate-100 text-slate-500"
+                });
+            }
 
             return Ok(activities);
+
         }
 
         [HttpGet("charts/performance")]
@@ -143,6 +205,17 @@ namespace Masarak.API.Controllers
                 .ToListAsync(ct);
 
             return Ok(sessions);
+        }
+
+        private static string GetTimeAgo(DateTime dateTime)
+        {
+            var diff = DateTime.UtcNow - dateTime;
+            if (diff.TotalMinutes < 1) return "الآن";
+            if (diff.TotalMinutes < 60) return $"منذ {(int)diff.TotalMinutes} دقيقة";
+            if (diff.TotalHours < 24) return $"منذ {(int)diff.TotalHours} ساعة";
+            if (diff.TotalDays < 2) return "أمس";
+            if (diff.TotalDays < 7) return $"منذ {(int)diff.TotalDays} أيام";
+            return dateTime.ToString("yyyy-MM-dd");
         }
     }
 }

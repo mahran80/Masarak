@@ -5,6 +5,7 @@ import { ChatSignalRService } from './core/services/signalr';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { cacheInterceptor } from './core/interceptors/cache.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { NotificationHubService } from './core/services/notification-hub.service';
 
@@ -26,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
 
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, cacheInterceptor, loadingInterceptor])),
 
     {
       provide: APP_INITIALIZER,

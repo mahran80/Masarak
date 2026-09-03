@@ -1,3 +1,4 @@
+import { BreadcrumbComponent } from '../../../../../shared/components/breadcrumb/breadcrumb.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,7 +14,7 @@ import { QuestionEditorComponent } from '../question-editor/question-editor.comp
 @Component({
   selector: 'app-exam-creator',
   standalone: true,
-  imports: [IconComponent, ReactiveFormsModule, QuestionEditorComponent],
+  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, QuestionEditorComponent],
   templateUrl: './exam-creator.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

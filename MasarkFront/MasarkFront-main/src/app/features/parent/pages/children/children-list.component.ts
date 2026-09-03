@@ -56,13 +56,20 @@ import { ProfileService, LinkedChildDto } from '../../../profile/services/profil
                 <p class="text-sm text-slate-500 truncate" dir="ltr">{{ student.email }}</p>
               </div>
               
-              <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 grid grid-cols-3 gap-2">
+              <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 grid grid-cols-4 gap-2">
                 <a [routerLink]="student.hasActiveSubscription ? ['/dashboard/parent/reports', student.studentUserId] : null" 
                    [class.opacity-50]="!student.hasActiveSubscription"
                    [class.cursor-not-allowed]="!student.hasActiveSubscription"
                    class="flex flex-col items-center justify-center gap-1 text-slate-600 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-blue-50">
                    <span class="text-xl"><app-icon name="chart" size="1.2em"></app-icon></span>
                    <span class="text-xs font-medium">التقارير</span>
+                </a>
+                <a [routerLink]="student.hasActiveSubscription ? ['/dashboard/parent/schedule', student.studentUserId] : null" 
+                   [class.opacity-50]="!student.hasActiveSubscription"
+                   [class.cursor-not-allowed]="!student.hasActiveSubscription"
+                   class="flex flex-col items-center justify-center gap-1 text-slate-600 hover:text-purple-600 transition-colors p-2 rounded-lg hover:bg-purple-50">
+                   <span class="text-xl"><app-icon name="calendar" size="1.2em"></app-icon></span>
+                   <span class="text-xs font-medium">الجدول</span>
                 </a>
                 <a [routerLink]="student.hasActiveSubscription ? ['/dashboard/parent/alerts', student.studentUserId] : null" 
                    [class.opacity-50]="!student.hasActiveSubscription"
@@ -75,7 +82,7 @@ import { ProfileService, LinkedChildDto } from '../../../profile/services/profil
                    [class.opacity-50]="!student.hasActiveSubscription"
                    [class.cursor-not-allowed]="!student.hasActiveSubscription"
                    class="flex flex-col items-center justify-center gap-1 text-slate-600 hover:text-emerald-600 transition-colors p-2 rounded-lg hover:bg-emerald-50">
-                   <span class="text-xl"><app-icon name="calendar" size="1.2em"></app-icon></span>
+                   <span class="text-xl"><app-icon name="clock" size="1.2em"></app-icon></span>
                    <span class="text-xs font-medium">الحضور</span>
                 </a>
               </div>
