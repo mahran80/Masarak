@@ -11,6 +11,8 @@ namespace Masarak.Application.Interfaces
         // ── Grades ──────────────────────────────────────────────────────────
         Task<IEnumerable<GradeDto>> GetAllGradesAsync(CancellationToken ct = default);
         Task<GradeDetailDto> GetGradeWithDetailsAsync(int gradeId, int? academicYear = null, CancellationToken ct = default);
+        Task<GradeDto> CreateGradeAsync(CreateGradeRequest request, CancellationToken ct = default);
+        Task<GradeDto> UpdateGradeAsync(int gradeId, UpdateGradeRequest request, CancellationToken ct = default);
 
         // ── Subjects ────────────────────────────────────────────────────────
         Task<IEnumerable<SubjectCategoryDto>> GetAllSubjectCategoriesAsync(CancellationToken ct = default);

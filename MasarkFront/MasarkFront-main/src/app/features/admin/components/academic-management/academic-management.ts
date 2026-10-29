@@ -162,7 +162,13 @@ export class AcademicManagementComponent implements OnInit {
   showFeedback(msg: string, type: 'success' | 'error' = 'success') {
     this.feedbackMsg.set(msg);
     this.feedbackType.set(type);
-    setTimeout(() => this.feedbackMsg.set(''), 4000);
+    if (type === 'success') {
+      setTimeout(() => this.feedbackMsg.set(''), 4000);
+    }
+  }
+
+  clearFeedback() {
+    this.feedbackMsg.set('');
   }
 
   showConfirm(msg: string, action: () => void) {
@@ -223,6 +229,20 @@ export class AcademicManagementComponent implements OnInit {
         handleResult(this.api.createClass(req), 'تمت إضافة الفصل بنجاح.', 'فشل إنشاء الفصل.', this.loadClasses);
       } else {
         handleResult(this.api.updateClass(data.classId, { name: data.name, maxCapacity: Number(data.maxCapacity ?? 30), isActive: data.isActive ?? true }), 'تم تحديث الفصل بنجاح.', 'فشل تحديث الفصل.', this.loadClasses);
+      }
+    }
+
+    if (type === 'grade') {
+      if (mode === 'create') {
+        const req = { 
+          name: data.name, 
+          nameAr: data.nameAr, 
+          stage: Number(data.stage ?? 0), 
+          order: Number(data.order ?? 1) 
+        };
+        handleResult(this.api.createGrade(req), 'تمت إضافة المرحلة بنجاح.', 'فشل إنشاء المرحلة.', this.loadGrades);
+      } else {
+        handleResult(this.api.updateGrade(data.gradeId, { name: data.name, nameAr: data.nameAr, isActive: data.isActive ?? true }), 'تم تحديث المرحلة بنجاح.', 'فشل تحديث المرحلة.', this.loadGrades);
       }
     }
   }

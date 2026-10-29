@@ -28,7 +28,9 @@ export class ExamTimerComponent implements OnInit, OnDestroy {
   @Input() startTime: string = new Date().toISOString();
   
   @Output() timeUp = new EventEmitter<void>();
+  @Output() timeWarning = new EventEmitter<number>();
 
+  private warningEmitted = false;
   readonly remainingSeconds = signal<number>(0);
   
   readonly formattedTime = computed(() => {
@@ -77,6 +79,11 @@ export class ExamTimerComponent implements OnInit, OnDestroy {
     
     this.remainingSeconds.set(remaining);
     
+    if (remaining <= 60 && remaining > 0 && !this.warningEmitted) {
+      this.warningEmitted = true;
+      this.timeWarning.emit(remaining);
+    }
+
     if (remaining <= 0) {
       if (this.intervalId) clearInterval(this.intervalId);
       this.timeUp.emit();

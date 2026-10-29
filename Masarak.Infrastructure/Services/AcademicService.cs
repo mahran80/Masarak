@@ -92,6 +92,28 @@ namespace Masarak.Infrastructure.Services
                 classDtos);
         }
 
+        public async Task<GradeDto> CreateGradeAsync(CreateGradeRequest request, CancellationToken ct = default)
+        {
+            var grade = Masarak.Domain.Entities.Grade.Create(request.Name, request.NameAr, request.Stage, request.Order);
+            await _gradeRepo.AddAsync(grade, ct);
+            await _cache.RemoveAsync(GradesCacheKey, ct);
+            return MapGrade(grade);
+        }
+
+        public async Task<GradeDto> UpdateGradeAsync(int gradeId, UpdateGradeRequest request, CancellationToken ct = default)
+        {
+            var grade = await _gradeRepo.GetByIdAsync(gradeId, ct)
+                ?? throw new KeyNotFoundException($"Grade {gradeId} not found.");
+            
+            grade.Name = request.Name;
+            grade.NameAr = request.NameAr;
+            grade.IsActive = request.IsActive;
+            
+            await _gradeRepo.UpdateAsync(grade, ct);
+            await _cache.RemoveAsync(GradesCacheKey, ct);
+            return MapGrade(grade);
+        }
+
         // ═══════════════════════════════════════════════════════════════════════
         // SUBJECTS
         // ═══════════════════════════════════════════════════════════════════════

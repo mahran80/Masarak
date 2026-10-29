@@ -62,6 +62,26 @@ namespace Masarak.API.Controllers
             return Ok(grades);
         }
 
+        [HttpPost("grades")]
+        [ProducesResponseType(typeof(GradeDto), 201)]
+        public async Task<IActionResult> CreateGrade([FromBody] CreateGradeRequest request, CancellationToken ct)
+        {
+            var grade = await _academicService.CreateGradeAsync(request, ct);
+            return Ok(grade);
+        }
+
+        [HttpPut("grades/{id}")]
+        [ProducesResponseType(typeof(GradeDto), 200)]
+        public async Task<IActionResult> UpdateGrade(int id, [FromBody] UpdateGradeRequest request, CancellationToken ct)
+        {
+            try
+            {
+                var grade = await _academicService.UpdateGradeAsync(id, request, ct);
+                return Ok(grade);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
         // ── Subjects ────────────────────────────────────────────────────────
         [HttpGet("categories")]
         public async Task<IActionResult> GetAllSubjectCategories(CancellationToken ct)

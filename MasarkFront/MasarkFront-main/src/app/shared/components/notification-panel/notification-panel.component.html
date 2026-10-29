@@ -33,9 +33,10 @@
     </div>
   </div>
 
-  <div class="px-5 py-3 border-t border-slate-100 bg-slate-50 text-center">
-    <a href="javascript:void(0)" class="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors" (click)="onBackdropClick()">
-      عرض كل الإشعارات
-    </a>
+  <div class="px-5 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+    <span class="text-[11px] text-slate-400 font-medium">يتم التحديث تلقائياً عبر SignalR</span>
+    <button type="button" class="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors" (click)="close.emit()">
+      إغلاق اللوحة
+    </button>
   </div>
 </div>

@@ -168,6 +168,7 @@ namespace Masarak.API.Controllers
                 return Ok(result);
             }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            catch (Stripe.StripeException ex) { return BadRequest(new { message = $"Stripe error: {ex.Message}" }); }
         }
 
         [HttpPost("subscribe/verify")]

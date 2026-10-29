@@ -202,12 +202,25 @@
                 <app-exam-timer 
                   [durationSeconds]="active.secondsRemaining || (selectedExam()?.exam?.durationMinutes || 0) * 60"
                   [startTime]="active.startedAt"
+                  (timeWarning)="onTimerWarning()"
                   (timeUp)="submitActiveExam(true)">
                 </app-exam-timer>
               </div>
             </div>
           </div>
         </div>
+
+        @if (showTimerWarning()) {
+          <div role="alert" class="relative z-10 flex items-center gap-3 bg-amber-50 border-r-4 border-amber-500 p-4 rounded-2xl text-amber-900 shadow-sm animate-pulse mb-6">
+            <svg class="w-6 h-6 flex-shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p class="font-bold text-sm">تنبيه: الوقت على وشك الانتهاء!</p>
+              <p class="text-xs text-amber-700 mt-0.5">يتبقى أقل من دقيقة واحدة. سيتم تسليم إجاباتك تلقائياً عند انتهاء الوقت، يرجى التأكد من اختيار إجاباتك.</p>
+            </div>
+          </div>
+        }
 
         <div class="relative z-10 flex flex-col lg:flex-row gap-8">
           <!-- Main Question Area -->
@@ -357,3 +370,57 @@
     </article>
   }
 </div>
+
+<!-- Exam Submit Confirmation Modal (P0 Fix — replaces browser confirm()) -->
+@if (showSubmitConfirm()) {
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" dir="rtl">
+    <div class="relative w-full max-w-md mx-4 rounded-2xl bg-white p-8 shadow-2xl animate-fade-in">
+      <!-- Warning Icon -->
+      <div class="flex justify-center mb-5">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+      </div>
+
+      <h2 class="text-xl font-black text-slate-900 text-center mb-2">تأكيد تسليم الاختبار</h2>
+      <p class="text-sm text-slate-600 text-center mb-2 leading-relaxed">
+        هل أنت متأكد من رغبتك في تسليم الاختبار النهائي؟
+      </p>
+      <p class="text-xs text-red-600 font-bold text-center mb-6 bg-red-50 rounded-lg py-2 px-4">
+        ⚠ لا يمكن التراجع عن هذه الخطوة بعد التسليم.
+      </p>
+
+      <!-- Answers summary -->
+      <div class="flex items-center justify-center gap-4 mb-6 text-sm">
+        <div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg">
+          <span class="font-black">{{ store.answeredQuestionsCount() }}</span>
+          <span class="font-medium">أسئلة مُجابة</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+          <span class="font-black">{{ store.totalQuestions() - store.answeredQuestionsCount() }}</span>
+          <span class="font-medium">بدون إجابة</span>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          class="flex-1 min-h-12 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:shadow-md"
+          (click)="cancelSubmit()"
+        >
+          العودة للاختبار
+        </button>
+        <button
+          type="button"
+          class="flex-1 min-h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-sm font-black text-white shadow-lg shadow-emerald-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          (click)="confirmSubmit()"
+        >
+          تأكيد التسليم
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

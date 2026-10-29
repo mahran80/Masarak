@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, inject, HostListener } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { IconComponent } from '../icon/icon.component';
@@ -36,6 +36,11 @@ export class NotificationPanelComponent {
   @Output() close = new EventEmitter<void>();
 
   private router = inject(Router);
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.close.emit();
+  }
 
   constructor(public notificationService: NotificationService) {}
 

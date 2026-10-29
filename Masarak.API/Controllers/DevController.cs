@@ -11,6 +11,9 @@ using Masarak.Application.Interfaces;
 using Masarak.Infrastructure.Persistence;
 using Masarak.Infrastructure.Services;
 
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
 namespace Masarak.API.Controllers
 {
     [ApiController]
@@ -19,11 +22,18 @@ namespace Masarak.API.Controllers
     {
         private readonly Context _db;
         private readonly IPasswordService _pwd;
+        private readonly IWebHostEnvironment _env;
 
-        public DevController(Context db, IPasswordService pwd)
+        public DevController(Context db, IPasswordService pwd, IWebHostEnvironment env)
         {
             _db = db;
             _pwd = pwd;
+            _env = env;
+
+            if (!_env.IsDevelopment())
+            {
+                throw new InvalidOperationException("DevController is only available in Development environment.");
+            }
         }
 
         [HttpPost("seed-massive")]

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { canDeactivateGuard } from './core/guards/can-deactivate.guard';
 import { Chat } from './features/signalR/Component/chat/chat';
 import { LandingPageComponent } from './features/landing/landing';
 import { DashboardLayoutComponent } from './layouts/dashboard-layout/dashboard-layout';
@@ -45,19 +46,29 @@ export const routes: Routes = [
         loadComponent: () => import('./features/auth/signup/signup').then((m) => m.Signup),
       },
       {
-        path: 'ForgotPassword',
+        path: 'forgot-password',
         loadComponent: () =>
           import('./features/auth/forgot-password-component/forgot-password-component').then(
             (m) => m.ForgotPasswordComponent,
           ),
       },
+      {
+        path: 'ForgotPassword',
+        redirectTo: 'forgot-password',
+        pathMatch: 'full',
+      },
 
       {
-        path: 'ResetPassword',
+        path: 'reset-password',
         loadComponent: () =>
           import('./features/auth/reset-password-component/reset-password-component').then(
             (m) => m.ResetPasswordComponent,
           ),
+      },
+      {
+        path: 'ResetPassword',
+        redirectTo: 'reset-password',
+        pathMatch: 'full',
       },
     ],
   },
@@ -89,6 +100,7 @@ export const routes: Routes = [
           { path: '', component: TeacherComponent },
           { path: 'courses', component: TeacherCourses },
           { path: 'students', component: TeacherStudents },
+          { path: 'assignments', redirectTo: 'assessment/assignments/create', pathMatch: 'full' },
 
           { path: 'analytics/:classId/:subjectId', component: PerformanceAnalysisComponent },
           { path: 'parent-report/:studentId/:month', component: ParentSummaryComponent },
@@ -101,7 +113,7 @@ export const routes: Routes = [
           { path: 'assessment/grading/exam/:studentExamId', loadComponent: () => import('./features/teacher/pages/assessment/exam-grader/exam-grader.component').then(m => m.ExamGraderComponent) },
           { path: 'lessons', loadComponent: () => import('./features/teacher/pages/assessment/lessons-manager/lessons-manager.component').then(m => m.LessonsManagerComponent) },
           { path: 'sessions', loadComponent: () => import('./features/teacher/components/teacher-sessions/teacher-sessions.component').then(m => m.TeacherSessionsComponent) },
-          { path: 'sessions/:id/live', loadComponent: () => import('./features/shared/components/live-room/live-room.component').then(m => m.LiveRoomComponent), data: { role: 'teacher' } },
+          { path: 'sessions/:id/live', loadComponent: () => import('./features/shared/components/live-room/live-room.component').then(m => m.LiveRoomComponent), data: { role: 'teacher' }, canDeactivate: [canDeactivateGuard] },
           { path: 'sessions/:id/attendance', loadComponent: () => import('./features/teacher/pages/live-session/attendance/session-attendance.component').then(m => m.TeacherSessionAttendanceComponent) },
           { path: 'class-analytics/:classId/:subjectId', loadComponent: () => import('./features/teacher/pages/class-analytics/class-analytics.component').then(m => m.ClassAnalyticsComponent) },
           { path: 'student-insight/:studentId/:subjectId', loadComponent: () => import('./features/teacher/pages/student-insight/student-insight.component').then(m => m.StudentInsightComponent) },

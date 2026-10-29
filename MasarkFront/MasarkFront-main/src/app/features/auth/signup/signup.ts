@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthApiService } from '../../../core/services/auth-api-service';
 import { AuthStateService } from '../../../core/services/auth-state-service';
@@ -23,6 +23,17 @@ export class Signup {
   mode: 'Parent' | 'Student' = 'Parent';
   grades: any[] = [];
 
+  readonly showPassword = signal(false);
+  readonly showConfirmPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword.update(v => !v);
+  }
+
   countryCodes = [
     { code: '+20', name: 'مصر (+20)', pattern: '^01[0125]\\d{8}$' },
     { code: '+966', name: 'السعودية (+966)', pattern: '^5\\d{8}$' },
@@ -44,6 +55,12 @@ export class Signup {
     country: ['Egypt'],
     role: ['Parent' as 'Student' | 'Parent', [Validators.required]],
     gradeId: ['', []],
+  }, {
+    validators: (group: AbstractControl): ValidationErrors | null => {
+      const pass = group.get('password')?.value;
+      const confirm = group.get('confirmPassword')?.value;
+      return pass && confirm && pass !== confirm ? { passwordMismatch: true } : null;
+    }
   });
 
   ngOnInit() {

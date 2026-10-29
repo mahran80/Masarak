@@ -1,4 +1,5 @@
 import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
+import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -38,7 +39,7 @@ interface SelectedExam {
   templateUrl: './exams.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudentExamsPageComponent implements OnInit {
+export class StudentExamsPageComponent implements OnInit, CanComponentDeactivate {
   private readonly studentService = inject(StudentService);
   readonly store = inject(ExamAttemptStore);
   private readonly destroyRef = inject(DestroyRef);
@@ -51,6 +52,8 @@ export class StudentExamsPageComponent implements OnInit {
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
+  readonly showSubmitConfirm = signal<boolean>(false);
+  readonly showTimerWarning = signal<boolean>(false);
 
   readonly currentPage = signal<number>(1);
   readonly pageSize = signal<number>(5);
@@ -87,6 +90,11 @@ export class StudentExamsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadExams();
+  }
+
+  canDeactivate(): boolean {
+    // Prevent navigation away when an exam is active
+    return !this.store.exam();
   }
 
   loadExams(): void {
@@ -168,7 +176,8 @@ export class StudentExamsPageComponent implements OnInit {
       return;
     }
 
-    if (!force && !confirm('هل أنت متأكد من رغبتك في تسليم الاختبار النهائي؟ لا يمكن التراجع عن هذه الخطوة.')) {
+    if (!force) {
+      this.showSubmitConfirm.set(true);
       return;
     }
 
@@ -202,5 +211,18 @@ export class StudentExamsPageComponent implements OnInit {
     }
 
     return null;
+  }
+
+  confirmSubmit(): void {
+    this.showSubmitConfirm.set(false);
+    this.submitActiveExam(true);
+  }
+
+  cancelSubmit(): void {
+    this.showSubmitConfirm.set(false);
+  }
+
+  onTimerWarning(): void {
+    this.showTimerWarning.set(true);
   }
 }

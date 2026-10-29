@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { canDeactivateGuard } from '../../../core/guards/can-deactivate.guard';
 
 export const STUDENT_ROUTES: Routes = [
   {
@@ -47,6 +48,7 @@ export const STUDENT_ROUTES: Routes = [
     path: 'exams',
     loadComponent: () =>
       import('../pages/exams/exams.component').then((m) => m.StudentExamsPageComponent),
+    canDeactivate: [canDeactivateGuard],
   },
   {
     path: 'grades',
@@ -76,7 +78,8 @@ export const STUDENT_ROUTES: Routes = [
     path: 'sessions/:id/live',
     loadComponent: () =>
       import('../../shared/components/live-room/live-room.component').then((m) => m.LiveRoomComponent),
-    data: { role: 'student' }
+    data: { role: 'student' },
+    canDeactivate: [canDeactivateGuard],
   },
   {
     path: 'profile',

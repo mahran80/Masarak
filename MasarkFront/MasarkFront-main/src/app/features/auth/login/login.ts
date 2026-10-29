@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -17,6 +17,12 @@ export class Login {
   private authApi = inject(AuthApiService);
   public authState = inject(AuthStateService); // عملناها public عشان نستخدم الـ Signals في الـ HTML
   private router = inject(Router);
+
+  readonly showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
 
   // بناء الفورم مع الـ Validation
   loginForm = this.fb.nonNullable.group({
