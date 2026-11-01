@@ -135,7 +135,8 @@
                 type="button"
                 class="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
                 [disabled]="isStarting() || store.exam()"
-                (click)="startSelectedExam()"
+                title="سيبدأ الاختبار وسيتم عرض تعليمات قبل البدء"
+                (click)="showInstructions.set(true)"
               >
                 @if (isStarting()) {
                   جاري البدء...
@@ -165,10 +166,84 @@
             @if (result.hasPendingManualGrading) {
               <p class="mt-3 text-xs text-amber-600 text-center">بعض الأسئلة المقالية بانتظار تصحيح المعلم.</p>
             }
+
+            <div class="mt-5 pt-4 border-t border-emerald-100 flex flex-col gap-2 w-full">
+              <a routerLink="/dashboard/student/performance"
+                 class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-900 transition-colors">
+                📊 عرض تقرير الأداء الكامل
+              </a>
+              <a routerLink="/dashboard/student/insights"
+                 class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-900 transition-colors">
+                ✨ رؤى التعلم الذكية
+              </a>
+            </div>
           </article>
         }
       </aside>
     </div>
+
+    @if (showInstructions() && selectedExam(); as selected) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <article class="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl text-right animate-fade-in" dir="rtl">
+          <h2 class="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
+            <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-sky-100 text-sky-600">📝</span>
+            تعليمات الاختبار
+          </h2>
+          <div class="space-y-3 text-sm mb-6">
+            <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+              <span class="font-bold text-slate-500">الاختبار</span>
+              <span class="font-bold text-slate-900">{{ selected.exam.title }}</span>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+              <span class="font-bold text-slate-500">المادة</span>
+              <span class="font-bold text-slate-900">{{ selected.subject.subjectName }}</span>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+              <span class="font-bold text-slate-500">المدة</span>
+              <span class="font-bold text-slate-900">{{ selected.exam.durationMinutes ?? 0 }} دقيقة</span>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+              <span class="font-bold text-slate-500">عدد الأسئلة</span>
+              <span class="font-bold text-slate-900">{{ selected.exam.questionCount || 'غير محدد' }} سؤال</span>
+            </div>
+          </div>
+          <div class="border-t border-slate-100 pt-4 mb-6">
+            <h3 class="text-sm font-black text-slate-800 mb-3">⚠️ تعليمات هامة</h3>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-start gap-2">
+                <span class="mt-1 w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
+                سيتم حفظ إجاباتك تلقائياً كل 30 ثانية.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                لا يمكنك العودة للاختبار بعد تسليمه.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                سيتم التسليم تلقائياً عند انتهاء الوقت.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1 w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0"></span>
+                تأكد من اتصالك بالإنترنت.
+              </li>
+            </ul>
+          </div>
+          <div class="flex gap-3">
+            <button type="button"
+              class="flex-1 rounded-lg bg-sky-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-sky-700 shadow-sm"
+              [disabled]="isStarting()"
+              (click)="showInstructions.set(false); startSelectedExam()">
+              @if (isStarting()) { جاري البدء... } @else { بدء الاختبار }
+            </button>
+            <button type="button"
+              class="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50"
+              (click)="showInstructions.set(false)">
+              رجوع
+            </button>
+          </div>
+        </article>
+      </div>
+    }
 
     @if (store.exam(); as active) {
       <article class="relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 p-6 shadow-2xl backdrop-blur-xl mb-12 ring-1 ring-slate-900/5 transition-all duration-500">
@@ -286,7 +361,7 @@
                 </span>
               </div>
               
-              <div class="grid grid-cols-5 gap-3">
+              <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
                 @for (q of active.questions; track q.questionId; let i = $index) {
                   <button 
                     type="button"
@@ -316,7 +391,7 @@
               <div class="mt-8 pt-6 border-t border-slate-200/50">
                 <div class="flex items-center justify-center gap-2 mb-5 bg-white/50 rounded-lg py-2">
                   @if (store.isSaving()) {
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-600"></div>
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-600" aria-hidden="true"></div>
                     <span class="text-xs font-bold text-sky-700">جاري الحفظ التلقائي...</span>
                   } @else if (store.lastSavedAt()) {
                     <div class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100">
@@ -328,16 +403,26 @@
                   }
                 </div>
 
+                @if (store.saveFailed()) {
+                  <div role="alert" class="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 text-xs font-bold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-amber-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>فشل الحفظ التلقائي. تحقق من اتصالك بالإنترنت. إجاباتك محفوظة محلياً وسيتم إعادة المحاولة.</span>
+                  </div>
+                }
+
                 <button
                   type="button"
                   class="group relative w-full inline-flex min-h-[3.5rem] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 text-sm font-black text-white overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/30 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                   [disabled]="isSubmitting()"
+                  title="لا يمكن التراجع بعد التسليم"
                   (click)="submitActiveExam()"
                 >
                   <div class="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0 duration-300"></div>
                   <span class="relative flex items-center gap-2">
                     @if (isSubmitting()) {
-                      <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-b-transparent"></div>
+                      <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-b-transparent" aria-hidden="true"></div>
                       جاري التسليم...
                     } @else {
                       تسليم الاختبار النهائي
@@ -374,18 +459,24 @@
 <!-- Exam Submit Confirmation Modal (P0 Fix — replaces browser confirm()) -->
 @if (showSubmitConfirm()) {
   <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" dir="rtl">
-    <div class="relative w-full max-w-md mx-4 rounded-2xl bg-white p-8 shadow-2xl animate-fade-in">
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="exam-confirm-title"
+      aria-describedby="exam-confirm-desc"
+      class="relative w-full max-w-md mx-4 rounded-2xl bg-white p-8 shadow-2xl animate-fade-in"
+    >
       <!-- Warning Icon -->
       <div class="flex justify-center mb-5">
         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>
       </div>
 
-      <h2 class="text-xl font-black text-slate-900 text-center mb-2">تأكيد تسليم الاختبار</h2>
-      <p class="text-sm text-slate-600 text-center mb-2 leading-relaxed">
+      <h2 id="exam-confirm-title" class="text-xl font-black text-slate-900 text-center mb-2">تأكيد تسليم الاختبار</h2>
+      <p id="exam-confirm-desc" class="text-sm text-slate-600 text-center mb-2 leading-relaxed">
         هل أنت متأكد من رغبتك في تسليم الاختبار النهائي؟
       </p>
       <p class="text-xs text-red-600 font-bold text-center mb-6 bg-red-50 rounded-lg py-2 px-4">

@@ -1,7 +1,7 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { Component, inject, signal, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { SubscriptionApiService } from '../../../../core/services/subscription-api-service';
 import { AuthStateService } from '../../../../core/services/auth-state-service';
 import { PlanDto } from '../../../../core/models/subscription.model';
@@ -9,7 +9,7 @@ import { PlanDto } from '../../../../core/models/subscription.model';
 @Component({
   selector: 'plans-component',
   standalone: true,
-  imports: [IconComponent, CommonModule],
+  imports: [IconComponent, CommonModule, RouterLink],
   templateUrl: './plans-component.html',
 })
 export class PlansComponent implements OnInit {

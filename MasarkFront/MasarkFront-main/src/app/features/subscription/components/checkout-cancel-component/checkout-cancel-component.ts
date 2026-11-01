@@ -13,15 +13,15 @@ import { RouterLink } from '@angular/router';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </div>
-        <h1 class="text-2xl font-bold text-surface-900 font-display mb-2">Checkout Cancelled</h1>
-        <p class="text-surface-500 mb-8">
-          No payment was taken. You can return to plans anytime to subscribe.
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">تم إلغاء عملية الدفع</h1>
+        <p class="text-slate-500 mb-8">
+          لم يتم خصم أي مبالغ. يمكنك العودة لصفحة الخطط والاشتراك في أي وقت.
         </p>
-        <a routerLink="/plans" class="btn-primary w-full btn-lg">
-          View Plans
+        <a routerLink="/dashboard/plans" class="btn-primary w-full block text-center">
+          عرض الخطط المتاحة
         </a>
-        <a routerLink="/dashboard" class="btn-ghost w-full mt-3">
-          Back to Dashboard
+        <a routerLink="/dashboard" class="block text-center text-sm font-semibold text-slate-600 hover:text-blue-600 mt-4 transition-colors">
+          العودة للوحة التحكم
         </a>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { Injectable, DestroyRef, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, Subject, Observable, of } from 'rxjs';
-import { filter, switchMap, throttleTime } from 'rxjs/operators';
+import { filter, switchMap, throttleTime, catchError } from 'rxjs/operators';
 import { StudentService } from './student.service';
 import { 
   StartStudentExamResponse, 
@@ -23,6 +23,7 @@ export interface ExamAttemptState {
 export class ExamAttemptStore {
   private readonly studentService = inject(StudentService);
   private readonly destroyRef = inject(DestroyRef);
+  private retryTimeoutId: any = null;
 
   // State
   private readonly state = signal<ExamAttemptState>({
@@ -32,6 +33,10 @@ export class ExamAttemptStore {
     isSaving: false,
     lastSavedAt: null
   });
+
+  // Autosave status signals
+  readonly saveFailed = signal<boolean>(false);
+  readonly saveRetryCount = signal<number>(0);
 
   // Selectors
   readonly exam = computed(() => this.state().exam);
@@ -67,6 +72,13 @@ export class ExamAttemptStore {
   private readonly autoSaveTrigger = new Subject<void>();
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.retryTimeoutId) {
+        clearTimeout(this.retryTimeoutId);
+        this.retryTimeoutId = null;
+      }
+    });
+
     // Set up auto-save every 30 seconds if there are changes
     // Or when manually triggered (throttled to avoid spam)
     this.autoSaveTrigger.pipe(
@@ -75,19 +87,19 @@ export class ExamAttemptStore {
       switchMap(() => {
         this.updateState({ isSaving: true });
         const examId = this.exam()!.studentExamId;
-        return this.studentService.saveExamAnswers(examId, { answers: this.answersList() });
+        return this.studentService.saveExamAnswers(examId, { answers: this.answersList() }).pipe(
+          catchError(() => {
+            this.handleSaveError();
+            return of(null);
+          })
+        );
       }),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: () => {
-        this.updateState({ 
-          isSaving: false,
-          lastSavedAt: new Date()
-        });
-      },
-      error: () => {
-        this.updateState({ isSaving: false });
-        // Handle error gracefully, maybe retry later
+      next: (res) => {
+        if (res !== null) {
+          this.handleSaveSuccess();
+        }
       }
     });
 
@@ -101,8 +113,43 @@ export class ExamAttemptStore {
     });
   }
 
+  private handleSaveSuccess(): void {
+    if (this.retryTimeoutId) {
+      clearTimeout(this.retryTimeoutId);
+      this.retryTimeoutId = null;
+    }
+    this.saveFailed.set(false);
+    this.saveRetryCount.set(0);
+    this.updateState({ 
+      isSaving: false,
+      lastSavedAt: new Date()
+    });
+  }
+
+  private handleSaveError(): void {
+    this.updateState({ isSaving: false });
+    this.saveFailed.set(true);
+    const count = this.saveRetryCount();
+    if (count < 3) {
+      const delayMs = Math.pow(2, count) * 2000;
+      this.saveRetryCount.set(count + 1);
+      this.retryTimeoutId = setTimeout(() => {
+        if (this.exam()?.studentExamId) {
+          this.autoSaveTrigger.next();
+        }
+      }, delayMs);
+    }
+  }
+
   // Actions
   initExam(exam: StartStudentExamResponse): void {
+    if (this.retryTimeoutId) {
+      clearTimeout(this.retryTimeoutId);
+      this.retryTimeoutId = null;
+    }
+    this.saveFailed.set(false);
+    this.saveRetryCount.set(0);
+
     const initialAnswers = this.createAnswerMap(exam.savedAnswers || []);
     
     this.state.set({
@@ -115,6 +162,13 @@ export class ExamAttemptStore {
   }
 
   clearExam(): void {
+    if (this.retryTimeoutId) {
+      clearTimeout(this.retryTimeoutId);
+      this.retryTimeoutId = null;
+    }
+    this.saveFailed.set(false);
+    this.saveRetryCount.set(0);
+
     this.state.set({
       exam: null,
       answers: {},

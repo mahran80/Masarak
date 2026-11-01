@@ -1,4 +1,7 @@
 <div class="space-y-6 font-sans text-slate-800" dir="rtl">
+  @if (studentId()) {
+    <app-child-context-bar [studentId]="studentId()" />
+  }
   
   <div class="flex items-center justify-between mb-4">
     <div class="flex items-center gap-3">
@@ -26,7 +29,7 @@
 
   @if (isLoading()) {
     <div class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm gap-4">
-      <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+      <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" aria-hidden="true"></div>
       <p class="text-sm font-bold text-slate-500">جاري تحميل الجدول...</p>
     </div>
   } @else if (schedule()) {

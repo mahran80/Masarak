@@ -1,11 +1,14 @@
 import { BreadcrumbComponent } from '../../../../shared/components/breadcrumb/breadcrumb.component';
 import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
+import { installBeforeUnload } from '../../../../core/helpers/before-unload.helper';
+import { ConfirmDialogService } from '../../../../shared/services/confirm-dialog.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
   OnInit,
+  OnDestroy,
   computed,
   inject,
   signal,
@@ -27,6 +30,8 @@ import { ScoreBadgeComponent } from '../../components/score-badge/score-badge.co
 import { ExamTimerComponent } from '../../components/exam-timer/exam-timer.component';
 import { QuestionRendererComponent } from '../../components/question-renderer/question-renderer.component';
 
+import { RouterLink } from '@angular/router';
+
 interface SelectedExam {
   subject: StudentCourse;
   exam: StudentExam;
@@ -35,14 +40,16 @@ interface SelectedExam {
 @Component({
   selector: 'app-student-exams-page',
   standalone: true,
-  imports: [BreadcrumbComponent, DatePipe, DecimalPipe, ScoreBadgeComponent, ExamTimerComponent, QuestionRendererComponent],
+  imports: [BreadcrumbComponent, DatePipe, DecimalPipe, ScoreBadgeComponent, ExamTimerComponent, QuestionRendererComponent, RouterLink],
   templateUrl: './exams.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudentExamsPageComponent implements OnInit, CanComponentDeactivate {
+export class StudentExamsPageComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   private readonly studentService = inject(StudentService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   readonly store = inject(ExamAttemptStore);
   private readonly destroyRef = inject(DestroyRef);
+  private cleanupBeforeUnload: (() => void) | null = null;
 
   readonly groups = signal<StudentExamGroup[]>([]);
   readonly selectedExamId = signal<StudentEntityId | null>(null);
@@ -50,6 +57,7 @@ export class StudentExamsPageComponent implements OnInit, CanComponentDeactivate
   readonly isLoading = signal<boolean>(true);
   readonly isStarting = signal<boolean>(false);
   readonly isSubmitting = signal<boolean>(false);
+  readonly showInstructions = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly actionMessage = signal<string | null>(null);
   readonly showSubmitConfirm = signal<boolean>(false);
@@ -90,6 +98,14 @@ export class StudentExamsPageComponent implements OnInit, CanComponentDeactivate
 
   ngOnInit(): void {
     this.loadExams();
+    this.cleanupBeforeUnload = installBeforeUnload(() => this.canDeactivate());
+  }
+
+  ngOnDestroy(): void {
+    if (this.cleanupBeforeUnload) {
+      this.cleanupBeforeUnload();
+      this.cleanupBeforeUnload = null;
+    }
   }
 
   canDeactivate(): boolean {

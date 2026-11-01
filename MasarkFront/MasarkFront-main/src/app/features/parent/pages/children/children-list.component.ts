@@ -21,9 +21,28 @@ import { ProfileService, LinkedChildDto } from '../../../profile/services/profil
             <p class="text-sm text-slate-500 mt-1">إدارة حسابات أبنائك المرتبطين بحسابك</p>
           </div>
         </div>
-        <a routerLink="/dashboard/parent/onboarding/add-student" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200 flex items-center gap-2">
-          <span><app-icon name="plus" size="1.2em"></app-icon></span> إضافة طالب جديد
-        </a>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a routerLink="/dashboard/parent/onboarding/add-student"
+             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200 flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-blue-500/40 flex items-center justify-center shrink-0">
+              <app-icon name="plus" size="1.1em"></app-icon>
+            </span>
+            <div class="text-right">
+              <div class="text-sm font-bold leading-tight">إنشاء حساب طالب جديد</div>
+              <div class="text-[11px] font-normal opacity-85 mt-0.5">حساب جديد وربطه تلقائياً</div>
+            </div>
+          </a>
+          <a routerLink="/dashboard/parent/link"
+             class="bg-white hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-semibold transition-colors border border-slate-200 shadow-sm flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+              <app-icon name="link" size="1.1em"></app-icon>
+            </span>
+            <div class="text-right">
+              <div class="text-sm font-bold leading-tight">ربط طالب موجود بالكود</div>
+              <div class="text-[11px] font-normal text-slate-500 mt-0.5">إذا كان للطالب حساب بالفعل</div>
+            </div>
+          </a>
+        </div>
       </div>
 
       @if (combinedStudents().length > 0) {
@@ -94,10 +113,15 @@ import { ProfileService, LinkedChildDto } from '../../../profile/services/profil
         <div class="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm border-dashed">
           <div class="text-6xl mb-4 text-slate-300"><app-icon name="family" size="1.2em"></app-icon></div>
           <h3 class="text-xl font-bold text-slate-700 mb-2">لا يوجد طلاب مرتبطين بحسابك بعد</h3>
-          <p class="text-slate-500 mb-6 max-w-md mx-auto">ابدأ بإضافة أول طالب أو استخدام رابط الدعوة لربط حساب موجود بحسابك كولي أمر.</p>
-          <a routerLink="/dashboard/parent/onboarding/add-student" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200">
-            <span><app-icon name="plus" size="1.2em"></app-icon></span> إنشاء حساب طالب جديد
-          </a>
+          <p class="text-slate-500 mb-6 max-w-md mx-auto">ابدأ بإضافة أول طالب أو استخدام رمز الدعوة لربط حساب موجود بحسابك كولي أمر.</p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a routerLink="/dashboard/parent/onboarding/add-student" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200">
+              <span><app-icon name="plus" size="1.2em"></app-icon></span> إنشاء حساب طالب جديد
+            </a>
+            <a routerLink="/dashboard/parent/link" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-xl font-semibold transition-colors border border-slate-200 shadow-sm">
+              <span><app-icon name="link" size="1.2em"></app-icon></span> ربط طالب موجود بالكود
+            </a>
+          </div>
         </div>
       }
     </div>

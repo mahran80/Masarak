@@ -116,5 +116,16 @@
         <app-student-performance-table [rows]="performance()" />
       </div>
     </article>
+
+    <div class="mt-6 p-5 rounded-xl bg-gradient-to-l from-indigo-50 to-sky-50 border border-sky-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-right">
+        <p class="text-sm font-bold text-slate-800">✨ رؤى التعلم بالذكاء الاصطناعي</p>
+        <p class="text-xs text-slate-500 mt-1">اكتشف نقاط القوة والضعف بناءً على أدائك</p>
+      </div>
+      <a routerLink="/dashboard/student/insights"
+         class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-colors shadow-sm whitespace-nowrap">
+        عرض الرؤى
+      </a>
+    </div>
   }
 </div>

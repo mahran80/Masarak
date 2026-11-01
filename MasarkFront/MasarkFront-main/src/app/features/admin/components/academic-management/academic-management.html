@@ -11,6 +11,7 @@
       </div>
 
       <!-- Horizontal Tab Bar -->
+      <!-- Horizontal Tab Bar (4 Consolidated Tabs) -->
       <div class="flex gap-1 mt-5 -mb-px overflow-x-auto">
         <button
           (click)="setTab('grades')"
@@ -46,28 +47,6 @@
           الفصول الدراسية
         </button>
         <button
-          (click)="setTab('roster')"
-          [class.border-blue-600]="activeTab() === 'roster'"
-          [class.text-blue-600]="activeTab() === 'roster'"
-          [class.font-semibold]="activeTab() === 'roster'"
-          [class.border-transparent]="activeTab() !== 'roster'"
-          [class.text-slate-500]="activeTab() !== 'roster'"
-          class="flex items-center gap-2 px-4 py-3 text-sm border-b-2 transition-all whitespace-nowrap hover:text-slate-800">
-          <app-icon name="users" [size]="16"></app-icon>
-          تسكين الطلاب
-        </button>
-        <button
-          (click)="setTab('teachers')"
-          [class.border-blue-600]="activeTab() === 'teachers'"
-          [class.text-blue-600]="activeTab() === 'teachers'"
-          [class.font-semibold]="activeTab() === 'teachers'"
-          [class.border-transparent]="activeTab() !== 'teachers'"
-          [class.text-slate-500]="activeTab() !== 'teachers'"
-          class="flex items-center gap-2 px-4 py-3 text-sm border-b-2 transition-all whitespace-nowrap hover:text-slate-800">
-          <app-icon name="user" [size]="16"></app-icon>
-          تعيين المعلمين
-        </button>
-        <button
           (click)="setTab('specializations')"
           [class.border-blue-600]="activeTab() === 'specializations'"
           [class.text-blue-600]="activeTab() === 'specializations'"
@@ -82,13 +61,32 @@
     </div>
   </div>
 
+  <!-- Selection Context Bar -->
+  @if (selectedGradeName() || selectedClassName()) {
+    <div class="max-w-7xl mx-auto px-6 pt-4">
+      <div class="flex flex-wrap items-center gap-2 text-sm bg-blue-50 border border-blue-100 rounded-xl px-4 py-2.5">
+        <span class="text-blue-500 font-bold text-xs">السياق الحالي:</span>
+        @if (selectedGradeName()) {
+          <span class="bg-white text-blue-700 px-3 py-1 rounded-lg font-bold text-xs border border-blue-200 shadow-sm">
+            المرحلة: {{ selectedGradeName() }}
+          </span>
+        }
+        @if (selectedClassName()) {
+          <span class="bg-white text-blue-700 px-3 py-1 rounded-lg font-bold text-xs border border-blue-200 shadow-sm">
+            الفصل: {{ selectedClassName() }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+
   <!-- Main Content -->
   <div class="max-w-7xl mx-auto px-6 py-6">
 
     <!-- Global Loader -->
     @if (isLoading()) {
       <div class="flex justify-center items-center py-20">
-        <div class="w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+        <div class="w-8 h-8 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" aria-hidden="true"></div>
       </div>
     }
 
@@ -126,10 +124,17 @@
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-slate-800">المراحل الدراسية</h2>
-            <p class="text-xs text-slate-400 mt-0.5">{{ grades().length }} مرحلة مسجلة</p>
+            <p class="text-xs text-slate-400 mt-0.5">
+              @if (isLoading()) {
+                <span class="inline-block w-16 h-3.5 bg-slate-200 rounded animate-pulse"></span>
+              } @else {
+                {{ grades().length }} مرحلة مسجلة
+              }
+            </p>
           </div>
           <button
             (click)="openModal('grade', 'create')"
+            title="أضف مرحلة دراسية جديدة (مثال: الصف الأول الابتدائي)"
             class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
             <app-icon name="plus" [size]="14"></app-icon>
             إضافة مرحلة
@@ -145,7 +150,7 @@
                 <div class="relative group">
                   <button
                     (click)="onGradeSelect(g.gradeId); setTab('subjects')"
-                    class="w-full text-right p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 hover:shadow-sm transition-all">
+                    class="w-full text-right p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 hover:shadow-sm transition-all cursor-pointer">
                     <div class="flex items-center justify-between mb-3">
                       <span class="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 group-hover:border-blue-300 transition-colors">
                         <app-icon name="academic-cap" [size]="16" class="text-slate-400 group-hover:text-blue-500"></app-icon>
@@ -154,10 +159,14 @@
                     </div>
                     <p class="font-bold text-slate-800 text-sm">{{ g.nameAr || g.name }}</p>
                     <p class="text-xs text-slate-400 mt-0.5">{{ g.name }}</p>
+                    <p class="text-xs text-blue-500 font-semibold mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      عرض المواد ←
+                    </p>
                   </button>
                   <button
                     (click)="openModal('grade', 'edit', g)"
-                    class="absolute top-3 left-10 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-100 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+                    aria-label="تعديل المرحلة"
+                    class="absolute top-3 left-10 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-100 transition-colors opacity-0 sm:group-hover:opacity-100 max-sm:opacity-100 focus:opacity-100">
                     <app-icon name="pencil" [size]="14"></app-icon>
                   </button>
                 </div>
@@ -191,7 +200,16 @@
             @if (selectedGrade()) {
               <button
                 (click)="openModal('subject', 'create')"
+                title="إضافة مادة دراسية جديدة"
                 class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                <app-icon name="plus" [size]="14"></app-icon>
+                إضافة مادة
+              </button>
+            } @else {
+              <button
+                disabled
+                title="يجب اختيار المرحلة أولاً لإضافة مادة"
+                class="flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-400 text-sm font-semibold rounded-lg cursor-not-allowed">
                 <app-icon name="plus" [size]="14"></app-icon>
                 إضافة مادة
               </button>
@@ -214,6 +232,7 @@
                   </div>
                   <button
                     (click)="openModal('subject', 'edit', s)"
+                    aria-label="تعديل المادة"
                     class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
                     <app-icon name="pencil" [size]="14"></app-icon>
                   </button>
@@ -226,247 +245,282 @@
     }
 
     <!-- ══════════════════════════════════════════════════ -->
-    <!-- TAB 3: CLASSES                                    -->
+    <!-- TAB 3: CLASSES (Includes Info, Roster, Teachers)   -->
     <!-- ══════════════════════════════════════════════════ -->
     @if (activeTab() === 'classes' && !isLoading()) {
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-base font-bold text-slate-800">الفصول الدراسية</h2>
-            <p class="text-xs text-slate-400 mt-0.5">اختر مرحلة وسنة أكاديمية</p>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <input
-              type="text"
-              [(ngModel)]="academicYear"
-              placeholder="السنة (مثال: 2026)"
-              class="w-32 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
-              (change)="loadClasses()">
-            <select
-              [ngModel]="selectedGrade()"
-              (ngModelChange)="onGradeSelect($event)"
-              class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-              <option [ngValue]="null">-- اختر المرحلة --</option>
-              @for (g of grades(); track g.gradeId) {
-                <option [ngValue]="g.gradeId">{{ g.nameAr || g.name }}</option>
-              }
-            </select>
-            @if (selectedGrade()) {
-              <button
-                (click)="openModal('class', 'create')"
-                class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-                <app-icon name="plus" [size]="14"></app-icon>
-                إضافة فصل
-              </button>
-            }
-          </div>
+        <!-- Sub-tab Navigation Bar -->
+        <div class="flex gap-1 px-6 pt-3 border-b border-slate-100 bg-slate-50/50 overflow-x-auto">
+          <button (click)="setClassSubTab('info')"
+            [class.border-blue-600]="classSubTab() === 'info'"
+            [class.text-blue-600]="classSubTab() === 'info'"
+            [class.border-transparent]="classSubTab() !== 'info'"
+            [class.text-slate-500]="classSubTab() !== 'info'"
+            class="px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap">
+            <app-icon name="building" [size]="14"></app-icon>
+            بيانات الفصول
+          </button>
+          <button (click)="setClassSubTab('roster')"
+            [class.border-blue-600]="classSubTab() === 'roster'"
+            [class.text-blue-600]="classSubTab() === 'roster'"
+            [class.border-transparent]="classSubTab() !== 'roster'"
+            [class.text-slate-500]="classSubTab() !== 'roster'"
+            class="px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap">
+            <app-icon name="users" [size]="14"></app-icon>
+            تسكين الطلاب
+          </button>
+          <button (click)="setClassSubTab('teachers')"
+            [class.border-blue-600]="classSubTab() === 'teachers'"
+            [class.text-blue-600]="classSubTab() === 'teachers'"
+            [class.border-transparent]="classSubTab() !== 'teachers'"
+            [class.text-slate-500]="classSubTab() !== 'teachers'"
+            class="px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap">
+            <app-icon name="user" [size]="14"></app-icon>
+            تعيين المعلمين
+          </button>
         </div>
 
-        <div class="p-6">
-          @if (!selectedGrade()) {
-            <div class="text-center py-16 text-slate-400 text-sm">يرجى اختيار المرحلة الدراسية أولاً.</div>
-          } @else if (classes().length === 0) {
-            <div class="text-center py-16 text-slate-400 text-sm">لا توجد فصول دراسية لهذه المرحلة.</div>
-          } @else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              @for (c of classes(); track c.classId) {
-                <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all">
-                  <div class="flex items-start justify-between mb-3">
-                    <div>
-                      <p class="font-bold text-slate-800 text-sm">{{ c.name }}</p>
-                      <p class="text-xs text-slate-400 mt-0.5">السنة الأكاديمية: {{ c.academicYear }}</p>
-                    </div>
-                    <button
-                      (click)="openModal('class', 'edit', c)"
-                      class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-                      <app-icon name="pencil" [size]="14"></app-icon>
-                    </button>
-                  </div>
-                  <div class="flex items-center gap-1 mb-4">
-                    <span class="text-xs px-2 py-0.5 rounded-full"
-                      [class]="c.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'">
-                      {{ c.isActive ? 'نشط' : 'غير نشط' }}
-                    </span>
-                    <span class="text-xs text-slate-400 mr-1">{{ c.enrollmentCount }}/{{ c.maxCapacity }} طالب</span>
-                  </div>
-                  <div class="flex gap-2">
-                    <button
-                      (click)="onClassSelect(c.classId); setTab('roster')"
-                      class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors">
-                      <app-icon name="users" [size]="13"></app-icon>
-                      الطلاب
-                    </button>
-                    <button
-                      (click)="onClassSelect(c.classId); setTab('teachers')"
-                      class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 transition-colors">
-                      <app-icon name="user" [size]="13"></app-icon>
-                      المعلمين
-                    </button>
-                  </div>
-                </div>
+        @if (classSubTab() === 'info') {
+          <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-800">الفصول الدراسية</h2>
+              <p class="text-xs text-slate-400 mt-0.5">اختر مرحلة وسنة أكاديمية</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <input
+                type="text"
+                [(ngModel)]="academicYear"
+                placeholder="السنة (مثال: 2026)"
+                class="w-32 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                (change)="loadClasses()">
+              <select
+                [ngModel]="selectedGrade()"
+                (ngModelChange)="onGradeSelect($event)"
+                class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                <option [ngValue]="null">-- اختر المرحلة --</option>
+                @for (g of grades(); track g.gradeId) {
+                  <option [ngValue]="g.gradeId">{{ g.nameAr || g.name }}</option>
+                }
+              </select>
+              @if (selectedGrade()) {
+                <button
+                  (click)="openModal('class', 'create')"
+                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                  <app-icon name="plus" [size]="14"></app-icon>
+                  إضافة فصل
+                </button>
               }
             </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- ══════════════════════════════════════════════════ -->
-    <!-- TAB 4: ROSTER                                     -->
-    <!-- ══════════════════════════════════════════════════ -->
-    @if (activeTab() === 'roster' && !isLoading()) {
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100">
-          <h2 class="text-base font-bold text-slate-800">تسكين الطلاب</h2>
-          <p class="text-xs text-slate-400 mt-0.5">إدارة قوائم الطلاب في الفصول</p>
-        </div>
-
-        @if (!selectedClass()) {
-          <div class="p-6 text-center py-16">
-            <p class="text-slate-400 text-sm mb-3">يرجى اختيار المرحلة والفصل أولاً.</p>
-            <button (click)="setTab('classes')" class="text-blue-600 text-sm font-semibold hover:underline">الذهاب إلى الفصول</button>
-          </div>
-        } @else {
-          <!-- Enroll Student Form -->
-          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60">
-            <div class="flex gap-2 flex-wrap sm:flex-nowrap">
-              <select #studentSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-                <option value="">-- اختر الطالب للتسجيل --</option>
-                @for (s of filteredStudentsForGrade(); track s.userId) {
-                  <option [value]="s.userId">{{ s.fullName }} ({{ s.email }})</option>
-                }
-              </select>
-              <button
-                (click)="enrollStudent(studentSelect.value); studentSelect.value = ''"
-                class="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
-                <app-icon name="plus" [size]="14"></app-icon>
-                تسجيل طالب
-              </button>
-            </div>
           </div>
 
-          <!-- Roster Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-right text-sm">
-              <thead>
-                <tr class="border-b border-slate-100 bg-slate-50">
-                  <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">الطالب</th>
-                  <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">البريد الإلكتروني</th>
-                  <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">نوع التسجيل</th>
-                  <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">إجراء</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (r of roster(); track r.studentId) {
-                  <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4">
-                      <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                          {{ r.fullName?.charAt(0) || 'T' }}
-                        </div>
-                        <span class="font-semibold text-slate-800">{{ r.fullName }}</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 text-slate-500">{{ r.email }}</td>
-                    <td class="px-6 py-4">
-                      @if (r.enrollmentType === 'FullClass') {
-                        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold">فصل كامل</span>
-                      } @else {
-                        <div class="flex flex-wrap gap-1">
-                          <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-semibold">جزئي</span>
-                          @for (sub of r.enrolledSubjects; track sub) {
-                            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">{{ sub }}</span>
-                          }
-                        </div>
-                      }
-                    </td>
-                    <td class="px-6 py-4">
-                      <button
-                        (click)="unenrollStudent(r.studentClassId)"
-                        class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors">
-                        إلغاء
-                      </button>
-                    </td>
-                  </tr>
-                } @empty {
-                  <tr>
-                    <td colspan="4" class="px-6 py-16 text-center text-slate-400 text-sm">لا يوجد طلاب مسجلين في هذا الفصل.</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- ══════════════════════════════════════════════════ -->
-    <!-- TAB 5: TEACHERS                                   -->
-    <!-- ══════════════════════════════════════════════════ -->
-    @if (activeTab() === 'teachers' && !isLoading()) {
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100">
-          <h2 class="text-base font-bold text-slate-800">تعيين المعلمين</h2>
-          <p class="text-xs text-slate-400 mt-0.5">ربط المعلمين بالمواد والفصول</p>
-        </div>
-
-        @if (!selectedClass()) {
-          <div class="p-6 text-center py-16">
-            <p class="text-slate-400 text-sm mb-3">يرجى اختيار المرحلة والفصل أولاً.</p>
-            <button (click)="setTab('classes')" class="text-blue-600 text-sm font-semibold hover:underline">الذهاب إلى الفصول</button>
-          </div>
-        } @else {
-          <!-- Assign Teacher Form -->
-          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60">
-            <div class="flex gap-2 flex-wrap md:flex-nowrap">
-              <select #teacherSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-                <option value="">-- اختر المعلم --</option>
-                @for (t of availableTeachers(); track t.teacherId) {
-                  <option [value]="t.teacherId">{{ t.fullName }}</option>
-                }
-              </select>
-              <select #subjectSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-                <option value="">-- اختر المادة --</option>
-                @for (s of subjects(); track s.subjectId) {
-                  <option [value]="s.subjectId">{{ s.nameAr || s.name }}</option>
-                }
-              </select>
-              <button
-                (click)="assignTeacher(teacherSelect.value, subjectSelect.value); teacherSelect.value = ''; subjectSelect.value = ''"
-                class="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
-                <app-icon name="plus" [size]="14"></app-icon>
-                تعيين معلم
-              </button>
-            </div>
-          </div>
-
-          <!-- Teachers List -->
           <div class="p-6">
-            @if (teachers().length === 0) {
-              <div class="text-center py-12 text-slate-400 text-sm">لا يوجد معلمون معينون لهذا الفصل.</div>
+            @if (!selectedGrade()) {
+              <div class="text-center py-16 text-slate-400 text-sm">يرجى اختيار المرحلة الدراسية أولاً.</div>
+            } @else if (classes().length === 0) {
+              <div class="text-center py-16 text-slate-400 text-sm">لا توجد فصول دراسية لهذه المرحلة.</div>
             } @else {
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @for (t of teachers(); track t.id) {
-                  <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
-                        {{ t.teacherName?.charAt(0) || 'م' }}
-                      </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @for (c of classes(); track c.classId) {
+                  <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all">
+                    <div class="flex items-start justify-between mb-3">
                       <div>
-                        <p class="font-semibold text-slate-800 text-sm">{{ t.teacherName }}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ t.subjectName }} — {{ t.className }}</p>
+                        <p class="font-bold text-slate-800 text-sm">{{ c.name }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">السنة الأكاديمية: {{ c.academicYear }}</p>
                       </div>
+                      <button
+                        (click)="openModal('class', 'edit', c)"
+                        aria-label="تعديل الفصل"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
+                        <app-icon name="pencil" [size]="14"></app-icon>
+                      </button>
                     </div>
-                    <button
-                      (click)="unassignTeacher(t.id)"
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex-shrink-0">
-                      <app-icon name="x-mark" [size]="14"></app-icon>
-                    </button>
+                    <div class="flex items-center gap-1 mb-4">
+                      <span class="text-xs px-2 py-0.5 rounded-full"
+                        [class]="c.isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'">
+                        {{ c.isActive ? 'نشط' : 'غير نشط' }}
+                      </span>
+                      <span class="text-xs text-slate-400 mr-1">{{ c.enrollmentCount }}/{{ c.maxCapacity }} طالب</span>
+                    </div>
+                    <div class="flex gap-2">
+                      <button
+                        (click)="onClassSelect(c.classId); setClassSubTab('roster')"
+                        class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors">
+                        <app-icon name="users" [size]="13"></app-icon>
+                        الطلاب
+                      </button>
+                      <button
+                        (click)="onClassSelect(c.classId); setClassSubTab('teachers')"
+                        class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 transition-colors">
+                        <app-icon name="user" [size]="13"></app-icon>
+                        المعلمين
+                      </button>
+                    </div>
                   </div>
                 }
               </div>
             }
           </div>
+        } @else if (classSubTab() === 'roster') {
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-slate-800">تسكين الطلاب</h2>
+              <p class="text-xs text-slate-400 mt-0.5">إدارة قوائم الطلاب في الفصول</p>
+            </div>
+            @if (selectedClass()) {
+              <button (click)="setClassSubTab('info')" class="text-xs text-blue-600 font-semibold hover:underline">
+                ← العودة لبيانات الفصول
+              </button>
+            }
+          </div>
+
+          @if (!selectedClass()) {
+            <div class="p-6 text-center py-16">
+              <p class="text-slate-400 text-sm mb-3">يرجى اختيار المرحلة والفصل أولاً.</p>
+              <button (click)="setClassSubTab('info')" class="text-blue-600 text-sm font-semibold hover:underline">الذهاب إلى الفصول</button>
+            </div>
+          } @else {
+            <!-- Enroll Student Form -->
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60">
+              <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+                <select #studentSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                  <option value="">-- اختر الطالب للتسجيل --</option>
+                  @for (s of filteredStudentsForGrade(); track s.userId) {
+                    <option [value]="s.userId">{{ s.fullName }} ({{ s.email }})</option>
+                  }
+                </select>
+                <button
+                  (click)="enrollStudent(studentSelect.value); studentSelect.value = ''"
+                  class="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
+                  <app-icon name="plus" [size]="14"></app-icon>
+                  تسجيل طالب
+                </button>
+              </div>
+            </div>
+
+            <!-- Roster Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-sm">
+                <thead>
+                  <tr class="border-b border-slate-100 bg-slate-50">
+                    <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">الطالب</th>
+                    <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">البريد الإلكتروني</th>
+                    <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider">نوع التسجيل</th>
+                    <th class="px-6 py-3.5 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">إجراء</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  @for (r of roster(); track r.studentId) {
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            {{ r.fullName?.charAt(0) || 'T' }}
+                          </div>
+                          <span class="font-semibold text-slate-800">{{ r.fullName }}</span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-slate-500">{{ r.email }}</td>
+                      <td class="px-6 py-4">
+                        @if (r.enrollmentType === 'FullClass') {
+                          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold">فصل كامل</span>
+                        } @else {
+                          <div class="flex flex-wrap gap-1">
+                            <span class="px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-semibold">جزئي</span>
+                            @for (sub of r.enrolledSubjects; track sub) {
+                              <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">{{ sub }}</span>
+                            }
+                          </div>
+                        }
+                      </td>
+                      <td class="px-6 py-4">
+                        <button
+                          (click)="unenrollStudent(r.studentClassId)"
+                          class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors">
+                          إلغاء
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="px-6 py-16 text-center text-slate-400 text-sm">لا يوجد طلاب مسجلين في هذا الفصل.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        } @else if (classSubTab() === 'teachers') {
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-slate-800">تعيين المعلمين</h2>
+              <p class="text-xs text-slate-400 mt-0.5">ربط المعلمين بالمواد والفصول</p>
+            </div>
+            @if (selectedClass()) {
+              <button (click)="setClassSubTab('info')" class="text-xs text-blue-600 font-semibold hover:underline">
+                ← العودة لبيانات الفصول
+              </button>
+            }
+          </div>
+
+          @if (!selectedClass()) {
+            <div class="p-6 text-center py-16">
+              <p class="text-slate-400 text-sm mb-3">يرجى اختيار المرحلة والفصل أولاً.</p>
+              <button (click)="setClassSubTab('info')" class="text-blue-600 text-sm font-semibold hover:underline">الذهاب إلى الفصول</button>
+            </div>
+          } @else {
+            <!-- Assign Teacher Form -->
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60">
+              <div class="flex gap-2 flex-wrap md:flex-nowrap">
+                <select #teacherSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                  <option value="">-- اختر المعلم --</option>
+                  @for (t of availableTeachers(); track t.teacherId) {
+                    <option [value]="t.teacherId">{{ t.fullName }}</option>
+                  }
+                </select>
+                <select #subjectSelect class="flex-1 min-w-0 px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                  <option value="">-- اختر المادة --</option>
+                  @for (s of subjects(); track s.subjectId) {
+                    <option [value]="s.subjectId">{{ s.nameAr || s.name }}</option>
+                  }
+                </select>
+                <button
+                  (click)="assignTeacher(teacherSelect.value, subjectSelect.value); teacherSelect.value = ''; subjectSelect.value = ''"
+                  class="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap">
+                  <app-icon name="plus" [size]="14"></app-icon>
+                  تعيين معلم
+                </button>
+              </div>
+            </div>
+
+            <!-- Teachers List -->
+            <div class="p-6">
+              @if (teachers().length === 0) {
+                <div class="text-center py-12 text-slate-400 text-sm">لا يوجد معلمون معينون لهذا الفصل.</div>
+              } @else {
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  @for (t of teachers(); track t.id) {
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                          {{ t.teacherName?.charAt(0) || 'م' }}
+                        </div>
+                        <div>
+                          <p class="font-semibold text-slate-800 text-sm">{{ t.teacherName }}</p>
+                          <p class="text-xs text-slate-400 mt-0.5">{{ t.subjectName }} — {{ t.className }}</p>
+                        </div>
+                      </div>
+                      <button
+                        (click)="unassignTeacher(t.id)"
+                        aria-label="إلغاء تعيين المعلم"
+                        class="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex-shrink-0">
+                        <app-icon name="x-mark" [size]="14"></app-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
         }
       </div>
     }
@@ -563,6 +617,7 @@
         </h3>
         <button
           (click)="closeModal()"
+          aria-label="إغلاق"
           class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
           <app-icon name="x-mark" [size]="16"></app-icon>
         </button>
@@ -570,80 +625,110 @@
 
       <!-- Modal Body -->
       <div class="px-6 py-5 space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-            الاسم بالإنجليزية <span class="text-red-500">*</span>
-          </label>
+        <app-form-field
+          label="الاسم بالإنجليزية"
+          fieldId="modal-name"
+          [required]="true"
+          [errorMessage]="modalErrors()['name'] || null"
+        >
           <input
+            id="modal-name"
             type="text"
+            required
             [(ngModel)]="formData.name"
+            [attr.aria-describedby]="modalErrors()['name'] ? 'modal-name-error' : null"
             class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">الاسم بالعربية</label>
+        </app-form-field>
+
+        <app-form-field
+          label="الاسم بالعربية"
+          fieldId="modal-nameAr"
+        >
           <input
+            id="modal-nameAr"
             type="text"
             [(ngModel)]="formData.nameAr"
             class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-        </div>
+        </app-form-field>
 
         @if (modalType() === 'grade' && modalMode() === 'create') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-              المرحلة التعليمية (Stage) <span class="text-red-500">*</span>
-            </label>
+          <app-form-field
+            label="المرحلة التعليمية (Stage)"
+            fieldId="modal-stage"
+            [required]="true"
+            [errorMessage]="modalErrors()['stage'] || null"
+          >
             <select
+              id="modal-stage"
+              required
               [(ngModel)]="formData.stage"
+              [attr.aria-describedby]="modalErrors()['stage'] ? 'modal-stage-error' : null"
               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
               <option value="0">ابتدائي (Primary)</option>
               <option value="1">إعدادي (Preparatory)</option>
               <option value="2">ثانوي (Secondary)</option>
             </select>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-              الترتيب (Order) <span class="text-red-500">*</span>
-            </label>
+          </app-form-field>
+
+          <app-form-field
+            label="الترتيب (Order)"
+            fieldId="modal-order"
+            [required]="true"
+            [errorMessage]="modalErrors()['order'] || null"
+          >
             <input
+              id="modal-order"
               type="number"
+              required
               [(ngModel)]="formData.order"
               min="1"
               placeholder="1"
+              [attr.aria-describedby]="modalErrors()['order'] ? 'modal-order-error' : null"
               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-          </div>
+          </app-form-field>
         }
 
         @if (modalType() === 'subject') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-              رمز المادة <span class="text-red-500">*</span>
-              <span class="text-xs font-normal text-slate-400 mr-1">(مثال: MATH-01)</span>
-            </label>
+          <app-form-field
+            label="رمز المادة"
+            fieldId="modal-code"
+            hint="(مثال: MATH-01)"
+            [required]="true"
+            [errorMessage]="modalErrors()['code'] || null"
+          >
             <input
+              id="modal-code"
               type="text"
+              required
               [(ngModel)]="formData.code"
               maxlength="20"
+              [attr.aria-describedby]="modalErrors()['code'] ? 'modal-code-error' : null"
               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-          </div>
+          </app-form-field>
         }
 
         @if (modalType() === 'class') {
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-              الطاقة الاستيعابية <span class="text-red-500">*</span>
-            </label>
+          <app-form-field
+            label="الطاقة الاستيعابية"
+            fieldId="modal-maxCapacity"
+            [required]="true"
+            [errorMessage]="modalErrors()['maxCapacity'] || null"
+          >
             <input
+              id="modal-maxCapacity"
               type="number"
+              required
               [(ngModel)]="formData.maxCapacity"
               min="1" max="500"
               placeholder="30"
+              [attr.aria-describedby]="modalErrors()['maxCapacity'] ? 'modal-maxCapacity-error' : null"
               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
-          </div>
+          </app-form-field>
         }
 
         @if (modalMode() === 'edit') {
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" [(ngModel)]="formData.isActive" class="w-4 h-4 accent-blue-600 rounded">
+          <label for="modal-isActive" class="flex items-center gap-3 cursor-pointer">
+            <input id="modal-isActive" type="checkbox" [(ngModel)]="formData.isActive" class="w-4 h-4 accent-blue-600 rounded">
             <span class="text-sm font-semibold text-slate-700">نشط</span>
           </label>
         }
@@ -670,7 +755,7 @@
 <!-- CONFIRM DIALOG                                              -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 @if (confirmAction()) {
-  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir="rtl">
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] flex items-center justify-center p-4" dir="rtl">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
       <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
         <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">

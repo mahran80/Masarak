@@ -16,11 +16,12 @@ import { StudentPerformanceTableComponent } from '../../components/performance-t
 import { PerformanceChartComponent } from '../../components/performance-chart/performance-chart.component';
 import { StudentGrade, StudentPerformance } from '../../models';
 import { StudentService } from '../../services/student.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-student-performance-page',
   standalone: true,
-  imports: [BreadcrumbComponent, IconComponent, StudentPerformanceTableComponent, PerformanceChartComponent],
+  imports: [BreadcrumbComponent, IconComponent, StudentPerformanceTableComponent, PerformanceChartComponent, RouterLink],
   templateUrl: './performance.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -15,7 +15,7 @@ import {
 @Component({
   selector: 'app-learning-insights',
   standalone: true,
-  imports: [BreadcrumbComponent, IconComponent, CommonModule],
+  imports: [BreadcrumbComponent, IconComponent, CommonModule, RouterLink],
   template: `
     <div class="space-y-6 pb-12" dir="rtl">
       <app-breadcrumb [items]="[
@@ -34,6 +34,18 @@ import {
             <p class="text-sm text-slate-500 mt-1">تحليل نقاط الضعف والقوة لديك مع توصيات مخصصة بالذكاء الاصطناعي</p>
           </div>
         </div>
+      </div>
+
+      <!-- Performance Link Banner -->
+      <div class="p-4 rounded-xl bg-gradient-to-l from-sky-50 to-indigo-50 border border-sky-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-right">
+          <p class="text-sm font-bold text-slate-800">📊 الأداء الأكاديمي</p>
+          <p class="text-xs text-slate-500 mt-1">عرض متوسط الدرجات وسجل الأداء التفصيلي</p>
+        </div>
+        <a routerLink="/dashboard/student/performance"
+           class="inline-flex items-center gap-2 text-sm font-bold text-sky-700 hover:text-sky-900 transition-colors whitespace-nowrap">
+          عرض الأداء ←
+        </a>
       </div>
 
       <!-- Loading -->

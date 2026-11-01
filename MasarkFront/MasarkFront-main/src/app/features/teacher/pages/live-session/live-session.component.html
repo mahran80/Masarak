@@ -9,7 +9,7 @@
 
   @if (isLoading()) {
     <div class="flex-1 flex items-center justify-center">
-      <div class="animate-spin w-10 h-10 border-4 border-[#4F8CD4] border-t-transparent rounded-full"></div>
+      <div class="animate-spin w-10 h-10 border-4 border-[#4F8CD4] border-t-transparent rounded-full" aria-hidden="true"></div>
     </div>
   } @else if (errorMessage()) {
     <div class="flex-1 flex items-center justify-center">

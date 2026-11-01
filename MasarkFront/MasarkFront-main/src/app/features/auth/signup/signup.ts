@@ -5,6 +5,7 @@ import { AuthApiService } from '../../../core/services/auth-api-service';
 import { AuthStateService } from '../../../core/services/auth-state-service';
 import { RegisterRequest } from '../../../core/models/auth.models';
 import { ParentService } from '../../parent/services/parent.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -19,6 +20,7 @@ export class Signup {
   private router = inject(Router);
   private parentService = inject(ParentService);
   private route = inject(ActivatedRoute);
+  private toastService = inject(ToastService);
   
   mode: 'Parent' | 'Student' = 'Parent';
   grades: any[] = [];
@@ -147,6 +149,7 @@ export class Signup {
               refreshToken: res.refreshToken,
               user: res.user,
             });
+            this.toastService.success('تم إنشاء الحساب بنجاح! يمكنك الآن إضافة أبنائك.');
             this.router.navigate(['/dashboard/parent/onboarding/add-student']);
           } else {
             // Student Mode: Do not overwrite Parent auth.
@@ -156,14 +159,17 @@ export class Signup {
               this.parentService.linkStudent(linkageCode).subscribe({
                 next: () => {
                   this.parentService.fetchLinkedStudents().subscribe();
+                  this.toastService.success('تم إنشاء حساب الطالب وربطه بنجاح.');
                   this.router.navigate(['/dashboard/parent']);
                 },
                 error: (err) => {
+                  this.toastService.warning('تم إنشاء حساب الطالب، ولكن فشل الربط التلقائي.');
                   this.authState.setError('تم إنشاء حساب الطالب، ولكن فشل الربط التلقائي. يرجى الربط يدوياً عبر الكود.');
                   this.router.navigate(['/dashboard/parent']);
                 }
               });
             } else {
+              this.toastService.success('تم إنشاء حساب الطالب بنجاح.');
               this.router.navigate(['/dashboard/parent']);
             }
           }

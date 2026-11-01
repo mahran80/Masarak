@@ -8,7 +8,7 @@
   }
 
   body {
-    font-family: 'Inter', 'Tajawal', sans-serif;
+    font-family: 'Tajawal', 'Inter', sans-serif;
     @apply antialiased text-slate-800 bg-slate-50 leading-relaxed;
   }
 
@@ -33,6 +33,23 @@
   a:hover {
     @apply opacity-80;
     text-decoration: none !important;
+  }
+
+  /* WCAG 2.3.3: Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* A-16: High Contrast Mode focus outlines */
+  @media (forced-colors: active) {
+    *:focus {
+      outline: 2px solid ButtonText !important;
+    }
   }
 }
 

@@ -1,0 +1,40 @@
+@if (activeCrumbs().length > 0) {
+  <nav class="flex items-center gap-1.5 text-sm mb-6" aria-label="مسار التنقل" dir="rtl">
+    <ol class="flex items-center gap-1.5 flex-wrap">
+      @for (item of activeCrumbs(); track $index; let last = $last; let first = $first) {
+        <li class="inline-flex items-center gap-1.5" [attr.aria-current]="last ? 'page' : null">
+          @if (!last && item.route) {
+            <a [routerLink]="item.route"
+               class="font-medium transition-colors inline-flex items-center gap-1.5"
+               [ngClass]="theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-blue-600 focus:outline-none focus:underline'">
+              @if (first) {
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+              }
+              <span>{{ item.label }}</span>
+            </a>
+            <span class="mx-0.5 inline-flex" [ngClass]="theme === 'dark' ? 'text-slate-600' : 'text-slate-300'" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </span>
+          } @else if (!last) {
+            <span class="font-medium"
+                  [ngClass]="theme === 'dark' ? 'text-slate-400' : 'text-slate-500'">{{ item.label }}</span>
+            <span class="mx-0.5 inline-flex" [ngClass]="theme === 'dark' ? 'text-slate-600' : 'text-slate-300'" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </span>
+          } @else {
+            <span class="font-bold truncate max-w-[240px] sm:max-w-none"
+                  [ngClass]="theme === 'dark' ? 'text-white' : 'text-slate-800'">
+              {{ item.label }}
+            </span>
+          }
+        </li>
+      }
+    </ol>
+  </nav>
+}

@@ -100,7 +100,7 @@ import { environment } from '../../../../../environments/environment';
                   [disabled]="isSubscribing()"
                   class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow-md shadow-blue-200">
                   @if (isSubscribing()) {
-                    <span class="animate-spin"><app-icon name="clock" size="1.2em"></app-icon></span> جاري التحويل...
+                    <span class="animate-spin" aria-hidden="true"><app-icon name="clock" size="1.2em"></app-icon></span> جاري التحويل...
                   } @else {
                     <span><app-icon name="credit-card" size="1.2em"></app-icon></span> تفعيل اشتراك للطالب
                   }

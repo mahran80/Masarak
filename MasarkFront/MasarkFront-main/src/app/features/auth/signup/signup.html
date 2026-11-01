@@ -218,7 +218,7 @@
             >
               <option value="" disabled selected>اختر المرحلة الدراسية</option>
               @for (grade of grades; track grade.gradeId) {
-                <option [ngValue]="grade.gradeId">{{ grade.nameAr }}</option>
+                <option [ngValue]="grade.gradeId">{{ grade.nameAr || grade.name || 'مرحلة ' + grade.gradeId }}</option>
               }
             </select>
             @if (

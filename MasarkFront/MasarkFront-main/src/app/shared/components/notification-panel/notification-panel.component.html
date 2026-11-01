@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-40" (click)="onBackdropClick()"></div>
 
-<div class="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden" dir="rtl">
+<div class="absolute top-full left-0 mt-2 w-80 max-sm:fixed max-sm:top-16 max-sm:left-4 max-sm:right-4 max-sm:w-auto max-sm:mt-0 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden" dir="rtl">
   
   <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
     <h4 class="font-bold text-slate-900 text-sm">الإشعارات</h4>
@@ -10,27 +10,42 @@
   </div>
 
   <div class="max-h-[60vh] overflow-y-auto bg-white">
-    <div
-      *ngFor="let n of notificationService.notifications()"
-      (click)="onMarkRead(n)"
-      class="p-5 border-b border-slate-50 cursor-pointer transition-colors hover:bg-slate-50"
-      [class.bg-blue-50]="!n.isRead"
-      [class.bg-white]="n.isRead">
-      
-      <div class="flex flex-col gap-1.5 relative">
-        <h6 class="font-semibold text-sm text-slate-900 leading-tight" [class.pr-3]="!n.isRead">
-          <span *ngIf="!n.isRead" class="absolute right-0 top-1.5 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-          {{ n.title }}
-        </h6>
-        <p class="text-xs text-slate-600 leading-relaxed">{{ n.body }}</p>
-        <span class="text-[11px] font-medium text-slate-400 mt-1">{{ notificationService.timeAgo(n.createdAt) }}</span>
+    <div *ngIf="notificationService.isLoading()" class="divide-y divide-slate-100">
+      <div *ngFor="let item of [1, 2, 3]" class="p-5 animate-pulse">
+        <div class="h-3.5 bg-slate-200 rounded w-3/4 mb-2"></div>
+        <div class="h-3 bg-slate-100 rounded w-5/6 mb-2"></div>
+        <div class="h-2.5 bg-slate-100 rounded w-1/4"></div>
       </div>
-      
     </div>
 
-    <div *ngIf="notificationService.notifications().length === 0" class="p-8 text-center text-sm text-slate-500 font-medium">
-      لا توجد إشعارات حاليًا.
-    </div>
+    <ng-container *ngIf="!notificationService.isLoading()">
+      <div
+        *ngFor="let n of notificationService.notifications()"
+        (click)="onMarkRead(n)"
+        class="p-4 border-b border-slate-50 cursor-pointer transition-colors hover:bg-slate-50 flex items-start gap-3"
+        [class.bg-blue-50]="!n.isRead"
+        [class.bg-white]="n.isRead">
+        
+        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5" [class.bg-blue-100]="!n.isRead" [class.text-blue-600]="!n.isRead" [class.text-slate-500]="n.isRead">
+          <app-icon [name]="iconFor(n.type)" [size]="16"></app-icon>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <h6 class="font-semibold text-sm text-slate-900 leading-tight truncate">
+              {{ n.title }}
+            </h6>
+            <span *ngIf="!n.isRead" class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mt-1 line-clamp-2">{{ n.body }}</p>
+          <span class="text-[11px] font-medium text-slate-400 mt-1.5 block">{{ notificationService.timeAgo(n.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="notificationService.notifications().length === 0" class="p-8 text-center text-sm text-slate-500 font-medium">
+        لا توجد إشعارات حاليًا.
+      </div>
+    </ng-container>
   </div>
 
   <div class="px-5 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between">

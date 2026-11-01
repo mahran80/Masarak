@@ -52,7 +52,7 @@ import { TeacherDto } from '../../../../../models/academic.model';
       <!-- Loader -->
       @if (isLoading()) {
         <div class="flex justify-center py-16">
-          <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" aria-hidden="true"></div>
         </div>
       } @else {
         <!-- Teachers Grid -->

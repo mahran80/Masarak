@@ -1,206 +1,300 @@
-<div class="min-h-screen bg-slate-50 flex flex-col font-sans" dir="rtl" (click)="closeMenus()">
-  <!-- Top Navigation Bar -->
+<div class="min-h-screen bg-surface-semantic flex flex-col font-sans" dir="rtl" (click)="closeMenus()">
+  <!-- Accessible Skip Link -->
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:right-4 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-white focus:text-blue-600 focus:font-bold focus:rounded-xl focus:shadow-xl focus:border focus:border-blue-200"
+  >
+    تخطي إلى المحتوى
+  </a>
+
+  <!-- Route Navigation Progress Bar (T2-07) -->
+  @if (isNavigating()) {
+    <div
+      class="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-[100] animate-pulse"
+      role="progressbar"
+      aria-label="جارِ تحميل الصفحة..."
+    ></div>
+  }
+
+  <!-- Top Navigation Header -->
   <header
-    class="h-16 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center justify-between sticky top-0 z-50 shadow-sm"
+    class="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-sm"
     (click)="$event.stopPropagation()"
   >
-    <!-- Right side: Logo, Explore Dropdown & Search -->
-    <div class="flex items-center gap-4 md:gap-8">
-      <!-- Logo -->
-      <a routerLink="/" class="flex items-center gap-2">
+    <!-- Right side (RTL): Hamburger button + Brand Logo -->
+    <div class="flex items-center gap-3 sm:gap-4">
+      <!-- Mobile Hamburger Button (44×44px min touch target) -->
+      <button
+        type="button"
+        (click)="toggleMobileDrawer()"
+        class="flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors lg:hidden"
+        aria-label="القائمة"
+        [attr.aria-expanded]="mobileDrawerOpen()"
+      >
+        <app-icon name="menu" [size]="22"></app-icon>
+      </button>
+
+      <!-- Brand Logo -->
+      <a routerLink="/" class="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
         <span class="text-2xl font-black text-blue-600 tracking-tight">Masarak</span>
         <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">مسارك</span>
       </a>
-
-      <!-- Explore Dropdown Removed and merged to User Profile -->
     </div>
 
-
-    <!-- Left side: Notification & User Menu -->
-    <div class="flex items-center gap-4">
+    <!-- Left side (RTL): Notifications & User Profile Menu -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Notification Bell Component -->
       <app-notification-bell></app-notification-bell>
 
+      <!-- User Profile Dropdown -->
       <div class="relative">
         <button
+          type="button"
           (click)="toggleUserMenu($event)"
           aria-label="قائمة المستخدم"
-          [attr.aria-expanded]="isUserMenuOpen"
+          [attr.aria-expanded]="isUserMenuOpen()"
           aria-haspopup="true"
-          class="flex items-center gap-2 focus:outline-none hover:opacity-80 transition-opacity"
+          class="flex items-center gap-2 min-w-[44px] min-h-[44px] p-1.5 rounded-xl hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
         >
-          <div class="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold overflow-hidden">
+          <div class="w-9 h-9 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold overflow-hidden shadow-inner">
             @if (userName()?.avatarUrl) {
-              <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="Avatar" />
+              <img [src]="userName()?.avatarUrl" class="w-full h-full object-cover" (error)="onAvatarError($event)" alt="الصورة الشخصية" />
             } @else {
-              {{ userName()?.fullName?.[0] || 'U' }}
+              <span>{{ userName()?.fullName?.[0] || 'م' }}</span>
             }
           </div>
+          <span class="hidden md:inline-block text-xs font-bold text-slate-700 max-w-[110px] truncate">
+            {{ userName()?.fullName ?? 'المستخدم' }}
+          </span>
+          <app-icon name="chevron-down" [size]="16" class="text-slate-400 hidden sm:inline-block"></app-icon>
         </button>
 
-        @if (isUserMenuOpen) {
-          <nav role="menu" aria-label="قائمة التنقل" class="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg py-2 z-50 max-h-[80vh] overflow-y-auto">
-            <div class="px-4 py-3 border-b border-slate-100 mb-1">
-              <p class="font-bold text-slate-800 text-sm truncate">{{ userName()?.fullName ?? 'User' }}</p>
-              <p class="text-xs text-slate-500 truncate mt-0.5">{{ userRoleDisplay()?.role ?? 'User' }}</p>
+        <!-- Dropdown Menu (Simplified: Profile, Password, Logout) -->
+        @if (isUserMenuOpen()) {
+          <div
+            role="menu"
+            aria-label="قائمة المستخدم"
+            class="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+          >
+            <div class="px-4 py-3 border-b border-slate-100 mb-1 bg-slate-50/50">
+              <p class="font-bold text-slate-800 text-sm truncate">{{ userName()?.fullName ?? 'المستخدم' }}</p>
+              <p class="text-xs text-slate-500 truncate mt-0.5">{{ userRoleDisplay()?.role ?? 'مستخدم' }}</p>
             </div>
 
-            <!-- Role-based Links (Moved from Explore Dropdown) -->
-            @if (userRole() === 'Student') {
-              <a routerLink="/plans" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="credit-card" [size]="18"></app-icon> الخطط والاشتراكات
-              </a>
-              <a routerLink="student" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="chart" [size]="18"></app-icon> لوحة التحكم للطالب
-              </a>
-              <a routerLink="student/courses" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="book" [size]="18"></app-icon> دروسي
-              </a>
-              <a routerLink="student/lessons" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="book-open" [size]="18"></app-icon> الدروس والوحدات
-              </a>
-              <a routerLink="student/library" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="archive" [size]="18"></app-icon> مكتبه الدروس
-              </a>
-              <a routerLink="student/assignments" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="clipboard-document-list" [size]="18"></app-icon> الواجبات
-              </a>
-              <a routerLink="student/exams" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="document-check" [size]="18"></app-icon> الاختبارات
-              </a>
-              <a routerLink="student/grades" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="clipboard-document-check" [size]="18"></app-icon> الدرجات
-              </a>
-              <a routerLink="student/schedule" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="calendar" [size]="18"></app-icon> الجدول الأسبوعي
-              </a>
-              <a routerLink="student/insights" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="trend-up" [size]="18"></app-icon> رؤى التعلم
-              </a>
-              <a routerLink="/dashboard/chat" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 transition-colors">
-                <app-icon name="chat" [size]="18"></app-icon> المحادثات
-              </a>
-            } @else if (userRole() === 'Teacher') {
-              <a routerLink="teacher" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="chart" [size]="18"></app-icon> لوحة المدرس
-              </a>
-              <a routerLink="teacher/courses" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="book-open" [size]="18"></app-icon> المقررات الدراسيه
-              </a>
-              <a routerLink="teacher/lessons" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="academic-cap" [size]="18"></app-icon> الدروس
-              </a>
-              <a routerLink="teacher/students" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="users" [size]="18"></app-icon> الطلاب
-              </a>
-              <a routerLink="/dashboard/teacher/assessment/assignments/create" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="clipboard-document-list" [size]="18"></app-icon> الواجبات
-              </a>
-              <a routerLink="/dashboard/teacher/exams" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="document-check" [size]="18"></app-icon> الاختبارات
-              </a>
-              <a routerLink="/dashboard/teacher/sessions" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="video" [size]="18"></app-icon> الحصص المباشرة
-              </a>
-              <div class="border-t border-slate-100 pt-2 mt-2">
-                <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">التقييمات</p>
-                <a routerLink="/dashboard/teacher/assessment/grading" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="check-badge" [size]="18"></app-icon> لوحة التصحيح
-                </a>
-                <a routerLink="/dashboard/teacher/assessment/assignments/create" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="plus" [size]="18"></app-icon> إنشاء واجب
-                </a>
-                <a routerLink="/dashboard/teacher/assessment/exams/create" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="pencil-square" [size]="18"></app-icon> إنشاء اختبار
-                </a>
-                <a routerLink="/dashboard/teacher/assessment/question-bank" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="folder-open" [size]="18"></app-icon> بنك الأسئلة
-                </a>
-              </div>
-              <a routerLink="/dashboard/chat" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors mt-2 border-t border-slate-100 pt-2">
-                <app-icon name="chat" [size]="18"></app-icon> المحادثات
-              </a>
-            } @else if (userRole() === 'Admin') {
-              <a routerLink="/dashboard/admin" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="chart" [size]="18"></app-icon> نظرة عامة للمدير
-              </a>
-              <a routerLink="admin/users" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="users" [size]="18"></app-icon> إدارة المستخدمين
-              </a>
-              <a routerLink="admin/teachers" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="user" [size]="18"></app-icon> دليل المعلمين
-              </a>
-              <a routerLink="admin/academic" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="building" [size]="18"></app-icon> الإدارة الأكاديمية
-              </a>
-              <a routerLink="admin/schedule" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="calendar" [size]="18"></app-icon> جدول الحصص
-              </a>
-              <a routerLink="admin/performance" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="trend-up" [size]="18"></app-icon> تقارير الأداء
-              </a>
-              <a routerLink="admin/content-moderation" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="shield" [size]="18"></app-icon> إدارة المحتوى
-              </a>
-              <a routerLink="admin/subscriptions" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="credit-card" [size]="18"></app-icon> إدارة الاشتراكات
-              </a>
-              <a routerLink="admin/plans" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="clipboard-document-list" [size]="18"></app-icon> إدارة الخطط
-              </a>
-              <div class="border-t border-slate-100 pt-2 mt-2">
-                <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">الذكاء الاصطناعي</p>
-                <a routerLink="admin/platform-analytics" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="chart" [size]="18"></app-icon> تحليلات المنصة
-                </a>
-                <a routerLink="admin/prompt-editor" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                  <app-icon name="robot" [size]="18"></app-icon> قوالب الذكاء الاصطناعي
-                </a>
-              </div>
-              <a routerLink="/dashboard/chat" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors mt-2 border-t border-slate-100 pt-2">
-                <app-icon name="chat" [size]="18"></app-icon> المحادثات
-              </a>
-            } @else if (userRole() === 'Parent') {
-              <a routerLink="/dashboard/parent/subscriptions" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="credit-card" [size]="18"></app-icon> الخطط والاشتراكات
-              </a>
-              <a routerLink="parent" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="home" [size]="18"></app-icon> الرئيسية
-              </a>
-              <a routerLink="parent/children" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="family" [size]="18"></app-icon> أبنائي
-              </a>
-              <a routerLink="/dashboard/chat" routerLinkActive="bg-blue-50 text-blue-600 font-semibold" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="chat" [size]="18"></app-icon> المحادثات
-              </a>
-            }
+            <a
+              routerLink="/dashboard/profile"
+              (click)="closeMenus()"
+              role="menuitem"
+              class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none transition-colors"
+            >
+              <app-icon name="user" [size]="18" class="text-slate-400"></app-icon>
+              <span>حسابي</span>
+            </a>
 
-            <div class="border-t border-slate-100 mt-2 pt-2">
-              <a routerLink="/dashboard/profile" (click)="closeMenus()" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <app-icon name="user" [size]="18"></app-icon> حسابي
-              </a>
-            </div>
+            <a
+              routerLink="/dashboard/change-password"
+              (click)="closeMenus()"
+              role="menuitem"
+              class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 focus:outline-none transition-colors"
+            >
+              <app-icon name="lock" [size]="18" class="text-slate-400"></app-icon>
+              <span>تغيير كلمة المرور</span>
+            </a>
 
-            <div class="border-t border-slate-100 mt-1 pt-1">
-              <button
-                type="button"
-                (click)="logout(); closeMenus()"
-                class="w-full text-right flex items-center gap-3 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 font-semibold transition-colors"
-              >
-                <app-icon name="arrow-right-on-rectangle" [size]="18"></app-icon> تسجيل الخروج
-              </button>
-            </div>
-          </nav>
+            <div class="border-t border-slate-100 my-1"></div>
+
+            <button
+              type="button"
+              (click)="logout()"
+              role="menuitem"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-colors"
+            >
+              <app-icon name="logout" [size]="18" class="text-red-500"></app-icon>
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
         }
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="flex-1 w-full max-w-[98%] mx-auto p-4 md:p-8" (click)="closeMenus()">
-    <router-outlet></router-outlet>
-  </main>
+  <!-- Body Content: Sidebar + Main Area -->
+  <div class="flex flex-1 min-h-[calc(100vh-4rem)]">
+    <!-- Desktop Persistent Collapsible Sidebar -->
+    <aside
+      class="hidden lg:flex flex-col bg-white border-l border-slate-200 sticky top-16 h-[calc(100vh-4rem)] sidebar-transition z-20 shrink-0"
+      [class.w-[280px]]="sidebarExpanded()"
+      [class.w-[72px]]="!sidebarExpanded()"
+      aria-label="الشريط الجانبي"
+    >
+      <nav aria-label="القائمة الرئيسية" class="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-6">
+        @for (group of navGroups(); track group.heading) {
+          <div>
+            @if (sidebarExpanded()) {
+              <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                {{ group.heading }}
+              </h3>
+            } @else {
+              <div class="my-2 border-t border-slate-100" title="{{ group.heading }}"></div>
+            }
 
-  <!-- Footer (A-05) -->
+            <div class="space-y-1">
+              @for (item of group.items; track item.route) {
+                <a
+                  [routerLink]="item.route"
+                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                  routerLinkActive="bg-blue-50 text-blue-600 font-bold"
+                  #rla="routerLinkActive"
+                  [attr.aria-current]="rla.isActive ? 'page' : null"
+                  class="group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.text-slate-700]="!rla.isActive"
+                  [class.hover:bg-slate-100]="!rla.isActive"
+                  [class.hover:text-slate-900]="!rla.isActive"
+                >
+                  <app-icon
+                    [name]="item.icon"
+                    [size]="20"
+                    [class.text-blue-600]="rla.isActive"
+                    class="text-slate-400 group-hover:text-slate-700 transition-colors"
+                  ></app-icon>
+
+                  @if (sidebarExpanded()) {
+                    <span class="truncate">{{ item.label }}</span>
+                  }
+
+                  <!-- Tooltip when collapsed -->
+                  @if (!sidebarExpanded()) {
+                    <span
+                      class="sr-only sm:not-sr-only absolute right-full mr-2 hidden group-hover:flex items-center px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none"
+                    >
+                      {{ item.label }}
+                    </span>
+                  }
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </nav>
+
+      <!-- Sidebar Collapse Toggle Button -->
+      <div class="p-3 border-t border-slate-100 bg-white">
+        <button
+          type="button"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="sidebarExpanded() ? 'طي القائمة الجانبية' : 'توسيع القائمة الجانبية'"
+          class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          @if (sidebarExpanded()) {
+            <app-icon name="chevron-right" [size]="18"></app-icon>
+            <span class="truncate">طي القائمة</span>
+          } @else {
+            <app-icon name="chevron-left" [size]="18"></app-icon>
+          }
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Off-Canvas Drawer -->
+    @if (mobileDrawerOpen()) {
+      <!-- Backdrop -->
+      <div
+        class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+        (click)="closeMobileDrawer()"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Drawer Content with Focus Trap -->
+      <div
+        cdkTrapFocus
+        [cdkTrapFocusAutoCapture]="true"
+        role="dialog"
+        aria-modal="true"
+        aria-label="قائمة التنقل الجانبية"
+        class="fixed inset-y-0 right-0 w-[280px] max-w-[85vw] bg-white shadow-2xl z-50 lg:hidden flex flex-col drawer-transition"
+      >
+        <!-- Drawer Header -->
+        <div class="h-16 px-5 border-b border-slate-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-black text-blue-600">Masarak</span>
+            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">مسارك</span>
+          </div>
+
+          <button
+            type="button"
+            (click)="closeMobileDrawer()"
+            class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            aria-label="إغلاق القائمة"
+          >
+            <app-icon name="close" [size]="20"></app-icon>
+          </button>
+        </div>
+
+        <!-- Drawer Navigation Items -->
+        <nav aria-label="قائمة الهاتف" class="flex-1 overflow-y-auto p-4 space-y-6">
+          @for (group of navGroups(); track group.heading) {
+            <div>
+              <h3 class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                {{ group.heading }}
+              </h3>
+
+              <div class="space-y-1">
+                @for (item of group.items; track item.route) {
+                  <a
+                    [routerLink]="item.route"
+                    [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                    routerLinkActive="bg-blue-50 text-blue-600 font-bold"
+                    #rlaMob="routerLinkActive"
+                    [attr.aria-current]="rlaMob.isActive ? 'page' : null"
+                    (click)="closeMobileDrawer()"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.text-slate-700]="!rlaMob.isActive"
+                    [class.hover:bg-slate-100]="!rlaMob.isActive"
+                  >
+                    <app-icon
+                      [name]="item.icon"
+                      [size]="20"
+                      [class.text-blue-600]="rlaMob.isActive"
+                      class="text-slate-400"
+                    ></app-icon>
+                    <span>{{ item.label }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+        </nav>
+
+        <!-- Drawer Footer: Profile & Logout -->
+        <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-2">
+          <div class="px-3 py-1">
+            <p class="font-bold text-sm text-slate-800 truncate">{{ userName()?.fullName ?? 'المستخدم' }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ userRoleDisplay()?.role ?? 'مستخدم' }}</p>
+          </div>
+
+          <button
+            type="button"
+            (click)="logout()"
+            class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 bg-white border border-red-200 hover:bg-red-50 transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-red-500"
+          >
+            <app-icon name="logout" [size]="18" class="text-red-500"></app-icon>
+            <span>تسجيل الخروج</span>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto" (click)="closeMenus()">
+      <!-- Unified Automatic Route-Data-Driven Breadcrumbs (T2-03) -->
+      <app-breadcrumb></app-breadcrumb>
+
+      <!-- Router Outlet for Child Pages -->
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <!-- Accessible Footer -->
   <footer class="mt-auto py-5 border-t border-slate-200 bg-white text-center text-xs text-slate-500">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center gap-2">

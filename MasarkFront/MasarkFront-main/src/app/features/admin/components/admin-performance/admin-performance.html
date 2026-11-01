@@ -53,7 +53,7 @@
         [disabled]="!selectedClass() || !selectedSubject() || isLoading()"
         class="h-[44px] px-8 bg-[#4F8CD4] hover:bg-blue-600 text-white rounded-xl text-[13px] font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px] shadow-sm hover:shadow active:scale-95">
         @if (isLoading()) {
-          <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></div>
         } @else {
           بحث
         }

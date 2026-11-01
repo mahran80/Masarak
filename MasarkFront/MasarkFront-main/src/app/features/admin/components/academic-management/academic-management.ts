@@ -1,4 +1,5 @@
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { FormFieldComponent } from '../../../../shared/components/form-field/form-field.component';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { AdminApiService } from '../../../../core/services/admin-api-service';
 @Component({
   selector: 'app-academic-management',
   standalone: true,
-  imports: [IconComponent, CommonModule, FormsModule],
+  imports: [IconComponent, CommonModule, FormsModule, FormFieldComponent],
   templateUrl: './academic-management.html',
   styleUrl: './academic-management.css',
 })
@@ -16,7 +17,8 @@ export class AcademicManagementComponent implements OnInit {
   private readonly api = inject(AcademicApiService);
   private readonly adminApi = inject(AdminApiService);
 
-  activeTab = signal<'grades' | 'subjects' | 'classes' | 'roster' | 'teachers' | 'specializations'>('grades');
+  activeTab = signal<'grades' | 'subjects' | 'classes' | 'specializations'>('grades');
+  classSubTab = signal<'info' | 'roster' | 'teachers'>('info');
   
   // Data State
   grades = signal<any[]>([]);
@@ -39,6 +41,20 @@ export class AcademicManagementComponent implements OnInit {
   selectedTeacher = signal<number | null>(null);
   academicYear = signal<string>(new Date().getFullYear().toString());
 
+  readonly selectedGradeName = computed(() => {
+    const gid = this.selectedGrade();
+    if (!gid) return '';
+    const g = this.grades().find(item => item.gradeId === gid);
+    return g ? (g.nameAr || g.name) : '';
+  });
+
+  readonly selectedClassName = computed(() => {
+    const cid = this.selectedClass();
+    if (!cid) return '';
+    const c = this.classes().find(item => item.classId === cid);
+    return c ? c.name : '';
+  });
+
   // Enrollment State
   // Enrollment type and subjects are automatically inferred by the backend based on Active Subscription
 
@@ -50,6 +66,7 @@ export class AcademicManagementComponent implements OnInit {
 
   // Form & Feedback State
   formData: any = {};
+  modalErrors = signal<Record<string, string>>({});
   feedbackMsg = signal<string>('');
   feedbackType = signal<'success' | 'error'>('success');
   confirmAction = signal<{ msg: string, action: () => void } | null>(null);
@@ -76,19 +93,40 @@ export class AcademicManagementComponent implements OnInit {
   }
 
   setTab(tab: 'grades' | 'subjects' | 'classes' | 'roster' | 'teachers' | 'specializations') {
+    if (tab === 'roster') {
+      this.activeTab.set('classes');
+      this.setClassSubTab('roster');
+      return;
+    }
+    if (tab === 'teachers') {
+      this.activeTab.set('classes');
+      this.setClassSubTab('teachers');
+      return;
+    }
     this.activeTab.set(tab);
     if (tab === 'grades') this.loadGrades();
     if (tab === 'subjects' && this.selectedGrade()) this.loadSubjects();
-    if (tab === 'classes' && this.selectedGrade()) this.loadClasses();
-    if (tab === 'roster' && this.selectedClass()) this.loadRoster();
-    if (tab === 'teachers' && this.selectedClass()) {
-      this.loadTeachers();
-      // Subjects must be loaded for the assignment dropdown — use the class's grade
-      if (!this.subjects().length && this.selectedGrade()) this.loadSubjects();
+    if (tab === 'classes') {
+      if (this.selectedGrade()) this.loadClasses();
+      if (this.classSubTab() === 'roster' && this.selectedClass()) this.loadRoster();
+      if (this.classSubTab() === 'teachers' && this.selectedClass()) {
+        this.loadTeachers();
+        if (!this.subjects().length && this.selectedGrade()) this.loadSubjects();
+      }
     }
     if (tab === 'specializations') {
       if (!this.allCategories().length) this.loadAllCategories();
       if (this.selectedTeacher()) this.loadTeacherSpecializations();
+    }
+  }
+
+  setClassSubTab(subTab: 'info' | 'roster' | 'teachers') {
+    this.classSubTab.set(subTab);
+    if (subTab === 'info' && this.selectedGrade()) this.loadClasses();
+    if (subTab === 'roster' && this.selectedClass()) this.loadRoster();
+    if (subTab === 'teachers' && this.selectedClass()) {
+      this.loadTeachers();
+      if (!this.subjects().length && this.selectedGrade()) this.loadSubjects();
     }
   }
 
@@ -145,11 +183,12 @@ export class AcademicManagementComponent implements OnInit {
 
   onClassSelect(cid: number) {
     this.selectedClass.set(cid);
-    if (this.activeTab() === 'roster') this.loadRoster();
-    if (this.activeTab() === 'teachers') {
-      this.loadTeachers();
-      // Always refresh subjects for the selected grade when on teachers tab
-      if (this.selectedGrade()) this.loadSubjects();
+    if (this.activeTab() === 'classes') {
+      if (this.classSubTab() === 'roster') this.loadRoster();
+      if (this.classSubTab() === 'teachers') {
+        this.loadTeachers();
+        if (this.selectedGrade()) this.loadSubjects();
+      }
     }
   }
 
@@ -179,12 +218,19 @@ export class AcademicManagementComponent implements OnInit {
   openModal(type: 'grade' | 'subject' | 'class', mode: 'create' | 'edit', data?: any) {
     this.modalType.set(type);
     this.modalMode.set(mode);
+    this.modalErrors.set({});
     this.formData = data ? { ...data } : {};
+    if (type === 'grade' && mode === 'create') {
+      this.formData.stage = this.formData.stage ?? '0';
+      const maxOrder = this.grades().length ? Math.max(...this.grades().map(g => Number(g.order) || 0), 0) : 0;
+      this.formData.order = this.formData.order ?? (maxOrder + 1);
+    }
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.modalErrors.set({});
     this.formData = {};
   }
 
@@ -192,12 +238,62 @@ export class AcademicManagementComponent implements OnInit {
     const type = this.modalType();
     const mode = this.modalMode();
     const data = this.formData;
+    const errors: Record<string, string> = {};
 
     if (!data.name?.trim()) {
-      this.showFeedback('حقل الاسم مطلوب.', 'error');
+      errors['name'] = 'حقل الاسم مطلوب.';
+    }
+
+    if (type === 'subject') {
+      if (!data.code?.trim()) {
+        errors['code'] = 'رمز المادة مطلوب.';
+      }
+    }
+
+    if (type === 'class') {
+      const yr = Number(this.academicYear());
+      if (isNaN(yr) || yr < 2020) {
+        this.showFeedback('سنة أكاديمية غير صالحة.', 'error');
+        return;
+      }
+      if (mode === 'create') {
+        const cap = Number(data.maxCapacity ?? 30);
+        if (isNaN(cap) || cap < 1) {
+          errors['maxCapacity'] = 'الطاقة الاستيعابية يجب أن تكون رقماً أكبر من صفر.';
+        }
+      }
+    }
+
+    if (type === 'grade' && mode === 'create') {
+      const stageNum = Number(data.stage);
+      const orderNum = Number(data.order);
+      if (isNaN(stageNum)) {
+        errors['stage'] = 'المرحلة التعليمية مطلوبة.';
+      }
+      if (isNaN(orderNum) || orderNum <= 0) {
+        errors['order'] = 'الترتيب يجب أن يكون رقماً أكبر من صفر.';
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      this.modalErrors.set(errors);
+      this.showFeedback('يرجى تصحيح الأخطاء في النموذج.', 'error');
+      return;
+    }
+    this.modalErrors.set({});
+
+    if (mode === 'edit') {
+      const typeLabel = type === 'grade' ? 'المرحلة' : type === 'subject' ? 'المادة' : 'الفصل';
+      this.showConfirm(`هل أنت متأكد من حفظ تعديلات ${typeLabel}؟`, () => {
+        this.executeSaveModal(type, mode, data);
+      });
       return;
     }
 
+    this.executeSaveModal(type, mode, data);
+  }
+
+  private executeSaveModal(type: 'grade' | 'subject' | 'class', mode: 'create' | 'edit', data: any) {
     const handleResult = (obs: import('rxjs').Observable<any>, successMsg: string, errorMsg: string, reloadFn: () => void) => {
       obs.subscribe({
         next: () => { this.closeModal(); reloadFn.call(this); this.showFeedback(successMsg); },
@@ -206,10 +302,6 @@ export class AcademicManagementComponent implements OnInit {
     };
 
     if (type === 'subject') {
-      if (!data.code?.trim()) {
-        this.showFeedback('رمز المادة مطلوب.', 'error');
-        return;
-      }
       if (mode === 'create') {
         const req = { gradeId: this.selectedGrade()!, name: data.name, nameAr: data.nameAr || undefined, code: data.code };
         handleResult(this.api.createSubject(req), 'تمت إضافة المادة بنجاح.', 'فشل إنشاء المادة.', this.loadSubjects);
@@ -220,10 +312,6 @@ export class AcademicManagementComponent implements OnInit {
 
     if (type === 'class') {
       const yr = Number(this.academicYear());
-      if (isNaN(yr) || yr < 2020) {
-        this.showFeedback('سنة أكاديمية غير صالحة.', 'error');
-        return;
-      }
       if (mode === 'create') {
         const req = { gradeId: this.selectedGrade()!, name: data.name, maxCapacity: Number(data.maxCapacity ?? 30), academicYear: yr };
         handleResult(this.api.createClass(req), 'تمت إضافة الفصل بنجاح.', 'فشل إنشاء الفصل.', this.loadClasses);

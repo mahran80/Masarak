@@ -7,10 +7,12 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-student-lessons',
   standalone: true,
-  imports: [BreadcrumbComponent, CommonModule, IconComponent],
+  imports: [BreadcrumbComponent, CommonModule, IconComponent, RouterLink],
   templateUrl: './student-lessons.component.html',
 })
 export class StudentLessonsComponent implements OnInit {

@@ -3,11 +3,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ParentService } from '../../services/parent.service';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { ChildContextBarComponent } from '../../components/child-context-bar/child-context-bar.component';
 
 @Component({
   selector: 'app-parent-schedule',
   standalone: true,
-  imports: [CommonModule, IconComponent, RouterLink],
+  imports: [CommonModule, IconComponent, RouterLink, ChildContextBarComponent],
   templateUrl: './parent-schedule.html'
 })
 export class ParentScheduleComponent implements OnInit {

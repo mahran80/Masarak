@@ -128,7 +128,7 @@ import { ParentService } from '../../services/parent.service';
             
             <div class="h-px bg-slate-100 mx-4"></div>
 
-            <a routerLink="/plans" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
+            <a routerLink="/dashboard/parent/subscriptions" class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-50 transition-colors group">
               <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
                 <app-icon name="credit-card" size="1.2em"></app-icon>
               </div>

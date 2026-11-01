@@ -328,7 +328,7 @@
               <button id="btn-submit-upload" (click)="submitUpload()" [disabled]="isUploading()"
                 class="flex items-center justify-center gap-2 bg-[#4F8CD4] hover:bg-blue-600 disabled:opacity-60 text-white font-bold px-8 py-3 rounded-xl text-sm transition-all active:scale-95">
                 @if (isUploading()) {
-                  <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
                   جارٍ الرفع...
                 } @else if (uploadMode() === 'file') {
                   <app-icon name="upload" size="1.2em"></app-icon> رفع الملف

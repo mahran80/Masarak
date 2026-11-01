@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
         <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
              [ngClass]="isVerifying ? 'bg-blue-100 text-blue-600' : (verificationSuccess ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600')">
           @if (isVerifying) {
-            <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24">
+            <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -89,7 +89,7 @@ export class CheckoutSuccessComponent implements OnInit {
     if (this.auth.userRole() === 'Parent') {
       this.router.navigate(['/dashboard/parent/subscriptions']);
     } else {
-      this.router.navigate(['/my-subscription']);
+      this.router.navigate(['/dashboard/my-subscription']);
     }
   }
 }

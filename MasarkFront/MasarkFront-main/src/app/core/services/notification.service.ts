@@ -9,6 +9,7 @@ export class NotificationService {
   private readonly baseUrl = `${environment.apiUrl}/notifications`;
 
   private readonly _notifications = signal<NotificationDto[]>([]);
+  private readonly _isLoading = signal<boolean>(false);
 
   readonly notifications = computed(() =>
     [...this._notifications()]
@@ -20,9 +21,18 @@ export class NotificationService {
     this._notifications().filter(n => !n.isRead).length
   );
 
+  readonly isLoading = this._isLoading.asReadonly();
+
   loadNotifications(): void {
-    this.http.get<{ items: NotificationDto[] }>(`${this.baseUrl}?page=1&pageSize=50&unreadOnly=false`).subscribe(res => {
-      this._notifications.set(res.items || (res as any as NotificationDto[]) || []);
+    this._isLoading.set(true);
+    this.http.get<{ items: NotificationDto[] }>(`${this.baseUrl}?page=1&pageSize=50&unreadOnly=false`).subscribe({
+      next: res => {
+        this._notifications.set(res.items || (res as any as NotificationDto[]) || []);
+        this._isLoading.set(false);
+      },
+      error: () => {
+        this._isLoading.set(false);
+      }
     });
   }
 

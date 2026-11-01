@@ -73,7 +73,7 @@
         <!-- Expanded Details -->
         <div *ngIf="expandedLessonId === lesson.lessonId" class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-4 sm:px-5 sm:py-5">
           <div *ngIf="!lessonDetails[lesson.lessonId]" class="flex items-center justify-center gap-2 py-6 text-gray-500">
-            <span class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+            <span class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
             <span class="text-sm">جاري التحميل...</span>
           </div>
           <div *ngIf="lessonDetails[lesson.lessonId] as detail">
@@ -83,7 +83,7 @@
               <h4 class="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
                 <app-icon name="document-text" [size]="16"></app-icon> المحتوى التعليمي
               </h4>
-              <div *ngIf="detail.contentItems?.length; else noContent" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.contentItems.length; else noContent" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div *ngFor="let item of detail.contentItems" 
                      (click)="openContent(item.resourceUrl)"
                      class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-indigo-300 transition-colors flex items-center gap-3"
@@ -109,7 +109,7 @@
               <h4 class="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-3 flex items-center gap-2">
                 <app-icon name="document-check" [size]="16"></app-icon> الاختبارات
               </h4>
-              <div *ngIf="detail.exams?.length; else noExams" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.exams.length; else noExams" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div *ngFor="let item of detail.exams" 
                      class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
                   <h5 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
@@ -117,7 +117,7 @@
                     <span class="inline-flex items-center gap-1 text-xs text-gray-500">
                       <app-icon name="clock" [size]="12"></app-icon> {{ item.durationMinutes }} دقيقة
                     </span>
-                    <a [href]="'/dashboard/student/exams'" class="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">الانتقال للاختبارات</a>
+                    <a routerLink="/dashboard/student/exams" class="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">الانتقال للاختبارات</a>
                   </div>
                 </div>
               </div>
@@ -129,7 +129,7 @@
               <h4 class="text-sm font-medium text-orange-600 dark:text-orange-400 mb-3 flex items-center gap-2">
                 <app-icon name="clipboard-document-list" [size]="16"></app-icon> الواجبات
               </h4>
-              <div *ngIf="detail.assignments?.length; else noAssig" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div *ngIf="detail.assignments.length; else noAssig" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div *ngFor="let item of detail.assignments" 
                      class="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
                   <h5 class="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">{{ item.title }}</h5>
@@ -137,11 +137,18 @@
                     <span class="inline-flex items-center gap-1 text-xs text-gray-500">
                       <app-icon name="calendar" [size]="12"></app-icon> {{ item.dueDate | date:'mediumDate' }}
                     </span>
-                    <a [href]="'/dashboard/student/assignments'" class="text-xs font-medium text-orange-600 hover:text-orange-700 transition-colors">الانتقال للواجبات</a>
+                    <a routerLink="/dashboard/student/assignments" class="text-xs font-medium text-orange-600 hover:text-orange-700 transition-colors">الانتقال للواجبات</a>
                   </div>
                 </div>
               </div>
               <ng-template #noAssig><p class="text-sm text-gray-500">لا توجد واجبات</p></ng-template>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-200">
+              <a [routerLink]="['/dashboard/student/assignments']"
+                 class="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                📋 عرض الواجبات المرتبطة
+              </a>
             </div>
 
           </div>

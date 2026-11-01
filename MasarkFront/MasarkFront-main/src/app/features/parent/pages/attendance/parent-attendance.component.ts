@@ -3,13 +3,17 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ParentService } from '../../services/parent.service';
+import { ChildContextBarComponent } from '../../components/child-context-bar/child-context-bar.component';
 
 @Component({
   selector: 'app-parent-attendance',
   standalone: true,
-  imports: [IconComponent, CommonModule],
+  imports: [IconComponent, CommonModule, ChildContextBarComponent],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
+      @if (studentId()) {
+        <app-child-context-bar [studentId]="studentId()" />
+      }
       <!-- Header -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
         <div class="flex items-center gap-4">
